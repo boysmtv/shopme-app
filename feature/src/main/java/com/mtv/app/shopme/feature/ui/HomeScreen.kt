@@ -71,16 +71,14 @@ fun HomeScreen(
                 Brush.verticalGradient(
                     colors = listOf(
                         AppColor.LightOrange,
-                        AppColor.White
+                        AppColor.WhiteSoft
                     )
                 )
             )
-            .padding(
-                top = 16.dp,
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 24.dp)
+            .padding(16.dp)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         HomeHeader()
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -8,15 +8,22 @@
 
 package com.mtv.app.shopme.nav
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.mtv.app.shopme.common.AppColor
 
 @Composable
 fun AppNavigation() {
@@ -32,19 +39,30 @@ fun AppNavigation() {
         BottomNavItem.Profile.route
     )
 
-    Scaffold(
-        bottomBar = {
-            if (currentRoute in bottomRoutes) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        AppColor.LightOrange,
+                        AppColor.WhiteSoft
+                    )
+                )
+            )
+    ) {
+        AppNavGraph(navController)
+
+        if (currentRoute in bottomRoutes) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+                    .align(Alignment.BottomCenter),
+                contentAlignment = Alignment.Center
+            ) {
                 BottomNavigationBar(navController)
             }
-        }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ) {
-            AppNavGraph(navController)
         }
     }
 }
