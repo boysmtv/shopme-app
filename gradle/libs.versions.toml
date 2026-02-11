@@ -1,0 +1,134 @@
+[versions]
+agp = "8.13.2"
+animation = "1.10.2"
+appcompat = "1.7.1"
+coilCompose = "2.7.0"
+composeBom = "2026.01.01"
+core = "13.0.0"
+coreKtx = "1.17.0"
+coroutines = "1.7.3"
+exifinterface = "1.4.2"
+espressoCore = "3.7.0"
+firebaseAuthInterop = "20.0.0"
+firebaseAuthKtx = "24.0.1"
+firebaseBom = "33.5.1"
+firebaseCommonKtx = "21.0.0"
+foundation = "1.10.2"
+google-services = "4.4.0"
+gson = "2.10.1"
+hilt = "2.51"
+hiltCompose = "1.0.0"
+junit = "4.13.2"
+junitExt = "1.3.0"
+kotlin = "2.0.21"
+kotlinxSerialization = "1.6.0"
+ksp = "2.0.21-1.0.25"
+ktor = "2.3.5"
+lifecycleRuntimeKtx = "2.10.0"
+lifecycleViewModelKtx = "2.10.0"
+material = "1.13.0"
+material3 = "1.4.0"
+materialVersion = "1.6.7"
+moshi = "1.15.0"
+mtvCore = "1.0.0"
+navigationCompose = "2.8.0"
+okhttp = "4.11.0"
+retrofit = "2.9.0"
+threetenabp = "1.4.6"
+uiTooling = "1.10.1"
+uiToolingPreview = "1.10.1"
+
+[libraries]
+
+# --- AndroidX Core ---
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+
+# --- Lifecycle ---
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewModelKtx" }
+
+# --- Compose BOM & UI ---
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
+
+# --- Material ---
+androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+
+# --- Navigation ---
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+
+# --- Coroutines & Serialization ---
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+# --- Dependency Injection ---
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltCompose" }
+
+# --- Networking ---
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofit" }
+retrofit-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
+moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshi" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+
+# --- Ktor ---
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+# --- Firebase ---
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-common-ktx = { module = "com.google.firebase:firebase-common-ktx"}
+firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx" }
+firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-auth-interop = { module = "com.google.firebase:firebase-auth-interop"}
+
+# --- Media & Utils ---
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
+exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
+core-youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "core" }
+
+# --- Testing ---
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitExt" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+# --- MTV Core Libraries ---
+mtv-core-network = { group = "com.mtv.based.core", name = "network", version.ref = "mtvCore" }
+mtv-core-provider = { group = "com.mtv.based.core", name = "provider", version.ref = "mtvCore" }
+
+# --- MTV UI Component Libraries ---
+mtv-ui-component = { group = "com.mtv.based.uicomponent", name = "component", version.ref = "mtvCore" }
+mtv-ui-ui = { group = "com.mtv.based.uicomponent", name = "ui", version.ref = "mtvCore" }
+mtv-ui-theme = { group = "com.mtv.based.uicomponent", name = "theme-ui", version.ref = "mtvCore" }
+
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
+hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerialization" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+maven-publish = { id = "maven-publish" }
+signing = { id = "signing" }
