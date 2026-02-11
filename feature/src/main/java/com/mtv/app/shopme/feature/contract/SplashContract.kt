@@ -23,5 +23,5 @@ data class SplashEventListener(
 )
 
 data class SplashNavigationListener(
-    val onBack: () -> Unit,
+    val onNavigateToHome: () -> Unit,
 )

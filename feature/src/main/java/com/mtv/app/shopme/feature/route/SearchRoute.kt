@@ -22,12 +22,12 @@ import com.mtv.app.shopme.feature.presentation.SearchViewModel
 fun SearchRoute(nav: NavController) {
     BaseRoute<SearchViewModel, SearchStateListener, SearchDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
-            SearchScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = searchEvent(vm),
-                uiNavigation = searchNavigation(nav)
-            )
+//            SearchScreen(
+//                uiState = uiState,
+//                uiData = uiData,
+//                uiEvent = searchEvent(vm),
+//                uiNavigation = searchNavigation(nav)
+//            )
         }
     }
 }

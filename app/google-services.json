@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "870455241065",
+    "project_id": "shopme-app-360b4",
+    "storage_bucket": "shopme-app-360b4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:870455241065:android:76c3f0351cddb70a5f75f8",
+        "android_client_info": {
+          "package_name": "com.mtv.app.shopme"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7mMrrZWLBfk0SEo4oWuV7fUMuiBHXjrk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

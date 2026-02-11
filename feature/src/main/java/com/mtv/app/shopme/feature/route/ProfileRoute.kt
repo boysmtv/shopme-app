@@ -22,12 +22,12 @@ import com.mtv.app.shopme.feature.presentation.ProfileViewModel
 fun ProfileRoute(nav: NavController) {
     BaseRoute<ProfileViewModel, ProfileStateListener, ProfileDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
-            ProfileScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = profileEvent(vm),
-                uiNavigation = profileNavigation(nav)
-            )
+//            ProfileScreen(
+//                uiState = uiState,
+//                uiData = uiData,
+//                uiEvent = profileEvent(vm),
+//                uiNavigation = profileNavigation(nav)
+//            )
         }
     }
 }

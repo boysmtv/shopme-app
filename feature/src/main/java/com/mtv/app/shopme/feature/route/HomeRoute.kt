@@ -17,6 +17,7 @@ import com.mtv.app.shopme.feature.contract.HomeEventListener
 import com.mtv.app.shopme.feature.contract.HomeNavigationListener
 import com.mtv.app.shopme.feature.contract.HomeStateListener
 import com.mtv.app.shopme.feature.presentation.HomeViewModel
+import com.mtv.app.shopme.feature.ui.HomeScreen
 
 @Composable
 fun HomeRoute(nav: NavController) {
