@@ -11,6 +11,7 @@ package com.mtv.app.shopme.feature.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -72,13 +73,27 @@ fun CartScreen(
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        Text(
-            text = "${cartItems.size} Items",
-            fontFamily = PoppinsFont,
-            modifier = Modifier.padding(start = 20.dp, bottom = 12.dp),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Total Cart ${cartItems.size} Items",
+                fontFamily = PoppinsFont,
+                modifier = Modifier.padding(start = 20.dp, bottom = 12.dp),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = "Clear Cart",
+                fontFamily = PoppinsFont,
+                modifier = Modifier.padding(end = 20.dp, bottom = 12.dp),
+                fontSize = 14.sp,
+                color = AppColor.Orange,
+                fontWeight = FontWeight.Medium
+            )
+        }
 
         LazyColumn(
             modifier = Modifier

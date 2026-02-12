@@ -112,6 +112,7 @@ dependencies {
     /* =========================
      * Date & Time
      * ========================= */
+    implementation(libs.coil.compose)
     implementation(libs.threetenabp)
 
     /* =========================
