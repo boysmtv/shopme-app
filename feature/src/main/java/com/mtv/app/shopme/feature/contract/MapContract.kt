@@ -20,11 +20,11 @@ data class MapDataListener(
 )
 
 data class MapEventListener(
-    val onDismissActiveDialog: () -> Unit
+    val onDismissActiveDialog: () -> Unit = {}
 )
 
 data class MapNavigationListener(
-    val onBack: () -> Unit
+    val onBack: () -> Unit = {}
 )
 
 sealed class MapDialog {

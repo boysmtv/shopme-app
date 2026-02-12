@@ -11,22 +11,31 @@ package com.mtv.app.shopme.feature.contract
 import com.mtv.based.core.network.utils.ResourceFirebase
 
 data class ProfileStateListener(
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
     val activeDialog: ProfileDialog? = null
 )
 
 data class ProfileDataListener(
-    val emptyData: String? = null
+    val userName: String = "Dedy Wijaya",
+    val email: String = "dedy.wijaya@email.com"
 )
 
 data class ProfileEventListener(
-    val onDismissActiveDialog: () -> Unit
+    val onDismissDialog: () -> Unit = {},
 )
 
 data class ProfileNavigationListener(
-    val onBack: () -> Unit,
+    val onEditProfile: () -> Unit = {},
+    val onAddress: () -> Unit = {},
+    val onPayment: () -> Unit = {},
+    val onOrderHistory: () -> Unit = {},
+    val onTracking: () -> Unit = {},
+    val onWishlist: () -> Unit = {},
+    val onSettings: () -> Unit = {},
+    val onHelpCenter: () -> Unit = {},
+    val onAbout: () -> Unit = {},
+    val onBack: () -> Unit = {}
 )
 
 sealed class ProfileDialog {
-    object Success : ProfileDialog()
+    object LogoutConfirm : ProfileDialog()
 }

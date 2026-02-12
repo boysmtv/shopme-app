@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
@@ -202,13 +203,28 @@ fun DetailTitle() {
 fun DetailLocation() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
+            imageVector = Icons.Default.Home,
+            contentDescription = null,
+            tint = AppColor.Orange
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = "Mamah Al Cafe",
+            color = Color.DarkGray,
+            fontSize = 14.sp,
+            fontFamily = PoppinsFont,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Icon(
             imageVector = Icons.Default.LocationOn,
             contentDescription = null,
             tint = AppColor.Orange
         )
+        Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = "New York, AUS",
-            color = AppColor.Gray,
+            text = "Puri Lestari - Blok H12/01",
+            color = Color.DarkGray,
             fontSize = 14.sp,
             fontFamily = PoppinsFont
         )

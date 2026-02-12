@@ -70,6 +70,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":data"))
 
     /* =========================
      * Core & Lifecycle
@@ -132,6 +133,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.exifinterface)
 
     /* =========================
      * Date & Time

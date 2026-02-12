@@ -10,23 +10,8 @@ package com.mtv.app.shopme.feature.contract
 
 import com.mtv.based.core.network.utils.ResourceFirebase
 
-data class SearchStateListener(
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
-    val activeDialog: SearchDialog? = null
-)
+data class SearchStateListener(val loading: Boolean = false)
+data class SearchDataListener(val query: String = "", val results: List<String> = emptyList())
+data class SearchEventListener(val onQueryChanged: (String) -> Unit = {})
+data class SearchNavigationListener(val onBack: () -> Unit = {})
 
-data class SearchDataListener(
-    val emptyData: String? = null
-)
-
-data class SearchEventListener(
-    val onDismissActiveDialog: () -> Unit
-)
-
-data class SearchNavigationListener(
-    val onBack: () -> Unit,
-)
-
-sealed class SearchDialog {
-    object Success : SearchDialog()
-}

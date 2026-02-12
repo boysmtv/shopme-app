@@ -17,17 +17,18 @@ import com.mtv.app.shopme.feature.contract.MapEventListener
 import com.mtv.app.shopme.feature.contract.MapNavigationListener
 import com.mtv.app.shopme.feature.contract.MapStateListener
 import com.mtv.app.shopme.feature.presentation.MapViewModel
+import com.mtv.app.shopme.feature.ui.MapScreen
 
 @Composable
 fun MapRoute(nav: NavController) {
     BaseRoute<MapViewModel, MapStateListener, MapDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
-//            MapScreen(
-//                uiState = uiState,
-//                uiData = uiData,
-//                uiEvent = mapEvent(vm),
-//                uiNavigation = mapNavigation(nav)
-//            )
+            MapScreen(
+                uiState = uiState,
+                uiData = uiData,
+                uiEvent = mapEvent(vm),
+                uiNavigation = mapNavigation(nav)
+            )
         }
     }
 }

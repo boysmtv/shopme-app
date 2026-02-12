@@ -48,10 +48,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.InterFont
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.mockFoodList
+import com.mtv.app.shopme.data.FoodItemModel
 import com.mtv.app.shopme.feature.contract.HomeDataListener
 import com.mtv.app.shopme.feature.contract.HomeEventListener
 import com.mtv.app.shopme.feature.contract.HomeNavigationListener
@@ -409,7 +412,7 @@ fun CategoryItem(title: String) {
 
 @Composable
 fun FoodCard(
-    item: FoodItem,
+    item: FoodItemModel,
     onClickDetail: () -> Unit
 ) {
     Card(
@@ -423,7 +426,7 @@ fun FoodCard(
     ) {
         Column {
             Image(
-                painter = painterResource(id = item.imageRes),
+                painter = rememberAsyncImagePainter(item.imageUrl),
                 contentDescription = item.name,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -452,66 +455,6 @@ fun FoodCard(
         }
     }
 }
-
-// DATA MODEL
-data class FoodItem(
-    val id: Int,
-    val name: String,
-    val price: Double,
-    val imageRes: Int
-)
-
-// MOCK DATA
-val mockFoodList = listOf(
-    FoodItem(
-        id = 1,
-        name = "Grilled Cheeseburger",
-        price = 9.99,
-        imageRes = R.drawable.image_burger
-    ),
-    FoodItem(
-        id = 2,
-        name = "Fried Chicken Bucket",
-        price = 12.49,
-        imageRes = R.drawable.image_pizza
-    ),
-    FoodItem(
-        id = 3,
-        name = "Double Beef Burger",
-        price = 10.99,
-        imageRes = R.drawable.image_platbread
-    ),
-    FoodItem(
-        id = 4,
-        name = "Hotdog Original",
-        price = 7.49,
-        imageRes = R.drawable.image_cheese_burger
-    ),
-    FoodItem(
-        id = 5,
-        name = "Pepperoni Pizza Slice",
-        price = 4.99,
-        imageRes = R.drawable.image_burger
-    ),
-    FoodItem(
-        id = 6,
-        name = "BBQ Chicken Pizza",
-        price = 11.49,
-        imageRes = R.drawable.image_pizza
-    ),
-    FoodItem(
-        id = 7,
-        name = "Crispy Fries",
-        price = 3.29,
-        imageRes = R.drawable.image_platbread
-    ),
-    FoodItem(
-        id = 8,
-        name = "Spaghetti Bolognese",
-        price = 8.79,
-        imageRes = R.drawable.image_cheese_burger
-    )
-)
 
 // PREVIEWS
 @Preview(showBackground = true)
