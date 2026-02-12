@@ -39,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.feature.contract.SplashDataListener
 import com.mtv.app.shopme.feature.contract.SplashEventListener
 import com.mtv.app.shopme.feature.contract.SplashNavigationListener
@@ -102,10 +103,9 @@ fun SplashScreen(
                 .scale(scale.value)
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF5A3FD1),
-                            Color(0xFF4A32C3),
-                            Color(0xFF3B2AAE)
+                        listOf(
+                            AppColor.LightOrange,
+                            AppColor.WhiteSoft
                         )
                     )
                 )
@@ -124,7 +124,7 @@ fun SplashScreen(
                     text = "Shopme",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = alpha.value)
+                    color = AppColor.Orange.copy(alpha = alpha.value)
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
@@ -133,7 +133,7 @@ fun SplashScreen(
                     text = "App",
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF6FE3FF).copy(alpha = alpha.value)
+                    color = AppColor.Orange.copy(alpha = alpha.value)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -156,8 +156,8 @@ private fun AbstractSplashBackground() {
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFF69E3FF),
-                            Color(0xFF46C8F0)
+                            AppColor.Orange,
+                            AppColor.WhiteSoft
                         )
                     )
                 )
@@ -171,8 +171,8 @@ private fun AbstractSplashBackground() {
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFF7A5CFF),
-                            Color(0xFF5A3FD1)
+                            AppColor.WhiteSoft,
+                            AppColor.Orange
                         )
                     )
                 )
@@ -215,6 +215,6 @@ fun PulsingLoadingText(text: String = "Loading...") {
         text = text,
         fontSize = 14.sp,
         fontWeight = FontWeight.Medium,
-        color = Color.White.copy(alpha = alpha.value)
+        color = AppColor.Orange.copy(alpha = alpha.value)
     )
 }

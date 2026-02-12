@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.nav
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,21 +49,24 @@ fun BottomNavigationBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val activeColor = AppColor.Orange
-    val inactiveColor = AppColor.Gray
+    val activeColorBox = AppColor.Orange
+    val activeColorIcon = AppColor.White
+    val inactiveColorIcon = AppColor.Orange
 
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .background(Color.White)
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         NavigationBar(
             modifier = Modifier
+                .padding(horizontal = 32.dp, vertical = 16.dp)
                 .height(64.dp)
                 .clip(RoundedCornerShape(32.dp))
+                .border(1.dp, AppColor.Orange.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
                 .background(Color.White),
-            containerColor = Color.Transparent,
+            containerColor = Color.White,
             tonalElevation = 0.dp
         ) {
             items.forEach { item ->
@@ -85,7 +89,7 @@ fun BottomNavigationBar(navController: NavController) {
                                 Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(activeColor)
+                                    .background(activeColorBox)
                                     .padding(8.dp)
                             } else {
                                 Modifier.padding(8.dp)
@@ -95,7 +99,7 @@ fun BottomNavigationBar(navController: NavController) {
                             Icon(
                                 imageVector = item.icon,
                                 contentDescription = item.label,
-                                tint = if (isSelected) Color.White else inactiveColor,
+                                tint = if (isSelected) activeColorIcon else inactiveColorIcon,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -103,7 +107,7 @@ fun BottomNavigationBar(navController: NavController) {
                     alwaysShowLabel = false,
                     label = null,
                     colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = Color.Transparent
+                        indicatorColor = Color.White
                     )
                 )
             }

@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.mtv.app.shopme.feature.route.CartRoute
+import com.mtv.app.shopme.feature.route.DetailRoute
 import com.mtv.app.shopme.feature.route.HomeRoute
 import com.mtv.app.shopme.feature.route.MapRoute
 import com.mtv.app.shopme.feature.route.NotifRoute
@@ -60,6 +61,12 @@ fun NavGraphBuilder.homeGraph(nav: NavHostController) {
         composable(BottomNavItem.Profile.route) {
             ProfileRoute(nav)
         }
+    }
+}
+
+fun NavGraphBuilder.detailGraph(nav: NavHostController) {
+    composable(AppDestinations.DETAIL_GRAPH) {
+        DetailRoute(nav)
     }
 }
 

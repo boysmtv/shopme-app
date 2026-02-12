@@ -3,7 +3,7 @@
  * Author: Boys.mtv@gmail.com
  * File: HomeScreen.kt
  *
- * Last modified by Dedy Wijaya on 11/02/26 14.39
+ * Last modified by ChatGPT on 12/02/26
  */
 
 package com.mtv.app.shopme.feature.ui
@@ -12,12 +12,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +28,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -43,11 +41,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.InterFont
 import com.mtv.app.shopme.common.PoppinsFont
@@ -56,6 +56,7 @@ import com.mtv.app.shopme.feature.contract.HomeDataListener
 import com.mtv.app.shopme.feature.contract.HomeEventListener
 import com.mtv.app.shopme.feature.contract.HomeNavigationListener
 import com.mtv.app.shopme.feature.contract.HomeStateListener
+import com.mtv.app.shopme.nav.BottomNavigationBar
 
 @Composable
 fun HomeScreen(
@@ -71,11 +72,12 @@ fun HomeScreen(
                 Brush.verticalGradient(
                     colors = listOf(
                         AppColor.LightOrange,
-                        AppColor.WhiteSoft
+                        AppColor.WhiteSoft,
+                        AppColor.White
                     )
                 )
             )
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -95,9 +97,13 @@ fun HomeScreen(
                     )
 
                     Spacer(Modifier.height(16.dp))
+
                     HomePromoBanner()
+
                     Spacer(Modifier.height(16.dp))
+
                     HomeMenuBar()
+
                     Spacer(Modifier.height(20.dp))
                 }
             }
@@ -107,12 +113,15 @@ fun HomeScreen(
             }
 
             gridItems(
-                data = List(10) { it },
+                data = mockFoodList,
                 columnCount = 2,
                 horizontalSpacing = 16.dp,
-                verticalSpacing = 16.dp,
-            ) {
-                FoodCard()
+                verticalSpacing = 16.dp
+            ) { item ->
+                FoodCard(
+                    item = item,
+                    onClickDetail = { uiNavigation.onNavigateToDetail() }
+                )
             }
         }
     }
@@ -177,7 +186,6 @@ fun <T> LazyListScope.gridItems(
     }
 }
 
-
 @Composable
 private fun HomeHeader() {
     Row(
@@ -197,9 +205,9 @@ private fun HomeHeader() {
                     .padding(12.dp),
                 tint = Color.Black
             )
+
             Column(
-                modifier = Modifier
-                    .padding(start = 12.dp)
+                modifier = Modifier.padding(start = 12.dp)
             ) {
                 Text(
                     text = "Location",
@@ -209,7 +217,7 @@ private fun HomeHeader() {
                     style = MaterialTheme.typography.titleSmall
                 )
 
-                Spacer(Modifier.width(2.dp))
+                Spacer(Modifier.height(2.dp))
 
                 Text(
                     text = "Dedy Wijaya",
@@ -240,29 +248,22 @@ private fun HomeSearch(
     onQueryChange: (String) -> Unit,
     onClearClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Discover amazing food offers",
             color = Color.Black,
             fontSize = 22.sp,
-            fontFamily = PoppinsFont,
-            style = MaterialTheme.typography.titleMedium
+            fontFamily = PoppinsFont
         )
 
         Spacer(Modifier.height(16.dp))
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp)
-                    .background(Color(0xFFFFFFFF), RoundedCornerShape(24.dp))
+                    .background(Color.White, RoundedCornerShape(24.dp))
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -298,8 +299,7 @@ private fun HomeSearch(
                                         text = "Order your food here...",
                                         color = Color.Gray,
                                         fontSize = 14.sp,
-                                        fontFamily = PoppinsFont,
-                                        style = MaterialTheme.typography.titleSmall
+                                        fontFamily = PoppinsFont
                                     )
                                 }
                                 innerTextField()
@@ -345,8 +345,6 @@ private fun HomePromoBanner() {
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            // Text Section
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -392,29 +390,6 @@ private fun HomeMenuBar() {
     }
 }
 
-
-@Composable
-private fun HomeMenuItem() {
-    Text(
-        "Top choices for you",
-        fontWeight = FontWeight.SemiBold,
-        fontFamily = PoppinsFont,
-        fontSize = 18.sp
-    )
-
-    Spacer(Modifier.height(12.dp))
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        items(10) {
-            FoodCard()
-        }
-    }
-}
-
 @Composable
 fun CategoryItem(title: String) {
     Column(
@@ -433,16 +408,23 @@ fun CategoryItem(title: String) {
 }
 
 @Composable
-fun FoodCard() {
+fun FoodCard(
+    item: FoodItem,
+    onClickDetail: () -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClickDetail()
+            },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column {
             Image(
-                painter = painterResource(id = R.drawable.ic_location_white),
-                contentDescription = null,
+                painter = painterResource(id = item.imageRes),
+                contentDescription = item.name,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
@@ -451,14 +433,17 @@ fun FoodCard() {
 
             Column(Modifier.padding(12.dp)) {
                 Text(
-                    "Grilled Cheeseburger",
+                    text = item.name,
                     fontFamily = PoppinsFont,
                     fontWeight = FontWeight.SemiBold,
-                    maxLines = 2
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
+
                 Spacer(Modifier.height(4.dp))
+
                 Text(
-                    "$9.99",
+                    text = "$${item.price}",
                     fontFamily = InterFont,
                     fontWeight = FontWeight.Medium,
                     color = AppColor.Orange
@@ -468,12 +453,72 @@ fun FoodCard() {
     }
 }
 
+// DATA MODEL
+data class FoodItem(
+    val id: Int,
+    val name: String,
+    val price: Double,
+    val imageRes: Int
+)
+
+// MOCK DATA
+val mockFoodList = listOf(
+    FoodItem(
+        id = 1,
+        name = "Grilled Cheeseburger",
+        price = 9.99,
+        imageRes = R.drawable.image_burger
+    ),
+    FoodItem(
+        id = 2,
+        name = "Fried Chicken Bucket",
+        price = 12.49,
+        imageRes = R.drawable.image_pizza
+    ),
+    FoodItem(
+        id = 3,
+        name = "Double Beef Burger",
+        price = 10.99,
+        imageRes = R.drawable.image_platbread
+    ),
+    FoodItem(
+        id = 4,
+        name = "Hotdog Original",
+        price = 7.49,
+        imageRes = R.drawable.image_cheese_burger
+    ),
+    FoodItem(
+        id = 5,
+        name = "Pepperoni Pizza Slice",
+        price = 4.99,
+        imageRes = R.drawable.image_burger
+    ),
+    FoodItem(
+        id = 6,
+        name = "BBQ Chicken Pizza",
+        price = 11.49,
+        imageRes = R.drawable.image_pizza
+    ),
+    FoodItem(
+        id = 7,
+        name = "Crispy Fries",
+        price = 3.29,
+        imageRes = R.drawable.image_platbread
+    ),
+    FoodItem(
+        id = 8,
+        name = "Spaghetti Bolognese",
+        price = 8.79,
+        imageRes = R.drawable.image_cheese_burger
+    )
+)
+
+// PREVIEWS
 @Preview(showBackground = true)
 @Composable
 fun HomeHeaderPreview() {
     HomeHeader()
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -484,13 +529,24 @@ fun HomePromoPreview() {
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(
-        uiState = HomeStateListener(),
-        uiData = HomeDataListener(),
-        uiEvent = HomeEventListener({}),
-        uiNavigation = HomeNavigationListener({})
-    )
+    val navController = rememberNavController()
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(navController)
+        }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .padding(bottom = padding.calculateBottomPadding())
+                .fillMaxSize()
+                .background(Color.White)
+        ) {
+            HomeScreen(
+                uiState = HomeStateListener(),
+                uiData = HomeDataListener(),
+                uiEvent = HomeEventListener({}),
+                uiNavigation = HomeNavigationListener({})
+            )
+        }
+    }
 }
-
-
-

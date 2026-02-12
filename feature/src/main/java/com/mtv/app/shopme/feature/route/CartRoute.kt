@@ -17,17 +17,18 @@ import com.mtv.app.shopme.feature.contract.CartEventListener
 import com.mtv.app.shopme.feature.contract.CartNavigationListener
 import com.mtv.app.shopme.feature.contract.CartStateListener
 import com.mtv.app.shopme.feature.presentation.CartViewModel
+import com.mtv.app.shopme.feature.ui.CartScreen
 
 @Composable
 fun CartRoute(nav: NavController) {
     BaseRoute<CartViewModel, CartStateListener, CartDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
-//            CartScreen(
-//                uiState = uiState,
-//                uiData = uiData,
-//                uiEvent = cartEvent(vm),
-//                uiNavigation = cartNavigation(nav)
-//            )
+            CartScreen(
+                uiState = uiState,
+                uiData = uiData,
+                uiEvent = cartEvent(vm),
+                uiNavigation = cartNavigation(nav)
+            )
         }
     }
 }
