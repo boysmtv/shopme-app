@@ -21,6 +21,7 @@ fun AppNavGraph(navController: NavHostController) {
         splashGraph(navController)
         authGraph(navController)
         homeGraph(navController)
+        detailGraph(navController)
         notificationGraph(navController)
     }
 }

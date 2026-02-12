@@ -20,11 +20,11 @@ data class CartDataListener(
 )
 
 data class CartEventListener(
-    val onDismissActiveDialog: () -> Unit
+    val onDismissActiveDialog: () -> Unit = {}
 )
 
 data class CartNavigationListener(
-    val onBack: () -> Unit,
+    val onBack: () -> Unit = {}
 )
 
 sealed class CartDialog {

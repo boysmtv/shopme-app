@@ -22,12 +22,12 @@ import com.mtv.app.shopme.feature.presentation.NotifViewModel
 fun NotifRoute(nav: NavController) {
     BaseRoute<NotifViewModel, NotifStateListener, NotifDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
-            NotifScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = notifEvent(vm),
-                uiNavigation = notifNavigation(nav)
-            )
+//            NotifScreen(
+//                uiState = uiState,
+//                uiData = uiData,
+//                uiEvent = notifEvent(vm),
+//                uiNavigation = notifNavigation(nav)
+//            )
         }
     }
 }

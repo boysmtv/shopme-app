@@ -17,6 +17,8 @@ import com.mtv.app.shopme.feature.contract.HomeEventListener
 import com.mtv.app.shopme.feature.contract.HomeNavigationListener
 import com.mtv.app.shopme.feature.contract.HomeStateListener
 import com.mtv.app.shopme.feature.presentation.HomeViewModel
+import com.mtv.app.shopme.feature.ui.HomeScreen
+import com.mtv.app.shopme.nav.AppDestinations
 
 @Composable
 fun HomeRoute(nav: NavController) {
@@ -37,5 +39,10 @@ private fun homeEvent(vm: HomeViewModel) = HomeEventListener(
 )
 
 private fun homeNavigation(nav: NavController) = HomeNavigationListener(
-    onBack = {}
+    onNavigateToDetail = {
+        nav.navigate(AppDestinations.DETAIL_GRAPH)
+    },
+    onBack = {
+        nav.popBackStack()
+    }
 )

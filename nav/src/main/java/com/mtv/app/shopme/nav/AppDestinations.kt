@@ -15,6 +15,7 @@ object AppDestinations {
     const val REGISTER_GRAPH = "REGISTER_GRAPH"
     const val HOME_GRAPH = "HOME_GRAPH"
     const val RESET_GRAPH = "FORGOT_GRAPH"
+    const val DETAIL_GRAPH = "DETAIL_GRAPH"
     const val NOTIFICATION_GRAPH = "NOTIFICATION_GRAPH"
 
     fun navigateToDetailMovies(movieId: Int): String {

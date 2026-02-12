@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.nav
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ManageSearch
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -20,6 +21,6 @@ sealed class BottomNavItem(
     object Home : BottomNavItem(route = "home", icon = Icons.Filled.Home, label = "Home")
     object Cart : BottomNavItem(route = "shop", icon = Icons.Filled.ShoppingCart, label = "Shop")
     object Search : BottomNavItem(route = "search", icon = Icons.Filled.Search, label = "Search")
-    object Map : BottomNavItem(route = "map", icon = Icons.Filled.Favorite, label = "Map")
+    object Map : BottomNavItem(route = "map", icon = Icons.Filled.Map, label = "Map")
     object Profile : BottomNavItem(route = "profile", icon = Icons.Filled.Person, label = "Profile")
 }

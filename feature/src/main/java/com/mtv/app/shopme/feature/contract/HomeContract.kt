@@ -24,7 +24,8 @@ data class HomeEventListener(
 )
 
 data class HomeNavigationListener(
-    val onBack: () -> Unit,
+    val onNavigateToDetail: () -> Unit = {},
+    val onBack: () -> Unit = {},
 )
 
 sealed class HomeDialog {

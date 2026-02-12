@@ -17,11 +17,14 @@ import com.mtv.app.shopme.feature.contract.SplashEventListener
 import com.mtv.app.shopme.feature.contract.SplashNavigationListener
 import com.mtv.app.shopme.feature.contract.SplashStateListener
 import com.mtv.app.shopme.feature.presentation.SplashViewModel
+import com.mtv.app.shopme.feature.ui.SplashScreen
+import com.mtv.app.shopme.nav.AppDestinations
+import com.mtv.app.shopme.nav.navigateAndPopSplash
 
 @Composable
 fun SplashRoute(nav: NavController) {
     BaseRoute<SplashViewModel, SplashStateListener, SplashDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base) {
+        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             SplashScreen(
                 uiState = uiState,
                 uiData = uiData,
@@ -37,5 +40,7 @@ private fun splashEvent(vm: SplashViewModel) = SplashEventListener(
 )
 
 private fun splashNavigation(nav: NavController) = SplashNavigationListener(
-    onBack = {}
+    onNavigateToHome = {
+        nav.navigateAndPopSplash(AppDestinations.HOME_GRAPH)
+    }
 )
