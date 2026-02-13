@@ -80,8 +80,11 @@ fun HomeScreen(
                     )
                 )
             )
-            .padding(start = 20.dp, end = 20.dp, top = 32.dp)
+            .padding(start = 20.dp, end = 20.dp)
+            .height(56.dp)
+            .statusBarsPadding()
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
         HomeHeader()
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -92,9 +95,9 @@ fun HomeScreen(
             item {
                 Column {
                     HomeSearch(
-                        query = "",
-                        onQueryChange = {},
-                        onClearClick = {}
+                        onClick = {
+                            uiNavigation.onNavigateToSearch()
+                        }
                     )
 
                     Spacer(Modifier.height(16.dp))
@@ -211,7 +214,7 @@ private fun HomeHeader() {
                 modifier = Modifier.padding(start = 12.dp)
             ) {
                 Text(
-                    text = "Location",
+                    text = "Puri Lestari - Blok G06/01",
                     color = Color.DarkGray.copy(alpha = 0.8f),
                     fontSize = 12.sp,
                     fontFamily = PoppinsFont,
@@ -245,90 +248,48 @@ private fun HomeHeader() {
 
 @Composable
 private fun HomeSearch(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    onClearClick: () -> Unit
+    onClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Discover amazing food offers",
             color = Color.Black,
-            fontSize = 22.sp,
+            fontSize = 20.sp,
             fontFamily = PoppinsFont
         )
 
         Spacer(Modifier.height(16.dp))
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .background(Color.White, RoundedCornerShape(24.dp))
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.DarkGray.copy(alpha = 0.7f),
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .size(24.dp)
-                    )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .background(Color.White, RoundedCornerShape(24.dp))
+                .clickable { onClick() }
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = Color.DarkGray.copy(alpha = 0.7f),
+                    modifier = Modifier.size(24.dp)
+                )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                Spacer(Modifier.width(8.dp))
 
-                    BasicTextField(
-                        value = query,
-                        onValueChange = onQueryChange,
-                        singleLine = true,
-                        cursorBrush = SolidColor(Color.LightGray),
-                        textStyle = TextStyle(
-                            color = Color.DarkGray,
-                            fontSize = 16.sp
-                        ),
-                        decorationBox = { innerTextField ->
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                if (query.isEmpty()) {
-                                    Text(
-                                        text = "Order your food here...",
-                                        color = Color.Gray,
-                                        fontSize = 14.sp,
-                                        fontFamily = PoppinsFont
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                            .padding(start = 8.dp, end = 12.dp)
-                    )
-
-                    if (query.isNotEmpty()) {
-                        IconButton(
-                            onClick = onClearClick,
-                            modifier = Modifier.padding(end = 12.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear text",
-                                tint = Color.DarkGray.copy(alpha = 0.7f)
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = "Order your food here...",
+                    color = Color.Gray,
+                    fontSize = 14.sp,
+                    fontFamily = PoppinsFont
+                )
             }
         }
     }
 }
+
 
 @Composable
 private fun HomePromoBanner() {
@@ -423,9 +384,30 @@ fun FoodCard(
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column {
+//            Image(
+//                painter = rememberAsyncImagePainter(item.imageUrl),
+//                contentDescription = item.name,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(100.dp),
+//                contentScale = ContentScale.Crop
+//            )
+
+            val imageRes = when (item.id) {
+                0 -> R.drawable.image_burger
+                1 -> R.drawable.image_pizza
+                2 -> R.drawable.image_platbread
+                3 -> R.drawable.image_cheese_burger
+                4 -> R.drawable.image_bakso
+                5 -> R.drawable.image_pempek
+                6 -> R.drawable.image_padang
+                7 -> R.drawable.image_sate
+                else -> R.drawable.image_burger
+            }
+
             Image(
-                painter = rememberAsyncImagePainter(item.imageUrl),
-                contentDescription = item.name,
+                painter = painterResource(imageRes),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),

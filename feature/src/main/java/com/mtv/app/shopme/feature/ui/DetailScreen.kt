@@ -12,7 +12,17 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -22,19 +32,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,9 +52,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,10 +69,7 @@ import com.mtv.app.shopme.feature.contract.DetailDataListener
 import com.mtv.app.shopme.feature.contract.DetailEventListener
 import com.mtv.app.shopme.feature.contract.DetailNavigationListener
 import com.mtv.app.shopme.feature.contract.DetailStateListener
-import com.mtv.app.shopme.feature.contract.HomeDataListener
-import com.mtv.app.shopme.feature.contract.HomeEventListener
-import com.mtv.app.shopme.feature.contract.HomeNavigationListener
-import com.mtv.app.shopme.feature.contract.HomeStateListener
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class SimilarItem(
     val image: Int,
@@ -117,13 +127,13 @@ fun DetailScreen(
             item { DetailStatsRow() }
             item { Spacer(Modifier.height(22.dp)) }
 
-            item { SectionTitle("Ingredients") }
+            item { SectionTitle("Bahan-bahan") }
             item { Spacer(Modifier.height(12.dp)) }
 
             item { IngredientsRow() }
             item { Spacer(Modifier.height(20.dp)) }
 
-            item { SectionTitle("Similar item") }
+            item { SectionTitle("Menu lainnya") }
             item { Spacer(Modifier.height(12.dp)) }
 
             items(similarItems) { item ->
@@ -165,6 +175,17 @@ fun DetailHeader() {
                 .background(Color.White)
                 .padding(12.dp),
             tint = Color.Black
+        )
+
+        Text(
+            text = "Food Detail",
+            fontFamily = PoppinsFont,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(1f)
         )
 
         Icon(
@@ -210,7 +231,8 @@ fun DetailImage() {
             Image(
                 painter = painterResource(images[page]),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -296,11 +318,103 @@ fun DetailStatsRow() {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("★ 4.8 (365+)")
-        Text("🔥 680 Kal")
-        Text("⏱ 20-25 Min")
+
+        StatusStatItem(OrderStatus.READY)
+
+        StatItem(
+            icon = Icons.Default.Inventory2,
+            text = "Tersedia 20 Pcs"
+        )
+
+        StatItem(
+            icon = Icons.Default.AccessTime,
+            text = "20–25 Min",
+        )
     }
 }
+
+enum class OrderStatus {
+    READY,
+    PREORDER,
+    JASTIP
+}
+
+@Composable
+fun StatusStatItem(
+    status: OrderStatus,
+    total: String = EMPTY_STRING
+) {
+    val (icon, color, text) = when (status) {
+        OrderStatus.READY -> Triple(
+            Icons.Default.CheckCircle,
+            Color(0xFF4CAF50),
+            if (total.isNotEmpty()) "Ready / $total pcs" else "Ready"
+        )
+
+        OrderStatus.PREORDER -> Triple(
+            Icons.Default.Schedule,
+            Color(0xFFFF9800),
+            if (total.isNotEmpty()) "Pre-order / $total pcs" else "Pre-order"
+        )
+
+        OrderStatus.JASTIP -> Triple(
+            Icons.Default.LocalShipping,
+            Color(0xFF2196F3),
+            if (total.isNotEmpty()) "Jastip / $total pcs" else "Jastip"
+        )
+    }
+
+    Row(
+        modifier = Modifier
+            .background(
+                color = color.copy(alpha = 0.12f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+            tint = color,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            color = color
+        )
+    }
+}
+
+@Composable
+fun StatItem(
+    icon: ImageVector,
+    text: String
+) {
+    Row(
+        modifier = Modifier
+            .background(
+                color = AppColor.Orange.copy(alpha = 0.12f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = AppColor.Orange,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            color = AppColor.Orange
+        )
+    }
+}
+
 
 @Composable
 fun SectionTitle(title: String) {
@@ -375,6 +489,14 @@ fun SimilarItemRow(image: Int, title: String, price: Double) {
                 fontSize = 14.sp
             )
         }
+
+        Box(
+            contentAlignment = Alignment.Center
+        ) {
+            StatusStatItem(OrderStatus.PREORDER, "5")
+        }
+
+        Spacer(Modifier.width(16.dp))
 
         Box(
             modifier = Modifier

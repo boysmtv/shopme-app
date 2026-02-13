@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: ProfileContract.kt
  *
@@ -31,7 +31,6 @@ data class ProfileNavigationListener(
     val onSettings: () -> Unit = {},
     val onHelpCenter: () -> Unit = {},
     val onAbout: () -> Unit = {},
-    val onBack: () -> Unit = {},
     val onOrder: () -> Unit = {}
 )
 
