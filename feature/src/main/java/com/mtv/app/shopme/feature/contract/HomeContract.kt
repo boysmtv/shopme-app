@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: HomeContract.kt
  *
@@ -25,7 +25,7 @@ data class HomeEventListener(
 
 data class HomeNavigationListener(
     val onNavigateToDetail: () -> Unit = {},
-    val onBack: () -> Unit = {},
+    val onNavigateToSearch: () -> Unit = {},
 )
 
 sealed class HomeDialog {

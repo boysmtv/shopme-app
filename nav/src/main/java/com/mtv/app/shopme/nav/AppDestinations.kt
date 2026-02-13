@@ -24,12 +24,4 @@ object AppDestinations {
     const val ORDER_GRAPH = "ORDER_GRAPH"
     const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
 
-    fun navigateToDetailMovies(movieId: Int): String {
-        return "MOVIE_DETAIL_ROUTE/$movieId"
-    }
-
-    fun navigateToPlayMovie(key: String): String {
-        return "MOVIE_PLAY_ROUTE/$key"
-    }
-
 }

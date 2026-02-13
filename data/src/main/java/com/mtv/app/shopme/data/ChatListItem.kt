@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: ChatListItem.kt
  *
@@ -13,5 +13,6 @@ data class ChatListItem(
     val name: String,
     val lastMessage: String,
     val time: String,
-    val unreadCount: Int = 0
+    val unreadCount: Int = 0,
+    val avatarBase64: String? = null
 )

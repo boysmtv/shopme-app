@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: ProfileRoute.kt
  *
@@ -48,6 +48,5 @@ private fun profileNavigation(nav: NavController) = ProfileNavigationListener(
     onSettings = { nav.navigate("") },
     onHelpCenter = { nav.navigate("") },
     onAbout = { nav.navigate("") },
-    onBack = { nav.popBackStack() },
     onOrder = { nav.navigate(AppDestinations.ORDER_GRAPH) },
 )

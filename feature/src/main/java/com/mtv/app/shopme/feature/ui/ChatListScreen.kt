@@ -8,10 +8,10 @@
 
 package com.mtv.app.shopme.feature.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,9 +24,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
@@ -36,17 +41,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.base64ToBitmap
 import com.mtv.app.shopme.data.ChatListItem
 import com.mtv.app.shopme.feature.contract.ChatListDataListener
 import com.mtv.app.shopme.feature.contract.ChatListEventListener
 import com.mtv.app.shopme.feature.contract.ChatListNavigationListener
 import com.mtv.app.shopme.feature.contract.ChatListStateListener
-import com.mtv.app.shopme.feature.contract.HomeDataListener
-import com.mtv.app.shopme.feature.contract.HomeEventListener
-import com.mtv.app.shopme.feature.contract.HomeNavigationListener
-import com.mtv.app.shopme.feature.contract.HomeStateListener
 import com.mtv.app.shopme.feature.presentation.mockChatList
 import com.mtv.app.shopme.nav.BottomNavigationBar
+import com.mtv.app.shopme.common.R
 
 @Composable
 fun ChatListScreen(
@@ -59,13 +62,14 @@ fun ChatListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColor.White)
-            .padding(top = 32.dp)
     ) {
-
+        Spacer(Modifier.height(16.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
+                .height(56.dp)
+                .statusBarsPadding()
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -96,6 +100,7 @@ fun ChatListScreen(
                 )
             }
         }
+        Spacer(Modifier.height(16.dp))
 
         HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
@@ -125,13 +130,13 @@ fun ListChatItem(
             .height(IntrinsicSize.Min)
             .background(AppColor.WhiteSoft, RoundedCornerShape(12.dp))
             .clickable { onClick() }
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 16.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .background(AppColor.Orange, RoundedCornerShape(50.dp))
+        ChatAvatar(
+            base64Image = data.avatarBase64,
+            placeholderRes = data.id.toInt(),
+            modifier = Modifier.size(48.dp)
         )
 
         Spacer(Modifier.width(12.dp))
@@ -185,6 +190,54 @@ fun ListChatItem(
         }
     }
 }
+
+@Composable
+fun ChatAvatar(
+    base64Image: String?,
+    placeholderRes: Int,
+    modifier: Modifier = Modifier
+) {
+    val bitmap = remember(base64Image) {
+        base64Image
+            ?.takeIf { it.isNotBlank() }
+            ?.let { base64ToBitmap(it) }
+    }
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(50))
+            .background(AppColor.Orange)
+    ) {
+        if (bitmap != null) {
+            Image(
+                bitmap = bitmap.asImageBitmap(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            val imageRes = when (placeholderRes) {
+                0 -> R.drawable.image_burger
+                1 -> R.drawable.image_pizza
+                2 -> R.drawable.image_platbread
+                3 -> R.drawable.image_cheese_burger
+                4 -> R.drawable.image_bakso
+                5 -> R.drawable.image_pempek
+                6 -> R.drawable.image_padang
+                7 -> R.drawable.image_sate
+                else -> R.drawable.image_burger
+            }
+
+            Image(
+                painter = painterResource(imageRes),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable

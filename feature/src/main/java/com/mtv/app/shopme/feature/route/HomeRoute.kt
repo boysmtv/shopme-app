@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: HomeRoute.kt
  *
@@ -19,6 +19,7 @@ import com.mtv.app.shopme.feature.contract.HomeStateListener
 import com.mtv.app.shopme.feature.presentation.HomeViewModel
 import com.mtv.app.shopme.feature.ui.HomeScreen
 import com.mtv.app.shopme.nav.AppDestinations
+import com.mtv.app.shopme.nav.BottomNavItem
 
 @Composable
 fun HomeRoute(nav: NavController) {
@@ -42,7 +43,15 @@ private fun homeNavigation(nav: NavController) = HomeNavigationListener(
     onNavigateToDetail = {
         nav.navigate(AppDestinations.DETAIL_GRAPH)
     },
-    onBack = {
-        nav.popBackStack()
+    onNavigateToSearch = {
+        nav.navigate(BottomNavItem.Search.route) {
+            launchSingleTop = true
+            restoreState = true
+
+            popUpTo(nav.graph.startDestinationId) {
+                saveState = true
+            }
+        }
     }
 )
+

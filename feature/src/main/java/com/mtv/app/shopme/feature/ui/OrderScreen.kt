@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -72,14 +73,7 @@ fun OrderScreen(
             .fillMaxSize()
             .background(AppColor.WhiteSoft)
     ) {
-
-        if (uiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            return
-        }
-
         OrderHeader(onBack = uiNavigation.onBack)
-
         OrderListScrollable(
             orders = uiData.orders,
             uiEvent = uiEvent,
@@ -92,15 +86,18 @@ fun OrderScreen(
 fun OrderHeader(onBack: () -> Unit) {
     Column(
         modifier = Modifier
-            .background(AppColor.White)
-            .padding(top = 16.dp)
+            .fillMaxWidth()
+            .background(Color.White)
+            .statusBarsPadding()
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 16.dp),
+                .height(80.dp)
+                .padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
@@ -112,9 +109,7 @@ fun OrderHeader(onBack: () -> Unit) {
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 8.dp),
+                modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
 
@@ -122,7 +117,8 @@ fun OrderHeader(onBack: () -> Unit) {
                 Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Chat")
             }
         }
-        HorizontalDivider(modifier = Modifier.height(1.dp))
+
+        HorizontalDivider()
     }
 }
 

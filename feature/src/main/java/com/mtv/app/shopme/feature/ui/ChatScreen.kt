@@ -8,26 +8,32 @@
 
 package com.mtv.app.shopme.feature.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,7 +47,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
@@ -50,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.feature.contract.ChatDataListener
 import com.mtv.app.shopme.feature.contract.ChatEventListener
 import com.mtv.app.shopme.feature.contract.ChatNavigationListener
@@ -71,11 +81,13 @@ fun ChatScreen(
     var userMessage by remember { mutableStateOf(EMPTY_STRING) }
     val messages = remember {
         mutableStateListOf(
-            ChatMessage("Halo! Ada yang bisa saya bantu?", false),
-            ChatMessage("Saya ingin memesan kopi latte, ada?", true),
-            ChatMessage("Ada dong! Mau ukuran regular atau large?", false),
-            ChatMessage("Halo! Ada yang bisa saya bantu?", false),
-            ChatMessage("Saya ingin memesan kopi latte, ada?", true),
+            ChatMessage("Halo 👋 Selamat datang di Coffee Corner. Ada yang bisa kami bantu?", true),
+            ChatMessage("Halo kak, saya mau pesan kopi latte.", false),
+            ChatMessage("Siap ☕ Mau yang panas atau dingin ya kak?", true),
+            ChatMessage("Yang dingin ya, ukuran regular.", false),
+            ChatMessage("Bisa banget 😊 Tambah 1 shot espresso ya. Ada request lain?", true),
+            ChatMessage("Tidak ada, itu saja. Terima kasih 🙏", false),
+            ChatMessage("Siap kak! Pesanan sedang kami siapkan. Mohon ditunggu ya ⏳", true)
         )
     }
 
@@ -83,18 +95,31 @@ fun ChatScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .padding(top = 32.dp)
     ) {
-        // --- AppBar ---
+        Spacer(Modifier.height(16.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
+                .height(56.dp)
+                .statusBarsPadding()
+                .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { uiNavigation.onBack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
+
+            Image(
+                painter = painterResource(R.drawable.image_cheese_burger),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(40.dp)
+                    .aspectRatio(1f)
+                    .clip(CircleShape)
+            )
+
+            Spacer(Modifier.width(16.dp))
 
             Column {
                 Text(
@@ -111,7 +136,14 @@ fun ChatScreen(
                 )
             }
 
+            Spacer(Modifier.weight(1f))
+
+            IconButton(onClick = { uiNavigation.onBack() }) {
+                Icon(Icons.Default.Call, contentDescription = "Call")
+            }
+
         }
+        Spacer(Modifier.height(16.dp))
 
         HorizontalDivider(modifier = Modifier.height(1.dp))
 

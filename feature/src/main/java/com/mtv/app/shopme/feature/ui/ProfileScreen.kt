@@ -158,12 +158,11 @@ fun ProfileScreen(
                                     tint = AppColor.Orange
                                 )
 
-                                // Badge Count (optional: only show if > 0)
                                 if (menu.count > 0) {
                                     Box(
                                         modifier = Modifier
                                             .align(Alignment.TopEnd)
-                                            .offset(x = 6.dp, y = (-6).dp)  // adjust position
+                                            .offset(x = 6.dp, y = (-6).dp)
                                             .background(Color.Red, RoundedCornerShape(50))
                                             .padding(horizontal = 6.dp, vertical = 2.dp),
                                         contentAlignment = Alignment.Center
