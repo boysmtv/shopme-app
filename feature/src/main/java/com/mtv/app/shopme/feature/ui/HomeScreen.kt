@@ -80,10 +80,8 @@ fun HomeScreen(
                     )
                 )
             )
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 32.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
         HomeHeader()
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -456,20 +454,19 @@ fun FoodCard(
     }
 }
 
-// PREVIEWS
-@Preview(showBackground = true)
-@Composable
-fun HomeHeaderPreview() {
-    HomeHeader()
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun HomeHeaderPreview() {
+//    HomeHeader()
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun HomePromoPreview() {
+//    HomePromoBanner()
+//}
 
-@Preview(showBackground = true)
-@Composable
-fun HomePromoPreview() {
-    HomePromoBanner()
-}
-
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController()

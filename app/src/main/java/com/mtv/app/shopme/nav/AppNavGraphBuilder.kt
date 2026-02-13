@@ -13,10 +13,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.mtv.app.shopme.feature.route.CartRoute
+import com.mtv.app.shopme.feature.route.ChatRoute
 import com.mtv.app.shopme.feature.route.DetailRoute
+import com.mtv.app.shopme.feature.route.EditAddressRoute
 import com.mtv.app.shopme.feature.route.EditProfileRoute
 import com.mtv.app.shopme.feature.route.HomeRoute
-import com.mtv.app.shopme.feature.route.MapRoute
+import com.mtv.app.shopme.feature.route.ChatListRoute
 import com.mtv.app.shopme.feature.route.NotifRoute
 import com.mtv.app.shopme.feature.route.ProfileRoute
 import com.mtv.app.shopme.feature.route.SearchRoute
@@ -56,8 +58,8 @@ fun NavGraphBuilder.homeGraph(nav: NavHostController) {
         composable(BottomNavItem.Search.route) {
             SearchRoute(nav)
         }
-        composable(BottomNavItem.Map.route) {
-            MapRoute(nav)
+        composable(BottomNavItem.Chat.route) {
+            ChatListRoute(nav)
         }
         composable(BottomNavItem.Profile.route) {
             ProfileRoute(nav)
@@ -75,6 +77,9 @@ fun NavGraphBuilder.notificationGraph(nav: NavHostController) {
     composable(AppDestinations.NOTIFICATION_GRAPH) {
         NotifRoute(nav)
     }
+    composable(AppDestinations.CHAT_GRAPH) {
+        ChatRoute(nav)
+    }
 }
 
 fun NavGraphBuilder.profileGraph(nav: NavHostController) {
@@ -84,12 +89,7 @@ fun NavGraphBuilder.profileGraph(nav: NavHostController) {
     composable(AppDestinations.EDIT_PROFILE_GRAPH) {
         EditProfileRoute(nav)
     }
-}
-
-fun NavGraphBuilder.orderGraph(nav: NavHostController) {
-
-}
-
-fun NavGraphBuilder.wishlistGraph(nav: NavHostController) {
-
+    composable(AppDestinations.EDIT_ADDRESS_GRAPH) {
+        EditAddressRoute(nav)
+    }
 }

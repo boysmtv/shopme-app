@@ -1,9 +1,9 @@
 /*
  * Project: App Movie Compose
  * Author: Boys.mtv@gmail.com
- * File: EditProfileScreen.kt
+ * File: EditAddressScreen.kt
  *
- * Last modified by Dedy Wijaya on 12/02/26 14.02
+ * Last modified by Dedy Wijaya on 13/02/26 11.00
  */
 
 package com.mtv.app.shopme.feature.ui
@@ -17,7 +17,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.setValue
@@ -37,11 +36,11 @@ import com.mtv.app.shopme.common.base.BaseSimpleFormField
 import com.mtv.app.shopme.feature.contract.*
 
 @Composable
-fun EditProfileScreen(
-    uiState: EditProfileStateListener,
-    uiData: EditProfileDataListener,
-    uiEvent: EditProfileEventListener,
-    uiNavigation: EditProfileNavigationListener
+fun EditAddressScreen(
+    uiState: EditAddressStateListener,
+    uiData: EditAddressDataListener,
+    uiEvent: EditAddressEventListener,
+    uiNavigation: EditAddressNavigationListener
 ) {
 
     Column(
@@ -59,16 +58,16 @@ fun EditProfileScreen(
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        EditProfileHeader(uiNavigation)
+        EditAddressHeader(uiNavigation)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        EditProfileMenus(uiEvent, uiData, uiNavigation)
+        EditAddressMenus(uiEvent, uiData, uiNavigation)
     }
 }
 
 @Composable
-fun EditProfileHeader(uiNavigation: EditProfileNavigationListener) {
+fun EditAddressHeader(uiNavigation: EditAddressNavigationListener) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -93,15 +92,18 @@ fun EditProfileHeader(uiNavigation: EditProfileNavigationListener) {
 }
 
 @Composable
-fun EditProfileMenus(
-    uiEvent: EditProfileEventListener,
-    uiData: EditProfileDataListener,
-    uiNavigation: EditProfileNavigationListener
+fun EditAddressMenus(
+    uiEvent: EditAddressEventListener,
+    uiData: EditAddressDataListener,
+    uiNavigation: EditAddressNavigationListener
 ) {
 
-    var name by remember { mutableStateOf(uiData.name) }
-    var phone by remember { mutableStateOf(uiData.phone) }
-    var email by remember { mutableStateOf(uiData.email) }
+    var village by remember { mutableStateOf(uiData.village) }
+    var block by remember { mutableStateOf(uiData.block) }
+    var number by remember { mutableStateOf(uiData.number) }
+    var rt by remember { mutableStateOf(uiData.rt) }
+    var rw by remember { mutableStateOf(uiData.rw) }
+    var map by remember { mutableStateOf(uiData.map) }
 
     Card(
         modifier = Modifier
@@ -117,30 +119,64 @@ fun EditProfileMenus(
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+
             BaseSimpleFormField(
-                label = "Nama Lengkap",
-                value = name
-            ) { name = it }
+                label = "Nama Perumahan",
+                value = village,
+            ) { village = it }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+
+                Row(modifier = Modifier.fillMaxWidth()) {
+
+                    BaseSimpleFormField(
+                        label = "Blok",
+                        value = block,
+                        modifier = Modifier.weight(1f)
+                    ) { block = it }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    BaseSimpleFormField(
+                        label = "No",
+                        value = number,
+                        keyboardType = KeyboardType.Number,
+                        modifier = Modifier.weight(1f)
+                    ) { number = it }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    BaseSimpleFormField(
+                        label = "RT",
+                        value = rt,
+                        keyboardType = KeyboardType.Number,
+                        modifier = Modifier.weight(1f)
+                    ) { rt = it }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    BaseSimpleFormField(
+                        label = "RW",
+                        value = rw,
+                        keyboardType = KeyboardType.Number,
+                        modifier = Modifier.weight(1f)
+                    ) { rw = it }
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
             BaseSimpleFormField(
-                label = "Nomor Telepon",
-                value = phone,
-                keyboardType = KeyboardType.Phone
-            ) { phone = it }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            BaseSimpleFormField(
-                label = "Email",
-                value = email,
-                keyboardType = KeyboardType.Phone
-            ) { email = it }
+                label = "Map",
+                value = map
+            ) { map = it }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Button(
                 onClick = {
-                    uiEvent.onSaveClicked(name, phone, email)
+                    uiEvent.onSaveClicked(village, block, number, rt, rw, map)
                     uiNavigation.onBack()
                 },
                 modifier = Modifier
@@ -162,11 +198,11 @@ fun EditProfileMenus(
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
-fun EditProfileScreenPreview() {
-    EditProfileScreen(
-        uiState = EditProfileStateListener(),
-        uiData = EditProfileDataListener(),
-        uiEvent = EditProfileEventListener(),
-        uiNavigation = EditProfileNavigationListener()
+fun EditAddressScreenPreview() {
+    EditAddressScreen(
+        uiState = EditAddressStateListener(),
+        uiData = EditAddressDataListener(),
+        uiEvent = EditAddressEventListener(),
+        uiNavigation = EditAddressNavigationListener()
     )
 }

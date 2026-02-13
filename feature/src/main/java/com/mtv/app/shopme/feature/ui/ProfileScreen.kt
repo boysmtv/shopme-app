@@ -94,13 +94,17 @@ fun ProfileScreen(
                     )
                 )
             )
+            .padding(top = 16.dp)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         HeaderProfile()
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Card(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 24.dp)
                 .background(
                     Brush.verticalGradient(
                         listOf(
@@ -126,7 +130,7 @@ fun ProfileScreen(
                     fontWeight = FontWeight.Normal
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Row(
                     modifier = Modifier
@@ -203,7 +207,7 @@ fun HeaderProfile() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 40.dp, start = 16.dp, end = 16.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -258,7 +262,7 @@ fun ProfileMenuItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp, bottom = 16.dp),
+                .padding(top = 20.dp, bottom = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -300,7 +304,7 @@ data class OrderMenu(
     val icon: ImageVector
 )
 
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun ProfileScreenPreview() {
     val navController = rememberNavController()

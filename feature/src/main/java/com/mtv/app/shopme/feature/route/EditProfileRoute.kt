@@ -31,8 +31,8 @@ fun EditProfileRoute(nav: NavController) {
 }
 
 private fun editProfileEvent(vm: EditProfileViewModel) = EditProfileEventListener(
-    onSaveClicked = { name, phone, address ->
-        vm.onSaveProfile(name, phone, address)
+    onSaveClicked = { name, phone, email ->
+        vm.onSaveProfile(name, phone, email)
     }
 )
 

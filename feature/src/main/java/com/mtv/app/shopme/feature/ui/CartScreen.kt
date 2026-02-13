@@ -68,10 +68,13 @@ fun CartScreen(
                     )
                 )
             )
+            .padding(start = 20.dp, end = 20.dp, top = 16.dp)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         CartHeader()
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -81,19 +84,19 @@ fun CartScreen(
             Text(
                 text = "Total Cart ${cartItems.size} Items",
                 fontFamily = PoppinsFont,
-                modifier = Modifier.padding(start = 20.dp, bottom = 12.dp),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )
             Text(
                 text = "Clear Cart",
                 fontFamily = PoppinsFont,
-                modifier = Modifier.padding(end = 20.dp, bottom = 12.dp),
                 fontSize = 14.sp,
                 color = AppColor.Orange,
                 fontWeight = FontWeight.Medium
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         LazyColumn(
             modifier = Modifier
@@ -105,16 +108,16 @@ fun CartScreen(
                 HorizontalDivider(
                     color = Color.LightGray.copy(alpha = 0.3f),
                     thickness = 1.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp)
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent)
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -151,7 +154,7 @@ fun CartScreen(
                 ) {
                     Text(
                         fontFamily = PoppinsFont,
-                        text = "Continue to checkout",
+                        text = "Checkout",
                         color = Color.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Normal,
@@ -166,9 +169,8 @@ fun CartScreen(
 private fun CartHeader() {
     Box(
         modifier = Modifier
-            .height(64.dp)
+            .height(48.dp)
             .fillMaxWidth()
-            .padding(12.dp)
     ) {
         Text(
             text = "My Cart",
@@ -187,7 +189,7 @@ fun CartItemRow(item: CartItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 14.dp),
+            .padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -382,7 +384,7 @@ data class CartItem(
     val quantity: Int
 )
 
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun CartScreenPreview() {
     val navController = rememberNavController()

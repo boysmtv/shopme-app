@@ -93,8 +93,10 @@ fun SearchScreen(
                     )
                 )
             )
-            .padding(16.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 16.dp)
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
         SearchHeader(uiData, uiEvent)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -245,7 +247,12 @@ fun SearchItem(
                             .background(Color.DarkGray),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No Image", fontSize = 12.sp, color = Color.DarkGray)
+                        Text(
+                            text = "No Image",
+                            fontSize = 12.sp,
+                            fontFamily = PoppinsFont,
+                            color = Color.DarkGray
+                        )
                     }
                 }
             } else if (previewDrawable != null) {
@@ -261,7 +268,12 @@ fun SearchItem(
                         .background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No Image", fontSize = 12.sp, color = Color.DarkGray)
+                    Text(
+                        text = "No Image",
+                        fontSize = 12.sp,
+                        fontFamily = PoppinsFont,
+                        color = Color.DarkGray
+                    )
                 }
             }
 
@@ -338,7 +350,7 @@ fun SearchItem(
 }
 
 
-//@Preview(showBackground = true, device = Devices.PIXEL_4)
+//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 //@Composable
 //fun SearchItemPreview() {
 //    SearchItem(
@@ -348,7 +360,7 @@ fun SearchItem(
 //    )
 //}
 
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SearchScreenPreview() {
     val navController = rememberNavController()

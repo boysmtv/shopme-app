@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.ui
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -177,16 +180,62 @@ fun DetailHeader() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DetailImage() {
-    Image(
-        painter = painterResource(id = R.drawable.ic_location_white),
-        contentDescription = null,
+    val images = listOf(
+        R.drawable.image_burger,
+        R.drawable.image_pizza,
+        R.drawable.image_platbread,
+        R.drawable.image_cheese_burger,
+        R.drawable.image_padang,
+        R.drawable.image_sate,
+        R.drawable.image_pempek,
+    )
+
+    val pagerState = rememberPagerState(
+        pageCount = { images.size }
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(280.dp),
-        contentScale = ContentScale.FillHeight
-    )
+            .height(280.dp)
+    ) {
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize()
+        ) { page ->
+            Image(
+                painter = painterResource(images[page]),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize()
+                    .clip(RoundedCornerShape(16.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 12.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            repeat(images.size) { index ->
+                val isSelected = pagerState.currentPage == index
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(if (isSelected) 10.dp else 8.dp)
+                        .background(
+                            color = if (isSelected) Color.White else Color.LightGray,
+                            shape = CircleShape
+                        )
+                )
+            }
+        }
+    }
 }
 
 @Composable
