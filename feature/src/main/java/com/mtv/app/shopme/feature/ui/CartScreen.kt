@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: CartScreen.kt
  *
@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,10 +69,8 @@ fun CartScreen(
                     )
                 )
             )
-            .padding(start = 20.dp, end = 20.dp, top = 16.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 32.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
         CartHeader()
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -176,7 +175,8 @@ private fun CartHeader() {
             text = "My Cart",
             color = Color.Black,
             fontFamily = PoppinsFont,
-            style = MaterialTheme.typography.titleMedium,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.Center),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

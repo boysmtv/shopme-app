@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: ListChatScreen.kt
  *
@@ -81,7 +81,7 @@ fun ChatListScreen(
                 }
 
                 Text(
-                    "Chats",
+                    text = "Chats",
                     fontFamily = PoppinsFont,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold

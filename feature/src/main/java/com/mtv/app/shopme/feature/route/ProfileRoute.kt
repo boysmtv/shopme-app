@@ -40,13 +40,14 @@ private fun profileEvent(vm: ProfileViewModel) = ProfileEventListener(
 
 private fun profileNavigation(nav: NavController) = ProfileNavigationListener(
     onEditProfile = { nav.navigate(AppDestinations.EDIT_PROFILE_GRAPH) },
-    onAddress = { nav.navigate("address") },
-    onPayment = { nav.navigate("payment") },
-    onOrderHistory = { nav.navigate("history") },
-    onTracking = { nav.navigate("tracking") },
-    onWishlist = { nav.navigate("wishlist") },
-    onSettings = { nav.navigate("settings") },
-    onHelpCenter = { nav.navigate("help") },
-    onAbout = { nav.navigate("about") },
-    onBack = { nav.popBackStack() }
+    onAddress = { nav.navigate(AppDestinations.EDIT_ADDRESS_GRAPH) },
+    onPayment = { nav.navigate("") },
+    onOrderHistory = { nav.navigate("") },
+    onTracking = { nav.navigate("") },
+    onWishlist = { nav.navigate("") },
+    onSettings = { nav.navigate("") },
+    onHelpCenter = { nav.navigate("") },
+    onAbout = { nav.navigate("") },
+    onBack = { nav.popBackStack() },
+    onOrder = { nav.navigate(AppDestinations.ORDER_GRAPH) },
 )

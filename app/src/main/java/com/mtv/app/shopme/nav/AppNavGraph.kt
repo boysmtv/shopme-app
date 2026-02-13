@@ -24,5 +24,6 @@ fun AppNavGraph(navController: NavHostController) {
         detailGraph(navController)
         notificationGraph(navController)
         profileGraph(navController)
+        orderGraph(navController)
     }
 }
