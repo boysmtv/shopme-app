@@ -30,7 +30,7 @@ fun AppNavigation() {
         BottomNavItem.Home.route,
         BottomNavItem.Cart.route,
         BottomNavItem.Search.route,
-        BottomNavItem.Map.route,
+        BottomNavItem.Chat.route,
         BottomNavItem.Profile.route
     )
 

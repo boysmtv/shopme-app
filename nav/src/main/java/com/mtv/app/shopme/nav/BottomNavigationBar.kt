@@ -42,7 +42,7 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavItem.Home,
         BottomNavItem.Cart,
         BottomNavItem.Search,
-        BottomNavItem.Map,
+        BottomNavItem.Chat,
         BottomNavItem.Profile
     )
 

@@ -70,6 +70,9 @@ import com.mtv.app.shopme.feature.contract.SearchNavigationListener
 import com.mtv.app.shopme.feature.contract.SearchStateListener
 import com.mtv.app.shopme.nav.BottomNavigationBar
 
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+
 @Composable
 fun SearchScreen(
     uiState: SearchStateListener,
@@ -77,116 +80,121 @@ fun SearchScreen(
     uiEvent: SearchEventListener,
     uiNavigation: SearchNavigationListener
 ) {
-    var query by remember { mutableStateOf(uiData.query) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.verticalGradient(listOf(AppColor.LightOrange, AppColor.White)))
-            .padding(16.dp)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        AppColor.LightOrange,
+                        AppColor.WhiteSoft,
+                        AppColor.White
+                    )
+                )
+            )
+            .padding(start = 20.dp, end = 20.dp, top = 16.dp)
     ) {
-        // Header with back + search
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(48.dp)
-                    .background(Color.White, RoundedCornerShape(24.dp)),
-                contentAlignment = Alignment.CenterStart
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = "Search",
-                        tint = Color.Gray,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    BasicTextField(
-                        value = query,
-                        onValueChange = { query = it; uiEvent.onQueryChanged(it) },
-                        singleLine = true,
-                        textStyle = TextStyle(color = Color.Black, fontSize = 14.sp, fontFamily = PoppinsFont),
-                        cursorBrush = SolidColor(AppColor.Orange),
-                        decorationBox = { innerTextField ->
-                            Box(
-                                Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.CenterStart
-                            ) {
-                                if (query.isEmpty()) Text(
-                                    "Search food here...",
-                                    color = Color.Gray,
-                                    fontFamily = PoppinsFont,
-                                    fontSize = 14.sp
-                                )
-                                innerTextField()
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
+        Spacer(modifier = Modifier.height(16.dp))
 
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = ""; uiEvent.onQueryChanged("") }) {
-                            Icon(Icons.Default.Clear, contentDescription = "Clear", tint = Color.Gray)
+        SearchHeader(uiData, uiEvent)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val scrollState = rememberScrollState()
+        Column(modifier = Modifier.verticalScroll(scrollState)) {
+            mockFoodList.forEachIndexed { index, food ->
+                SearchItem(
+                    movie = food,
+                    onClickMovie = {},
+                    previewDrawable = when (index) {
+                        0 -> R.drawable.image_burger
+                        1 -> R.drawable.image_pizza
+                        2 -> R.drawable.image_platbread
+                        3 -> R.drawable.image_cheese_burger
+                        4 -> R.drawable.image_bakso
+                        5 -> R.drawable.image_pempek
+                        6 -> R.drawable.image_padang
+                        7 -> R.drawable.image_sate
+                        else -> null
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchHeader(
+    uiData: SearchDataListener,
+    uiEvent: SearchEventListener
+) {
+    var query by remember { mutableStateOf(uiData.query) }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(48.dp)
+                .background(Color.White, RoundedCornerShape(24.dp)),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Search",
+                    tint = Color.Gray,
+                    modifier = Modifier.padding(start = 16.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                BasicTextField(
+                    value = query,
+                    onValueChange = { query = it; uiEvent.onQueryChanged(it) },
+                    singleLine = true,
+                    textStyle = TextStyle(color = Color.Black, fontSize = 14.sp, fontFamily = PoppinsFont),
+                    cursorBrush = SolidColor(AppColor.Orange),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (query.isEmpty()) Text(
+                                "Search food here...",
+                                color = Color.Gray,
+                                fontFamily = PoppinsFont,
+                                fontSize = 14.sp
+                            )
+                            innerTextField()
                         }
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (query.isNotEmpty()) {
+                    IconButton(onClick = { query = ""; uiEvent.onQueryChanged("") }) {
+                        Icon(Icons.Default.Clear, contentDescription = "Clear", tint = Color.Gray)
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Icon(
-                imageVector = Icons.Filled.Favorite,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .padding(12.dp),
-                tint = Color.Red
-            )
         }
 
-        SearchItem(
-            movie = mockFoodList.first(),
-            onClickMovie = {},
-            previewDrawable = R.drawable.image_burger
-        )
+        Spacer(modifier = Modifier.width(16.dp))
 
-        SearchItem(
-            movie = mockFoodList[1],
-            onClickMovie = {},
-            previewDrawable = R.drawable.image_pizza
-        )
-
-        SearchItem(
-            movie = mockFoodList[2],
-            onClickMovie = {},
-            previewDrawable = R.drawable.image_platbread
-        )
-
-        SearchItem(
-            movie = mockFoodList[3],
-            onClickMovie = {},
-            previewDrawable = R.drawable.image_cheese_burger
-        )
-
-        SearchItem(
-            movie = mockFoodList[4],
-            onClickMovie = {},
-            previewDrawable = R.drawable.image_bakso
-        )
-
-        SearchItem(
-            movie = mockFoodList[5],
-            onClickMovie = {},
-            previewDrawable = R.drawable.image_pempek
+        Icon(
+            imageVector = Icons.Filled.Favorite,
+            contentDescription = null,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .padding(12.dp),
+            tint = Color.Red
         )
     }
 }
@@ -217,7 +225,7 @@ fun SearchItem(
                     shape = RoundedCornerShape(8.dp)
                 )
 
-            if (!movie.imageUrl.isNullOrEmpty()) {
+            if (movie.imageUrl.isNotEmpty()) {
                 val bitmap = base64ToBitmap(movie.imageUrl)
                 if (bitmap != null) {
                     Image(
@@ -239,7 +247,12 @@ fun SearchItem(
                             .background(Color.DarkGray),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("No Image", fontSize = 12.sp, color = Color.DarkGray)
+                        Text(
+                            text = "No Image",
+                            fontSize = 12.sp,
+                            fontFamily = PoppinsFont,
+                            color = Color.DarkGray
+                        )
                     }
                 }
             } else if (previewDrawable != null) {
@@ -255,7 +268,12 @@ fun SearchItem(
                         .background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No Image", fontSize = 12.sp, color = Color.DarkGray)
+                    Text(
+                        text = "No Image",
+                        fontSize = 12.sp,
+                        fontFamily = PoppinsFont,
+                        color = Color.DarkGray
+                    )
                 }
             }
 
@@ -332,7 +350,7 @@ fun SearchItem(
 }
 
 
-//@Preview(showBackground = true, device = Devices.PIXEL_4)
+//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 //@Composable
 //fun SearchItemPreview() {
 //    SearchItem(
@@ -342,7 +360,7 @@ fun SearchItem(
 //    )
 //}
 
-@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SearchScreenPreview() {
     val navController = rememberNavController()
