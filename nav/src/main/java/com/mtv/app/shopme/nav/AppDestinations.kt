@@ -21,6 +21,8 @@ object AppDestinations {
     const val EDIT_ADDRESS_GRAPH = "EDIT_ADDRESS_GRAPH"
     const val NOTIFICATION_GRAPH = "NOTIFICATION_GRAPH"
     const val CHAT_GRAPH = "CHAT_GRAPH"
+    const val ORDER_GRAPH = "ORDER_GRAPH"
+    const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
 
     fun navigateToDetailMovies(movieId: Int): String {
         return "MOVIE_DETAIL_ROUTE/$movieId"

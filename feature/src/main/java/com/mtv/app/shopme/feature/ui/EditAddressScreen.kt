@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: EditAddressScreen.kt
  *
@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.base.BaseSimpleDropdownField
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
 import com.mtv.app.shopme.feature.contract.*
 
@@ -54,10 +55,8 @@ fun EditAddressScreen(
                     )
                 )
             )
-            .padding(top = 16.dp)
+            .padding(top = 32.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
         EditAddressHeader(uiNavigation)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -118,11 +117,19 @@ fun EditAddressMenus(
                 .padding(20.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
 
-            BaseSimpleFormField(
+            val villageList = listOf(
+                "Perumahan Griya Asri",
+                "Permata Indah",
+                "Bukit Hijau Residence",
+                "Green Valley",
+                "Puri Mewah"
+            )
+
+            BaseSimpleDropdownField(
                 label = "Nama Perumahan",
                 value = village,
+                options = villageList,
             ) { village = it }
 
             Spacer(modifier = Modifier.height(12.dp))

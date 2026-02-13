@@ -16,7 +16,8 @@ data class FoodItemModel(
     val desc: String = EMPTY_STRING,
     val price: Double = 0.0,
     val imageUrl: String = EMPTY_STRING,
-    val cafeId: String = EMPTY_STRING
+    val cafeId: String = EMPTY_STRING,
+    val categoryId: String = EMPTY_STRING
 )
 
 data class OwnerCafeModel(
@@ -55,12 +56,29 @@ data class OrderModel(
     val id: String = EMPTY_STRING,
     val customerId: String = EMPTY_STRING,
     val cafeId: String = EMPTY_STRING,
-    val items: Map<String, OrderItemModel> = emptyMap(),
+    val items: List<OrderItemModel> = emptyList(),
     val totalPrice: Double = 0.0,
     val status: OrderStatus = OrderStatus.ORDERED,
     val timestamp: Long = System.currentTimeMillis(),
-    val deliveryAddress: String = ""
+    val deliveryAddress: String = EMPTY_STRING
 )
+
+data class CategoryModel(
+    val id: String = "",
+    val name: String = "",
+    val icon: String = ""
+)
+
+data class CartItemModel(
+    val foodId: Int = 0,
+    val quantity: Int = 0
+)
+
+data class CartModel(
+    val customerId: String = "",
+    val items: List<CartItemModel> = emptyList()
+)
+
 
 enum class OrderStatus(val value: String) {
     ORDERED("ORDERED"),

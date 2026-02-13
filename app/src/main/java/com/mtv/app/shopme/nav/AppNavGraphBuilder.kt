@@ -20,6 +20,7 @@ import com.mtv.app.shopme.feature.route.EditProfileRoute
 import com.mtv.app.shopme.feature.route.HomeRoute
 import com.mtv.app.shopme.feature.route.ChatListRoute
 import com.mtv.app.shopme.feature.route.NotifRoute
+import com.mtv.app.shopme.feature.route.OrderRoute
 import com.mtv.app.shopme.feature.route.ProfileRoute
 import com.mtv.app.shopme.feature.route.SearchRoute
 import com.mtv.app.shopme.feature.route.SplashRoute
@@ -91,5 +92,11 @@ fun NavGraphBuilder.profileGraph(nav: NavHostController) {
     }
     composable(AppDestinations.EDIT_ADDRESS_GRAPH) {
         EditAddressRoute(nav)
+    }
+}
+
+fun NavGraphBuilder.orderGraph(nav: NavHostController) {
+    composable(AppDestinations.ORDER_GRAPH) {
+        OrderRoute(nav)
     }
 }

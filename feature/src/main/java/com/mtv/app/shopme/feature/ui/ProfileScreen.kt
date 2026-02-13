@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: ProfileScreen.kt
  *
@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -77,10 +78,10 @@ fun ProfileScreen(
 ) {
 
     val orderMenus = listOf(
-        OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet),
-        OrderMenu("Dimasak", Icons.Filled.Inventory),
-        OrderMenu("Dikirim", Icons.Filled.LocalShipping),
-        OrderMenu("Selesai", Icons.Filled.CheckCircle)
+        OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet, 1),
+        OrderMenu("Dimasak", Icons.Filled.Inventory, 2),
+        OrderMenu("Dikirim", Icons.Filled.LocalShipping, 3),
+        OrderMenu("Selesai", Icons.Filled.CheckCircle, 4)
     )
 
     Column(
@@ -94,10 +95,8 @@ fun ProfileScreen(
                     )
                 )
             )
-            .padding(top = 16.dp)
+            .padding(top = 32.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-
         HeaderProfile()
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -121,8 +120,11 @@ fun ProfileScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(start = 20.dp, end = 20.dp)
             ) {
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
                     fontFamily = PoppinsFont,
                     text = "Pesanan Saya",
@@ -133,21 +135,48 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     orderMenus.forEach { menu ->
                         Column(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { uiNavigation.onOrder() },
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(
-                                imageVector = menu.icon,
-                                contentDescription = menu.title,
-                                modifier = Modifier.size(40.dp),
-                                tint = AppColor.Orange
-                            )
+
+                            Box(
+                                modifier = Modifier.size(45.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+
+                                Icon(
+                                    imageVector = menu.icon,
+                                    contentDescription = menu.title,
+                                    modifier = Modifier.size(40.dp),
+                                    tint = AppColor.Orange
+                                )
+
+                                // Badge Count (optional: only show if > 0)
+                                if (menu.count > 0) {
+                                    Box(
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .offset(x = 6.dp, y = (-6).dp)  // adjust position
+                                            .background(Color.Red, RoundedCornerShape(50))
+                                            .padding(horizontal = 6.dp, vertical = 2.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = menu.count.toString(),
+                                            color = Color.White,
+                                            fontSize = 10.sp,
+                                            fontFamily = PoppinsFont,
+                                        )
+                                    }
+                                }
+                            }
 
                             Spacer(Modifier.height(6.dp))
 
@@ -172,7 +201,7 @@ fun ProfileScreen(
                 ProfileMenuItem(
                     title = "Alamat Saya",
                     icon = Icons.Default.Map,
-                    onClickMenu = { }
+                    onClickMenu = { uiNavigation.onAddress() }
                 )
                 ProfileMenuItem(
                     title = "Riwayat Belanja",
@@ -189,13 +218,6 @@ fun ProfileScreen(
                     icon = Icons.AutoMirrored.Filled.Help,
                     onClickMenu = { }
                 )
-                ProfileMenuItem(
-                    title = "Keluar",
-                    isLogout = true,
-                    icon = Icons.AutoMirrored.Filled.Logout,
-                    onClickMenu = { }
-                )
-
                 Spacer(modifier = Modifier.height(50.dp))
             }
         }
@@ -280,7 +302,7 @@ fun ProfileMenuItem(
                 text = title,
                 fontSize = 14.sp,
                 fontWeight = if (isLogout) FontWeight.Bold else FontWeight.Normal,
-                color = if (isLogout) Color.Red else Color.Black
+                color = Color.Black
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -301,7 +323,8 @@ fun ProfileMenuItem(
 
 data class OrderMenu(
     val title: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val count: Int
 )
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

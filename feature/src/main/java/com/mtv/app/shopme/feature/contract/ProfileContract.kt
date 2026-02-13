@@ -8,8 +8,6 @@
 
 package com.mtv.app.shopme.feature.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
-
 data class ProfileStateListener(
     val activeDialog: ProfileDialog? = null
 )
@@ -33,7 +31,8 @@ data class ProfileNavigationListener(
     val onSettings: () -> Unit = {},
     val onHelpCenter: () -> Unit = {},
     val onAbout: () -> Unit = {},
-    val onBack: () -> Unit = {}
+    val onBack: () -> Unit = {},
+    val onOrder: () -> Unit = {}
 )
 
 sealed class ProfileDialog {
