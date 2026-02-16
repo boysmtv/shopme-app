@@ -12,6 +12,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.mtv.app.shopme.feature.route.CafeRoute
 import com.mtv.app.shopme.feature.route.CartRoute
 import com.mtv.app.shopme.feature.route.ChatRoute
 import com.mtv.app.shopme.feature.route.DetailRoute
@@ -96,6 +97,9 @@ fun NavGraphBuilder.profileGraph(nav: NavHostController) {
 }
 
 fun NavGraphBuilder.orderGraph(nav: NavHostController) {
+    composable(AppDestinations.CAFE_GRAPH) {
+        CafeRoute(nav)
+    }
     composable(AppDestinations.ORDER_GRAPH) {
         OrderRoute(nav)
     }
