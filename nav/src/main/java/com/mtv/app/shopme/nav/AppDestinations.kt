@@ -22,6 +22,7 @@ object AppDestinations {
     const val NOTIFICATION_GRAPH = "NOTIFICATION_GRAPH"
     const val CHAT_GRAPH = "CHAT_GRAPH"
     const val ORDER_GRAPH = "ORDER_GRAPH"
+    const val CAFE_GRAPH = "CAFE_GRAPH"
     const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
 
 }

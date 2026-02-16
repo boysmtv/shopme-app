@@ -80,7 +80,7 @@ fun HomeScreen(
                     )
                 )
             )
-            .padding(start = 20.dp, end = 20.dp)
+            .padding(horizontal = 20.dp)
             .height(56.dp)
             .statusBarsPadding()
     ) {

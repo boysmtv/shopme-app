@@ -12,6 +12,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -118,7 +119,9 @@ fun DetailScreen(
             item { DetailTitle() }
             item { Spacer(Modifier.height(6.dp)) }
 
-            item { DetailLocation() }
+            item { DetailLocation(
+                onClickCafe = { uiNavigation.onclickCafe() }
+            ) }
             item { Spacer(Modifier.height(12.dp)) }
 
             item { DetailDescription() }
@@ -271,21 +274,31 @@ fun DetailTitle() {
 }
 
 @Composable
-fun DetailLocation() {
+fun DetailLocation(
+    onClickCafe: () -> Unit
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = Icons.Default.Home,
-            contentDescription = null,
-            tint = AppColor.Orange
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = "Mamah Al Cafe",
-            color = Color.DarkGray,
-            fontSize = 14.sp,
-            fontFamily = PoppinsFont,
-            fontWeight = FontWeight.SemiBold
-        )
+        Row(
+            modifier = Modifier
+                .clickable {
+                    onClickCafe()
+                },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = null,
+                tint = AppColor.Orange
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "Mamah Al Cafe",
+                color = Color.DarkGray,
+                fontSize = 14.sp,
+                fontFamily = PoppinsFont,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
         Spacer(modifier = Modifier.width(8.dp))
         Icon(
             imageVector = Icons.Default.LocationOn,

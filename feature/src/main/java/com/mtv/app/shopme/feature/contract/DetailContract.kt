@@ -29,7 +29,8 @@ data class DetailEventListener(
 )
 
 data class DetailNavigationListener(
-    val onBack: () -> Unit = {}
+    val onBack: () -> Unit = {},
+    val onclickCafe: () -> Unit = {}
 )
 
 sealed class DetailDialog {

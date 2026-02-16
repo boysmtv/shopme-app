@@ -18,6 +18,7 @@ import com.mtv.app.shopme.feature.contract.DetailNavigationListener
 import com.mtv.app.shopme.feature.contract.DetailStateListener
 import com.mtv.app.shopme.feature.presentation.DetailViewModel
 import com.mtv.app.shopme.feature.ui.DetailScreen
+import com.mtv.app.shopme.nav.AppDestinations
 
 @Composable
 fun DetailRoute(nav: NavController) {
@@ -38,5 +39,6 @@ private fun detailEvent(vm: DetailViewModel) = DetailEventListener(
 )
 
 private fun detailNavigation(nav: NavController) = DetailNavigationListener(
-    onBack = {}
+    onBack = {},
+    onclickCafe = { nav.navigate(AppDestinations.CAFE_GRAPH) }
 )
