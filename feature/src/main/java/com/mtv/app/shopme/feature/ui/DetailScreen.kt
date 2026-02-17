@@ -33,21 +33,35 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,6 +92,7 @@ data class SimilarItem(
     val price: Double
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     uiState: DetailStateListener,
@@ -92,8 +107,28 @@ fun DetailScreen(
         SimilarItem(R.drawable.image_platbread, "Veggie Burger", 7.99)
     )
 
+    var showSheet by remember { mutableStateOf(false) }
+
+    if (showSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false }
+        ) {
+            VariantBottomSheetContent(
+                onAddToCart = {
+                    showSheet = false
+                }
+            )
+        }
+    }
+
     Scaffold(
-        bottomBar = { AddToCartBar() }
+        bottomBar = {
+            AddToCartBar(
+                onCartClick = {
+                    uiEvent.onAddToCart()
+                }
+            )
+        }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -119,9 +154,11 @@ fun DetailScreen(
             item { DetailTitle() }
             item { Spacer(Modifier.height(6.dp)) }
 
-            item { DetailLocation(
-                onClickCafe = { uiNavigation.onclickCafe() }
-            ) }
+            item {
+                DetailLocation(
+                    onClickCafe = { uiNavigation.onclickCafe() }
+                )
+            }
             item { Spacer(Modifier.height(12.dp)) }
 
             item { DetailDescription() }
@@ -148,17 +185,67 @@ fun DetailScreen(
 }
 
 @Composable
-fun AddToCartBar() {
-    Button(
-        onClick = {},
-        colors = ButtonDefaults.buttonColors(AppColor.Orange),
-        shape = RoundedCornerShape(18.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .height(56.dp)
+fun AddToCartBar(
+    onCartClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("Add to cart  •  $9.99", color = Color.White, fontSize = 17.sp)
+        Button(
+            onClick = {},
+            colors = ButtonDefaults.buttonColors(Color(0xFF25D366)),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .padding(start = 16.dp, top = 16.dp, bottom = 16.dp)
+                .height(56.dp)
+                .weight(1f)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Chat,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            Text(
+                text = "Tanya",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontFamily = PoppinsFont
+            )
+        }
+
+        Spacer(Modifier.width(16.dp))
+
+        Button(
+            onClick = { onCartClick() },
+            colors = ButtonDefaults.buttonColors(AppColor.Orange),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier
+                .padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
+                .height(56.dp)
+                .weight(1f)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ShoppingCart,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            Text(
+                text = "Keranjang",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontFamily = PoppinsFont
+            )
+        }
     }
 }
 
@@ -224,7 +311,7 @@ fun DetailImage() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(280.dp)
+            .height(240.dp)
     ) {
 
         HorizontalPager(
@@ -236,7 +323,7 @@ fun DetailImage() {
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(16.dp)),
+                    .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
         }
@@ -395,7 +482,8 @@ fun StatusStatItem(
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = text,
-            color = color
+            color = color,
+            fontFamily = PoppinsFont
         )
     }
 }
@@ -423,7 +511,8 @@ fun StatItem(
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = text,
-            color = AppColor.Orange
+            color = AppColor.Orange,
+            fontFamily = PoppinsFont
         )
     }
 }
@@ -437,6 +526,239 @@ fun SectionTitle(title: String) {
         fontFamily = PoppinsFont
     )
 }
+
+@Composable
+fun VariantBottomSheetContent(
+    onAddToCart: () -> Unit
+) {
+
+    var selectedSize by remember { mutableStateOf("Medium") }
+    var selectedSpicy by remember { mutableStateOf("Normal") }
+    var extraCheese by remember { mutableStateOf(false) }
+    var doublePatty by remember { mutableStateOf(true) }
+
+    val basePrice = 35000
+    val sizePrice = when (selectedSize) {
+        "Large" -> 5000
+        else -> 0
+    }
+    val toppingPrice = if (extraCheese) 5000 else 0
+
+    val totalPrice = basePrice + sizePrice + toppingPrice
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp)
+    ) {
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Text(
+                text = "Pilih Varian",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = PoppinsFont
+            )
+
+            IconButton(
+                onClick = { }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = AppColor.Orange
+                )
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        Text(
+            text = "Ukuran",
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = PoppinsFont
+        )
+        Spacer(Modifier.height(8.dp))
+
+        VariantSelector(
+            options = listOf("Medium", "Large"),
+            selected = selectedSize,
+            onSelect = { selectedSize = it }
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = "Level Pedas",
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = PoppinsFont
+        )
+        Spacer(Modifier.height(8.dp))
+
+        VariantSelector(
+            options = listOf("Normal", "Sedang", "Pedas 🔥"),
+            selected = selectedSpicy,
+            onSelect = { selectedSpicy = it }
+        )
+
+        Spacer(Modifier.height(20.dp))
+        HorizontalDivider(color = AppColor.LightOrange, modifier = Modifier.height(1.dp))
+
+        Spacer(Modifier.height(20.dp))
+        Text(
+            text = "Tambahan",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = PoppinsFont
+        )
+
+        Spacer(Modifier.height(16.dp))
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            AddOnItem(
+                title = "Extra Cheese",
+                price = 5000,
+                selected = extraCheese,
+                onClick = { extraCheese = !extraCheese }
+            )
+
+            AddOnItem(
+                title = "Double Patty",
+                price = 12000,
+                selected = doublePatty,
+                onClick = { doublePatty = !doublePatty }
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = "Total: Rp $totalPrice",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = AppColor.Orange,
+            fontFamily = PoppinsFont,
+            textAlign = TextAlign.End
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(
+            onClick = onAddToCart,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(AppColor.Orange),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.ShoppingCart,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+
+            Spacer(Modifier.width(8.dp))
+
+            Text(
+                text = "Tambah ke Keranjang",
+                color = Color.White,
+                fontSize = 16.sp,
+                fontFamily = PoppinsFont,
+            )
+        }
+    }
+}
+
+@Composable
+fun AddOnItem(
+    title: String,
+    price: Int,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val borderColor =
+        if (selected) AppColor.Orange else Color.Gray.copy(alpha = 0.3f)
+
+    val backgroundColor =
+        if (selected) AppColor.Orange.copy(alpha = 0.08f) else Color.White
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(backgroundColor)
+            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                fontFamily = PoppinsFont,
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = "+ Rp $price",
+                fontSize = 13.sp,
+                color = AppColor.Orange
+            )
+        }
+
+        if (selected) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = AppColor.Orange
+            )
+        }
+    }
+}
+
+
+@Composable
+fun VariantSelector(
+    options: List<String>,
+    selected: String,
+    onSelect: (String) -> Unit
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        options.forEach { option ->
+            val isSelected = option == selected
+
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(
+                        if (isSelected) AppColor.Orange
+                        else AppColor.Orange.copy(alpha = 0.1f)
+                    )
+                    .clickable { onSelect(option) }
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    option,
+                    color = if (isSelected) Color.White else AppColor.Orange,
+                    fontFamily = PoppinsFont
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun IngredientsRow() {
@@ -491,7 +813,8 @@ fun SimilarItemRow(image: Int, title: String, price: Double) {
         ) {
             Text(
                 text = title,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                fontFamily = PoppinsFont
             )
 
             Spacer(Modifier.height(4.dp))
@@ -499,7 +822,8 @@ fun SimilarItemRow(image: Int, title: String, price: Double) {
             Text(
                 text = "$${price}",
                 color = AppColor.Orange,
-                fontSize = 14.sp
+                fontSize = 14.sp,
+                fontFamily = PoppinsFont
             )
         }
 
@@ -538,6 +862,28 @@ fun DetailScreenPreview() {
         uiEvent = DetailEventListener(),
         uiNavigation = DetailNavigationListener()
     )
+}
+
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
+@Composable
+fun VariantBottomSheetMockPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColor.Gray), // background gelap
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                .background(Color.White)
+        ) {
+            VariantBottomSheetContent(
+                onAddToCart = {}
+            )
+        }
+    }
 }
 
 
