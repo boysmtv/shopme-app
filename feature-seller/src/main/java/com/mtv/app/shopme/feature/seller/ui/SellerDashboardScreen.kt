@@ -492,7 +492,7 @@ fun WeeklyOrdersChart() {
 }
 
 @Composable
-fun OrderFilterChips(
+private fun OrderFilterChips(
     selected: String,
     onSelected: (String) -> Unit
 ) {

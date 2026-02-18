@@ -41,8 +41,9 @@ fun SellerBottomNavigationBar(navController: NavController) {
 
     val items = listOf(
         SellerBottomNavItem.Dashboard,
-        SellerBottomNavItem.Product,
         SellerBottomNavItem.Order,
+        SellerBottomNavItem.Chat,
+        SellerBottomNavItem.Product,
         SellerBottomNavItem.Profile
     )
 
@@ -57,7 +58,7 @@ fun SellerBottomNavigationBar(navController: NavController) {
     ) {
         NavigationBar(
             modifier = Modifier
-                .padding(horizontal = 32.dp, vertical = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .height(64.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .border(1.dp, AppColor.Blue.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
@@ -135,8 +136,9 @@ fun SellerBottomNavigationBarPreview(activeRoute: String) {
 
     val items = listOf(
         SellerBottomNavItem.Dashboard,
-        SellerBottomNavItem.Product,
         SellerBottomNavItem.Order,
+        SellerBottomNavItem.Chat,
+        SellerBottomNavItem.Product,
         SellerBottomNavItem.Profile
     )
 
@@ -148,7 +150,7 @@ fun SellerBottomNavigationBarPreview(activeRoute: String) {
     ) {
         NavigationBar(
             modifier = Modifier
-                .padding(horizontal = 32.dp, vertical = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .height(64.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .border(1.dp, AppColor.Blue.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
