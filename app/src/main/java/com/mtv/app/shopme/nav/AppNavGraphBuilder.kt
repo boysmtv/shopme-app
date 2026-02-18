@@ -106,32 +106,26 @@ fun NavGraphBuilder.orderGraph(nav: NavHostController) {
     }
 }
 
-
 fun NavGraphBuilder.sellerGraph(nav: NavHostController) {
     navigation(
         startDestination = SellerDestinations.DASHBOARD,
         route = SellerDestinations.SELLER_GRAPH
     ) {
-        composable(SellerDestinations.SELLER_GRAPH) {
-            SellerRootScreen()
-        }
-
         composable(SellerDestinations.DASHBOARD) {
             SellerDashboardRoute(nav)
         }
 
         composable(SellerDestinations.PRODUCT) {
-//            SellerProductRoute(nav)
+            // SellerProductRoute(nav)
         }
 
         composable(SellerDestinations.ORDER) {
-//            SellerOrderRoute(nav)
+            // SellerOrderRoute(nav)
         }
 
         composable(SellerDestinations.PROFILE) {
-//            SellerProfileRoute(nav)
+            // SellerProfileRoute(nav)
         }
-
     }
 }
 

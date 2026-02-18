@@ -61,7 +61,7 @@ import com.mtv.app.shopme.feature.customer.contract.CartDataListener
 import com.mtv.app.shopme.feature.customer.contract.CartEventListener
 import com.mtv.app.shopme.feature.customer.contract.CartNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.CartStateListener
-import com.mtv.app.shopme.nav.BottomNavigationBar
+import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
@@ -662,7 +662,7 @@ fun CartScreenPreview() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            CustomerBottomNavigationBar(navController)
         }
     ) { padding ->
         Box(

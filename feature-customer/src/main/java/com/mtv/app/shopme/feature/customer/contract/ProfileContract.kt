@@ -8,6 +8,8 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.navigation.NavController
+
 data class ProfileStateListener(
     val activeDialog: com.mtv.app.shopme.feature.customer.contract.ProfileDialog? = null
 )
@@ -31,7 +33,8 @@ data class ProfileNavigationListener(
     val onSettings: () -> Unit = {},
     val onHelpCenter: () -> Unit = {},
     val onAbout: () -> Unit = {},
-    val onOrder: () -> Unit = {}
+    val onOrder: () -> Unit = {},
+    val onNavigateToSeller: (navController: NavController) -> Unit = {}
 )
 
 sealed class ProfileDialog {

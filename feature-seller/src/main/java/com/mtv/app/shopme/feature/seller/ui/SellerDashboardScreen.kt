@@ -8,18 +8,26 @@
 
 package com.mtv.app.shopme.feature.seller.ui
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Payment
@@ -29,11 +37,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -45,12 +56,14 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
+import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.feature.seller.contract.SellerDataListener
 import com.mtv.app.shopme.feature.seller.contract.SellerEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerStateListener
+import com.mtv.app.shopme.nav.SellerBottomNavigationBar
 import kotlin.math.max
-
 
 @Composable
 fun SellerDashboardScreen(
@@ -69,6 +82,7 @@ fun SellerDashboardScreen(
             "customer" to "John Doe",
             "total" to "Rp 120.000",
             "date" to "18 Feb 2026",
+            "time" to "09:45",
             "payment" to "Transfer Bank",
             "status" to "Pending",
             "location" to "Puri Lestari - Blok H12/12"
@@ -78,6 +92,7 @@ fun SellerDashboardScreen(
             "customer" to "Jane Smith",
             "total" to "Rp 250.000",
             "date" to "17 Feb 2026",
+            "time" to "14:30",
             "payment" to "E-Wallet",
             "status" to "Completed",
             "location" to "Puri Lestari - Blok H11/10"
@@ -87,6 +102,7 @@ fun SellerDashboardScreen(
             "customer" to "Michael Johnson",
             "total" to "Rp 180.000",
             "date" to "16 Feb 2026",
+            "time" to "11:15",
             "payment" to "Cash",
             "status" to "Cooking",
             "location" to "Puri Indah - Blok A5/3"
@@ -96,6 +112,7 @@ fun SellerDashboardScreen(
             "customer" to "Emily Davis",
             "total" to "Rp 300.000",
             "date" to "15 Feb 2026",
+            "time" to "16:50",
             "payment" to "Transfer Bank",
             "status" to "Cancelled",
             "location" to "Puri Lestari - Blok H13/5"
@@ -108,13 +125,11 @@ fun SellerDashboardScreen(
     }
 
     Scaffold { padding ->
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFF4F6FA))
                 .padding(padding),
-            contentPadding = PaddingValues(bottom = 80.dp)
         ) {
 
             item { DashboardHeader(isOnline) { isOnline = !isOnline } }
@@ -146,7 +161,7 @@ fun SellerDashboardScreen(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(50))
                                     .background(
-                                        if (isSelected) Color(0xFFFF6B00)
+                                        if (isSelected) AppColor.Blue
                                         else Color.LightGray.copy(alpha = 0.3f)
                                     )
                                     .clickable { selectedSort = sortOption }
@@ -154,7 +169,7 @@ fun SellerDashboardScreen(
                             ) {
                                 Text(
                                     sortOption,
-                                    color = if (isSelected) Color.White else Color.Black,
+                                    color = if (isSelected) AppColor.White else Color.Black,
                                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                                     fontSize = 12.sp
                                 )
@@ -173,6 +188,7 @@ fun SellerDashboardScreen(
                         customer = order["customer"]!!,
                         total = order["total"]!!,
                         date = order["date"]!!,
+                        time = order["time"]!!,
                         paymentMethod = order["payment"]!!,
                         status = order["status"]!!,
                         location = order["location"]!!
@@ -190,15 +206,16 @@ fun ModernOrderItemCompact(
     customer: String,
     total: String,
     date: String,
+    time: String,
     paymentMethod: String,
     status: String,
     location: String
 ) {
     val statusColor = when (status.lowercase()) {
         "completed" -> Color(0xFF4CAF50)
-        "pending" -> Color(0xFFFFC107)
-        "canceled" -> Color(0xFFF44336)
-        else -> Color(0xFFFF6B00)
+        "pending" -> Color(0xFFFF5722)
+        "canceled" -> Color(0xFFFF0D00)
+        else -> AppColor.Blue
     }
 
     Card(
@@ -211,9 +228,11 @@ fun ModernOrderItemCompact(
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(invoice, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                    Text(customer, fontSize = 12.sp, color = Color.Gray, maxLines = 1)
-                    Text(location, fontSize = 11.sp, color = Color.Gray, maxLines = 1)
+                    Text(customer, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Spacer(Modifier.height(4.dp))
+                    Text(location, fontSize = 12.sp, color = Color.Gray, maxLines = 1)
+                    Spacer(Modifier.height(4.dp))
+                    Text(invoice, fontSize = 11.sp, color = Color.Gray, maxLines = 1)
                 }
                 Text(total, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             }
@@ -226,11 +245,21 @@ fun ModernOrderItemCompact(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.CalendarToday, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                    Icon(
+                        Icons.Default.CalendarToday,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(14.dp)
+                    )
                     Spacer(Modifier.width(4.dp))
-                    Text(date, fontSize = 11.sp, color = Color.Gray)
+                    Text("$time - $date", fontSize = 11.sp, color = Color.Gray)
                     Spacer(Modifier.width(12.dp))
-                    Icon(Icons.Default.Payment, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(14.dp))
+                    Icon(
+                        Icons.Default.Payment,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(14.dp)
+                    )
                     Spacer(Modifier.width(4.dp))
                     Text(paymentMethod, fontSize = 11.sp, color = Color.Gray)
                 }
@@ -258,7 +287,7 @@ fun DashboardHeader(
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(
-                    listOf(Color(0xFFFF6B00), Color(0xFFFF8C42))
+                    listOf(AppColor.Blue, AppColor.LightBlue)
                 )
             )
             .padding(20.dp)
@@ -270,19 +299,19 @@ fun DashboardHeader(
                 Column {
                     Text(
                         text = "Joe's Burger Cafe",
-                        color = Color.White,
+                        color = AppColor.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(8.dp))
-                    
+
                     Text(
                         text = "Puri Lestari - Blok H12/12",
-                        color = Color.White,
+                        color = AppColor.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(12.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
@@ -294,7 +323,7 @@ fun DashboardHeader(
                         Spacer(Modifier.width(6.dp))
                         Text(
                             if (isOnline) "Online" else "Offline",
-                            color = Color.White,
+                            color = AppColor.White,
                             fontSize = 12.sp
                         )
                     }
@@ -303,8 +332,6 @@ fun DashboardHeader(
                 Spacer(Modifier.weight(1f))
                 NotificationBadge(count = 3)
             }
-
-            Spacer(Modifier.height(8.dp))
 
             Switch(
                 checked = isOnline,
@@ -320,9 +347,9 @@ fun NotificationBadge(count: Int) {
         Icon(
             imageVector = Icons.Default.Notifications,
             contentDescription = null,
-            tint = Color.White,
+            tint = AppColor.White,
             modifier = Modifier
-                .size(40.dp)
+                .size(38.dp)
         )
 
         if (count > 0) {
@@ -337,7 +364,7 @@ fun NotificationBadge(count: Int) {
             ) {
                 Text(
                     text = count.toString(),
-                    color = Color.White,
+                    color = AppColor.White,
                     fontSize = 12.sp
                 )
             }
@@ -421,7 +448,7 @@ fun WeeklyOrdersChart() {
                     }
 
                     drawCircle(
-                        color = Color(0xFFFF6B00),
+                        color = AppColor.Blue,
                         radius = 6f,
                         center = Offset(x, y)
                     )
@@ -429,7 +456,7 @@ fun WeeklyOrdersChart() {
 
                 drawPath(
                     path = path,
-                    color = Color(0xFFFF6B00),
+                    color = AppColor.Blue,
                     style = Stroke(width = 4f)
                 )
 
@@ -482,7 +509,7 @@ fun OrderFilterChips(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
                     .background(
-                        if (isSelected) Color(0xFFFF6B00)
+                        if (isSelected) AppColor.Blue
                         else Color.LightGray.copy(alpha = 0.3f)
                     )
                     .clickable { onSelected(filter) }
@@ -490,7 +517,7 @@ fun OrderFilterChips(
             ) {
                 Text(
                     filter,
-                    color = if (isSelected) Color.White else Color.Black,
+                    color = if (isSelected) AppColor.White else Color.Black,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
                 )
             }
@@ -501,10 +528,25 @@ fun OrderFilterChips(
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerDashboardPreview() {
-    SellerDashboardScreen(
-        uiState = SellerStateListener(),
-        uiData = SellerDataListener(),
-        uiEvent = SellerEventListener(),
-        uiNavigation = SellerNavigationListener()
-    )
+    val navController = rememberNavController()
+    Scaffold(
+        bottomBar = {
+            SellerBottomNavigationBar(navController)
+        }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .padding(bottom = padding.calculateBottomPadding())
+                .fillMaxSize()
+                .background(AppColor.White)
+        ) {
+
+            SellerDashboardScreen(
+                uiState = SellerStateListener(),
+                uiData = SellerDataListener(),
+                uiEvent = SellerEventListener(),
+                uiNavigation = SellerNavigationListener()
+            )
+        }
+    }
 }
