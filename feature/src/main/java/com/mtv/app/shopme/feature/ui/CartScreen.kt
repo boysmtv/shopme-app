@@ -37,6 +37,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,6 +71,20 @@ fun CartScreen(
     uiEvent: CartEventListener,
     uiNavigation: CartNavigationListener
 ) {
+    var showCheckoutDialog by remember { mutableStateOf(false) }
+
+    if (showCheckoutDialog) {
+        CheckoutConfirmationDialog(
+            total = grandTotal,
+            onDismiss = { showCheckoutDialog = false },
+            onConfirm = {
+                showCheckoutDialog = false
+                uiNavigation.onNavigateToOrder()
+            }
+        )
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,7 +166,9 @@ fun CartScreen(
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Button(
-                    onClick = {},
+                    onClick = {
+                        showCheckoutDialog = true
+                    },
                     colors = ButtonDefaults.buttonColors(AppColor.Orange),
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier
@@ -562,6 +582,78 @@ data class CartItem(
     val quantity: Int,
     val notes: String = EMPTY_STRING
 )
+
+@Composable
+fun CheckoutConfirmationDialog(
+    total: Double,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(20.dp),
+        title = {
+            Text(
+                text = "Konfirmasi Pesanan",
+                fontFamily = PoppinsFont,
+                fontWeight = FontWeight.SemiBold
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = "Pesanan akan dikirim ke penjual dengan total harga:",
+                    fontFamily = PoppinsFont,
+                    fontSize = 14.sp
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    text = "$${"%.2f".format(total)}",
+                    fontFamily = PoppinsFont,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColor.Orange
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                Text(
+                    text = "Apakah kamu ingin melanjutkan?",
+                    fontFamily = PoppinsFont,
+                    fontSize = 14.sp
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(AppColor.Orange),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    "Ya, Lanjutkan",
+                    fontFamily = PoppinsFont,
+                    color = Color.White
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(Color.LightGray),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    "Batal",
+                    fontFamily = PoppinsFont,
+                    color = Color.Black
+                )
+            }
+        }
+    )
+}
 
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

@@ -36,8 +36,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
@@ -49,7 +47,6 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -57,8 +54,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -84,13 +83,18 @@ import com.mtv.app.shopme.feature.contract.DetailDataListener
 import com.mtv.app.shopme.feature.contract.DetailEventListener
 import com.mtv.app.shopme.feature.contract.DetailNavigationListener
 import com.mtv.app.shopme.feature.contract.DetailStateListener
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class SimilarItem(
     val image: Int,
     val title: String,
     val price: Double
 )
+
+enum class OrderStatus {
+    READY,
+    PREORDER,
+    JASTIP
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,23 +113,35 @@ fun DetailScreen(
 
     var showSheet by remember { mutableStateOf(false) }
 
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
     if (showSheet) {
         ModalBottomSheet(
-            onDismissRequest = { showSheet = false }
+            onDismissRequest = { showSheet = false },
+            sheetState = sheetState
         ) {
             VariantBottomSheetContent(
                 onAddToCart = {
+                    uiNavigation.onAddToCart()
+                },
+                onClose = {
                     showSheet = false
                 }
             )
+
         }
     }
 
     Scaffold(
         bottomBar = {
             AddToCartBar(
+                onChatClick = {
+                    uiNavigation.onChatClick()
+                },
                 onCartClick = {
-                    uiEvent.onAddToCart()
+                    showSheet = true
                 }
             )
         }
@@ -156,7 +172,7 @@ fun DetailScreen(
 
             item {
                 DetailLocation(
-                    onClickCafe = { uiNavigation.onclickCafe() }
+                    onClickCafe = { uiNavigation.onClickCafe() }
                 )
             }
             item { Spacer(Modifier.height(12.dp)) }
@@ -186,6 +202,7 @@ fun DetailScreen(
 
 @Composable
 fun AddToCartBar(
+    onChatClick: () -> Unit,
     onCartClick: () -> Unit
 ) {
     Row(
@@ -194,7 +211,7 @@ fun AddToCartBar(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Button(
-            onClick = {},
+            onClick = { onChatClick() },
             colors = ButtonDefaults.buttonColors(Color(0xFF25D366)),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
@@ -433,34 +450,27 @@ fun DetailStatsRow() {
     }
 }
 
-enum class OrderStatus {
-    READY,
-    PREORDER,
-    JASTIP
-}
-
 @Composable
 fun StatusStatItem(
     status: OrderStatus,
-    total: String = EMPTY_STRING
 ) {
     val (icon, color, text) = when (status) {
         OrderStatus.READY -> Triple(
             Icons.Default.CheckCircle,
             Color(0xFF4CAF50),
-            if (total.isNotEmpty()) "Ready / $total pcs" else "Ready"
+            "Ready"
         )
 
         OrderStatus.PREORDER -> Triple(
             Icons.Default.Schedule,
             Color(0xFFFF9800),
-            if (total.isNotEmpty()) "Pre-order / $total pcs" else "Pre-order"
+            "Pre-order"
         )
 
         OrderStatus.JASTIP -> Triple(
             Icons.Default.LocalShipping,
             Color(0xFF2196F3),
-            if (total.isNotEmpty()) "Jastip / $total pcs" else "Jastip"
+            "Jastip"
         )
     }
 
@@ -527,24 +537,131 @@ fun SectionTitle(title: String) {
     )
 }
 
+
+@Composable
+fun IngredientsRow() {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        items(7) {
+            IngredientItem(R.drawable.ic_location_white)
+        }
+    }
+}
+
+@Composable
+fun IngredientItem(image: Int) {
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(AppColor.White),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            painter = painterResource(id = image),
+            contentDescription = null,
+            modifier = Modifier.size(32.dp),
+            tint = AppColor.Orange
+        )
+    }
+}
+
+@Composable
+fun SimilarItemRow(image: Int, title: String, price: Double) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .border(1.dp, Color.Black.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Image(
+            painter = painterResource(id = image),
+            contentDescription = null,
+            modifier = Modifier
+                .size(42.dp)
+                .clip(RoundedCornerShape(4.dp)),
+            contentScale = ContentScale.Crop
+        )
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 12.dp)
+        ) {
+            Text(
+                text = title,
+                fontWeight = FontWeight.Medium,
+                fontFamily = PoppinsFont
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = "$${price}",
+                color = AppColor.Orange,
+                fontSize = 14.sp,
+                fontFamily = PoppinsFont
+            )
+        }
+
+        Box(
+            contentAlignment = Alignment.Center
+        ) {
+            StatusStatItem(OrderStatus.PREORDER)
+        }
+
+        Spacer(Modifier.width(16.dp))
+
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(AppColor.Orange),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = AppColor.White
+            )
+        }
+    }
+}
+
 @Composable
 fun VariantBottomSheetContent(
-    onAddToCart: () -> Unit
+    onAddToCart: () -> Unit,
+    onClose: () -> Unit
 ) {
-
+    var quantity by remember { mutableIntStateOf(1) }
     var selectedSize by remember { mutableStateOf("Medium") }
     var selectedSpicy by remember { mutableStateOf("Normal") }
     var extraCheese by remember { mutableStateOf(false) }
     var doublePatty by remember { mutableStateOf(true) }
 
     val basePrice = 35000
+
     val sizePrice = when (selectedSize) {
+        "Medium" -> 0
         "Large" -> 5000
         else -> 0
     }
-    val toppingPrice = if (extraCheese) 5000 else 0
 
-    val totalPrice = basePrice + sizePrice + toppingPrice
+    val spicyPrice = when (selectedSpicy) {
+        "Normal" -> 0
+        "Sedang" -> 2000
+        "Pedas 🔥" -> 3000
+        else -> 0
+    }
+
+    val toppingPrice =
+        (if (extraCheese) 5000 else 0) +
+                (if (doublePatty) 12000 else 0)
+
+    val singlePrice = basePrice + sizePrice + spicyPrice + toppingPrice
+    val totalPrice = singlePrice * quantity
 
     Column(
         modifier = Modifier
@@ -566,7 +683,7 @@ fun VariantBottomSheetContent(
             )
 
             IconButton(
-                onClick = { }
+                onClick = { onClose() }
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
@@ -576,7 +693,7 @@ fun VariantBottomSheetContent(
             }
         }
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
 
         Text(
             text = "Ukuran",
@@ -606,10 +723,10 @@ fun VariantBottomSheetContent(
             onSelect = { selectedSpicy = it }
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
         HorizontalDivider(color = AppColor.LightOrange, modifier = Modifier.height(1.dp))
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(8.dp))
         Text(
             text = "Tambahan",
             fontSize = 18.sp,
@@ -638,6 +755,89 @@ fun VariantBottomSheetContent(
 
         Spacer(Modifier.height(16.dp))
 
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            PriceRow("Harga", basePrice)
+            if (sizePrice > 0) PriceRow("Ukuran ($selectedSize)", sizePrice)
+            if (spicyPrice > 0) PriceRow("Level ($selectedSpicy)", spicyPrice)
+            if (extraCheese) PriceRow("Extra Cheese", 5000)
+            if (doublePatty) PriceRow("Double Patty", 12000)
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(AppColor.Orange.copy(alpha = 0.08f))
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Jumlah",
+                fontFamily = PoppinsFont,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (quantity > 1) AppColor.Orange else Color.Gray.copy(alpha = 0.3f)
+                        )
+                        .clickable {
+                            if (quantity > 1) quantity--
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "-",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(Modifier.width(12.dp))
+
+                Text(
+                    text = quantity.toString(),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = PoppinsFont
+                )
+
+                Spacer(Modifier.width(12.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(CircleShape)
+                        .background(AppColor.Orange)
+                        .clickable {
+                            quantity++
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "+",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
         Text(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -652,7 +852,7 @@ fun VariantBottomSheetContent(
         Spacer(Modifier.height(16.dp))
 
         Button(
-            onClick = onAddToCart,
+            onClick = { onAddToCart() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
@@ -669,7 +869,7 @@ fun VariantBottomSheetContent(
             Spacer(Modifier.width(8.dp))
 
             Text(
-                text = "Tambah ke Keranjang",
+                text = "Tambah ($quantity) • Rp $totalPrice",
                 color = Color.White,
                 fontSize = 16.sp,
                 fontFamily = PoppinsFont,
@@ -677,6 +877,29 @@ fun VariantBottomSheetContent(
         }
     }
 }
+
+@Composable
+fun PriceRow(label: String, price: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            fontFamily = PoppinsFont,
+            fontSize = 14.sp
+        )
+
+        Text(
+            text = "+ Rp $price",
+            fontFamily = PoppinsFont,
+            fontSize = 14.sp
+        )
+    }
+
+    Spacer(Modifier.height(6.dp))
+}
+
 
 @Composable
 fun AddOnItem(
@@ -759,100 +982,6 @@ fun VariantSelector(
     }
 }
 
-
-@Composable
-fun IngredientsRow() {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        items(7) {
-            IngredientItem(R.drawable.ic_location_white)
-        }
-    }
-}
-
-@Composable
-fun IngredientItem(image: Int) {
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(AppColor.White),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(id = image),
-            contentDescription = null,
-            modifier = Modifier.size(32.dp),
-            tint = AppColor.Orange
-        )
-    }
-}
-
-@Composable
-fun SimilarItemRow(image: Int, title: String, price: Double) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .border(1.dp, Color.Black.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = null,
-            modifier = Modifier
-                .size(42.dp)
-                .clip(RoundedCornerShape(4.dp)),
-            contentScale = ContentScale.Crop
-        )
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 12.dp)
-        ) {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Medium,
-                fontFamily = PoppinsFont
-            )
-
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                text = "$${price}",
-                color = AppColor.Orange,
-                fontSize = 14.sp,
-                fontFamily = PoppinsFont
-            )
-        }
-
-        Box(
-            contentAlignment = Alignment.Center
-        ) {
-            StatusStatItem(OrderStatus.PREORDER, "5")
-        }
-
-        Spacer(Modifier.width(16.dp))
-
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(AppColor.Orange),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = AppColor.White
-            )
-        }
-    }
-}
-
-
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun DetailScreenPreview() {
@@ -870,7 +999,7 @@ fun VariantBottomSheetMockPreview() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColor.Gray), // background gelap
+            .background(AppColor.Gray),
         contentAlignment = Alignment.BottomCenter
     ) {
         Box(
@@ -880,7 +1009,7 @@ fun VariantBottomSheetMockPreview() {
                 .background(Color.White)
         ) {
             VariantBottomSheetContent(
-                onAddToCart = {}
+                {}, {}
             )
         }
     }

@@ -1,9 +1,9 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: CafeScreen.kt
  *
- * Last modified by Dedy Wijaya on 14/02/26 22.35
+ * Last modified by Dedy Wijaya on 11/02/26 13.42
  */
 
 package com.mtv.app.shopme.feature.ui
@@ -33,6 +33,9 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -99,11 +102,16 @@ fun CafeScreen(
         ) {
 
             item {
-                CafeHeader(uiData)
+                CafeHeader(
+                    uiData = uiData,
+                    onChatClick = { uiNavigation.onNavigateToChat() },
+                    onWhatsappClick = { uiNavigation.onNavigateToWhatsapp },
+                )
+
                 Spacer(Modifier.height(16.dp))
 
                 Text(
-                    text = "Popular Menu",
+                    text = "Daftar Menu",
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = PoppinsFont,
                     fontSize = 16.sp,
@@ -120,7 +128,7 @@ fun CafeScreen(
             ) { item ->
                 CafeFoodItem(
                     item = item,
-                    onClickDetail = uiEvent.onFoodClick
+                    onClickDetail = { uiNavigation.onNavigateToDetail() }
                 )
             }
         }
@@ -185,8 +193,8 @@ fun CafeToolbar(
 @Composable
 fun CafeHeader(
     uiData: CafeDataListener,
-    onChatClick: () -> Unit = {},
-    onWhatsappClick: () -> Unit = {}
+    onChatClick: () -> Unit,
+    onWhatsappClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -198,7 +206,6 @@ fun CafeHeader(
             .padding(16.dp)
     ) {
         Column {
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(R.drawable.image_burger),
@@ -239,6 +246,33 @@ fun CafeHeader(
                 }
             }
 
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(AppColor.Orange.copy(alpha = 0.1f))
+                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = null,
+                    tint = AppColor.Orange,
+                    modifier = Modifier.size(16.dp)
+                )
+
+                Spacer(Modifier.width(6.dp))
+
+                Text(
+                    text = "Minimal Order Rp 10.000",
+                    fontSize = 12.sp,
+                    color = AppColor.Orange,
+                    fontFamily = PoppinsFont,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
             Spacer(Modifier.height(14.dp))
 
             Text(
@@ -261,7 +295,7 @@ fun CafeHeader(
                     background = AppColor.Orange,
                     textColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    onClick = { /* open chat */ }
+                    onClick = { onChatClick() }
                 )
 
                 ActionButton(
@@ -270,7 +304,7 @@ fun CafeHeader(
                     background = Color(0xFF25D366),
                     textColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    onClick = { /* open whatsapp */ }
+                    onClick = { onWhatsappClick() }
                 )
             }
         }
@@ -321,25 +355,62 @@ fun CafeFoodItem(
     Card(
         shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(4.dp),
-        modifier = Modifier.clickable { onClickDetail(item) }
+        modifier = Modifier
+            .then(
+                if (item.isActive) {
+                    Modifier.clickable { onClickDetail(item) }
+                } else {
+                    Modifier
+                }
+            )
     ) {
         Column {
 
             Box {
                 val imageRes = when (item.id) {
+                    0 -> R.drawable.image_burger
                     1 -> R.drawable.image_pizza
                     2 -> R.drawable.image_platbread
+                    3 -> R.drawable.image_cheese_burger
+                    4 -> R.drawable.image_bakso
+                    5 -> R.drawable.image_pempek
+                    6 -> R.drawable.image_padang
+                    7 -> R.drawable.image_sate
                     else -> R.drawable.image_burger
                 }
 
-                Image(
-                    painter = painterResource(imageRes),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp),
-                    contentScale = ContentScale.Crop
-                )
+                Box {
+                    Image(
+                        painter = painterResource(imageRes),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(100.dp),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    if (!item.isActive) {
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .background(Color.Black.copy(alpha = 0.5f))
+                        )
+
+                        Text(
+                            text = "Tidak Tersedia",
+                            color = Color.White,
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = PoppinsFont,
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .background(
+                                    Color.Black.copy(alpha = 0.7f),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 6.dp)
+                        )
+                    }
+                }
 
                 Icon(
                     imageVector = Icons.Default.Favorite,

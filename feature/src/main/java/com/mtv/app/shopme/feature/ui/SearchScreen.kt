@@ -113,7 +113,9 @@ fun SearchScreen(
             mockFoodList.forEachIndexed { index, food ->
                 SearchItem(
                     movie = food,
-                    onClickMovie = {},
+                    onClickItem = {
+                        uiNavigation.onDetailClick()
+                    },
                     previewDrawable = when (index) {
                         0 -> R.drawable.image_burger
                         1 -> R.drawable.image_pizza
@@ -209,13 +211,20 @@ fun SearchHeader(
 @Composable
 fun SearchItem(
     movie: FoodItemModel,
-    onClickMovie: (Int) -> Unit,
+    onClickItem: (Int) -> Unit,
     previewDrawable: Int? = null
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClickMovie(movie.id) }
+            .clickable { onClickItem(movie.id) }
+            .then(
+                if (movie.isActive) {
+                    Modifier.clickable { onClickItem(movie.id) }
+                } else {
+                    Modifier
+                }
+            )
     ) {
         Row(
             modifier = Modifier
@@ -242,12 +251,35 @@ fun SearchItem(
                         contentScale = ContentScale.Crop
                     )
                 } else if (previewDrawable != null) {
-                    Image(
-                        painter = painterResource(previewDrawable),
-                        contentDescription = movie.name,
-                        modifier = imageModifier,
-                        contentScale = ContentScale.FillWidth
-                    )
+                    Box {
+                        Image(
+                            painter = painterResource(previewDrawable),
+                            contentDescription = movie.name,
+                            modifier = imageModifier,
+                            contentScale = ContentScale.FillWidth
+                        )
+                        if (!movie.isActive) {
+                            Box(
+                                modifier = Modifier
+                                    .matchParentSize()
+                                    .background(Color.Black.copy(alpha = 0.5f))
+                            )
+
+                            Text(
+                                text = "Tidak Tersedia",
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = PoppinsFont,
+                                modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .background(
+                                        Color.Black.copy(alpha = 0.7f),
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
                 } else {
                     Box(
                         modifier = imageModifier

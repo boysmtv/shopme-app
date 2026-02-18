@@ -26,17 +26,17 @@ fun ChatRoute(nav: NavController) {
             ChatScreen(
                 uiState = uiState,
                 uiData = uiData,
-                uiEvent = ChatEvent(vm),
-                uiNavigation = ChatNavigation(nav)
+                uiEvent = chatEvent(vm),
+                uiNavigation = chatNavigation(nav)
             )
         }
     }
 }
 
-private fun ChatEvent(vm: ChatViewModel) = ChatEventListener(
+private fun chatEvent(vm: ChatViewModel) = ChatEventListener(
     onDismissActiveDialog = { }
 )
 
-private fun ChatNavigation(nav: NavController) = ChatNavigationListener(
+private fun chatNavigation(nav: NavController) = ChatNavigationListener(
     onBack = { nav.popBackStack() }
 )

@@ -24,7 +24,9 @@ data class CartEventListener(
 )
 
 data class CartNavigationListener(
-    val onBack: () -> Unit = {}
+    val onBack: () -> Unit = {},
+    val onNavigateToOrder: () -> Unit = {}
+
 )
 
 sealed class CartDialog {

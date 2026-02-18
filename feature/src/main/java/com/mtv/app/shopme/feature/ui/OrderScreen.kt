@@ -73,7 +73,10 @@ fun OrderScreen(
             .fillMaxSize()
             .background(AppColor.WhiteSoft)
     ) {
-        OrderHeader(onBack = uiNavigation.onBack)
+        OrderHeader(
+            onBack = uiNavigation.onBack,
+            onChatClick = uiNavigation.onChatClick
+        )
         OrderListScrollable(
             orders = uiData.orders,
             uiEvent = uiEvent,
@@ -83,7 +86,10 @@ fun OrderScreen(
 }
 
 @Composable
-fun OrderHeader(onBack: () -> Unit) {
+fun OrderHeader(
+    onBack: () -> Unit,
+    onChatClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -113,7 +119,7 @@ fun OrderHeader(onBack: () -> Unit) {
                 textAlign = TextAlign.Center
             )
 
-            IconButton(onClick = onBack) {
+            IconButton(onClick = onChatClick) {
                 Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Chat")
             }
         }

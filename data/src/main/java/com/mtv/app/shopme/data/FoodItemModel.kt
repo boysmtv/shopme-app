@@ -17,7 +17,8 @@ data class FoodItemModel(
     val price: Double = 0.0,
     val imageUrl: String = EMPTY_STRING,
     val cafeId: String = EMPTY_STRING,
-    val categoryId: String = EMPTY_STRING
+    val categoryId: String = EMPTY_STRING,
+    val isActive: Boolean = false
 )
 
 data class OwnerCafeModel(
@@ -78,7 +79,6 @@ data class CartModel(
     val customerId: String = "",
     val items: List<CartItemModel> = emptyList()
 )
-
 
 enum class OrderStatus(val value: String) {
     ORDERED("ORDERED"),
