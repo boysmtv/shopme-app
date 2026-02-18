@@ -11,10 +11,10 @@ package com.mtv.app.shopme.feature.customer.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,14 +24,14 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.CardTravel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Inventory
@@ -59,6 +59,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
@@ -67,15 +68,18 @@ import com.mtv.app.shopme.feature.customer.contract.ProfileDataListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileEventListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileStateListener
-import com.mtv.app.shopme.nav.BottomNavigationBar
+import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
 
 @Composable
 fun ProfileScreen(
+    navController: NavController,
     uiState: ProfileStateListener,
     uiData: ProfileDataListener,
     uiEvent: ProfileEventListener,
     uiNavigation: ProfileNavigationListener
 ) {
+
+    val scrollState = rememberScrollState()
 
     val orderMenus = listOf(
         OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet, 1),
@@ -192,32 +196,43 @@ fun ProfileScreen(
 
                 HorizontalDivider(modifier = Modifier.height(1.dp))
 
-                ProfileMenuItem(
-                    title = "Edit Profil",
-                    icon = Icons.Default.Person,
-                    onClickMenu = { uiNavigation.onEditProfile() }
-                )
-                ProfileMenuItem(
-                    title = "Alamat Saya",
-                    icon = Icons.Default.Map,
-                    onClickMenu = { uiNavigation.onAddress() }
-                )
-                ProfileMenuItem(
-                    title = "Riwayat Belanja",
-                    icon = Icons.Default.History,
-                    onClickMenu = { }
-                )
-                ProfileMenuItem(
-                    title = "Pengaturan Akun",
-                    icon = Icons.Default.Settings,
-                    onClickMenu = { }
-                )
-                ProfileMenuItem(
-                    title = "Bantuan",
-                    icon = Icons.AutoMirrored.Filled.Help,
-                    onClickMenu = { }
-                )
-                Spacer(modifier = Modifier.height(50.dp))
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(scrollState)
+                ) {
+                    ProfileMenuItem(
+                        title = "Edit Profil",
+                        icon = Icons.Default.Person,
+                        onClickMenu = { uiNavigation.onEditProfile() }
+                    )
+                    ProfileMenuItem(
+                        title = "Alamat Saya",
+                        icon = Icons.Default.Map,
+                        onClickMenu = { uiNavigation.onAddress() }
+                    )
+                    ProfileMenuItem(
+                        title = "Riwayat Belanja",
+                        icon = Icons.Default.History,
+                        onClickMenu = { }
+                    )
+                    ProfileMenuItem(
+                        title = "Pengaturan Akun",
+                        icon = Icons.Default.Settings,
+                        onClickMenu = { }
+                    )
+                    ProfileMenuItem(
+                        title = "Bantuan",
+                        icon = Icons.AutoMirrored.Filled.Help,
+                        onClickMenu = { }
+                    )
+                    ProfileMenuItem(
+                        title = "Menjadi Penjual",
+                        icon = Icons.Default.CardTravel,
+                        onClickMenu = {
+                            uiNavigation.onNavigateToSeller(navController)
+                        }
+                    )
+                }
             }
         }
     }
@@ -332,7 +347,7 @@ fun ProfileScreenPreview() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            CustomerBottomNavigationBar(navController)
         }
     ) { padding ->
         Box(
@@ -342,6 +357,7 @@ fun ProfileScreenPreview() {
                 .background(Color.White)
         ) {
             ProfileScreen(
+                navController = navController,
                 uiState = ProfileStateListener(),
                 uiData = ProfileDataListener(),
                 uiEvent = ProfileEventListener(),

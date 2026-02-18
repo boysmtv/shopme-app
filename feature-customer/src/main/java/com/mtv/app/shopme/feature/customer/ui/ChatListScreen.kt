@@ -48,7 +48,7 @@ import com.mtv.app.shopme.feature.customer.contract.ChatListEventListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
 import com.mtv.app.shopme.feature.customer.presentation.mockChatList
-import com.mtv.app.shopme.nav.BottomNavigationBar
+import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
 import com.mtv.app.shopme.common.R
 
 @Composable
@@ -245,7 +245,7 @@ fun ChatListScreenPreview() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            CustomerBottomNavigationBar(navController)
         }
     ) { padding ->
         Box(

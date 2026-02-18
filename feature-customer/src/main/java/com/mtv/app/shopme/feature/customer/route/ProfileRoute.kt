@@ -19,12 +19,14 @@ import com.mtv.app.shopme.feature.customer.contract.ProfileStateListener
 import com.mtv.app.shopme.feature.customer.presentation.ProfileViewModel
 import com.mtv.app.shopme.feature.customer.ui.ProfileScreen
 import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.SellerDestinations
 
 @Composable
 fun ProfileRoute(nav: NavController) {
     BaseRoute<ProfileViewModel, ProfileStateListener, ProfileDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             ProfileScreen(
+                navController = nav,
                 uiState = uiState,
                 uiData = uiData,
                 uiEvent = profileEvent(vm),
@@ -49,4 +51,10 @@ private fun profileNavigation(nav: NavController) = ProfileNavigationListener(
     onHelpCenter = { nav.navigate("") },
     onAbout = { nav.navigate("") },
     onOrder = { nav.navigate(CustomerDestinations.ORDER_GRAPH) },
+    onNavigateToSeller = {
+        nav.navigate(SellerDestinations.SELLER_GRAPH) {
+            popUpTo(0) { inclusive = true }
+            launchSingleTop = true
+        }
+    },
 )

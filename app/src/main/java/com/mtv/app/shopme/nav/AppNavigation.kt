@@ -34,10 +34,18 @@ fun AppNavigation() {
         CustomerBottomNavItem.Profile.route
     )
 
+    val sellerRoutes = listOf(
+        SellerBottomNavItem.Dashboard.route,
+        SellerBottomNavItem.Product.route,
+        SellerBottomNavItem.Order.route,
+        SellerBottomNavItem.Profile.route
+    )
+
     Scaffold(
         bottomBar = {
-            if (currentRoute in bottomRoutes) {
-                BottomNavigationBar(navController)
+            when (currentRoute) {
+                in bottomRoutes -> CustomerBottomNavigationBar(navController)
+                in sellerRoutes -> SellerBottomNavigationBar(navController)
             }
         }
     ) { padding ->

@@ -36,7 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun CustomerBottomNavigationBar(navController: NavController) {
 
     val items = listOf(
         CustomerBottomNavItem.Home,
@@ -55,7 +55,7 @@ fun BottomNavigationBar(navController: NavController) {
 
     Box(
         modifier = Modifier
-            .background(Color.White)
+            .background(AppColor.White)
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
@@ -65,8 +65,8 @@ fun BottomNavigationBar(navController: NavController) {
                 .height(64.dp)
                 .clip(RoundedCornerShape(32.dp))
                 .border(1.dp, AppColor.Orange.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
-                .background(Color.White),
-            containerColor = Color.White,
+                .background(AppColor.White),
+            containerColor = AppColor.White,
             tonalElevation = 0.dp
         ) {
             items.forEach { item ->
@@ -107,7 +107,7 @@ fun BottomNavigationBar(navController: NavController) {
                     alwaysShowLabel = false,
                     label = null,
                     colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = Color.White
+                        indicatorColor = AppColor.White
                     )
                 )
             }
@@ -115,15 +115,12 @@ fun BottomNavigationBar(navController: NavController) {
     }
 }
 
-@Preview(
-    showBackground = true,
-    device = Devices.PIXEL_4
-)
+@Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
-fun PreviewBottomNavigationBar() {
+fun PreviewCustomerBottomNavigationBar() {
     val navController = rememberNavController()
 
-    BottomNavigationBar(
+    CustomerBottomNavigationBar(
         navController = navController
     )
 }

@@ -67,7 +67,7 @@ import com.mtv.app.shopme.feature.customer.contract.HomeDataListener
 import com.mtv.app.shopme.feature.customer.contract.HomeEventListener
 import com.mtv.app.shopme.feature.customer.contract.HomeNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.HomeStateListener
-import com.mtv.app.shopme.nav.BottomNavigationBar
+import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
 import kotlinx.coroutines.launch
 
 @Composable
@@ -514,7 +514,7 @@ fun HomeScreenPreview() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            CustomerBottomNavigationBar(navController)
         }
     ) { padding ->
         Box(

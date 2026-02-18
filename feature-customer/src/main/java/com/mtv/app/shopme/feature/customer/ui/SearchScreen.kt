@@ -70,7 +70,7 @@ import com.mtv.app.shopme.feature.customer.contract.SearchDataListener
 import com.mtv.app.shopme.feature.customer.contract.SearchEventListener
 import com.mtv.app.shopme.feature.customer.contract.SearchNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SearchStateListener
-import com.mtv.app.shopme.nav.BottomNavigationBar
+import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
 
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -405,7 +405,7 @@ fun SearchScreenPreview() {
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(navController)
+            CustomerBottomNavigationBar(navController)
         }
     ) { padding ->
         Box(
