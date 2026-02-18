@@ -16,7 +16,7 @@ import androidx.navigation.compose.NavHost
 fun AppNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = AppDestinations.SPLASH_GRAPH
+        startDestination = CustomerDestinations.SPLASH_GRAPH
     ) {
         splashGraph(navController)
         authGraph(navController)
@@ -25,5 +25,6 @@ fun AppNavGraph(navController: NavHostController) {
         notificationGraph(navController)
         profileGraph(navController)
         orderGraph(navController)
+        sellerGraph(navController)
     }
 }
