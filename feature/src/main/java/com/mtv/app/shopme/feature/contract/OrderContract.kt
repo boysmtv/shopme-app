@@ -2,6 +2,8 @@
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: OrderContract.kt
+ *
+ * Last modified by Dedy Wijaya on 11/02/26 13.42
  */
 
 package com.mtv.app.shopme.feature.contract
@@ -24,7 +26,8 @@ data class OrderEventListener(
 
 data class OrderNavigationListener(
     val onDetail: (String) -> Unit = {},
-    val onBack: () -> Unit = {}
+    val onChatClick: () -> Unit = {},
+    val onBack: () -> Unit = {},
 )
 
 sealed class OrderDialog {

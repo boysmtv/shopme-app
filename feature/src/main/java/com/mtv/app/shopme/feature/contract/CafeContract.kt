@@ -1,9 +1,9 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: CafeContract.kt
  *
- * Last modified by Dedy Wijaya on 14/02/26 22.34
+ * Last modified by Dedy Wijaya on 11/02/26 13.42
  */
 
 package com.mtv.app.shopme.feature.contract
@@ -29,7 +29,9 @@ data class CafeEventListener(
 
 data class CafeNavigationListener(
     val onBack: () -> Unit = {},
-    val onFoodDetail: (Int) -> Unit = {}
+    val onNavigateToDetail: () -> Unit = {},
+    val onNavigateToChat: () -> Unit = {},
+    val onNavigateToWhatsapp: () -> Unit = {}
 )
 
 sealed class CafeDialog {

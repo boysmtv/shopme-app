@@ -13,5 +13,8 @@ import com.mtv.based.core.network.utils.ResourceFirebase
 data class SearchStateListener(val loading: Boolean = false)
 data class SearchDataListener(val query: String = "", val results: List<String> = emptyList())
 data class SearchEventListener(val onQueryChanged: (String) -> Unit = {})
-data class SearchNavigationListener(val onBack: () -> Unit = {})
+data class SearchNavigationListener(
+    val onDetailClick: () -> Unit = {},
+    val onBack: () -> Unit = {},
+)
 

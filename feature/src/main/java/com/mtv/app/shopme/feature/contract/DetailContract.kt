@@ -24,13 +24,14 @@ data class DetailDataListener(
 )
 
 data class DetailEventListener(
-    val onAddToCart: () -> Unit = {},
     val onDismissActiveDialog: () -> Unit = {}
 )
 
 data class DetailNavigationListener(
     val onBack: () -> Unit = {},
-    val onclickCafe: () -> Unit = {}
+    val onChatClick: () -> Unit = {},
+    val onAddToCart: () -> Unit = {},
+    val onClickCafe: () -> Unit = {}
 )
 
 sealed class DetailDialog {

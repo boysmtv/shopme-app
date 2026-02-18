@@ -2,6 +2,8 @@
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: OrderRoute.kt
+ *
+ * Last modified by Dedy Wijaya on 11/02/26 13.42
  */
 
 package com.mtv.app.shopme.feature.route
@@ -17,6 +19,7 @@ import com.mtv.app.shopme.feature.contract.OrderStateListener
 import com.mtv.app.shopme.feature.presentation.OrderViewModel
 import com.mtv.app.shopme.feature.ui.OrderScreen
 import com.mtv.app.shopme.nav.AppDestinations
+import com.mtv.app.shopme.nav.BottomNavItem
 
 @Composable
 fun OrderRoute(nav: NavController) {
@@ -44,5 +47,15 @@ private fun orderNavigation(nav: NavController) = OrderNavigationListener(
     onDetail = { orderId ->
         nav.navigate("${AppDestinations.ORDER_DETAIL_GRAPH}/$orderId")
     },
-    onBack = { nav.popBackStack() }
+    onChatClick = {
+        nav.navigate(BottomNavItem.Chat.route) {
+            launchSingleTop = true
+            restoreState = true
+
+            popUpTo(nav.graph.startDestinationId) {
+                saveState = true
+            }
+        }
+    },
+    onBack = { nav.popBackStack() },
 )

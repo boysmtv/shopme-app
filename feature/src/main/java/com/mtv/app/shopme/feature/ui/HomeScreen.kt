@@ -11,35 +11,44 @@ package com.mtv.app.shopme.feature.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
@@ -48,7 +57,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import coil.compose.rememberAsyncImagePainter
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.InterFont
 import com.mtv.app.shopme.common.PoppinsFont
@@ -60,6 +68,7 @@ import com.mtv.app.shopme.feature.contract.HomeEventListener
 import com.mtv.app.shopme.feature.contract.HomeNavigationListener
 import com.mtv.app.shopme.feature.contract.HomeStateListener
 import com.mtv.app.shopme.nav.BottomNavigationBar
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
@@ -68,6 +77,10 @@ fun HomeScreen(
     uiEvent: HomeEventListener,
     uiNavigation: HomeNavigationListener
 ) {
+
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,18 +93,23 @@ fun HomeScreen(
                     )
                 )
             )
-            .padding(horizontal = 20.dp)
-            .height(56.dp)
             .statusBarsPadding()
+            .padding(horizontal = 20.dp)
     ) {
+
         Spacer(modifier = Modifier.height(16.dp))
+
+        // ✅ HEADER (TIDAK IKUT SCROLL)
         HomeHeader()
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // ✅ LIST SCROLLABLE
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            state = listState,
+            modifier = Modifier.fillMaxSize()
         ) {
+
             item {
                 Column {
                     HomeSearch(
@@ -112,8 +130,16 @@ fun HomeScreen(
                 }
             }
 
-            item {
-                HomeMenuTitle()
+            item(key = "top_choice_section") {
+                HomeMenuTitle(
+                    onSeeAllClick = {
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(
+                                index = 1
+                            )
+                        }
+                    }
+                )
             }
 
             gridItems(
@@ -132,7 +158,9 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeMenuTitle() {
+private fun HomeMenuTitle(
+    onSeeAllClick: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -144,12 +172,16 @@ private fun HomeMenuTitle() {
             fontFamily = PoppinsFont,
             fontSize = 16.sp,
         )
+
         Text(
             text = "See All >>",
             fontWeight = FontWeight.Thin,
             fontFamily = PoppinsFont,
             fontSize = 16.sp,
             color = AppColor.Orange,
+            modifier = Modifier.clickable {
+                onSeeAllClick()
+            }
         )
     }
 
@@ -377,9 +409,13 @@ fun FoodCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onClickDetail()
-            },
+            .then(
+                if (item.isActive) {
+                    Modifier.clickable { onClickDetail() }
+                } else {
+                    Modifier
+                }
+            ),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
@@ -405,14 +441,38 @@ fun FoodCard(
                 else -> R.drawable.image_burger
             }
 
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                contentScale = ContentScale.Crop
-            )
+            Box {
+                Image(
+                    painter = painterResource(imageRes),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    contentScale = ContentScale.Crop
+                )
+
+                if (!item.isActive) {
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .background(Color.Black.copy(alpha = 0.5f))
+                    )
+
+                    Text(
+                        text = "Tidak Tersedia",
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = PoppinsFont,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .background(
+                                Color.Black.copy(alpha = 0.7f),
+                                RoundedCornerShape(8.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    )
+                }
+            }
 
             Column(Modifier.padding(12.dp)) {
                 Text(

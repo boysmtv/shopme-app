@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -76,9 +75,10 @@ fun ChatScreen(
     uiState: ChatStateListener,
     uiData: ChatDataListener,
     uiEvent: ChatEventListener,
-    uiNavigation: ChatNavigationListener
+    uiNavigation: ChatNavigationListener,
 ) {
     var userMessage by remember { mutableStateOf(EMPTY_STRING) }
+
     val messages = remember {
         mutableStateListOf(
             ChatMessage("Halo 👋 Selamat datang di Coffee Corner. Ada yang bisa kami bantu?", true),
@@ -164,7 +164,7 @@ fun ChatScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, bottom = 20.dp),
+                .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             OutlinedTextField(

@@ -18,6 +18,8 @@ import com.mtv.app.shopme.feature.contract.CartNavigationListener
 import com.mtv.app.shopme.feature.contract.CartStateListener
 import com.mtv.app.shopme.feature.presentation.CartViewModel
 import com.mtv.app.shopme.feature.ui.CartScreen
+import com.mtv.app.shopme.nav.AppDestinations
+import com.mtv.app.shopme.nav.BottomNavItem
 
 @Composable
 fun CartRoute(nav: NavController) {
@@ -39,4 +41,7 @@ private fun cartEvent(vm: CartViewModel) = CartEventListener(
 
 private fun cartNavigation(nav: NavController) = CartNavigationListener(
     onBack = { nav.popBackStack() },
+    onNavigateToOrder = {
+        nav.navigate(AppDestinations.ORDER_GRAPH)
+    },
 )

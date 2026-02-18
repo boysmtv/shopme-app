@@ -1,5 +1,5 @@
 /*
- * Project: App Movie Compose
+ * Project: Shopme App
  * Author: Boys.mtv@gmail.com
  * File: CafeRoute.kt
  *
@@ -15,6 +15,7 @@ import com.mtv.app.shopme.common.base.BaseScreen
 import com.mtv.app.shopme.feature.contract.*
 import com.mtv.app.shopme.feature.presentation.CafeViewModel
 import com.mtv.app.shopme.feature.ui.CafeScreen
+import com.mtv.app.shopme.nav.AppDestinations
 
 @Composable
 fun CafeRoute(nav: NavController) {
@@ -30,15 +31,21 @@ fun CafeRoute(nav: NavController) {
     }
 }
 
-private fun cafeEvent(
-    vm: CafeViewModel,
-    nav: NavController
-) = CafeEventListener(
+private fun cafeEvent(vm: CafeViewModel, nav: NavController) = CafeEventListener(
     onFoodClick = { food ->
         nav.navigate("detail/${food.id}")
     }
 )
 
 private fun cafeNavigation(nav: NavController) = CafeNavigationListener(
-    onBack = { nav.popBackStack() }
+    onBack = { nav.popBackStack() },
+    onNavigateToChat = {
+        nav.navigate(AppDestinations.CHAT_GRAPH)
+    },
+    onNavigateToWhatsapp = {
+        nav.navigate(AppDestinations.CHAT_GRAPH)
+    },
+    onNavigateToDetail = {
+        nav.navigate(AppDestinations.DETAIL_GRAPH)
+    }
 )

@@ -22,7 +22,8 @@ val mockFoodList = listOf(
         desc = "Juicy beef patty, cheddar cheese, lettuce, tomato, and our special sauce.",
         price = 9.99,
         imageUrl = "https://example.com/images/cheeseburger.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = true
     ),
     FoodItemModel(
         id = 2,
@@ -30,7 +31,8 @@ val mockFoodList = listOf(
         desc = "Crispy golden fried chicken, seasoned with herbs and spices, serves 6 pieces.",
         price = 12.49,
         imageUrl = "https://example.com/images/fried_chicken.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = false
     ),
     FoodItemModel(
         id = 3,
@@ -38,7 +40,8 @@ val mockFoodList = listOf(
         desc = "Two juicy beef patties, melted cheese, pickles, onions, and a special sauce in a soft bun.",
         price = 10.99,
         imageUrl = "https://example.com/images/double_beef_burger.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = true
     ),
     FoodItemModel(
         id = 4,
@@ -46,7 +49,8 @@ val mockFoodList = listOf(
         desc = "Classic hotdog with ketchup, mustard, and a soft warm bun, perfect snack on the go.",
         price = 7.49,
         imageUrl = "https://example.com/images/hotdog.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = false
     ),
     FoodItemModel(
         id = 5,
@@ -54,7 +58,8 @@ val mockFoodList = listOf(
         desc = "Slice of pizza with mozzarella cheese, tangy tomato sauce, and spicy pepperoni toppings.",
         price = 4.99,
         imageUrl = "https://example.com/images/pepperoni_pizza.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = true
     ),
     FoodItemModel(
         id = 6,
@@ -62,7 +67,8 @@ val mockFoodList = listOf(
         desc = "Delicious pizza with BBQ chicken, melted cheese, onions, and a smoky BBQ sauce.",
         price = 11.49,
         imageUrl = "https://example.com/images/bbq_chicken_pizza.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = false
     ),
     FoodItemModel(
         id = 7,
@@ -70,7 +76,8 @@ val mockFoodList = listOf(
         desc = "Golden crispy fries, lightly salted, served hot for the perfect side dish.",
         price = 3.29,
         imageUrl = "https://example.com/images/fries.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = true
     ),
     FoodItemModel(
         id = 8,
@@ -78,7 +85,8 @@ val mockFoodList = listOf(
         desc = "Classic spaghetti with rich meat sauce, parmesan cheese, and fresh herbs.",
         price = 8.79,
         imageUrl = "https://example.com/images/spaghetti.png",
-        cafeId = "cafe1"
+        cafeId = "cafe1",
+        isActive = false
     )
 )
 
@@ -90,7 +98,7 @@ val mockOwnerCafe = OwnerCafeModel(
     ownerPhone = "08129998877",
     ownerProfileImage = "https://example.com/images/owner.png",
     cafeId = "cafe1",
-    cafeName = "Burger House",
+    cafeName = "Fried Chicken Bucket",
     cafeAddress = "Jl. Puri Lestari 12",
     cafePhone = "081233344455",
     cafeOpenTime = "08:00",

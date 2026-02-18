@@ -18,6 +18,7 @@ import com.mtv.app.shopme.feature.contract.SearchNavigationListener
 import com.mtv.app.shopme.feature.contract.SearchStateListener
 import com.mtv.app.shopme.feature.presentation.SearchViewModel
 import com.mtv.app.shopme.feature.ui.SearchScreen
+import com.mtv.app.shopme.nav.AppDestinations
 
 @Composable
 fun SearchRoute(nav: NavController) {
@@ -38,5 +39,8 @@ private fun searchEvent(vm: SearchViewModel) = SearchEventListener(
 )
 
 private fun searchNavigation(nav: NavController) = SearchNavigationListener(
-    onBack = { nav.popBackStack() }
+    onBack = { nav.popBackStack() },
+    onDetailClick = {
+        nav.navigate(AppDestinations.DETAIL_GRAPH)
+    }
 )
