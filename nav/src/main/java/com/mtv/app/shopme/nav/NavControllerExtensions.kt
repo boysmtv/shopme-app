@@ -9,10 +9,9 @@
 package com.mtv.app.shopme.nav
 
 import androidx.navigation.NavController
-import com.mtv.app.shopme.nav.AppDestinations
 
 fun NavController.navigateAndPopSplash(route: String) {
     this.navigate(route) {
-        popUpTo(AppDestinations.SPLASH_GRAPH) { inclusive = true }
+        popUpTo(CustomerDestinations.SPLASH_GRAPH) { inclusive = true }
     }
 }

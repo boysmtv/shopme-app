@@ -27,11 +27,11 @@ fun AppNavigation() {
     val currentRoute = navBackStackEntry?.destination?.route
 
     val bottomRoutes = listOf(
-        BottomNavItem.Home.route,
-        BottomNavItem.Cart.route,
-        BottomNavItem.Search.route,
-        BottomNavItem.Chat.route,
-        BottomNavItem.Profile.route
+        CustomerBottomNavItem.Home.route,
+        CustomerBottomNavItem.Cart.route,
+        CustomerBottomNavItem.Search.route,
+        CustomerBottomNavItem.Chat.route,
+        CustomerBottomNavItem.Profile.route
     )
 
     Scaffold(

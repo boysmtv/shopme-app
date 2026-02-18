@@ -29,8 +29,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "Shopme"
 include(":app")
-include(":feature")
 include(":data")
 include(":domain")
 include(":common")
 include(":nav")
+include(":feature-seller")
+include(":feature-customer")

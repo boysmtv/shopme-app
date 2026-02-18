@@ -12,95 +12,126 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.mtv.app.shopme.feature.route.CafeRoute
-import com.mtv.app.shopme.feature.route.CartRoute
-import com.mtv.app.shopme.feature.route.ChatRoute
-import com.mtv.app.shopme.feature.route.DetailRoute
-import com.mtv.app.shopme.feature.route.EditAddressRoute
-import com.mtv.app.shopme.feature.route.EditProfileRoute
-import com.mtv.app.shopme.feature.route.HomeRoute
-import com.mtv.app.shopme.feature.route.ChatListRoute
-import com.mtv.app.shopme.feature.route.NotifRoute
-import com.mtv.app.shopme.feature.route.OrderRoute
-import com.mtv.app.shopme.feature.route.ProfileRoute
-import com.mtv.app.shopme.feature.route.SearchRoute
-import com.mtv.app.shopme.feature.route.SplashRoute
+import com.mtv.app.shopme.feature.customer.route.CafeRoute
+import com.mtv.app.shopme.feature.customer.route.CartRoute
+import com.mtv.app.shopme.feature.customer.route.ChatRoute
+import com.mtv.app.shopme.feature.customer.route.DetailRoute
+import com.mtv.app.shopme.feature.customer.route.EditAddressRoute
+import com.mtv.app.shopme.feature.customer.route.EditProfileRoute
+import com.mtv.app.shopme.feature.customer.route.HomeRoute
+import com.mtv.app.shopme.feature.customer.route.ChatListRoute
+import com.mtv.app.shopme.feature.customer.route.NotifRoute
+import com.mtv.app.shopme.feature.customer.route.OrderRoute
+import com.mtv.app.shopme.feature.customer.route.ProfileRoute
+import com.mtv.app.shopme.feature.customer.route.SearchRoute
+import com.mtv.app.shopme.feature.customer.route.SplashRoute
+import com.mtv.app.shopme.feature.seller.route.SellerDashboardRoute
 
 fun NavGraphBuilder.splashGraph(nav: NavHostController) {
-    composable(AppDestinations.SPLASH_GRAPH) {
+    composable(CustomerDestinations.SPLASH_GRAPH) {
         SplashRoute(nav)
     }
 }
 
 fun NavGraphBuilder.authGraph(nav: NavHostController) {
-    composable(AppDestinations.LOGIN_GRAPH) {
+    composable(CustomerDestinations.LOGIN_GRAPH) {
 //        LoginRoute(nav)
     }
 
-    composable(AppDestinations.REGISTER_GRAPH) {
+    composable(CustomerDestinations.REGISTER_GRAPH) {
 //        RegisterRoute(nav)
     }
 
-    composable(AppDestinations.RESET_GRAPH) {
+    composable(CustomerDestinations.RESET_GRAPH) {
 //        ResetRoute(nav)
     }
 }
 
 fun NavGraphBuilder.homeGraph(nav: NavHostController) {
     navigation(
-        startDestination = BottomNavItem.Home.route,
-        route = AppDestinations.HOME_GRAPH
+        startDestination = CustomerBottomNavItem.Home.route,
+        route = CustomerDestinations.HOME_GRAPH
     ) {
-        composable(BottomNavItem.Home.route) {
+        composable(CustomerBottomNavItem.Home.route) {
             HomeRoute(nav)
         }
-        composable(BottomNavItem.Cart.route) {
+        composable(CustomerBottomNavItem.Cart.route) {
             CartRoute(nav)
         }
-        composable(BottomNavItem.Search.route) {
+        composable(CustomerBottomNavItem.Search.route) {
             SearchRoute(nav)
         }
-        composable(BottomNavItem.Chat.route) {
+        composable(CustomerBottomNavItem.Chat.route) {
             ChatListRoute(nav)
         }
-        composable(BottomNavItem.Profile.route) {
+        composable(CustomerBottomNavItem.Profile.route) {
             ProfileRoute(nav)
         }
     }
 }
 
 fun NavGraphBuilder.detailGraph(nav: NavHostController) {
-    composable(AppDestinations.DETAIL_GRAPH) {
+    composable(CustomerDestinations.DETAIL_GRAPH) {
         DetailRoute(nav)
     }
 }
 
 fun NavGraphBuilder.notificationGraph(nav: NavHostController) {
-    composable(AppDestinations.NOTIFICATION_GRAPH) {
+    composable(CustomerDestinations.NOTIFICATION_GRAPH) {
         NotifRoute(nav)
     }
-    composable(AppDestinations.CHAT_GRAPH) {
+    composable(CustomerDestinations.CHAT_GRAPH) {
         ChatRoute(nav)
     }
 }
 
 fun NavGraphBuilder.profileGraph(nav: NavHostController) {
-    composable(AppDestinations.PROFILE_GRAPH) {
+    composable(CustomerDestinations.PROFILE_GRAPH) {
         ProfileRoute(nav)
     }
-    composable(AppDestinations.EDIT_PROFILE_GRAPH) {
+    composable(CustomerDestinations.EDIT_PROFILE_GRAPH) {
         EditProfileRoute(nav)
     }
-    composable(AppDestinations.EDIT_ADDRESS_GRAPH) {
+    composable(CustomerDestinations.EDIT_ADDRESS_GRAPH) {
         EditAddressRoute(nav)
     }
 }
 
 fun NavGraphBuilder.orderGraph(nav: NavHostController) {
-    composable(AppDestinations.CAFE_GRAPH) {
+    composable(CustomerDestinations.CAFE_GRAPH) {
         CafeRoute(nav)
     }
-    composable(AppDestinations.ORDER_GRAPH) {
+    composable(CustomerDestinations.ORDER_GRAPH) {
         OrderRoute(nav)
     }
 }
+
+
+fun NavGraphBuilder.sellerGraph(nav: NavHostController) {
+    navigation(
+        startDestination = SellerDestinations.DASHBOARD,
+        route = SellerDestinations.SELLER_GRAPH
+    ) {
+        composable(SellerDestinations.SELLER_GRAPH) {
+            SellerRootScreen()
+        }
+
+        composable(SellerDestinations.DASHBOARD) {
+            SellerDashboardRoute(nav)
+        }
+
+        composable(SellerDestinations.PRODUCT) {
+//            SellerProductRoute(nav)
+        }
+
+        composable(SellerDestinations.ORDER) {
+//            SellerOrderRoute(nav)
+        }
+
+        composable(SellerDestinations.PROFILE) {
+//            SellerProfileRoute(nav)
+        }
+
+    }
+}
+
