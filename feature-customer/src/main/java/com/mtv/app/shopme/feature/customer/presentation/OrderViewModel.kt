@@ -24,6 +24,8 @@ class OrderViewModel @Inject constructor() :
 
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(OrderStateListener())
+
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(OrderDataListener())
 
     init {

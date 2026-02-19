@@ -25,5 +25,7 @@ class SellerDashboardViewModel @Inject constructor(
 
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(SellerDashboardStateListener())
+
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(SellerDashboardDataListener())
 }

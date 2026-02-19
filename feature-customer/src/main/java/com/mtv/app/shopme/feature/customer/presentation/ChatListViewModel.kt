@@ -32,6 +32,7 @@ class ChatListViewModel @Inject constructor(
         )
     )
 
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(ChatListDataListener())
 }
 

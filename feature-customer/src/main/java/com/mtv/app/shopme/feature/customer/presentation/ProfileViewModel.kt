@@ -28,6 +28,7 @@ class ProfileViewModel @Inject constructor(
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(ProfileStateListener())
 
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(ProfileDataListener())
 
     fun showLogoutDialog() {

@@ -27,5 +27,6 @@ class DetailViewModel @Inject constructor(
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(DetailStateListener())
 
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(DetailDataListener())
 }

@@ -27,6 +27,7 @@ class SellerProductFormViewModel @Inject constructor(
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(SellerProductFormStateListener())
 
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(SellerProductFormDataListener())
 
     fun loadProduct(productId: String) {
