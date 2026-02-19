@@ -22,6 +22,7 @@ class SellerChatDetailViewModel @Inject constructor(
 ) : BaseViewModel(),
     UiOwner<SellerChatDetailStateListener, SellerChatDetailDataListener> {
 
+    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(SellerChatDetailStateListener(messages = mockSellerChatMessages()))
     override val uiData = MutableStateFlow(SellerChatDetailDataListener())
 

@@ -552,7 +552,6 @@ fun SellerDashboardPreview() {
                 .fillMaxSize()
                 .background(AppColor.White)
         ) {
-
             SellerDashboardScreen(
                 uiState = SellerDashboardStateListener(),
                 uiData = SellerDashboardDataListener(),

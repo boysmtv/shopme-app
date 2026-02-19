@@ -29,13 +29,19 @@ data class Product(
     val id: String,
     val name: String,
     val description: String,
+    val images: List<String>,
     val basePrice: Double,
-    val imageUrl: String,
-    val categoryId: String,
-    val isActive: Boolean,
-    val variants: List<VariantGroup>,
-    val stock: Int?
+    val stock: Int,
+    val availability: ProductAvailability,
+    val variants: List<VariantGroup>
 )
+
+enum class ProductAvailability {
+    READY,
+    PREORDER,
+    JASTIP
+}
+
 
 data class VariantGroup(
     val id: String,
@@ -152,3 +158,31 @@ data class SellerProduct(
     val stock: Int,
     val imageUrl: String? = null
 )
+
+object FakeProductData {
+
+    fun sampleProduct(): Product {
+        return Product(
+            id = "1",
+            name = "Cappuccino",
+            description = "Rich espresso with steamed milk",
+            images = listOf(
+                "https://picsum.photos/400/300"
+            ),
+            basePrice = 25000.0,
+            stock = 20,
+            availability = ProductAvailability.READY,
+            variants = listOf(
+                VariantGroup(
+                    id = "size",
+                    name = "Size",
+                    type = VariantType.SINGLE,
+                    options = listOf(
+                        VariantOption("m", "Medium", 0.0),
+                        VariantOption("l", "Large", 5000.0)
+                    )
+                )
+            )
+        )
+    }
+}

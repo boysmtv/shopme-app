@@ -25,6 +25,7 @@ class ChatListViewModel @Inject constructor(
     private val securePrefs: SecurePrefs
 ) : BaseViewModel(), UiOwner<ChatListStateListener, ChatListDataListener> {
 
+    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(
         ChatListStateListener(
             chatList = mockChatList()

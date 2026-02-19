@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.seller.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -59,6 +61,7 @@ fun SellerChatListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
+            .statusBarsPadding()
     ) {
         Spacer(Modifier.height(16.dp))
         Row(
@@ -159,16 +162,15 @@ fun ChatAvatar(
         if (!base64Image.isNullOrBlank()) {
             val bitmap = remember(base64Image) { base64ToBitmap(base64Image) }
             bitmap?.let {
-                androidx.compose.foundation.Image(
+                Image(
                     bitmap = it.asImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    contentScale = ContentScale.Crop
                 )
             }
         } else {
-            // Placeholder image dari resource (sesuaikan project)
-            androidx.compose.foundation.Image(
+            Image(
                 painter = painterResource(
                     id = when (placeholderRes) {
                         0 -> com.mtv.app.shopme.common.R.drawable.image_burger
@@ -184,7 +186,7 @@ fun ChatAvatar(
                 ),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
-                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                contentScale = ContentScale.Crop
             )
         }
     }

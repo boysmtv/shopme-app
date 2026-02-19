@@ -36,54 +36,50 @@ fun SellerOrderDetailScreen(
     uiEvent: SellerOrderDetailEventListener,
     uiNavigation: SellerOrderDetailNavigationListener
 ) {
-
     Scaffold(
-        topBar = {
-            SellerOrderDetailHeader(
-                orderId = uiState.orderId,
-                status = uiState.currentStatus,
-                onBack = uiNavigation.onBack
-            )
-        },
+        containerColor = AppColor.White,
         bottomBar = {
             UpdateStatusBottomBar(
                 currentStatus = uiState.currentStatus,
                 onUpdate = { uiEvent.onChangeStatus(it) }
             )
         }
-    ) { padding ->
+    ) { innerPadding ->
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AppColor.WhiteSoft)
-                .padding(padding)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(innerPadding)
+                .statusBarsPadding()
         ) {
 
-            item {
-                OrderTimeline(uiState.currentStatus)
-            }
+            SellerOrderDetailHeader(
+                orderId = uiState.orderId,
+                status = uiState.currentStatus,
+                onBack = uiNavigation.onBack
+            )
 
-            item {
-                OrderItemSection()
-            }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f) // 🔥 penting
+                    .background(AppColor.WhiteSoft)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp)
+            ) {
 
-            item {
-                CustomerSection(customerName = uiData.customerName)
-            }
+                item { OrderTimeline(uiState.currentStatus) }
 
-            item {
-                PaymentSection(total = uiData.total)
-            }
+                item { OrderItemSection() }
 
-            item { Spacer(Modifier.height(80.dp)) }
+                item { CustomerSection(customerName = uiData.customerName) }
+
+                item { PaymentSection(total = uiData.total) }
+            }
         }
     }
 }
 
-// ------------------- HEADER -------------------
 @Composable
 fun SellerOrderDetailHeader(
     orderId: String,
@@ -121,7 +117,6 @@ fun SellerOrderDetailHeader(
     }
 }
 
-// ------------------- STATUS CHIP -------------------
 @Composable
 fun StatusChip(status: OrderStatus) {
     val color by animateColorAsState(targetValue = status.statusColor())
@@ -149,7 +144,6 @@ fun StatusChip(status: OrderStatus) {
     }
 }
 
-// ------------------- TIMELINE -------------------
 @Composable
 fun OrderTimeline(status: OrderStatus) {
     val steps = OrderStatus.entries
@@ -206,7 +200,6 @@ fun OrderTimeline(status: OrderStatus) {
     }
 }
 
-// ------------------- ORDER ITEM -------------------
 @Composable
 fun OrderItemSection() {
     Column {
@@ -256,8 +249,8 @@ fun OrderItemRow(
             Text(title, fontWeight = FontWeight.Medium, fontFamily = PoppinsFont)
             Spacer(Modifier.height(6.dp))
             Text("Qty: $qty", fontSize = 12.sp, color = Color.Gray)
+            Spacer(Modifier.height(6.dp))
             AnimatedVisibility(expanded) {
-                Spacer(Modifier.height(6.dp))
                 Text("Notes: Extra spicy, no onion", fontSize = 12.sp, color = Color.Gray)
             }
         }
@@ -266,7 +259,6 @@ fun OrderItemRow(
     }
 }
 
-// ------------------- CUSTOMER & PAYMENT -------------------
 @Composable
 fun CustomerSection(customerName: String) {
     Column {
@@ -309,7 +301,6 @@ fun InfoCard(label: String, value: String, highlight: Boolean = false) {
     }
 }
 
-// ------------------- BOTTOM BAR -------------------
 @Composable
 fun UpdateStatusBottomBar(currentStatus: OrderStatus, onUpdate: (OrderStatus) -> Unit) {
     val nextStatus = OrderStatus.entries.getOrNull(currentStatus.ordinal + 1) ?: return
@@ -320,7 +311,8 @@ fun UpdateStatusBottomBar(currentStatus: OrderStatus, onUpdate: (OrderStatus) ->
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .height(56.dp),
+            .height(56.dp)
+            .navigationBarsPadding(),
         colors = ButtonDefaults.buttonColors(containerColor = color),
         shape = RoundedCornerShape(28.dp)
     ) {
@@ -333,17 +325,15 @@ fun UpdateStatusBottomBar(currentStatus: OrderStatus, onUpdate: (OrderStatus) ->
     }
 }
 
-// ------------------- ORDER STATUS COLOR -------------------
 fun OrderStatus.statusColor(): Color {
     return when (this) {
-        OrderStatus.ORDERED -> Color(0xFFFF9800)
-        OrderStatus.COOKING -> Color(0xFF2196F3)
-        OrderStatus.DELIVERING -> Color(0xFF4CAF50)
-        OrderStatus.COMPLETED -> Color(0xFFF44336)
+        OrderStatus.ORDERED -> Color(0xFFFFA000)
+        OrderStatus.COOKING -> Color(0xFF1E88E5)
+        OrderStatus.DELIVERING -> Color(0xFF00897B)
+        OrderStatus.COMPLETED -> Color(0xFF2E7D32)
     }
 }
 
-// ------------------- PREVIEW -------------------
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerOrderDetailPreview() {
