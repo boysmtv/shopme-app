@@ -284,11 +284,12 @@ fun OrderTotalAndButtons(order: OrderModel, onClick: () -> Unit) {
 @Composable
 fun StatusBadge(status: OrderStatus) {
     val color = when (status) {
-        OrderStatus.ORDERED -> Color.Gray
+        OrderStatus.ORDERED -> Color(0xFFFFA726)
         OrderStatus.COOKING -> AppColor.Orange
-        OrderStatus.DELIVERING -> Color(0xFF00A9FF)
-        OrderStatus.COMPLETED -> Color(0xFF4CAF50)
+        OrderStatus.DELIVERING -> Color(0xFF1E88E5)
+        OrderStatus.COMPLETED -> Color(0xFF2E7D32)
     }
+
     Surface(
         color = color.copy(alpha = 0.15f),
         shape = RoundedCornerShape(20.dp)

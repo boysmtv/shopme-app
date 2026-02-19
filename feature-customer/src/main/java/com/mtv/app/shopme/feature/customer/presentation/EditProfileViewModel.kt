@@ -25,6 +25,7 @@ class EditProfileViewModel @Inject constructor(
     private val securePrefs: SecurePrefs
 ) : BaseViewModel(), UiOwner<EditProfileStateListener, EditProfileDataListener> {
 
+    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(EditProfileStateListener())
 
     override val uiData = MutableStateFlow(EditProfileDataListener())

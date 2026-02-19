@@ -25,6 +25,7 @@ class ProfileViewModel @Inject constructor(
     private val securePrefs: SecurePrefs
 ) : BaseViewModel(), UiOwner<ProfileStateListener, ProfileDataListener> {
 
+    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(ProfileStateListener())
 
     override val uiData = MutableStateFlow(ProfileDataListener())

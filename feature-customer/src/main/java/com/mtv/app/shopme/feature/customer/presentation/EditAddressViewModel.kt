@@ -25,6 +25,7 @@ class EditAddressViewModel @Inject constructor(
     private val securePrefs: SecurePrefs
 ) : BaseViewModel(), UiOwner<EditAddressStateListener, EditAddressDataListener> {
 
+    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(EditAddressStateListener())
 
     override val uiData = MutableStateFlow(EditAddressDataListener())

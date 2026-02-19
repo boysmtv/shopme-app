@@ -24,6 +24,7 @@ class DetailViewModel @Inject constructor(
     private val securePrefs: SecurePrefs
 ) : BaseViewModel(), UiOwner<DetailStateListener, DetailDataListener> {
 
+    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(DetailStateListener())
 
     override val uiData = MutableStateFlow(DetailDataListener())
