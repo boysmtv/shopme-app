@@ -9,11 +9,13 @@
 package com.mtv.app.shopme.nav
 
 object SellerDestinations {
-    const val SELLER_GRAPH = "seller_graph"
-    const val DASHBOARD = "seller_dashboard"
-    const val ORDER = "seller_order"
-    const val PRODUCT = "seller_product"
-    const val CHAT = "chat"
-    const val PROFILE = "seller_profile"
-    const val ORDER_DETAIL = "seller_order_detail"
+    const val SELLER_GRAPH = "SELLER_GRAPH"
+    const val DASHBOARD = "SELLER_DASHBOARD"
+    const val ORDER = "SELLER_ORDER"
+    const val PRODUCT = "SELLER_PRODUCT"
+    const val CHAT = "SELLER_CHAT"
+    const val PROFILE = "SELLER_PROFILE"
+
+    const val ORDER_DETAIL_GRAPH = "SELLER_ORDER_DETAIL_GRAPH"
+    const val CHAT_DETAIL = "CHAT_DETAIL_GRAPH"
 }

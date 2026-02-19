@@ -42,18 +42,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.feature.seller.contract.SellerDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderStateListener
 import com.mtv.app.shopme.nav.SellerBottomNavigationBar
 
 @Composable
 fun SellerOrderScreen(
-    uiState: SellerStateListener,
-    uiData: SellerDataListener,
-    uiEvent: SellerEventListener,
-    uiNavigation: SellerNavigationListener
+    uiState: SellerOrderStateListener,
+    uiData: SellerOrderDataListener,
+    uiEvent: SellerOrderEventListener,
+    uiNavigation: SellerOrderNavigationListener
 ) {
     var selectedFilter by remember { mutableStateOf("All") }
     var isOnline by remember { mutableStateOf(true) }
@@ -143,12 +143,10 @@ fun SellerOrderScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // --- Filter Chips ---
         OrderFilterChips(selectedFilter) { selectedFilter = it }
 
         Spacer(Modifier.height(12.dp))
 
-        // --- Orders List ---
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -165,7 +163,7 @@ fun SellerOrderScreen(
                     time = order["time"]!!,
                     paymentMethod = order["payment"]!!,
                     status = order["status"]!!,
-                    onClick = { uiNavigation.onNavigateToOrderDetail(order["invoice"]!!) }
+                    onClick = { uiNavigation.onNavigateToOrderDetail() }
                 )
             }
         }
@@ -342,12 +340,10 @@ fun SellerOrderScreenPreview() {
                 .padding(bottom = padding.calculateBottomPadding())
         ) {
             SellerOrderScreen(
-                uiState = SellerStateListener(),
-                uiData = SellerDataListener(),
-                uiEvent = SellerEventListener(),
-                uiNavigation = SellerNavigationListener(
-                    onNavigateToOrderDetail = {}
-                )
+                uiState = SellerOrderStateListener(),
+                uiData = SellerOrderDataListener(),
+                uiEvent = SellerOrderEventListener({}, {}),
+                uiNavigation = SellerOrderNavigationListener({})
             )
         }
     }

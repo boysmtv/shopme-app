@@ -12,17 +12,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.seller.contract.SellerDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerDashboardViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerDashboardScreen
 import com.mtv.app.shopme.nav.SellerDestinations
 
 @Composable
 fun SellerDashboardRoute(nav: NavController) {
-    BaseRoute<SellerDashboardViewModel, SellerStateListener, SellerDataListener> { vm, base, uiState, uiData ->
+    BaseRoute<SellerDashboardViewModel, SellerDashboardStateListener, SellerDashboardDataListener> { vm, base, uiState, uiData ->
         BaseScreen(
             baseUiState = base,
             onDismissError = vm::dismissError
@@ -30,20 +30,20 @@ fun SellerDashboardRoute(nav: NavController) {
             SellerDashboardScreen(
                 uiState = uiState,
                 uiData = uiData,
-                uiEvent = sellerEvent(vm),
-                uiNavigation = sellerNavigation(nav)
+                uiEvent = sellerDashboardEvent(vm),
+                uiNavigation = sellerDashboardNavigation(nav)
             )
         }
     }
 }
 
-private fun sellerEvent(vm: SellerDashboardViewModel) = SellerEventListener(
+private fun sellerDashboardEvent(vm: SellerDashboardViewModel) = SellerDashboardEventListener(
     onRefresh = {
 
     }
 )
 
-private fun sellerNavigation(nav: NavController) = SellerNavigationListener(
+private fun sellerDashboardNavigation(nav: NavController) = SellerDashboardNavigationListener(
     onNavigateToProduct = {
         nav.navigate(SellerDestinations.PRODUCT)
     },
