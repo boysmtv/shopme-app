@@ -99,12 +99,10 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ✅ HEADER (TIDAK IKUT SCROLL)
         HomeHeader()
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ✅ LIST SCROLLABLE
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize()

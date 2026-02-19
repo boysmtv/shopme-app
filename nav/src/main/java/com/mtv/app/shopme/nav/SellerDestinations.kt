@@ -18,4 +18,5 @@ object SellerDestinations {
 
     const val ORDER_DETAIL_GRAPH = "SELLER_ORDER_DETAIL_GRAPH"
     const val CHAT_DETAIL = "CHAT_DETAIL_GRAPH"
+    const val PRODUCT_ADD = "PRODUCT_ADD_GRAPH"
 }

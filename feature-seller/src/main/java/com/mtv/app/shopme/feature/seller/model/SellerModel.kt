@@ -144,3 +144,11 @@ val dummyOrders = listOf(
     SellerOrderModel("INV-003", "Sari Dewi", "Rp 210.000", OrderStatus.DELIVERING),
     SellerOrderModel("INV-003", "Dika Pratama", "Rp 210.000", OrderStatus.COMPLETED),
 )
+
+data class SellerProduct(
+    val id: String,
+    val name: String,
+    val price: String,
+    val stock: Int,
+    val imageUrl: String? = null
+)
