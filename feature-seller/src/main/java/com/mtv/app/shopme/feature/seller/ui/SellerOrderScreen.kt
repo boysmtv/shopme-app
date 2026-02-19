@@ -61,11 +61,7 @@ fun SellerOrderScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(AppColor.Blue, AppColor.LightBlue)
-                )
-            )
+            .background(AppColor.Blue)
             .statusBarsPadding()
     ) {
         SellerOrderHeader(isOnline, orders)
@@ -111,7 +107,9 @@ fun SellerOrderHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                Brush.verticalGradient(listOf(AppColor.Blue, AppColor.LightBlue))
+                Brush.verticalGradient(
+                    listOf(AppColor.Blue, AppColor.BlueMedium)
+                )
             )
             .padding(20.dp)
     ) {
@@ -188,7 +186,7 @@ fun ModernOrderCard(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
-                            .background(AppColor.LightBlue.copy(alpha = 0.15f))
+                            .background(AppColor.LightBlue)
                             .padding(horizontal = 12.dp, vertical = 6.dp)
                     ) {
                         Text(total, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = AppColor.Blue)
@@ -197,7 +195,7 @@ fun ModernOrderCard(
 
                 Spacer(Modifier.height(12.dp))
                 HorizontalDivider(
-                    color = AppColor.LightBlue.copy(alpha = 0.5f),
+                    color = AppColor.LightBlue,
                     thickness = 1.dp,
                 )
 

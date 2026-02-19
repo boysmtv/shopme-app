@@ -30,7 +30,8 @@ import com.mtv.app.shopme.feature.seller.route.SellerChatListRoute
 import com.mtv.app.shopme.feature.seller.route.SellerDashboardRoute
 import com.mtv.app.shopme.feature.seller.route.SellerOrderDetailRoute
 import com.mtv.app.shopme.feature.seller.route.SellerOrderRoute
-import com.mtv.app.shopme.feature.seller.route.SellerProductRoute
+import com.mtv.app.shopme.feature.seller.route.SellerProductFormRoute
+import com.mtv.app.shopme.feature.seller.route.SellerProductListRoute
 
 fun NavGraphBuilder.splashGraph(nav: NavHostController) {
     composable(CustomerDestinations.SPLASH_GRAPH) {
@@ -129,20 +130,26 @@ fun NavGraphBuilder.sellerGraph(nav: NavHostController) {
         }
 
         composable(SellerDestinations.PRODUCT) {
-             SellerProductRoute(nav)
+             SellerProductListRoute(nav)
         }
 
         composable(SellerDestinations.PROFILE) {
             // SellerProfileRoute(nav)
         }
+    }
+}
 
-        composable(SellerDestinations.ORDER_DETAIL_GRAPH) {
-            SellerOrderDetailRoute(nav)
-        }
+fun NavGraphBuilder.sellerDetailGraph(nav: NavHostController) {
+    composable(SellerDestinations.ORDER_DETAIL_GRAPH) {
+        SellerOrderDetailRoute(nav)
+    }
 
-        composable(SellerDestinations.CHAT_DETAIL) {
-            SellerChatDetailRoute(nav)
-        }
+    composable(SellerDestinations.CHAT_DETAIL) {
+        SellerChatDetailRoute(nav)
+    }
+
+    composable(SellerDestinations.PRODUCT_ADD) {
+        SellerProductFormRoute(nav)
     }
 }
 

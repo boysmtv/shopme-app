@@ -8,8 +8,11 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import com.mtv.app.shopme.feature.seller.model.SellerProduct
+
 class SellerProductListStateListener(
-    var isLoading: Boolean = false
+    var isLoading: Boolean = false,
+    val productList: List<SellerProduct> = emptyList()
 )
 
 class SellerProductListDataListener(
@@ -17,11 +20,11 @@ class SellerProductListDataListener(
 )
 
 class SellerProductListEventListener(
-    val onDeleteProduct: (ProductItem) -> Unit
+    val onDeleteProduct: () -> Unit
 )
 
 class SellerProductListNavigationListener(
     val onBack: () -> Unit,
     val onNavigateToAdd: () -> Unit,
-    val onNavigateToEdit: (ProductItem) -> Unit
+    val onNavigateToEdit: () -> Unit
 )

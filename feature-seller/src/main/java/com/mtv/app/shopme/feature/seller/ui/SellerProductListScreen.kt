@@ -8,7 +8,6 @@
 
 package com.mtv.app.shopme.feature.seller.ui
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,15 +37,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -58,20 +54,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerProductDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerProductListDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerProductListEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerProductListNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerProductListStateListener
 import com.mtv.app.shopme.feature.seller.model.SellerProduct
 import com.mtv.app.shopme.nav.SellerBottomNavigationBar
 
 @Composable
 fun SellerProductListScreen(
-    uiState: SellerProductStateListener,
-    uiData: SellerProductDataListener,
-    uiEvent: SellerProductEventListener,
-    uiNavigation: SellerProductNavigationListener
+    uiState: SellerProductListStateListener,
+    uiData: SellerProductListDataListener,
+    uiEvent: SellerProductListEventListener,
+    uiNavigation: SellerProductListNavigationListener
 ) {
 
     val totalProduct = uiState.productList.size
@@ -79,10 +74,11 @@ fun SellerProductListScreen(
     val lowStockCount = uiState.productList.count { it.stock <= 5 }
 
     Scaffold(
+        modifier = Modifier.statusBarsPadding(),
         containerColor = AppColor.WhiteSoft,
         floatingActionButton = {
             Button(
-                onClick = uiNavigation.navigateToAddProduct,
+                onClick = { uiNavigation.onNavigateToAdd() },
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(AppColor.Blue),
                 modifier = Modifier.shadow(8.dp, RoundedCornerShape(50))
@@ -91,7 +87,6 @@ fun SellerProductListScreen(
             }
         }
     ) { padding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -116,8 +111,8 @@ fun SellerProductListScreen(
                     items(uiState.productList) { product ->
                         ModernProductItem(
                             product = product,
-                            onEdit = { uiNavigation.navigateToEditProduct(product) },
-                            onDelete = { uiEvent.onDeleteProduct(product.id) }
+                            onEdit = { uiNavigation.onNavigateToEdit() },
+                            onDelete = { uiEvent.onDeleteProduct() }
                         )
                     }
                 }
@@ -138,33 +133,18 @@ fun ProductHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(AppColor.Blue)
-            .padding(horizontal = 20.dp, vertical = 24.dp)
+            .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
+        Text(
+            text = "Product Management",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
 
-        // 🔹 Top Bar
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            IconButton(onClick = onBack) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = Color.White
-                )
-            }
-
-            Spacer(Modifier.width(8.dp))
-
-            Text(
-                text = "Product Management",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(20.dp))
 
         // 🔹 Stats Container (Solid White Card)
         Card(
@@ -407,7 +387,7 @@ fun EmptyProductState(
 fun SellerProductListScreenPreview() {
     val navController = rememberNavController()
 
-    val mockState = SellerProductStateListener(
+    val mockState = SellerProductListStateListener(
         productList = listOf(
             SellerProduct("1", "Double Beef Burger", "Rp 60.000", 10),
             SellerProduct("2", "Cheese Pizza", "Rp 75.000", 5),
@@ -431,9 +411,9 @@ fun SellerProductListScreenPreview() {
         ) {
             SellerProductListScreen(
                 uiState = mockState,
-                uiData = SellerProductDataListener(),
-                uiEvent = SellerProductEventListener(),
-                uiNavigation = SellerProductNavigationListener()
+                uiData = SellerProductListDataListener(),
+                uiEvent = SellerProductListEventListener({}),
+                uiNavigation = SellerProductListNavigationListener({}, {}, {})
             )
         }
     }
