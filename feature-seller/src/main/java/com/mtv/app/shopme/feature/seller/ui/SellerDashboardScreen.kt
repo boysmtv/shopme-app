@@ -58,19 +58,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.feature.seller.contract.SellerDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardStateListener
 import com.mtv.app.shopme.nav.SellerBottomNavigationBar
 import kotlin.math.max
 
 @Composable
 fun SellerDashboardScreen(
-    uiState: SellerStateListener,
-    uiData: SellerDataListener,
-    uiEvent: SellerEventListener,
-    uiNavigation: SellerNavigationListener
+    uiState: SellerDashboardStateListener,
+    uiData: SellerDashboardDataListener,
+    uiEvent: SellerDashboardEventListener,
+    uiNavigation: SellerDashboardNavigationListener
 ) {
     var isOnline by remember { mutableStateOf(true) }
     var selectedFilter by remember { mutableStateOf("All") }
@@ -542,10 +542,10 @@ fun SellerDashboardPreview() {
         ) {
 
             SellerDashboardScreen(
-                uiState = SellerStateListener(),
-                uiData = SellerDataListener(),
-                uiEvent = SellerEventListener(),
-                uiNavigation = SellerNavigationListener()
+                uiState = SellerDashboardStateListener(),
+                uiData = SellerDashboardDataListener(),
+                uiEvent = SellerDashboardEventListener(),
+                uiNavigation = SellerDashboardNavigationListener()
             )
         }
     }

@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: SellerContract.kt
+ * File: SellerDashboardContract.kt
  *
  * Last modified by Dedy Wijaya on 18/02/26 12.16
  */
@@ -10,19 +10,19 @@ package com.mtv.app.shopme.feature.seller.contract
 
 import com.mtv.based.core.network.utils.ResourceFirebase
 
-data class SellerStateListener(
+data class SellerDashboardStateListener(
     val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading
 )
 
-data class SellerDataListener(
+data class SellerDashboardDataListener(
     val emptyData: String? = null
 )
 
-data class SellerEventListener(
+data class SellerDashboardEventListener(
     val onRefresh: () -> Unit = {}
 )
 
-data class SellerNavigationListener(
+data class SellerDashboardNavigationListener(
     val onNavigateToProduct: () -> Unit = {},
     val onNavigateToOrder: () -> Unit = {},
     val onNavigateToOrderDetail: (String) -> Unit = {}

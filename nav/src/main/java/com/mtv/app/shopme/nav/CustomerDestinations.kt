@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: AppDestinations.kt
+ * File: CustomerDestinations.kt
  *
  * Last modified by Dedy Wijaya on 31/12/2025 11.08
  */
