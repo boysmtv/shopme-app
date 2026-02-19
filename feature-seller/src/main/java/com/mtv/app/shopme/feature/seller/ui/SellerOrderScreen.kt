@@ -58,114 +58,86 @@ fun SellerOrderScreen(
     var selectedFilter by remember { mutableStateOf("All") }
     var isOnline by remember { mutableStateOf(true) }
 
-    val orders = listOf(
-        mapOf(
-            "invoice" to "INV-2026-001",
-            "customer" to "John Doe",
-            "total" to "Rp 120.000",
-            "date" to "18 Feb 2026",
-            "time" to "09:45",
-            "payment" to "Transfer Bank",
-            "status" to "Pending",
-            "location" to "Puri Lestari - Blok H12/12"
-        ),
-        mapOf(
-            "invoice" to "INV-2026-002",
-            "customer" to "Jane Smith",
-            "total" to "Rp 250.000",
-            "date" to "17 Feb 2026",
-            "time" to "14:30",
-            "payment" to "E-Wallet",
-            "status" to "Completed",
-            "location" to "Puri Lestari - Blok H11/10"
-        ),
-        mapOf(
-            "invoice" to "INV-2026-003",
-            "customer" to "Michael Johnson",
-            "total" to "Rp 180.000",
-            "date" to "16 Feb 2026",
-            "time" to "11:15",
-            "payment" to "Cash",
-            "status" to "Cooking",
-            "location" to "Puri Indah - Blok A5/3"
-        ),
-        mapOf(
-            "invoice" to "INV-2026-004",
-            "customer" to "Emily Davis",
-            "total" to "Rp 300.000",
-            "date" to "15 Feb 2026",
-            "time" to "16:50",
-            "payment" to "Transfer Bank",
-            "status" to "Cancelled",
-            "location" to "Puri Lestari - Blok H13/5"
-        )
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF4F6FA))
-    ) {
-        // --- Header ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.verticalGradient(listOf(AppColor.Blue, AppColor.LightBlue))
+            .background(
+                Brush.verticalGradient(
+                    listOf(AppColor.Blue, AppColor.LightBlue)
                 )
-                .padding(20.dp)
-        ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Receipt,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(28.dp)
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Text("Orders", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .clip(CircleShape)
-                            .background(if (isOnline) Color.Green else Color.Red)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(if (isOnline) "Online" else "Offline", color = Color.White, fontSize = 14.sp)
-                }
+            )
+            .statusBarsPadding()
+    ) {
+        SellerOrderHeader(isOnline, orders)
 
-                Spacer(Modifier.height(8.dp))
-                Text("${orders.size} total orders", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+        Column(
+            modifier = Modifier
+                .background(AppColor.WhiteSoft)
+        ) {
+            Spacer(Modifier.height(16.dp))
+            OrderFilterChips(selectedFilter) { selectedFilter = it }
+
+            Spacer(Modifier.height(12.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(AppColor.WhiteSoft)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(orders.filter { selectedFilter == "All" || it["status"] == selectedFilter }) { order ->
+                    ModernOrderCard(
+                        invoice = order["invoice"]!!,
+                        customer = order["customer"]!!,
+                        location = order["location"]!!,
+                        total = order["total"]!!,
+                        date = order["date"]!!,
+                        time = order["time"]!!,
+                        paymentMethod = order["payment"]!!,
+                        status = order["status"]!!,
+                        onClick = { uiNavigation.onNavigateToOrderDetail() }
+                    )
+                }
             }
         }
+    }
+}
 
-        Spacer(Modifier.height(16.dp))
-
-        OrderFilterChips(selectedFilter) { selectedFilter = it }
-
-        Spacer(Modifier.height(12.dp))
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(orders.filter { selectedFilter == "All" || it["status"] == selectedFilter }) { order ->
-                ModernOrderCard(
-                    invoice = order["invoice"]!!,
-                    customer = order["customer"]!!,
-                    location = order["location"]!!,
-                    total = order["total"]!!,
-                    date = order["date"]!!,
-                    time = order["time"]!!,
-                    paymentMethod = order["payment"]!!,
-                    status = order["status"]!!,
-                    onClick = { uiNavigation.onNavigateToOrderDetail() }
+@Composable
+fun SellerOrderHeader(
+    isOnline: Boolean, orders: List<Map<String, String>>
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                Brush.verticalGradient(listOf(AppColor.Blue, AppColor.LightBlue))
+            )
+            .padding(20.dp)
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Receipt,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
                 )
+                Spacer(Modifier.width(12.dp))
+                Text("Orders", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .size(12.dp)
+                        .clip(CircleShape)
+                        .background(if (isOnline) Color.Green else Color.Red)
+                )
+                Spacer(Modifier.width(6.dp))
+                Text(if (isOnline) "Online" else "Offline", color = Color.White, fontSize = 14.sp)
             }
+
+            Spacer(Modifier.height(8.dp))
+            Text("${orders.size} total orders", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
         }
     }
 }
@@ -326,6 +298,49 @@ private fun OrderFilterChips(selected: String, onSelected: (String) -> Unit) {
         }
     }
 }
+
+val orders = listOf(
+    mapOf(
+        "invoice" to "INV-2026-001",
+        "customer" to "John Doe",
+        "total" to "Rp 120.000",
+        "date" to "18 Feb 2026",
+        "time" to "09:45",
+        "payment" to "Transfer Bank",
+        "status" to "Pending",
+        "location" to "Puri Lestari - Blok H12/12"
+    ),
+    mapOf(
+        "invoice" to "INV-2026-002",
+        "customer" to "Jane Smith",
+        "total" to "Rp 250.000",
+        "date" to "17 Feb 2026",
+        "time" to "14:30",
+        "payment" to "E-Wallet",
+        "status" to "Completed",
+        "location" to "Puri Lestari - Blok H11/10"
+    ),
+    mapOf(
+        "invoice" to "INV-2026-003",
+        "customer" to "Michael Johnson",
+        "total" to "Rp 180.000",
+        "date" to "16 Feb 2026",
+        "time" to "11:15",
+        "payment" to "Cash",
+        "status" to "Cooking",
+        "location" to "Puri Indah - Blok A5/3"
+    ),
+    mapOf(
+        "invoice" to "INV-2026-004",
+        "customer" to "Emily Davis",
+        "total" to "Rp 300.000",
+        "date" to "15 Feb 2026",
+        "time" to "16:50",
+        "payment" to "Transfer Bank",
+        "status" to "Cancelled",
+        "location" to "Puri Lestari - Blok H13/5"
+    )
+)
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable

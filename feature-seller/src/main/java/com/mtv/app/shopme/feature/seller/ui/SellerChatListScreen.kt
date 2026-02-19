@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.base64ToBitmap
@@ -40,7 +42,11 @@ import com.mtv.app.shopme.feature.seller.contract.SellerChatListEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListStateListener
-
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderStateListener
+import com.mtv.app.shopme.nav.SellerBottomNavigationBar
 
 @Composable
 fun SellerChatListScreen(
@@ -77,7 +83,7 @@ fun SellerChatListScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-        androidx.compose.material3.Divider()
+        HorizontalDivider()
         Spacer(Modifier.height(16.dp))
 
         LazyColumn(
@@ -184,14 +190,24 @@ fun ChatAvatar(
     }
 }
 
-
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerChatListPreview() {
-    SellerChatListScreen(
-        uiState = SellerChatListStateListener(chatList = mockSellerChatList()),
-        uiData = SellerChatListDataListener(),
-        uiEvent = SellerChatListEventListener({}),
-        uiNavigation = SellerChatListNavigationListener()
-    )
+    val navController = rememberNavController()
+    Scaffold(
+        bottomBar = { SellerBottomNavigationBar(navController) }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = padding.calculateBottomPadding())
+        ) {
+            SellerChatListScreen(
+                uiState = SellerChatListStateListener(chatList = mockSellerChatList()),
+                uiData = SellerChatListDataListener(),
+                uiEvent = SellerChatListEventListener({}),
+                uiNavigation = SellerChatListNavigationListener()
+            )
+        }
+    }
 }

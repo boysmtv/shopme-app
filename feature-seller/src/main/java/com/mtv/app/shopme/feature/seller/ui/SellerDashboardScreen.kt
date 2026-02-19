@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -124,14 +125,22 @@ fun SellerDashboardScreen(
         else orders.sortedByDescending { it["location"] }
     }
 
-    Scaffold { padding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(AppColor.Blue, AppColor.LightBlue)
+                )
+            )
+            .statusBarsPadding()
+    ) {
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF4F6FA))
-                .padding(padding),
+                .background(AppColor.WhiteSoft),
         ) {
-
             item { DashboardHeader(isOnline) { isOnline = !isOnline } }
 
             item { Spacer(Modifier.height(20.dp)) }
@@ -179,7 +188,6 @@ fun SellerDashboardScreen(
                 }
             }
 
-
             items(sortedOrders.size) { index ->
                 val order = sortedOrders[index]
                 if (selectedFilter == "All" || order["status"] == selectedFilter) {
@@ -198,6 +206,7 @@ fun SellerDashboardScreen(
             }
         }
     }
+
 }
 
 @Composable
@@ -223,6 +232,7 @@ fun ModernOrderItemCompact(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(3.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -379,6 +389,7 @@ fun WeeklySummaryCard() {
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Column(Modifier.padding(20.dp)) {
@@ -418,6 +429,7 @@ fun WeeklyOrdersChart() {
         modifier = Modifier
             .padding(horizontal = 20.dp)
             .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column(Modifier.padding(20.dp)) {
