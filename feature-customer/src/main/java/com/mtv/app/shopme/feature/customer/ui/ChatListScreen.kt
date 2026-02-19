@@ -161,7 +161,7 @@ fun ListChatItem(
 
         Column(
             modifier = Modifier
-                .fillMaxHeight(),     // sekarang bekerja
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.End
         ) {
             Text(

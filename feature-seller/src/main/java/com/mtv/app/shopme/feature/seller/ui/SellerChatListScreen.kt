@@ -125,23 +125,42 @@ fun SellerListChatItem(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(data.name, fontFamily = PoppinsFont, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-            Spacer(Modifier.height(4.dp))
-            Text(data.lastMessage, fontFamily = PoppinsFont, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = Color.Gray)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                data.lastMessage,
+                fontFamily = PoppinsFont,
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = Color.Gray
+            )
         }
 
         Column(
-            modifier = Modifier.fillMaxHeight(),
-            horizontalAlignment = Alignment.End
+            modifier = Modifier
+                .fillMaxHeight(),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(data.time, fontFamily = PoppinsFont, fontSize = 12.sp, color = Color.Gray)
-            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                data.time,
+                fontFamily = PoppinsFont,
+                fontSize = 12.sp,
+                color = Color.Gray,
+            )
+
             if (data.unreadCount > 0) {
                 Box(
                     modifier = Modifier
-                        .background(AppColor.Orange, RoundedCornerShape(50))
+                        .background(AppColor.Blue, RoundedCornerShape(50))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
-                    Text(data.unreadCount.toString(), color = Color.White, fontFamily = PoppinsFont, fontSize = 12.sp)
+                    Text(
+                        data.unreadCount.toString(),
+                        color = Color.White,
+                        fontFamily = PoppinsFont,
+                        fontSize = 12.sp
+                    )
                 }
             }
         }
@@ -157,7 +176,7 @@ fun ChatAvatar(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(AppColor.Orange)
+            .background(AppColor.Blue)
     ) {
         if (!base64Image.isNullOrBlank()) {
             val bitmap = remember(base64Image) { base64ToBitmap(base64Image) }

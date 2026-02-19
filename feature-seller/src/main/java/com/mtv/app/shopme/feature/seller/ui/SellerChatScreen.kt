@@ -66,7 +66,7 @@ fun SellerChatScreen(
 
             Spacer(Modifier.width(12.dp))
             Column {
-                Text("Customer Name", fontFamily = PoppinsFont, fontWeight = FontWeight.Bold)
+                Text("Customer Name", fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 Text("Online", fontFamily = PoppinsFont, fontSize = 12.sp, color = Color(0xFF4CAF50))
             }
 
@@ -74,7 +74,7 @@ fun SellerChatScreen(
         }
 
         Spacer(Modifier.height(16.dp))
-        androidx.compose.material3.Divider()
+        HorizontalDivider()
         Spacer(Modifier.height(16.dp))
 
         LazyColumn(
@@ -112,7 +112,7 @@ fun SellerChatScreen(
                 modifier = Modifier
                     .height(48.dp)
                     .width(64.dp)
-                    .background(AppColor.Orange, RoundedCornerShape(20.dp))
+                    .background(AppColor.Blue, RoundedCornerShape(20.dp))
             ) {
                 Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = Color.White)
             }
@@ -122,7 +122,7 @@ fun SellerChatScreen(
 
 @Composable
 fun SellerChatBubble(msg: SellerChatDetailMessage) {
-    val bubbleColor = if (msg.isFromSeller) AppColor.Orange else AppColor.LightOrange
+    val bubbleColor = if (msg.isFromSeller) AppColor.Blue else AppColor.LightBlue
     val textColor = if (msg.isFromSeller) Color.White else Color.Black
     val arrangement = if (msg.isFromSeller) Arrangement.End else Arrangement.Start
 

@@ -38,7 +38,7 @@ class SellerProductListViewModel @Inject constructor(
 
     }
 
-    fun deleteProduct(product: ProductItem) {
+    fun deleteProduct() {
 
     }
 

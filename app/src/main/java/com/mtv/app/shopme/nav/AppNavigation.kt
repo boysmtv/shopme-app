@@ -37,6 +37,7 @@ fun AppNavigation() {
     val sellerRoutes = listOf(
         SellerBottomNavItem.Dashboard.route,
         SellerBottomNavItem.Product.route,
+        SellerBottomNavItem.Chat.route,
         SellerBottomNavItem.Order.route,
         SellerBottomNavItem.Profile.route
     )

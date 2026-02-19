@@ -297,7 +297,7 @@ fun DashboardHeader(
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(
-                    listOf(AppColor.Blue, AppColor.LightBlue)
+                    listOf(AppColor.Blue, AppColor.BlueMedium)
                 )
             )
             .padding(20.dp)

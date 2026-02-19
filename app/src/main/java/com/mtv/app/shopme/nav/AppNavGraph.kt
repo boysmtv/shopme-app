@@ -26,5 +26,6 @@ fun AppNavGraph(navController: NavHostController) {
         profileGraph(navController)
         orderGraph(navController)
         sellerGraph(navController)
+        sellerDetailGraph(navController)
     }
 }

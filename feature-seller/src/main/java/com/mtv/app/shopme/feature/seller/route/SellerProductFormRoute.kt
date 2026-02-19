@@ -13,26 +13,13 @@ import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
 import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.app.shopme.feature.seller.presentation.SellerProductFormViewModel
+import com.mtv.app.shopme.feature.seller.ui.SellerProductFormScreen
 
 @Composable
-fun SellerProductFormRoute(
-    nav: NavController,
-    productId: String? = null
-) {
-    BaseRoute<
-            SellerProductFormViewModel,
-            SellerProductFormStateListener,
-            SellerProductFormDataListener> { vm, base, uiState, uiData ->
-
-        LaunchedEffect(productId) {
-            productId?.let { vm.loadProduct(it) }
-        }
-
-        BaseScreen(
-            baseUiState = base,
-            onDismissError = vm::dismissError
-        ) {
-
+fun SellerProductFormRoute(nav: NavController) {
+    BaseRoute<SellerProductFormViewModel, SellerProductFormStateListener, SellerProductFormDataListener> { vm, base, uiState, uiData ->
+        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             SellerProductFormScreen(
                 uiState = uiState,
                 uiData = uiData,

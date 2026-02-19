@@ -11,15 +11,8 @@ import com.mtv.app.shopme.nav.SellerDestinations
 
 @Composable
 fun SellerProductListRoute(nav: NavController) {
-    BaseRoute<SellerProductListViewModel,
-            SellerProductListStateListener,
-            SellerProductListDataListener> { vm, base, uiState, uiData ->
-
-        BaseScreen(
-            baseUiState = base,
-            onDismissError = vm::dismissError
-        ) {
-
+    BaseRoute<SellerProductListViewModel, SellerProductListStateListener, SellerProductListDataListener> { vm, base, uiState, uiData ->
+        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             SellerProductListScreen(
                 uiState = uiState,
                 uiData = uiData,
@@ -32,10 +25,14 @@ fun SellerProductListRoute(nav: NavController) {
 
 private fun sellerProductListEvent(vm: SellerProductListViewModel) =
     SellerProductListEventListener(
-        onDeleteProduct = { vm.deleteProduct(it) }
+        onDeleteProduct = { vm.deleteProduct() }
     )
 
 private fun sellerProductListNavigation(nav: NavController) =
     SellerProductListNavigationListener(
-        onBack = { nav.popBackStack() },
+        onBack = {},
+        onNavigateToAdd = {
+            nav.navigate(SellerDestinations.PRODUCT_ADD)
+        },
+        onNavigateToEdit = {}
     )
