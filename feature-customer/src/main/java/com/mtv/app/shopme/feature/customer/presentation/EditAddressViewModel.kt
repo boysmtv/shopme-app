@@ -28,6 +28,7 @@ class EditAddressViewModel @Inject constructor(
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(EditAddressStateListener())
 
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(EditAddressDataListener())
 
     fun onSaveProfile(name: String, phone: String, address: String) {

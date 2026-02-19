@@ -29,6 +29,8 @@ class CafeViewModel @Inject constructor() :
 
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(CafeStateListener())
+
+    /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(CafeDataListener())
 
     init {
