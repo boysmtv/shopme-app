@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,9 +48,9 @@ fun CustomerBottomNavigationBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val activeColorBox = AppColor.Orange
+    val activeColorBox = AppColor.Green
     val activeColorIcon = AppColor.White
-    val inactiveColorIcon = AppColor.Orange
+    val inactiveColorIcon = AppColor.Green
 
     Box(
         modifier = Modifier
@@ -64,7 +63,7 @@ fun CustomerBottomNavigationBar(navController: NavController) {
                 .padding(horizontal = 32.dp, vertical = 16.dp)
                 .height(64.dp)
                 .clip(RoundedCornerShape(32.dp))
-                .border(1.dp, AppColor.Orange.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
+                .border(1.dp, AppColor.Green.copy(alpha = 0.2f), RoundedCornerShape(32.dp))
                 .background(AppColor.White),
             containerColor = AppColor.White,
             tonalElevation = 0.dp

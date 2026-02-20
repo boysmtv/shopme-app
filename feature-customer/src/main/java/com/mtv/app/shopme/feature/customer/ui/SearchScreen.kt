@@ -89,7 +89,7 @@ fun SearchScreen(
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        AppColor.LightOrange,
+                        AppColor.GreenSoft,
                         AppColor.WhiteSoft,
                         AppColor.White
                     )
@@ -167,7 +167,7 @@ fun SearchHeader(
                     onValueChange = { query = it; uiEvent.onQueryChanged(it) },
                     singleLine = true,
                     textStyle = TextStyle(color = Color.Black, fontSize = 14.sp, fontFamily = PoppinsFont),
-                    cursorBrush = SolidColor(AppColor.Orange),
+                    cursorBrush = SolidColor(AppColor.Green),
                     decorationBox = { innerTextField ->
                         Box(
                             Modifier.fillMaxSize(),
@@ -351,7 +351,7 @@ fun SearchItem(
                     Icon(
                         imageVector = Icons.Default.Home,
                         contentDescription = null,
-                        tint = AppColor.Orange,
+                        tint = AppColor.Green,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -367,7 +367,7 @@ fun SearchItem(
                     Icon(
                         imageVector = Icons.Default.LocationOn,
                         contentDescription = null,
-                        tint = AppColor.Orange,
+                        tint = AppColor.Green,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))

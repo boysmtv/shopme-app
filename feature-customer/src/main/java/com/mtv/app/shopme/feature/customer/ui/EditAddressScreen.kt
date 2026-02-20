@@ -12,8 +12,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -24,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,8 +47,8 @@ fun EditAddressScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        AppColor.Orange,
-                        AppColor.LightOrange
+                        AppColor.Green,
+                        AppColor.GreenSoft
                     )
                 )
             )
@@ -190,7 +187,7 @@ fun EditAddressMenus(
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = AppColor.Orange)
+                colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green)
             ) {
                 Text(
                     text = "Simpan",

@@ -293,7 +293,7 @@ fun InfoCard(label: String, value: String, highlight: Boolean = false) {
             value,
             fontFamily = PoppinsFont,
             fontWeight = if (highlight) FontWeight.Bold else FontWeight.Medium,
-            color = if (highlight) AppColor.Orange else Color.Black
+            color = if (highlight) AppColor.Green else Color.Black
         )
     }
 }

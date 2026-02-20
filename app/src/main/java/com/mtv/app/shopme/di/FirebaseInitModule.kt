@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: MainActivity.kt
+ * File: FirebaseInitModule.kt
  *
  * Last modified by Dedy Wijaya on 11/02/26 13.42
  */

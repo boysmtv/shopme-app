@@ -29,7 +29,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -260,18 +259,18 @@ fun OrderTotalAndButtons(order: OrderModel, onClick: () -> Unit) {
             OutlinedButton(
                 onClick = onClick, shape = RoundedCornerShape(6.dp), colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = AppColor.White,
-                    contentColor = AppColor.Orange
+                    contentColor = AppColor.Green
                 )
             ) {
                 Text(
                     "Chat",
-                    color = AppColor.Orange
+                    color = AppColor.Green
                 )
             }
             Spacer(Modifier.width(8.dp))
             OutlinedButton(
                 onClick = onClick, shape = RoundedCornerShape(6.dp), colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = AppColor.Orange,
+                    containerColor = AppColor.Green,
                     contentColor = AppColor.White
                 )
             ) {
@@ -285,7 +284,7 @@ fun OrderTotalAndButtons(order: OrderModel, onClick: () -> Unit) {
 fun StatusBadge(status: OrderStatus) {
     val color = when (status) {
         OrderStatus.ORDERED -> Color(0xFFFFA726)
-        OrderStatus.COOKING -> AppColor.Orange
+        OrderStatus.COOKING -> AppColor.Green
         OrderStatus.DELIVERING -> Color(0xFF1E88E5)
         OrderStatus.COMPLETED -> Color(0xFF2E7D32)
     }

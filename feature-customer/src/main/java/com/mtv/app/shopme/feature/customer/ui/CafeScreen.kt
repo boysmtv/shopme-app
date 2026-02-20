@@ -34,8 +34,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -90,7 +88,7 @@ fun CafeScreen(
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
-                            AppColor.LightOrange,
+                            AppColor.GreenSoft,
                             AppColor.WhiteSoft,
                             AppColor.White
                         )
@@ -240,7 +238,7 @@ fun CafeHeader(
                     Text(
                         text = "⏰ ${uiData.cafe?.cafeOpenTime} - ${uiData.cafe?.cafeCloseTime}",
                         fontSize = 12.sp,
-                        color = AppColor.Orange,
+                        color = AppColor.Green,
                         fontFamily = PoppinsFont
                     )
                 }
@@ -251,14 +249,14 @@ fun CafeHeader(
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .background(AppColor.Orange.copy(alpha = 0.1f))
+                    .background(AppColor.Green.copy(alpha = 0.1f))
                     .padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
                     contentDescription = null,
-                    tint = AppColor.Orange,
+                    tint = AppColor.Green,
                     modifier = Modifier.size(16.dp)
                 )
 
@@ -267,7 +265,7 @@ fun CafeHeader(
                 Text(
                     text = "Minimal Order Rp 10.000",
                     fontSize = 12.sp,
-                    color = AppColor.Orange,
+                    color = AppColor.Green,
                     fontFamily = PoppinsFont,
                     fontWeight = FontWeight.Medium
                 )
@@ -292,7 +290,7 @@ fun CafeHeader(
                 ActionButton(
                     text = "Chat",
                     icon = Icons.AutoMirrored.Filled.Chat,
-                    background = AppColor.Orange,
+                    background = AppColor.Green,
                     textColor = Color.White,
                     modifier = Modifier.weight(1f),
                     onClick = { onChatClick() }
@@ -446,7 +444,7 @@ fun CafeFoodItem(
                 ) {
                     Text(
                         text = "$${item.price}",
-                        color = AppColor.Orange,
+                        color = AppColor.Green,
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = PoppinsFont
                     )
@@ -454,7 +452,7 @@ fun CafeFoodItem(
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
-                        tint = AppColor.Orange,
+                        tint = AppColor.Green,
                         modifier = Modifier.size(18.dp)
                     )
                 }

@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: NotificationViewModel.kt
+ * File: NotifViewModel.kt
  *
  * Last modified by Dedy Wijaya on 20/02/26 15.00
  */

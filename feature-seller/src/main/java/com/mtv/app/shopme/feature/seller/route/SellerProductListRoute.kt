@@ -32,7 +32,7 @@ private fun sellerProductListNavigation(nav: NavController) =
     SellerProductListNavigationListener(
         onBack = {},
         onNavigateToAdd = {
-            nav.navigate(SellerDestinations.PRODUCT_ADD)
+            nav.navigate(SellerDestinations.SELLER_PRODUCT_ADD_GRAPH)
         },
         onNavigateToEdit = {}
     )

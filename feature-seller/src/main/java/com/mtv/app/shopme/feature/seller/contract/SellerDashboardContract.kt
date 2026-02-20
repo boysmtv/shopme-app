@@ -25,5 +25,6 @@ data class SellerDashboardEventListener(
 data class SellerDashboardNavigationListener(
     val onNavigateToProduct: () -> Unit = {},
     val onNavigateToOrder: () -> Unit = {},
-    val onNavigateToOrderDetail: (String) -> Unit = {}
+    val onNavigateToOrderDetail: (String) -> Unit = {},
+    val onNavigateToNotif: () -> Unit = {}
 )

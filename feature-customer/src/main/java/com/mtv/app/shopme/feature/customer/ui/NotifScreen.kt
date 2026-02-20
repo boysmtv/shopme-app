@@ -31,8 +31,6 @@ import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,7 +46,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.feature.customer.contract.NotifDataListener
@@ -256,7 +253,7 @@ fun UnreadDot() {
 fun InitialAvatar(
     text: String,
     size: Dp = 44.dp,
-    backgroundColor: Color = AppColor.LightOrange,
+    backgroundColor: Color = AppColor.GreenSoft,
     textColor: Color = Color.Black
 ) {
     val initial = remember(text) {

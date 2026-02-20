@@ -122,7 +122,7 @@ fun SellerChatScreen(
 
 @Composable
 fun SellerChatBubble(msg: SellerChatDetailMessage) {
-    val bubbleColor = if (msg.isFromSeller) AppColor.Blue else AppColor.LightBlue
+    val bubbleColor = if (msg.isFromSeller) AppColor.Blue else AppColor.BlueSoft
     val textColor = if (msg.isFromSeller) Color.White else Color.Black
     val arrangement = if (msg.isFromSeller) Arrangement.End else Arrangement.Start
 

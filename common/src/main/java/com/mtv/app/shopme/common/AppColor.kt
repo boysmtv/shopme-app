@@ -11,14 +11,13 @@ package com.mtv.app.shopme.common
 import androidx.compose.ui.graphics.Color
 
 object AppColor {
-    val Orange = Color(0xFFFF6A00)
-    val LightOrange = Color(0xFFFFE0CC)
+    val Green = Color(0xFF00B14F)
+    val GreenSoft = Color(0xFFDFF5E8)
     val White = Color(0xFFFFFFFF)
-    val WhiteSoft = Color(0xFFF6F6F6)
-    val TextDark = Color(0xFF1C1C1C)
-    val Gray = Color(0xFF9E9E9E)
+    val WhiteSoft = Color(0xFFF2FBF6)
+    val Gray = Color(0x99000000)
     val Black = Color(0xFF000000)
-    val Blue = Color(0xFF1976D2)
-    val BlueMedium = Color(0xFF42A5F5)
-    val LightBlue = Color(0xFFD7EEFF)
+    val Blue = Color(0xFF1BA0E2)
+    val BlueMedium = Color(0xFF0F7DC2)
+    val BlueSoft = Color(0xFFE7F4FB)
 }

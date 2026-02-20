@@ -41,6 +41,6 @@ private fun sellerOrderEvent(vm: SellerOrderViewModel) = SellerOrderEventListene
 
 private fun sellerOrderNavigation(nav: NavController) = SellerOrderNavigationListener(
     onNavigateToOrderDetail = {
-        nav.navigate(SellerDestinations.ORDER_DETAIL_GRAPH)
+        nav.navigate(SellerDestinations.SELLER_ORDER_DETAIL_GRAPH)
     }
 )

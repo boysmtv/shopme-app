@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":nav"))
     implementation(project(":feature-customer"))
     implementation(project(":feature-seller"))
+    implementation(project(":feature-auth"))
 
     /* =========================
      * Core & Lifecycle

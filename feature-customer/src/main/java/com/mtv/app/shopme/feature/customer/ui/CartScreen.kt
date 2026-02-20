@@ -112,7 +112,7 @@ fun CartScreen(
                 text = "Clear Cart",
                 fontFamily = PoppinsFont,
                 fontSize = 14.sp,
-                color = AppColor.Orange,
+                color = AppColor.Green,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -169,7 +169,7 @@ fun CartScreen(
                     onClick = {
                         showCheckoutDialog = true
                     },
-                    colors = ButtonDefaults.buttonColors(AppColor.Orange),
+                    colors = ButtonDefaults.buttonColors(AppColor.Green),
                     shape = RoundedCornerShape(18.dp),
                     modifier = Modifier
                         .height(42.dp)
@@ -233,7 +233,7 @@ fun CafeGroupCard(items: List<CartItem>) {
                 Icon(
                     imageVector = Icons.Default.Home,
                     contentDescription = null,
-                    tint = AppColor.Orange,
+                    tint = AppColor.Green,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(Modifier.width(8.dp))
@@ -248,7 +248,7 @@ fun CafeGroupCard(items: List<CartItem>) {
             Icon(
                 imageVector = Icons.Default.Delete,
                 contentDescription = null,
-                tint = AppColor.Orange,
+                tint = AppColor.Green,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -274,7 +274,7 @@ fun CafeGroupCard(items: List<CartItem>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    AppColor.LightOrange.copy(alpha = 0.7f),
+                    AppColor.GreenSoft.copy(alpha = 0.7f),
                     RoundedCornerShape(12.dp)
                 )
                 .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -338,7 +338,7 @@ fun CafeSubtotal(items: List<CartItem>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(AppColor.LightOrange.copy(alpha = 0.15f))
+            .background(AppColor.GreenSoft.copy(alpha = 0.15f))
             .padding(12.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -473,7 +473,7 @@ fun QuantityCounter(quantity: Int) {
             modifier = Modifier
                 .size(28.dp)
                 .clip(CircleShape)
-                .background(AppColor.Orange),
+                .background(AppColor.Green),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -614,7 +614,7 @@ fun CheckoutConfirmationDialog(
                     fontFamily = PoppinsFont,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = AppColor.Orange
+                    color = AppColor.Green
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -629,7 +629,7 @@ fun CheckoutConfirmationDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(AppColor.Orange),
+                colors = ButtonDefaults.buttonColors(AppColor.Green),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
