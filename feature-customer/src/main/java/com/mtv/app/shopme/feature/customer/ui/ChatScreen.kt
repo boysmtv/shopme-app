@@ -199,7 +199,7 @@ fun ChatScreen(
                     .height(48.dp)
                     .width(64.dp)
                     .align(Alignment.Bottom)
-                    .background(AppColor.Orange, RoundedCornerShape(20.dp))
+                    .background(AppColor.Green, RoundedCornerShape(20.dp))
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.Send,
@@ -213,7 +213,7 @@ fun ChatScreen(
 
 @Composable
 fun ChatBubble(message: ChatMessage) {
-    val bubbleColor = if (message.isFromUser) AppColor.Orange else AppColor.LightOrange
+    val bubbleColor = if (message.isFromUser) AppColor.Green else AppColor.GreenSoft
     val alignment = if (message.isFromUser) Arrangement.End else Arrangement.Start
     val textColor = if (message.isFromUser) AppColor.White else Color.Black
 

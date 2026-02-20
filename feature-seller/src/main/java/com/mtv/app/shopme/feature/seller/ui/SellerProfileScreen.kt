@@ -30,7 +30,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
@@ -394,7 +393,7 @@ fun SellerProfileHeader(
 
                 SellerActionButton(
                     text = "Check Store",
-                    background = AppColor.LightBlue,
+                    background = AppColor.BlueSoft,
                     textColor = AppColor.Blue,
                     modifier = Modifier.weight(1f),
                     onClick = uiEvent.onToggleOnline

@@ -42,6 +42,6 @@ private fun sellerChatListEvent(vm: SellerChatListViewModel) = SellerChatListEve
 private fun sellerChatListNavigation(nav: NavController) = SellerChatListNavigationListener(
     onBack = { nav.popBackStack() },
     navigateToChat = {
-        nav.navigate(SellerDestinations.CHAT_DETAIL)
+        nav.navigate(SellerDestinations.SELLER_CHAT_DETAIL_GRAPH)
     }
 )

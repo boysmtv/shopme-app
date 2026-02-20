@@ -23,10 +23,7 @@ import com.mtv.app.shopme.nav.SellerDestinations
 @Composable
 fun SellerDashboardRoute(nav: NavController) {
     BaseRoute<SellerDashboardViewModel, SellerDashboardStateListener, SellerDashboardDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(
-            baseUiState = base,
-            onDismissError = vm::dismissError
-        ) {
+        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             SellerDashboardScreen(
                 uiState = uiState,
                 uiData = uiData,
@@ -52,6 +49,9 @@ private fun sellerDashboardNavigation(nav: NavController) = SellerDashboardNavig
     },
     onNavigateToOrderDetail = { orderId ->
         nav.navigate("seller_order_detail/$orderId")
+    },
+    onNavigateToNotif = {
+        nav.navigate(SellerDestinations.SELLER_NOTIFICATION_GRAPH)
     }
 )
 

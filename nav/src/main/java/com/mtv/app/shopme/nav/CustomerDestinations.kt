@@ -10,9 +10,6 @@ package com.mtv.app.shopme.nav
 
 
 object CustomerDestinations {
-    const val SPLASH_GRAPH = "SPLASH_GRAPH"
-    const val LOGIN_GRAPH = "LOGIN_GRAPH"
-    const val REGISTER_GRAPH = "REGISTER_GRAPH"
     const val HOME_GRAPH = "HOME_GRAPH"
     const val RESET_GRAPH = "FORGOT_GRAPH"
     const val DETAIL_GRAPH = "DETAIL_GRAPH"

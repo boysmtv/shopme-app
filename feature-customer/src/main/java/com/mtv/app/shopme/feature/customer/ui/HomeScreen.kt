@@ -87,7 +87,7 @@ fun HomeScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        AppColor.LightOrange,
+                        AppColor.GreenSoft,
                         AppColor.WhiteSoft,
                         AppColor.White
                     )
@@ -180,7 +180,7 @@ private fun HomeMenuTitle(
             fontWeight = FontWeight.Thin,
             fontFamily = PoppinsFont,
             fontSize = 16.sp,
-            color = AppColor.Orange,
+            color = AppColor.Green,
             modifier = Modifier.clickable {
                 onSeeAllClick()
             }
@@ -335,7 +335,7 @@ private fun HomePromoBanner() {
             .fillMaxWidth()
             .height(110.dp)
             .background(
-                color = AppColor.Orange,
+                color = AppColor.Green,
                 shape = RoundedCornerShape(20.dp)
             )
             .padding(16.dp)
@@ -400,7 +400,7 @@ fun CategoryItem(title: String) {
             .clickable {}
             .padding(12.dp)
     ) {
-        Icon(Icons.Default.Fastfood, contentDescription = null, tint = AppColor.Orange)
+        Icon(Icons.Default.Fastfood, contentDescription = null, tint = AppColor.Green)
         Spacer(Modifier.height(6.dp))
         Text(title, fontFamily = PoppinsFont, fontSize = 11.sp)
     }
@@ -494,20 +494,20 @@ fun FoodCard(
                     text = "$${item.price}",
                     fontFamily = InterFont,
                     fontWeight = FontWeight.Medium,
-                    color = AppColor.Orange
+                    color = AppColor.Green
                 )
             }
         }
     }
 }
 
-//@Preview(showBackground = true)
+//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 //@Composable
 //fun HomeHeaderPreview() {
 //    HomeHeader()
 //}
 //
-//@Preview(showBackground = true)
+//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 //@Composable
 //fun HomePromoPreview() {
 //    HomePromoBanner()

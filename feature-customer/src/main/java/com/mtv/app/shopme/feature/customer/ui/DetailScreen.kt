@@ -152,7 +152,7 @@ fun DetailScreen(
                 .background(
                     Brush.verticalGradient(
                         listOf(
-                            AppColor.LightOrange,
+                            AppColor.GreenSoft,
                             AppColor.WhiteSoft,
                             AppColor.White
                         )
@@ -240,7 +240,7 @@ fun AddToCartBar(
 
         Button(
             onClick = { onCartClick() },
-            colors = ButtonDefaults.buttonColors(AppColor.Orange),
+            colors = ButtonDefaults.buttonColors(AppColor.Green),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
                 .padding(end = 16.dp, top = 16.dp, bottom = 16.dp)
@@ -392,7 +392,7 @@ fun DetailLocation(
             Icon(
                 imageVector = Icons.Default.Home,
                 contentDescription = null,
-                tint = AppColor.Orange
+                tint = AppColor.Green
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
@@ -407,7 +407,7 @@ fun DetailLocation(
         Icon(
             imageVector = Icons.Default.LocationOn,
             contentDescription = null,
-            tint = AppColor.Orange
+            tint = AppColor.Green
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
@@ -506,7 +506,7 @@ fun StatItem(
     Row(
         modifier = Modifier
             .background(
-                color = AppColor.Orange.copy(alpha = 0.12f),
+                color = AppColor.Green.copy(alpha = 0.12f),
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(horizontal = 8.dp, vertical = 4.dp),
@@ -515,13 +515,13 @@ fun StatItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = AppColor.Orange,
+            tint = AppColor.Green,
             modifier = Modifier.size(16.dp)
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
             text = text,
-            color = AppColor.Orange,
+            color = AppColor.Green,
             fontFamily = PoppinsFont
         )
     }
@@ -560,7 +560,7 @@ fun IngredientItem(image: Int) {
             painter = painterResource(id = image),
             contentDescription = null,
             modifier = Modifier.size(32.dp),
-            tint = AppColor.Orange
+            tint = AppColor.Green
         )
     }
 }
@@ -599,7 +599,7 @@ fun SimilarItemRow(image: Int, title: String, price: Double) {
 
             Text(
                 text = "$${price}",
-                color = AppColor.Orange,
+                color = AppColor.Green,
                 fontSize = 14.sp,
                 fontFamily = PoppinsFont
             )
@@ -617,7 +617,7 @@ fun SimilarItemRow(image: Int, title: String, price: Double) {
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(AppColor.Orange),
+                .background(AppColor.Green),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -688,7 +688,7 @@ fun VariantBottomSheetContent(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Close",
-                    tint = AppColor.Orange
+                    tint = AppColor.Green
                 )
             }
         }
@@ -724,7 +724,7 @@ fun VariantBottomSheetContent(
         )
 
         Spacer(Modifier.height(16.dp))
-        HorizontalDivider(color = AppColor.LightOrange, modifier = Modifier.height(1.dp))
+        HorizontalDivider(color = AppColor.GreenSoft, modifier = Modifier.height(1.dp))
 
         Spacer(Modifier.height(8.dp))
         Text(
@@ -771,7 +771,7 @@ fun VariantBottomSheetContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(16.dp))
-                .background(AppColor.Orange.copy(alpha = 0.08f))
+                .background(AppColor.Green.copy(alpha = 0.08f))
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
@@ -790,7 +790,7 @@ fun VariantBottomSheetContent(
                         .size(24.dp)
                         .clip(CircleShape)
                         .background(
-                            if (quantity > 1) AppColor.Orange else Color.Gray.copy(alpha = 0.3f)
+                            if (quantity > 1) AppColor.Green else Color.Gray.copy(alpha = 0.3f)
                         )
                         .clickable {
                             if (quantity > 1) quantity--
@@ -820,7 +820,7 @@ fun VariantBottomSheetContent(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(AppColor.Orange)
+                        .background(AppColor.Green)
                         .clickable {
                             quantity++
                         },
@@ -844,7 +844,7 @@ fun VariantBottomSheetContent(
             text = "Total: Rp $totalPrice",
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
-            color = AppColor.Orange,
+            color = AppColor.Green,
             fontFamily = PoppinsFont,
             textAlign = TextAlign.End
         )
@@ -856,7 +856,7 @@ fun VariantBottomSheetContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(AppColor.Orange),
+            colors = ButtonDefaults.buttonColors(AppColor.Green),
             shape = RoundedCornerShape(16.dp)
         ) {
             Icon(
@@ -909,10 +909,10 @@ fun AddOnItem(
     onClick: () -> Unit
 ) {
     val borderColor =
-        if (selected) AppColor.Orange else Color.Gray.copy(alpha = 0.3f)
+        if (selected) AppColor.Green else Color.Gray.copy(alpha = 0.3f)
 
     val backgroundColor =
-        if (selected) AppColor.Orange.copy(alpha = 0.08f) else Color.White
+        if (selected) AppColor.Green.copy(alpha = 0.08f) else Color.White
 
     Row(
         modifier = Modifier
@@ -937,7 +937,7 @@ fun AddOnItem(
             Text(
                 text = "+ Rp $price",
                 fontSize = 13.sp,
-                color = AppColor.Orange
+                color = AppColor.Green
             )
         }
 
@@ -945,7 +945,7 @@ fun AddOnItem(
             Icon(
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = null,
-                tint = AppColor.Orange
+                tint = AppColor.Green
             )
         }
     }
@@ -966,15 +966,15 @@ fun VariantSelector(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
                     .background(
-                        if (isSelected) AppColor.Orange
-                        else AppColor.Orange.copy(alpha = 0.1f)
+                        if (isSelected) AppColor.Green
+                        else AppColor.Green.copy(alpha = 0.1f)
                     )
                     .clickable { onSelect(option) }
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
                     option,
-                    color = if (isSelected) Color.White else AppColor.Orange,
+                    color = if (isSelected) Color.White else AppColor.Green,
                     fontFamily = PoppinsFont
                 )
             }

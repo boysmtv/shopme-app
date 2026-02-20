@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 11/02/26 13.50
  */
 
-package com.mtv.app.shopme.feature.customer.contract
+package com.mtv.app.shopme.feature.auth.contract
 
 import com.mtv.based.core.network.utils.ResourceFirebase
 
@@ -23,5 +23,5 @@ data class SplashEventListener(
 )
 
 data class SplashNavigationListener(
-    val onNavigateToHome: () -> Unit,
+    val onNavigateToLogin: () -> Unit,
 )

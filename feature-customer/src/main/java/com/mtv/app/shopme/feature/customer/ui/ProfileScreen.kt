@@ -11,7 +11,6 @@ package com.mtv.app.shopme.feature.customer.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -94,8 +93,8 @@ fun ProfileScreen(
             .background(
                 Brush.verticalGradient(
                     listOf(
-                        AppColor.Orange,
-                        AppColor.LightOrange
+                        AppColor.Green,
+                        AppColor.GreenSoft
                     )
                 )
             )
@@ -159,7 +158,7 @@ fun ProfileScreen(
                                     imageVector = menu.icon,
                                     contentDescription = menu.title,
                                     modifier = Modifier.size(40.dp),
-                                    tint = AppColor.Orange
+                                    tint = AppColor.Green
                                 )
 
                                 if (menu.count > 0) {
@@ -305,7 +304,7 @@ fun ProfileMenuItem(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isLogout) Color.Red else AppColor.Orange,
+                tint = if (isLogout) Color.Red else AppColor.Green,
                 modifier = Modifier.size(22.dp)
             )
 

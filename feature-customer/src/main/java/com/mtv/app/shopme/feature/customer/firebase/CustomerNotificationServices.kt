@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: MyFirebaseService.kt
+ * File: CustomerNotificationServices.kt
  *
  * Last modified by Dedy Wijaya on 10/02/26 15.16
  */
@@ -17,7 +17,7 @@ import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.app.shopme.common.ConstantPreferences.FCM_NOTIFICATION
+import com.mtv.app.shopme.common.ConstantPreferences.FCM_CUSTOMER_NOTIFICATION
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_STATUS
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_TOKEN
 import com.mtv.app.shopme.common.R
@@ -33,7 +33,7 @@ data class NotifItem(
     val isRead: Boolean,
 )
 
-class MyFirebaseService : FirebaseMessagingService() {
+class CustomerNotificationServices : FirebaseMessagingService() {
 
     private val repository by lazy { NotificationRepository(SecurePrefs(applicationContext)) }
 
@@ -85,11 +85,11 @@ class NotificationRepository(private val securePrefs: SecurePrefs) {
     fun saveNotification(item: NotifItem) {
         val current = getAllNotifications().toMutableList()
         current.add(0, item)
-        securePrefs.putObject(FCM_NOTIFICATION, current.toTypedArray())
+        securePrefs.putObject(FCM_CUSTOMER_NOTIFICATION, current.toTypedArray())
     }
 
     fun getAllNotifications(): List<NotifItem> {
-        return securePrefs.getObject(FCM_NOTIFICATION, Array<NotifItem>::class.java)?.toList()
+        return securePrefs.getObject(FCM_CUSTOMER_NOTIFICATION, Array<NotifItem>::class.java)?.toList()
             ?: emptyList()
     }
 }

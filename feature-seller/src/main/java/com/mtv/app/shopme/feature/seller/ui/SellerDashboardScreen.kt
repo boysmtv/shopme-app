@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.seller.ui
 
+import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -130,7 +131,7 @@ fun SellerDashboardScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(AppColor.Blue, AppColor.LightBlue)
+                    listOf(AppColor.Blue, AppColor.BlueSoft)
                 )
             )
             .statusBarsPadding()
@@ -141,7 +142,13 @@ fun SellerDashboardScreen(
                 .fillMaxSize()
                 .background(AppColor.WhiteSoft),
         ) {
-            item { DashboardHeader(isOnline) { isOnline = !isOnline } }
+            item {
+                DashboardHeader(
+                    isOnline = isOnline,
+                    onToggle = { isOnline = !isOnline },
+                    onNotifClick = { uiNavigation.onNavigateToNotif() }
+                )
+            }
 
             item { Spacer(Modifier.height(20.dp)) }
 
@@ -290,7 +297,8 @@ fun ModernOrderItemCompact(
 @Composable
 fun DashboardHeader(
     isOnline: Boolean,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    onNotifClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -340,7 +348,10 @@ fun DashboardHeader(
                 }
 
                 Spacer(Modifier.weight(1f))
-                NotificationBadge(count = 3)
+                NotificationBadge(
+                    count = 3,
+                    onNotifClick = { onNotifClick() }
+                )
             }
 
             Switch(
@@ -352,8 +363,13 @@ fun DashboardHeader(
 }
 
 @Composable
-fun NotificationBadge(count: Int) {
-    Box {
+fun NotificationBadge(
+    count: Int,
+    onNotifClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier.clickable { onNotifClick() }
+    ) {
         Icon(
             imageVector = Icons.Default.Notifications,
             contentDescription = null,
@@ -479,8 +495,8 @@ fun WeeklyOrdersChart() {
                             days[index],
                             x,
                             height + 20.dp.toPx(),
-                            android.graphics.Paint().apply {
-                                textAlign = android.graphics.Paint.Align.CENTER
+                            Paint().apply {
+                                textAlign = Paint.Align.CENTER
                                 textSize = 30f
                                 color = android.graphics.Color.BLACK
                             }

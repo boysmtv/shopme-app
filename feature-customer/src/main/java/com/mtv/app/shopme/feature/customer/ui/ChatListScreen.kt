@@ -176,7 +176,7 @@ fun ListChatItem(
             if (data.unreadCount > 0) {
                 Box(
                     modifier = Modifier
-                        .background(AppColor.Orange, RoundedCornerShape(50))
+                        .background(AppColor.Green, RoundedCornerShape(50))
                         .padding(horizontal = 8.dp, vertical = 2.dp)
                 ) {
                     Text(
@@ -206,7 +206,7 @@ fun ChatAvatar(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(50))
-            .background(AppColor.Orange)
+            .background(AppColor.Green)
     ) {
         if (bitmap != null) {
             Image(
