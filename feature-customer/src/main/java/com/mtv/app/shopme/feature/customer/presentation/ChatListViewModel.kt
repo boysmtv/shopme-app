@@ -15,6 +15,7 @@ import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.data.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatListDataListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
+import com.mtv.app.shopme.feature.customer.firebase.NotifItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
@@ -108,3 +109,14 @@ fun mockChatList() = listOf(
         unreadCount = 0
     )
 )
+
+val previewNotification = NotifItem(
+    title = "Watch Fast & Furious 7",
+    message = "Ini masuk ke semua device yang subscribe topic",
+    photo = "https://i.pinimg.com/236x/94/25/fa/9425faaad20d8f527e178a34435734be.jpg",
+    signatureName = "Dsrv Developer",
+    signatureDate = "Feb 11, 2026",
+    signatureTime = "10.00",
+    isRead = false
+)
+

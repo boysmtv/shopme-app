@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="movie_app">Movie App</string>
+    <string name="success">Success</string>
+    <string name="success_register">Success Register</string>
+    <string name="success_clear_fav">Successfully clear your favorite</string>
+    <string name="success_clear_notif">Successfully clear your notification</string>
+    <string name="recently_added">Recently added</string>
+    <string name="under_maintenance">Under Maintenance</string>
+    <string name="hello">Hello,</string>
+    <string name="your_favorite">Your favorite</string>
+    <string name="hide_password">Hide Password</string>
+    <string name="show_password">Show Password</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="add_pin">Add Pin</string>
+    <string name="change_password">Change Password</string>
+    <string name="settings">Settings</string>
+    <string name="invite_friend">Invite a friend</string>
+    <string name="logout">Logout</string>
+    <string name="reset_password_success">Reset Password Successfully</string>
+    <string name="enter_your_email_reset_password">Enter your email and we’ll send you a reset link.</string>
+    <string name="send_reset_link">Send Reset Link</string>
+    <string name="or_reset_via">or reset via</string>
+    <string name="back_to">Back to </string>
+    <string name="successfully_update_profile">Successfully Update Profile</string>
+</resources>

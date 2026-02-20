@@ -99,7 +99,11 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        HomeHeader()
+        HomeHeader(
+            onNotifClick = {
+                uiNavigation.onNavigateToNotif()
+            }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -221,7 +225,9 @@ fun <T> LazyListScope.gridItems(
 }
 
 @Composable
-private fun HomeHeader() {
+private fun HomeHeader(
+    onNotifClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -267,6 +273,7 @@ private fun HomeHeader() {
             painter = painterResource(id = R.drawable.ic_notification_white),
             contentDescription = "Notification",
             modifier = Modifier
+                .clickable { onNotifClick() }
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Color.White)

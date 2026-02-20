@@ -19,7 +19,7 @@ object CustomerDestinations {
     const val PROFILE_GRAPH = "PROFILE_GRAPH"
     const val EDIT_PROFILE_GRAPH = "EDIT_PROFILE_GRAPH"
     const val EDIT_ADDRESS_GRAPH = "EDIT_ADDRESS_GRAPH"
-    const val NOTIFICATION_GRAPH = "NOTIFICATION_GRAPH"
+    const val NOTIF_GRAPH = "NOTIF_GRAPH"
     const val CHAT_GRAPH = "CHAT_GRAPH"
     const val ORDER_GRAPH = "ORDER_GRAPH"
     const val CAFE_GRAPH = "CAFE_GRAPH"

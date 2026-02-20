@@ -52,6 +52,9 @@ private fun homeNavigation(nav: NavController) = HomeNavigationListener(
                 saveState = true
             }
         }
-    }
+    },
+    onNavigateToNotif = {
+        nav.navigate(CustomerDestinations.NOTIF_GRAPH)
+    },
 )
 
