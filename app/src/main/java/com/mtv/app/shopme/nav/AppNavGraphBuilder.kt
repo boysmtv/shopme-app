@@ -84,7 +84,7 @@ fun NavGraphBuilder.detailGraph(nav: NavHostController) {
 }
 
 fun NavGraphBuilder.notificationGraph(nav: NavHostController) {
-    composable(CustomerDestinations.NOTIFICATION_GRAPH) {
+    composable(CustomerDestinations.NOTIF_GRAPH) {
         NotifRoute(nav)
     }
     composable(CustomerDestinations.CHAT_GRAPH) {
