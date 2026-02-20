@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,8 +30,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,18 +63,30 @@ fun ResetScreen(
             .background(AppColor.GreenSoft)
     ) {
 
-        Column {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-            Image(
-                painter = painterResource(R.drawable.image_cafe_1),
-                contentDescription = null,
+            // HEADER IMAGE (max 220)
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(240.dp)
-            )
+                    .weight(1f)
+                    .heightIn(max = 220.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.image_cafe_1),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
 
+            // CARD FORM (FULL SISA HEIGHT)
             Card(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(2f),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.White)
             ) {
@@ -79,16 +94,27 @@ fun ResetScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(24.dp)
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
 
                     Text(
-                        "Reset Password",
+                        text = "Reset Password",
                         fontFamily = PoppinsFont,
                         fontSize = 22.sp,
                         color = AppColor.Black,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        text = "Enter your email to receive reset link",
+                        fontFamily = PoppinsFont,
+                        fontSize = 13.sp,
+                        color = AppColor.Gray,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -100,7 +126,9 @@ fun ResetScreen(
                     OutlinedTextField(
                         value = uiData.email,
                         onValueChange = uiEvent.onEmailChange,
-                        leadingIcon = { Icon(Icons.Outlined.Email, null) },
+                        leadingIcon = {
+                            Icon(Icons.Outlined.Email, contentDescription = null)
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
                     )
@@ -112,16 +140,29 @@ fun ResetScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green),
-                        shape = RoundedCornerShape(50)
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppColor.Green
+                        )
                     ) {
-                        Text("Send Reset Link", color = Color.White, fontFamily = PoppinsFont)
+                        Text(
+                            "Send Reset Link",
+                            fontFamily = PoppinsFont,
+                            color = Color.White
+                        )
                     }
 
                     Spacer(Modifier.height(16.dp))
 
-                    TextButton(onClick = uiNavigation.onNavigateToLogin) {
-                        Text("Back to Login", color = AppColor.Green, fontFamily = PoppinsFont)
+                    TextButton(
+                        onClick = uiNavigation.onNavigateToLogin,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            "Back to Login",
+                            color = AppColor.Green,
+                            fontFamily = PoppinsFont
+                        )
                     }
                 }
             }

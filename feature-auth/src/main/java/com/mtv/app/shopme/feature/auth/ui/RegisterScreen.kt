@@ -11,17 +11,37 @@ package com.mtv.app.shopme.feature.auth.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -34,7 +54,10 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.auth.contract.*
+import com.mtv.app.shopme.feature.auth.contract.RegisterDataListener
+import com.mtv.app.shopme.feature.auth.contract.RegisterEventListener
+import com.mtv.app.shopme.feature.auth.contract.RegisterNavigationListener
+import com.mtv.app.shopme.feature.auth.contract.RegisterStateListener
 
 @Composable
 fun RegisterScreen(
@@ -53,19 +76,30 @@ fun RegisterScreen(
             .background(AppColor.GreenSoft)
     ) {
 
-        Column {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-            // Header Image
-            Image(
-                painter = painterResource(R.drawable.image_cafe_5),
-                contentDescription = null,
+            // HEADER IMAGE (max 220)
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(260.dp)
-            )
+                    .weight(1f)
+                    .heightIn(max = 220.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.image_cafe_5),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
 
+            // CARD FORM (FULL SISA HEIGHT)
             Card(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(2f),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.White)
             ) {
@@ -73,43 +107,47 @@ fun RegisterScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(24.dp)
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
 
                     Text(
-                        "Create Account",
-                        fontFamily = PoppinsFont,
+                        text = "Create Account",
                         fontSize = 22.sp,
+                        fontFamily = PoppinsFont,
                         color = AppColor.Black,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(16.dp))
 
-                    // Email
+                    // EMAIL
                     Text("Email", fontFamily = PoppinsFont)
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
                         value = uiData.email,
                         onValueChange = uiEvent.onEmailChange,
-                        leadingIcon = { Icon(Icons.Outlined.Email, null) },
+                        leadingIcon = {
+                            Icon(Icons.Outlined.Email, contentDescription = null)
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
                     )
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Password
+                    // PASSWORD
                     Text("Password", fontFamily = PoppinsFont)
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
                         value = uiData.password,
                         onValueChange = uiEvent.onPasswordChange,
-                        leadingIcon = { Icon(Icons.Outlined.Lock, null) },
+                        leadingIcon = {
+                            Icon(Icons.Outlined.Lock, contentDescription = null)
+                        },
                         trailingIcon = {
                             IconButton(
                                 onClick = { passwordVisible = !passwordVisible }
@@ -124,21 +162,25 @@ fun RegisterScreen(
                                 )
                             }
                         },
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        visualTransformation =
+                            if (passwordVisible) VisualTransformation.None
+                            else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
                     )
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Confirm Password
+                    // CONFIRM PASSWORD
                     Text("Confirm Password", fontFamily = PoppinsFont)
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
                         value = uiData.confirmPassword,
                         onValueChange = uiEvent.onConfirmPasswordChange,
-                        leadingIcon = { Icon(Icons.Outlined.Lock, null) },
+                        leadingIcon = {
+                            Icon(Icons.Outlined.Lock, contentDescription = null)
+                        },
                         trailingIcon = {
                             IconButton(
                                 onClick = { confirmVisible = !confirmVisible }
@@ -153,7 +195,9 @@ fun RegisterScreen(
                                 )
                             }
                         },
-                        visualTransformation = if (confirmVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        visualTransformation =
+                            if (confirmVisible) VisualTransformation.None
+                            else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
                     )
@@ -165,19 +209,29 @@ fun RegisterScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green),
-                        shape = RoundedCornerShape(50)
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppColor.Green
+                        )
                     ) {
-                        Text("Register", color = Color.White, fontFamily = PoppinsFont)
+                        Text(
+                            "Register",
+                            fontFamily = PoppinsFont,
+                            color = Color.White
+                        )
                     }
 
                     Spacer(Modifier.height(16.dp))
 
                     Text(
                         "Already have account? Login",
-                        color = AppColor.Green,
                         fontFamily = PoppinsFont,
-                        modifier = Modifier.clickable { uiNavigation.onNavigateToLogin() }
+                        color = AppColor.Green,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .clickable {
+                                uiNavigation.onNavigateToLogin()
+                            }
                     )
                 }
             }
