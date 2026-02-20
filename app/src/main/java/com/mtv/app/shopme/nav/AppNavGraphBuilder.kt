@@ -32,6 +32,7 @@ import com.mtv.app.shopme.feature.seller.route.SellerOrderDetailRoute
 import com.mtv.app.shopme.feature.seller.route.SellerOrderRoute
 import com.mtv.app.shopme.feature.seller.route.SellerProductFormRoute
 import com.mtv.app.shopme.feature.seller.route.SellerProductListRoute
+import com.mtv.app.shopme.feature.seller.route.SellerProfileRoute
 
 fun NavGraphBuilder.splashGraph(nav: NavHostController) {
     composable(CustomerDestinations.SPLASH_GRAPH) {
@@ -134,7 +135,7 @@ fun NavGraphBuilder.sellerGraph(nav: NavHostController) {
         }
 
         composable(SellerDestinations.PROFILE) {
-            // SellerProfileRoute(nav)
+             SellerProfileRoute(nav)
         }
     }
 }
