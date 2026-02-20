@@ -12,6 +12,6 @@ import androidx.navigation.NavController
 
 fun NavController.navigateAndPopSplash(route: String) {
     this.navigate(route) {
-        popUpTo(CustomerDestinations.SPLASH_GRAPH) { inclusive = true }
+        popUpTo(AuthDestinations.SPLASH_GRAPH) { inclusive = true }
     }
 }

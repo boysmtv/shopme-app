@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,37 +56,35 @@ fun LoginScreen(
             .fillMaxSize()
             .background(AppColor.GreenSoft)
     ) {
-
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
 
-            // Top Image / Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(260.dp),
+                    .weight(1f)
+                    .heightIn(max = 220.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.image_cafe_3),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
 
-            // Card Form
             Card(
                 modifier = Modifier
-                    .fillMaxSize(),
+                    .fillMaxWidth()
+                    .weight(2f),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.White)
             ) {
-
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 24.dp, vertical = 28.dp)
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
 
                     Text(
@@ -222,7 +221,7 @@ fun LoginScreen(
                         )
                     }
 
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     // Login Button
                     Button(
@@ -242,23 +241,23 @@ fun LoginScreen(
                         )
                     }
 
-                    Spacer(Modifier.height(22.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     // Divider
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Divider(modifier = Modifier.weight(1f))
+                        HorizontalDivider(modifier = Modifier.weight(1f))
                         Text(
                             "  Or sign in with  ",
                             fontSize = 12.sp,
                             fontFamily = PoppinsFont,
                             color = AppColor.Gray
                         )
-                        Divider(modifier = Modifier.weight(1f))
+                        HorizontalDivider(modifier = Modifier.weight(1f))
                     }
 
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     // Social Login
                     Row(
@@ -273,7 +272,7 @@ fun LoginScreen(
                         SocialButton(R.drawable.icon_apple)
                     }
 
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     // Sign Up
                     Row(
@@ -297,6 +296,8 @@ fun LoginScreen(
                             }
                         )
                     }
+
+                    Spacer(Modifier.height(16.dp))
                 }
             }
         }
