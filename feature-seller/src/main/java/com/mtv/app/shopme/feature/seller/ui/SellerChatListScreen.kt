@@ -61,7 +61,6 @@ fun SellerChatListScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .statusBarsPadding()
     ) {
         Spacer(Modifier.height(16.dp))
         Row(

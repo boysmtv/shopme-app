@@ -13,6 +13,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,23 +35,24 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Store
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -58,12 +62,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.feature.seller.contract.SellerProfileDataListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProfileEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProfileNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProfileStateListener
-import androidx.compose.material3.ripple
-import com.mtv.app.shopme.common.AppColor
+
+@Immutable
+data class ProfileMenuItemModel(
+    val title: String,
+    val subtitle: String,
+    val icon: ImageVector,
+    val onClick: () -> Unit
+)
 
 @Composable
 fun SellerProfileScreen(
@@ -81,20 +93,26 @@ fun SellerProfileScreen(
             uiNavigation.navigateToChangePassword
         ),
         ProfileMenuItemModel(
-            "Payment Methods",
-            "Manage payout account",
-            Icons.Default.AccountBalance,
-            uiNavigation.navigateToBankAccount
-        ),
-        ProfileMenuItemModel(
             "Store Settings",
             "Manage your store",
             Icons.Default.Store,
             uiNavigation.navigateToStoreSettings
         ),
         ProfileMenuItemModel(
+            "Payment Methods",
+            "Manage payout account",
+            Icons.Default.AccountBalance,
+            uiNavigation.navigateToBankAccount
+        ),
+        ProfileMenuItemModel(
             "Change Password",
             "Update your password",
+            Icons.Default.Lock,
+            uiNavigation.navigateToChangePassword
+        ),
+        ProfileMenuItemModel(
+            "To be Customer",
+            "Back to customer for buy something",
             Icons.Default.Lock,
             uiNavigation.navigateToChangePassword
         )
@@ -103,68 +121,51 @@ fun SellerProfileScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding()
+            .background(Color.White)
     ) {
-
-        SellerProfileTopBar(
-            onBack = uiNavigation.navigateToChangePassword,
-            onLogout = uiEvent.onLogout
-        )
+        Spacer(Modifier.height(16.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .statusBarsPadding()
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SellerProfileTopBar(
+                onBack = uiNavigation.navigateToChangePassword,
+                onLogout = uiEvent.onLogout
+            )
+        }
 
         Spacer(Modifier.height(16.dp))
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(AppColor.WhiteSoft)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-
-            SellerProfileAvatar(
-                imageUrl = "https://i.pravatar.cc/300"
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            Text(
-                uiData.sellerName,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                uiData.email,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = uiNavigation.navigateToEditProfile,
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppColor.Blue
+            item {
+                SellerProfileHeader(
+                    uiData = uiData,
+                    uiEvent = uiEvent
                 )
-            ) {
-                Text("Edit Profile")
             }
-        }
 
-        Spacer(Modifier.height(28.dp))
+            item {
+                Spacer(Modifier.height(16.dp))
+            }
 
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            menuItems.forEach {
-                ProfileMenuItem(it)
+            items(menuItems) { item ->
+                ProfileMenuItem(
+                    item = item
+                )
             }
         }
     }
 }
 
-data class ProfileMenuItemModel(
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector,
-    val onClick: () -> Unit
-)
 
 @Composable
 fun SellerProfileTopBar(
@@ -173,19 +174,19 @@ fun SellerProfileTopBar(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
         IconButton(
             onClick = onBack,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+            modifier = Modifier.size(40.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = "Back",
+                tint = AppColor.BlueMedium
+            )
         }
 
         Box(
@@ -195,18 +196,21 @@ fun SellerProfileTopBar(
             Text(
                 text = "Profile",
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+                fontSize = 18.sp,
+                fontFamily = PoppinsFont,
+                color = Color.Black
             )
         }
 
         IconButton(
             onClick = onLogout,
-            modifier = Modifier
-                .size(40.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+            modifier = Modifier.size(40.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null)
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Logout",
+                tint = AppColor.BlueMedium
+            )
         }
     }
 }
@@ -239,9 +243,9 @@ fun ProfileMenuItem(
             ),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = AppColor.White
         ),
-        elevation = CardDefaults.cardElevation(3.dp)
+        elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -265,12 +269,17 @@ fun ProfileMenuItem(
             Spacer(Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(item.title, fontWeight = FontWeight.SemiBold)
+                Text(
+                    text = item.title,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = PoppinsFont
+                )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    item.subtitle,
+                    text = item.subtitle,
                     fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontFamily = PoppinsFont
                 )
             }
 
@@ -284,19 +293,143 @@ fun ProfileMenuItem(
 }
 
 @Composable
-fun SellerProfileAvatar(
-    imageUrl: String
+fun SellerProfileHeader(
+    uiData: SellerProfileDataListener,
+    uiEvent: SellerProfileEventListener
 ) {
-    AsyncImage(
-        model = imageUrl,
-        contentDescription = null,
-        modifier = Modifier
-            .size(110.dp)
-            .clip(CircleShape),
-        contentScale = ContentScale.Crop
-    )
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = AppColor.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+
+                AsyncImage(
+                    model = "https://i.pravatar.cc/300",
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+
+                Spacer(Modifier.width(16.dp))
+
+                Column {
+
+                    Text(
+                        text = uiData.sellerName,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = PoppinsFont
+                    )
+
+                    Spacer(Modifier.height(4.dp))
+
+                    Text(
+                        text = uiData.storeName,
+                        fontSize = 14.sp,
+                        color = AppColor.Gray,
+                        fontFamily = PoppinsFont
+                    )
+
+                    Spacer(Modifier.height(6.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+
+                        val onlineColor =
+                            if (uiData.isOnline) Color(0xFF2E7D32) else AppColor.Gray
+
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(onlineColor)
+                        )
+
+                        Spacer(Modifier.width(6.dp))
+
+                        Text(
+                            text = if (uiData.isOnline) "Online" else "Offline",
+                            fontSize = 12.sp,
+                            color = onlineColor,
+                            fontFamily = PoppinsFont
+                        )
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = uiData.storeAddress,
+                fontSize = 12.sp,
+                color = AppColor.Gray,
+                fontFamily = PoppinsFont,
+                lineHeight = 16.sp
+            )
+
+            Spacer(Modifier.height(14.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                SellerActionButton(
+                    text = "Edit Profile",
+                    background = AppColor.Blue,
+                    textColor = Color.White,
+                    modifier = Modifier.weight(1f),
+                    onClick = uiEvent.onEditProfile
+                )
+
+                SellerActionButton(
+                    text = "Check Store",
+                    background = AppColor.LightBlue,
+                    textColor = AppColor.Blue,
+                    modifier = Modifier.weight(1f),
+                    onClick = uiEvent.onToggleOnline
+                )
+            }
+        }
+    }
 }
 
+@Composable
+fun SellerActionButton(
+    text: String,
+    background: Color,
+    textColor: Color = Color.White,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .height(44.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(background)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = text,
+            color = textColor,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            fontFamily = PoppinsFont
+        )
+    }
+}
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
