@@ -75,6 +75,7 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -206,7 +207,7 @@ fun SellerProductFormScreen(
                                     ProductStep.entries[currentStep.ordinal + 1]
                             }
                         },
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(24.dp),
                         colors = ButtonDefaults.buttonColors(AppColor.Blue)
                     ) {
                         Text(
@@ -677,7 +678,7 @@ class RupiahVisualTransformation : VisualTransformation {
     }
 }
 
-@Preview(name = "Step 1 - Basic", showBackground = true)
+@Preview(name = "Step 1 - Basic", showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun PreviewStepBasic() {
     MaterialTheme {
@@ -691,7 +692,7 @@ fun PreviewStepBasic() {
     }
 }
 
-@Preview(name = "Step 2 - Pricing", showBackground = true)
+@Preview(name = "Step 2 - Pricing", showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun PreviewStepPricing() {
     MaterialTheme {
@@ -706,7 +707,7 @@ fun PreviewStepPricing() {
 }
 
 @SuppressLint("UnrememberedMutableState")
-@Preview(name = "Step 3 - Variant", showBackground = true)
+@Preview(name = "Step 3 - Variant", showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun PreviewStepVariant() {
     MaterialTheme {
@@ -737,7 +738,7 @@ fun PreviewStepVariant() {
     }
 }
 
-@Preview(name = "Step 4 - Review", showBackground = true)
+@Preview(name = "Step 4 - Review", showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun PreviewStepReview() {
     MaterialTheme {

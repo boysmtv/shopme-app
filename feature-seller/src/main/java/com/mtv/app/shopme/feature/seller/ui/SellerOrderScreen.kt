@@ -182,20 +182,13 @@ fun ModernOrderCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(customer, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(AppColor.LightBlue)
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        Text(total, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = AppColor.Blue)
-                    }
+                    Text(customer, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                    Text(total, fontWeight = FontWeight.SemiBold, fontSize = 14.sp, color = AppColor.Blue)
                 }
 
                 Spacer(Modifier.height(12.dp))
                 HorizontalDivider(
-                    color = AppColor.LightBlue,
+                    color = AppColor.BlueMedium,
                     thickness = 1.dp,
                 )
 

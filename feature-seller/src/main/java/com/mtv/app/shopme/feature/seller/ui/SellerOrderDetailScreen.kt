@@ -45,14 +45,11 @@ fun SellerOrderDetailScreen(
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .statusBarsPadding()
         ) {
-
             SellerOrderDetailHeader(
                 orderId = uiState.orderId,
                 status = uiState.currentStatus,
