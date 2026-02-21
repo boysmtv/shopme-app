@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -80,7 +79,6 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxSize()
         ) {
 
-            // HEADER IMAGE (max 220)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -132,6 +130,13 @@ fun RegisterScreen(
                         leadingIcon = {
                             Icon(Icons.Outlined.Email, contentDescription = null)
                         },
+                        placeholder = {
+                            Text(
+                                "Enter Your Email",
+                                fontFamily = PoppinsFont,
+                                fontSize = 12.sp
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
                     )
@@ -161,6 +166,13 @@ fun RegisterScreen(
                                     tint = AppColor.Gray
                                 )
                             }
+                        },
+                        placeholder = {
+                            Text(
+                                "Enter your password",
+                                fontFamily = PoppinsFont,
+                                fontSize = 12.sp
+                            )
                         },
                         visualTransformation =
                             if (passwordVisible) VisualTransformation.None
@@ -194,6 +206,13 @@ fun RegisterScreen(
                                     tint = AppColor.Gray
                                 )
                             }
+                        },
+                        placeholder = {
+                            Text(
+                                "Enter your confirm password",
+                                fontFamily = PoppinsFont,
+                                fontSize = 12.sp
+                            )
                         },
                         visualTransformation =
                             if (confirmVisible) VisualTransformation.None
@@ -245,9 +264,9 @@ fun RegisterScreenPreview() {
     RegisterScreen(
         uiState = RegisterStateListener(),
         uiData = RegisterDataListener(
-            email = "john@example.com",
-            password = "123456",
-            confirmPassword = "123456"
+            email = "",
+            password = "",
+            confirmPassword = ""
         ),
         uiEvent = RegisterEventListener(
             onEmailChange = {},

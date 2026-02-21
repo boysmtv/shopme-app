@@ -18,7 +18,6 @@ import com.mtv.app.shopme.feature.auth.contract.RegisterNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.RegisterStateListener
 import com.mtv.app.shopme.feature.auth.presentation.RegisterViewModel
 import com.mtv.app.shopme.feature.auth.ui.RegisterScreen
-import com.mtv.app.shopme.nav.AuthDestinations
 
 @Composable
 fun RegisterRoute(nav: NavController) {

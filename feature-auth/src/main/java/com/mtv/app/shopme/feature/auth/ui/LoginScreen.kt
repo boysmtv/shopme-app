@@ -114,9 +114,9 @@ fun LoginScreen(
                         onValueChange = uiEvent.onEmailChange,
                         placeholder = {
                             Text(
-                                "Enter Your Email",
+                                "Enter your email",
                                 fontFamily = PoppinsFont,
-                                fontSize = 13.sp
+                                fontSize = 12.sp
                             )
                         },
                         leadingIcon = {
@@ -133,7 +133,6 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-// PASSWORD TITLE
                     Text(
                         text = "Password",
                         fontFamily = PoppinsFont,
@@ -150,9 +149,9 @@ fun LoginScreen(
                         onValueChange = uiEvent.onPasswordChange,
                         placeholder = {
                             Text(
-                                "Enter Your Password",
+                                "Enter your password",
                                 fontFamily = PoppinsFont,
-                                fontSize = 13.sp
+                                fontSize = 12.sp
                             )
                         },
                         leadingIcon = {

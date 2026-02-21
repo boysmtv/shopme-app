@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.mtv.app.shopme.feature.auth.route.LoginRoute
+import com.mtv.app.shopme.feature.auth.route.PasswordRoute
 import com.mtv.app.shopme.feature.auth.route.RegisterRoute
 import com.mtv.app.shopme.feature.auth.route.ResetRoute
 import com.mtv.app.shopme.feature.auth.route.SplashRoute
@@ -52,6 +53,10 @@ fun NavGraphBuilder.authGraph(nav: NavHostController) {
 
     composable(AuthDestinations.RESET_GRAPH) {
         ResetRoute(nav)
+    }
+
+    composable(AuthDestinations.PASSWORD_GRAPH) {
+        PasswordRoute(nav)
     }
 }
 

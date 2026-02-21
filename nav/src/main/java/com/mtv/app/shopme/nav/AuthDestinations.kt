@@ -13,4 +13,5 @@ object AuthDestinations {
     const val LOGIN_GRAPH = "LOGIN_GRAPH"
     const val REGISTER_GRAPH = "REGISTER_GRAPH"
     const val RESET_GRAPH = "RESET_GRAPH"
+    const val PASSWORD_GRAPH = "PASSWORD_GRAPH"
 }
