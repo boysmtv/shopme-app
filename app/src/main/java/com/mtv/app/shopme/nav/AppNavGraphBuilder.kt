@@ -17,6 +17,7 @@ import com.mtv.app.shopme.feature.auth.route.PasswordRoute
 import com.mtv.app.shopme.feature.auth.route.RegisterRoute
 import com.mtv.app.shopme.feature.auth.route.ResetRoute
 import com.mtv.app.shopme.feature.auth.route.SplashRoute
+import com.mtv.app.shopme.feature.customer.route.SettingsRoute
 import com.mtv.app.shopme.feature.customer.route.CafeRoute
 import com.mtv.app.shopme.feature.customer.route.CartRoute
 import com.mtv.app.shopme.feature.customer.route.ChatRoute
@@ -26,6 +27,8 @@ import com.mtv.app.shopme.feature.customer.route.EditProfileRoute
 import com.mtv.app.shopme.feature.customer.route.HomeRoute
 import com.mtv.app.shopme.feature.customer.route.ChatListRoute
 import com.mtv.app.shopme.feature.customer.route.NotifRoute
+import com.mtv.app.shopme.feature.customer.route.NotificationRoute
+import com.mtv.app.shopme.feature.customer.route.OrderHistoryRoute
 import com.mtv.app.shopme.feature.customer.route.OrderRoute
 import com.mtv.app.shopme.feature.customer.route.ProfileRoute
 import com.mtv.app.shopme.feature.customer.route.SearchRoute
@@ -105,8 +108,17 @@ fun NavGraphBuilder.profileGraph(nav: NavHostController) {
     composable(CustomerDestinations.EDIT_PROFILE_GRAPH) {
         EditProfileRoute(nav)
     }
-    composable(CustomerDestinations.EDIT_ADDRESS_GRAPH) {
-        EditAddressRoute(nav)
+    composable(CustomerDestinations.ORDER_HISTORY_GRAPH) {
+        OrderHistoryRoute(nav)
+    }
+    composable(CustomerDestinations.SETTINGS_GRAPH) {
+        SettingsRoute(nav)
+    }
+    composable(CustomerDestinations.HELP_GRAPH) {
+        SettingsRoute(nav)
+    }
+    composable(CustomerDestinations.NOTIFICATION_GRAPH) {
+        NotificationRoute(nav)
     }
 }
 
