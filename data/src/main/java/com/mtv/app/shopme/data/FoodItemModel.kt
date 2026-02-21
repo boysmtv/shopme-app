@@ -53,6 +53,10 @@ data class OrderItemModel(
     val price: Double = 0.0
 )
 
+enum class PaymentMethod {
+    CASH,
+    TRANSFER
+}
 data class OrderModel(
     val id: String = EMPTY_STRING,
     val customerId: String = EMPTY_STRING,
@@ -61,7 +65,8 @@ data class OrderModel(
     val totalPrice: Double = 0.0,
     val status: OrderStatus = OrderStatus.ORDERED,
     val timestamp: Long = System.currentTimeMillis(),
-    val deliveryAddress: String = EMPTY_STRING
+    val deliveryAddress: String = EMPTY_STRING,
+    val paymentMethod: PaymentMethod = PaymentMethod.TRANSFER
 )
 
 data class CategoryModel(
