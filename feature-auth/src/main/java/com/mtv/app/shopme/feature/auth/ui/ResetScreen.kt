@@ -129,6 +129,13 @@ fun ResetScreen(
                         leadingIcon = {
                             Icon(Icons.Outlined.Email, contentDescription = null)
                         },
+                        placeholder = {
+                            Text(
+                                "Enter your email",
+                                fontFamily = PoppinsFont,
+                                fontSize = 12.sp
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)
                     )
@@ -176,7 +183,7 @@ fun ResetScreenPreview() {
     ResetScreen(
         uiState = ResetStateListener(),
         uiData = ResetDataListener(
-            email = "john@example.com"
+            email = ""
         ),
         uiEvent = ResetEventListener(
             onEmailChange = {},
