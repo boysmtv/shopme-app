@@ -12,7 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerChatDetailViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerChatScreen
 

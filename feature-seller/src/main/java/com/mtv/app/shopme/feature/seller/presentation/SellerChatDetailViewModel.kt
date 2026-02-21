@@ -11,10 +11,12 @@ package com.mtv.app.shopme.feature.seller.presentation
 import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @HiltViewModel
 class SellerChatDetailViewModel @Inject constructor(
