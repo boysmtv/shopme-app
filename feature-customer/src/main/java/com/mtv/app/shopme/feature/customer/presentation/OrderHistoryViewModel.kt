@@ -11,13 +11,15 @@ package com.mtv.app.shopme.feature.customer.presentation
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.customer.contract.*
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.app.shopme.feature.customer.contract.OrderHistoryDataListener
+import com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem
+import com.mtv.app.shopme.feature.customer.contract.OrderHistoryStateListener
+import com.mtv.app.shopme.feature.customer.contract.OrderStatusFilter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class OrderHistoryViewModel @Inject constructor() :
@@ -36,9 +38,11 @@ class OrderHistoryViewModel @Inject constructor() :
 
             uiData.value = uiData.value.copy(
                 orders = listOf(
-                    OrderHistoryItem("1", "Cappuccino", "12 Feb 2026", "Rp 25.000", "SELESAI"),
-                    OrderHistoryItem("2", "Latte", "10 Feb 2026", "Rp 28.000", "DIPROSES"),
-                    OrderHistoryItem("3", "Burger", "5 Feb 2026", "Rp 45.000", "BATAL")
+                    OrderHistoryItem("1", "Cafe Kopi Boy", "Cappuccino", "12 Feb 2026", "Rp 25.000", "SELESAI", 3, "E-Wallet", "Diantar"),
+                    OrderHistoryItem("2", "Kopi Nusantara", "Caramel Latte", "11 Feb 2026", "Rp 32.000", "DIPROSES", 2, "QRIS", "Pickup"),
+                    OrderHistoryItem("3", "Burger Town", "Cheese Burger Combo", "10 Feb 2026", "Rp 48.000", "DIKIRIM", 4, "Cash", "Diantar"),
+                    OrderHistoryItem("4", "Coffee Corner", "Americano", "08 Feb 2026", "Rp 22.000", "SELESAI", 1, "E-Wallet", "Pickup"),
+                    OrderHistoryItem("5", "Cafe Kopi Boy", "Matcha Latte", "05 Feb 2026", "Rp 30.000", "BATAL", 2, "QRIS", "Diantar")
                 )
             )
 

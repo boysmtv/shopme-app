@@ -42,14 +42,9 @@ private fun profileEvent(vm: ProfileViewModel) = ProfileEventListener(
 
 private fun profileNavigation(nav: NavController) = ProfileNavigationListener(
     onEditProfile = { nav.navigate(CustomerDestinations.EDIT_PROFILE_GRAPH) },
-    onAddress = { nav.navigate(CustomerDestinations.EDIT_ADDRESS_GRAPH) },
-    onPayment = { nav.navigate("") },
-    onOrderHistory = { nav.navigate("") },
-    onTracking = { nav.navigate("") },
-    onWishlist = { nav.navigate("") },
-    onSettings = { nav.navigate("") },
-    onHelpCenter = { nav.navigate("") },
-    onAbout = { nav.navigate("") },
+    onOrderHistory = { nav.navigate(CustomerDestinations.ORDER_HISTORY_GRAPH) },
+    onSettings = { nav.navigate(CustomerDestinations.SETTINGS_GRAPH) },
+    onHelpCenter = { nav.navigate(CustomerDestinations.HELP_GRAPH) },
     onOrder = { nav.navigate(CustomerDestinations.ORDER_GRAPH) },
     onNavigateToSeller = {
         nav.navigate(SellerDestinations.SELLER_GRAPH) {

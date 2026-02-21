@@ -200,29 +200,24 @@ fun ProfileScreen(
                         .verticalScroll(scrollState)
                 ) {
                     ProfileMenuItem(
-                        title = "Edit Profil",
+                        title = "Edit Account",
                         icon = Icons.Default.Person,
                         onClickMenu = { uiNavigation.onEditProfile() }
                     )
                     ProfileMenuItem(
-                        title = "Alamat Saya",
-                        icon = Icons.Default.Map,
-                        onClickMenu = { uiNavigation.onAddress() }
-                    )
-                    ProfileMenuItem(
                         title = "Riwayat Belanja",
                         icon = Icons.Default.History,
-                        onClickMenu = { }
+                        onClickMenu = { uiNavigation.onOrderHistory() }
                     )
                     ProfileMenuItem(
                         title = "Pengaturan Akun",
                         icon = Icons.Default.Settings,
-                        onClickMenu = { }
+                        onClickMenu = { uiNavigation.onSettings() }
                     )
                     ProfileMenuItem(
                         title = "Bantuan",
                         icon = Icons.AutoMirrored.Filled.Help,
-                        onClickMenu = { }
+                        onClickMenu = { uiNavigation.onHelpCenter() }
                     )
                     ProfileMenuItem(
                         title = "Menjadi Penjual",

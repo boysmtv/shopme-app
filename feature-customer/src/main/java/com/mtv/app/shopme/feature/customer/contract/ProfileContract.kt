@@ -25,14 +25,9 @@ data class ProfileEventListener(
 
 data class ProfileNavigationListener(
     val onEditProfile: () -> Unit = {},
-    val onAddress: () -> Unit = {},
-    val onPayment: () -> Unit = {},
     val onOrderHistory: () -> Unit = {},
-    val onTracking: () -> Unit = {},
-    val onWishlist: () -> Unit = {},
     val onSettings: () -> Unit = {},
     val onHelpCenter: () -> Unit = {},
-    val onAbout: () -> Unit = {},
     val onOrder: () -> Unit = {},
     val onNavigateToSeller: (navController: NavController) -> Unit = {}
 )
