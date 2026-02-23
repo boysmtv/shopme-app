@@ -22,7 +22,10 @@ object CustomerDestinations {
     const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
     const val ORDER_HISTORY_GRAPH = "ORDER_HISTORY_GRAPH"
     const val SETTINGS_GRAPH = "SETTINGS_GRAPH"
+    const val SUPPORT_GRAPH = "SUPPORT_GRAPH"
     const val HELP_GRAPH = "HELP_GRAPH"
+    const val CHAT_SUPPORT_GRAPH = "CHAT_SUPPORT_GRAPH"
     const val NOTIFICATION_GRAPH = "NOTIFICATION_GRAPH"
+    const val SECURITY_GRAPH = "SECURITY_GRAPH"
 
 }

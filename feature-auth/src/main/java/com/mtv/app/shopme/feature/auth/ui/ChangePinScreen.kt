@@ -44,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -78,7 +79,7 @@ fun ChangePinScreen(
 ) {
 
     val haptic = LocalHapticFeedback.current
-    var errorTrigger by remember { mutableStateOf(0) }
+    var errorTrigger by remember { mutableIntStateOf(0) }
 
     val isValid =
         uiData.oldPin.length == 6 &&
@@ -139,7 +140,7 @@ fun ChangePinScreen(
                         PinStrengthMeter(uiData.newPin)
 
                         Spacer(Modifier.height(18.dp))
-                        PinSection("Konfirmasi", uiData.confirmPin, uiEvent.onConfirmPinChange)
+                        PinSection("Konfirmasi PIN Baru", uiData.confirmPin, uiEvent.onConfirmPinChange)
                     }
                 }
 
