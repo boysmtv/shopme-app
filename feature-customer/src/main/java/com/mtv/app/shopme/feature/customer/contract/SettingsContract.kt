@@ -26,7 +26,6 @@ data class SettingsEventListener(
 data class SettingsNavigationListener(
     val onBack: () -> Unit = {},
     val onSecurity: () -> Unit = {},
-    val onPayment: () -> Unit = {},
     val onHelp: () -> Unit = {},
     val onNotification: () -> Unit = {},
 )
