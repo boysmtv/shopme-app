@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -69,6 +71,9 @@ import com.mtv.app.shopme.feature.customer.contract.SupportEventListener
 import com.mtv.app.shopme.feature.customer.contract.SupportNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SupportStateListener
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
@@ -94,13 +99,14 @@ fun SupportScreen(
                     listOf(AppColor.Green, AppColor.GreenSoft)
                 )
             )
+            .statusBarsPadding()
     ) {
 
         Column(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 18.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = uiNavigation.onBack) {
@@ -144,7 +150,9 @@ fun SupportScreen(
                 )
             }
 
-            // ================= BODY =================
+
+            Spacer(Modifier.height(8.dp))
+
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
@@ -242,30 +250,15 @@ private fun HeroSupportCard(onClick: () -> Unit) {
         spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
 
-    ElevatedCard(
+    Card(
         shape = RoundedCornerShape(26.dp),
-        elevation = CardDefaults.elevatedCardElevation(6.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = AppColor.GreenSoft.copy(alpha = 0.3f)
+        colors = CardDefaults.cardColors(
+            containerColor = AppColor.GreenSoft.copy(alpha = 0.25f)
         ),
         modifier = Modifier
             .border(
-                width = 1.dp,
-                brush = Brush.linearGradient(
-                    listOf(
-                        Color.White.copy(alpha = 0.18f),
-                        Color.White.copy(alpha = 0.05f)
-                    )
-                ),
-                shape = RoundedCornerShape(26.dp)
-            )
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        Color.White.copy(alpha = 0.08f),
-                        Color.White.copy(alpha = 0.02f)
-                    )
-                ),
+                1.dp,
+                Color.White.copy(alpha = 0.18f),
                 RoundedCornerShape(26.dp)
             )
     ) {

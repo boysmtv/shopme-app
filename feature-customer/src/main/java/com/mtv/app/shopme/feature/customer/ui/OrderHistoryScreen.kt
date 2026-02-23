@@ -11,6 +11,7 @@ package com.mtv.app.shopme.feature.customer.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,7 +30,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
-import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -37,6 +38,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -82,6 +84,7 @@ fun OrderHistoryScreen(
                     listOf(AppColor.Green, AppColor.GreenSoft)
                 )
             )
+            .statusBarsPadding()
     ) {
 
         ModernTopBar(uiNavigation)
@@ -120,7 +123,7 @@ private fun ModernTopBar(nav: OrderHistoryNavigationListener) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(18.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -168,22 +171,32 @@ private fun ModernFilter(
     ) {
 
         OrderStatusFilter.entries.forEach { filter ->
+
             val selectedState = selected == filter
+
             Box(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(50))
-                    .background(if (selectedState) AppColor.Green else Color.Transparent)
-                    .clickable { event.onFilterChange(filter) }
+                    .background(
+                        if (selectedState) AppColor.Green else Color.Transparent
+                    )
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) {
+                        event.onFilterChange(filter)
+                    }
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
+
                 Text(
-                    filter.name.lowercase().replaceFirstChar { it.uppercase() },
+                    text = filter.name.lowercase().replaceFirstChar { it.uppercase() },
                     fontFamily = PoppinsFont,
-                    color = if (selectedState) Color.White else AppColor.Green,
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = if (selectedState) Color.White else AppColor.Green
                 )
             }
         }
@@ -456,11 +469,61 @@ fun OrderHistoryPreview() {
         uiData = OrderHistoryDataListener(
             selectedFilter = OrderStatusFilter.SEMUA,
             orders = listOf(
-                OrderHistoryItem("1", "Cafe Kopi Boy", "Cappuccino", "12 Feb 2026", "Rp 25.000", "SELESAI", 3, "E-Wallet", "Diantar"),
-                OrderHistoryItem("2", "Kopi Nusantara", "Caramel Latte", "11 Feb 2026", "Rp 32.000", "DIPROSES", 2, "QRIS", "Pickup"),
-                OrderHistoryItem("3", "Burger Town", "Cheese Burger Combo", "10 Feb 2026", "Rp 48.000", "DIKIRIM", 4, "Cash", "Diantar"),
-                OrderHistoryItem("4", "Coffee Corner", "Americano", "08 Feb 2026", "Rp 22.000", "SELESAI", 1, "E-Wallet", "Pickup"),
-                OrderHistoryItem("5", "Cafe Kopi Boy", "Matcha Latte", "05 Feb 2026", "Rp 30.000", "BATAL", 2, "QRIS", "Diantar")
+                OrderHistoryItem(
+                    "1",
+                    "Cafe Kopi Boy",
+                    "Cappuccino",
+                    "12 Feb 2026",
+                    "Rp 25.000",
+                    "SELESAI",
+                    3,
+                    "E-Wallet",
+                    "Diantar"
+                ),
+                OrderHistoryItem(
+                    "2",
+                    "Kopi Nusantara",
+                    "Caramel Latte",
+                    "11 Feb 2026",
+                    "Rp 32.000",
+                    "DIPROSES",
+                    2,
+                    "QRIS",
+                    "Pickup"
+                ),
+                OrderHistoryItem(
+                    "3",
+                    "Burger Town",
+                    "Cheese Burger Combo",
+                    "10 Feb 2026",
+                    "Rp 48.000",
+                    "DIKIRIM",
+                    4,
+                    "Cash",
+                    "Diantar"
+                ),
+                OrderHistoryItem(
+                    "4",
+                    "Coffee Corner",
+                    "Americano",
+                    "08 Feb 2026",
+                    "Rp 22.000",
+                    "SELESAI",
+                    1,
+                    "E-Wallet",
+                    "Pickup"
+                ),
+                OrderHistoryItem(
+                    "5",
+                    "Cafe Kopi Boy",
+                    "Matcha Latte",
+                    "05 Feb 2026",
+                    "Rp 30.000",
+                    "BATAL",
+                    2,
+                    "QRIS",
+                    "Diantar"
+                )
             )
         ),
         uiEvent = OrderHistoryEventListener(),

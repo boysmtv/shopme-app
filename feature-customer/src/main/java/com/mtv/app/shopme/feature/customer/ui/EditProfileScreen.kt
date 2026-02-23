@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -115,6 +116,7 @@ fun EditProfileScreen(
                     listOf(AppColor.Green, AppColor.GreenSoft)
                 )
             )
+            .statusBarsPadding()
     ) {
 
         PremiumHeader(uiNavigation)
@@ -211,7 +213,7 @@ fun PremiumHeader(nav: EditProfileNavigationListener) {
             }
 
             Text(
-                text = "Edit Akun",
+                text = "Edit Profile",
                 fontFamily = PoppinsFont,
                 fontSize = 22.sp,
                 color = Color.White
@@ -231,7 +233,7 @@ fun PremiumHeader(nav: EditProfileNavigationListener) {
             )
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(32.dp))
     }
 }
 

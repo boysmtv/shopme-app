@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -67,7 +69,6 @@ fun HelpScreen(
     uiEvent: HelpEventListener,
     uiNavigation: HelpNavigationListener
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,21 +77,23 @@ fun HelpScreen(
                     listOf(AppColor.Green, AppColor.GreenSoft)
                 )
             )
+            .statusBarsPadding()
     ) {
-
-        // Top Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = uiNavigation.onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = Color.White
+                )
             }
-
             Text(
-                "Pusat Bantuan",
+                text = "Pusat Bantuan",
                 fontFamily = PoppinsFont,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
@@ -119,7 +122,10 @@ fun HelpScreen(
                 }
 
                 items(uiData.faq) { faq ->
-                    HelpFaqItem(faq)
+                    HelpFaqItem(
+                        faq = faq,
+                        onToggle = { uiEvent.onToggleFaq(faq) }
+                    )
                 }
 
                 item {
@@ -143,35 +149,55 @@ fun HelpScreen(
 @Composable
 fun HelpFaqItem(
     faq: HelpFaq,
-    onToggle: (() -> Unit)? = null
+    onToggle: () -> Unit
 ) {
 
-    ElevatedCard(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft)
+    Card(
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = AppColor.White
+        ),
+        elevation = CardDefaults.cardElevation(1.dp)
     ) {
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onToggle?.invoke() }
-                .padding(14.dp)
+                .clickable { onToggle() }
+                .padding(horizontal = 16.dp, vertical = 14.dp)
         ) {
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.AutoMirrored.Filled.Help, null, tint = MaterialTheme.colorScheme.primary)
-                Spacer(Modifier.width(10.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    Icons.AutoMirrored.Filled.Help,
+                    null,
+                    tint = AppColor.Green
+                )
+
+                Spacer(Modifier.width(12.dp))
 
                 Text(
                     faq.question,
                     fontFamily = PoppinsFont,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
                     modifier = Modifier.weight(1f)
                 )
+
+                val rotation =
+                    androidx.compose.animation.core.animateFloatAsState(
+                        if (faq.expanded) 180f else 0f,
+                        label = ""
+                    )
 
                 Icon(
                     Icons.Default.ExpandMore,
                     contentDescription = null,
-                    modifier = Modifier.rotate(if (faq.expanded) 180f else 0f)
+                    modifier = Modifier.rotate(rotation.value),
+                    tint = AppColor.Green
                 )
             }
 
@@ -180,13 +206,17 @@ fun HelpFaqItem(
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
+
                 Column {
-                    Spacer(Modifier.height(6.dp))
+
+                    Spacer(Modifier.height(10.dp))
+
                     Text(
                         faq.answer,
                         fontFamily = PoppinsFont,
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = Color.Gray,
+                        lineHeight = 18.sp
                     )
                 }
             }

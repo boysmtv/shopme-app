@@ -28,7 +28,8 @@ fun OrderHistoryRoute(nav: NavController) {
                 uiData = uiData,
                 uiEvent = OrderHistoryEventListener(
                     onRefresh = vm::loadOrders,
-                    onClickOrder = {}
+                    onClickOrder = {},
+                    onFilterChange = vm::updateFilter
                 ),
                 uiNavigation = OrderHistoryNavigationListener(
                     onBack = { nav.popBackStack() }

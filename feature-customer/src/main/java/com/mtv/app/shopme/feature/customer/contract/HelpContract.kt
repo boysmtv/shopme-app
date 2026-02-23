@@ -17,7 +17,8 @@ data class HelpDataListener(
 )
 
 data class HelpEventListener(
-    val onRefresh: () -> Unit = {}
+    val onRefresh: () -> Unit = {},
+    val onToggleFaq: (faq: HelpFaq) -> Unit = {},
 )
 
 data class HelpNavigationListener(
