@@ -142,6 +142,7 @@ fun ProfileScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     orderMenus.forEach { menu ->
+
                         Column(
                             modifier = Modifier
                                 .weight(1f)
@@ -150,15 +151,17 @@ fun ProfileScreen(
                         ) {
 
                             Box(
-                                modifier = Modifier.size(45.dp),
+                                modifier = Modifier
+                                    .size(55.dp)
+                                    .background(AppColor.GreenSoft, RoundedCornerShape(16.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
 
                                 Icon(
                                     imageVector = menu.icon,
-                                    contentDescription = menu.title,
-                                    modifier = Modifier.size(40.dp),
-                                    tint = AppColor.Green
+                                    contentDescription = null,
+                                    tint = AppColor.Green,
+                                    modifier = Modifier.size(28.dp)
                                 )
 
                                 if (menu.count > 0) {
@@ -167,25 +170,23 @@ fun ProfileScreen(
                                             .align(Alignment.TopEnd)
                                             .offset(x = 6.dp, y = (-6).dp)
                                             .background(Color.Red, RoundedCornerShape(50))
-                                            .padding(horizontal = 6.dp, vertical = 2.dp),
-                                        contentAlignment = Alignment.Center
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
                                     ) {
                                         Text(
-                                            text = menu.count.toString(),
+                                            menu.count.toString(),
                                             color = Color.White,
-                                            fontSize = 10.sp,
-                                            fontFamily = PoppinsFont,
+                                            fontSize = 10.sp
                                         )
                                     }
                                 }
                             }
 
-                            Spacer(Modifier.height(6.dp))
+                            Spacer(Modifier.height(8.dp))
 
                             Text(
-                                fontFamily = PoppinsFont,
-                                text = menu.title,
-                                fontSize = 12.sp
+                                menu.title,
+                                fontSize = 12.sp,
+                                fontFamily = PoppinsFont
                             )
                         }
                     }
@@ -215,16 +216,22 @@ fun ProfileScreen(
                         onClickMenu = { uiNavigation.onSettings() }
                     )
                     ProfileMenuItem(
-                        title = "Bantuan",
-                        icon = Icons.AutoMirrored.Filled.Help,
-                        onClickMenu = { uiNavigation.onHelpCenter() }
-                    )
-                    ProfileMenuItem(
                         title = "Menjadi Penjual",
                         icon = Icons.Default.CardTravel,
                         onClickMenu = {
                             uiNavigation.onNavigateToSeller(navController)
                         }
+                    )
+                    ProfileMenuItem(
+                        title = "Bantuan",
+                        icon = Icons.AutoMirrored.Filled.Help,
+                        onClickMenu = { uiNavigation.onHelpCenter() }
+                    )
+                    ProfileMenuItem(
+                        title = "Keluar",
+                        icon = Icons.Default.Map,
+                        isLogout = true,
+                        onClickMenu = { /* logout */ }
                     )
                 }
             }
@@ -234,46 +241,103 @@ fun ProfileScreen(
 
 @Composable
 fun HeaderProfile() {
-    Row(
+
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 20.dp)
     ) {
 
-        Image(
-            painter = painterResource(R.drawable.image_burger),
-            contentDescription = "Profile Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(70.dp)
-                .clip(RoundedCornerShape(50))
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
 
-        Spacer(modifier = Modifier.width(16.dp))
+            Box {
+                Image(
+                    painter = painterResource(R.drawable.image_burger),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(24.dp))
+                )
 
-        Column {
-            Text(
-                fontFamily = PoppinsFont,
-                text = "Hi, Boy",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                fontFamily = PoppinsFont,
-                text = "08158844424",
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                fontFamily = PoppinsFont,
-                text = "Puri Lestari - Blok G06/01",
-                color = Color.White.copy(alpha = 0.8f),
-                fontSize = 14.sp
-            )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .background(Color(0xFF1DA1F2), RoundedCornerShape(50))
+                        .padding(4.dp)
+                ) {
+                    Icon(
+                        Icons.Default.CheckCircle,
+                        contentDescription = "Verified",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(16.dp))
+
+            Column {
+                Text(
+                    "Hi, Boy 👋",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = PoppinsFont
+                )
+                Text(
+                    "08158844424",
+                    color = Color.White.copy(.9f),
+                    fontSize = 14.sp,
+                    fontFamily = PoppinsFont
+                )
+                Text(
+                    "Puri Lestari - Blok G06/01",
+                    color = Color.White.copy(.7f),
+                    fontSize = 12.sp,
+                    fontFamily = PoppinsFont
+                )
+            }
         }
+
+        Spacer(Modifier.height(20.dp))
+
+        // Stats Card
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White.copy(alpha = 0.15f)
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 14.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+
+                ProfileStat("12", "Pesanan")
+                ProfileStat("3", "Aktif")
+                ProfileStat("Gold", "Member")
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileStat(value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            value,
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+        Text(
+            label,
+            color = Color.White.copy(.7f),
+            fontSize = 12.sp
+        )
     }
 }
 

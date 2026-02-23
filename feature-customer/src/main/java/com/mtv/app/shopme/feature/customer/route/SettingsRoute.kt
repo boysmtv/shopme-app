@@ -44,8 +44,7 @@ private fun settingsEvent(vm: SettingsViewModel) =
 private fun settingsNavigation(nav: NavController) =
     SettingsNavigationListener(
         onBack = { nav.popBackStack() },
-        onSecurity = { nav.navigate("security_graph") },
-        onPayment = { nav.navigate("payment_graph") },
-        onHelp = { nav.navigate("help_graph") },
+        onSecurity = { nav.navigate(CustomerDestinations.SECURITY_GRAPH) },
+        onHelp = { nav.navigate(CustomerDestinations.SUPPORT_GRAPH) },
         onNotification = { nav.navigate(CustomerDestinations.NOTIFICATION_GRAPH)}
     )

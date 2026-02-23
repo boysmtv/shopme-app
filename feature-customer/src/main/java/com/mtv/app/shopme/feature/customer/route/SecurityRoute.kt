@@ -18,6 +18,7 @@ import com.mtv.app.shopme.feature.customer.contract.SecurityNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SecurityStateListener
 import com.mtv.app.shopme.feature.customer.presentation.SecurityViewModel
 import com.mtv.app.shopme.feature.customer.ui.SecurityScreen
+import com.mtv.app.shopme.nav.AuthDestinations
 
 @Composable
 fun SecurityRoute(nav: NavController) {
@@ -41,6 +42,6 @@ private fun securityEvent(vm: SecurityViewModel) = SecurityEventListener(
 
 private fun securityNavigation(nav: NavController) = SecurityNavigationListener(
     onBack = { nav.popBackStack() },
-    onChangePassword = { nav.navigate("change_password") },
-    onChangePin = { nav.navigate("change_pin") }
+    onChangePassword = { nav.navigate(AuthDestinations.PASSWORD_GRAPH) },
+    onChangePin = { nav.navigate(AuthDestinations.CHANGE_PIN_GRAPH) }
 )

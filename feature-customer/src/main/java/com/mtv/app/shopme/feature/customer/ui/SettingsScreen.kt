@@ -192,10 +192,6 @@ private fun TopBar(nav: SettingsNavigationListener) {
     }
 }
 
-// ========================================================
-// GROUP WRAPPER
-// ========================================================
-
 @Composable
 fun SettingsGroup(
     title: String,
