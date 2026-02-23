@@ -86,7 +86,6 @@ fun ChangePinScreen(
                 uiData.newPin.length == 6 &&
                 uiData.confirmPin.length == 6
 
-    // Trigger shake + haptic when error
     LaunchedEffect(uiState.error) {
         if (uiState.error != null) {
             errorTrigger++

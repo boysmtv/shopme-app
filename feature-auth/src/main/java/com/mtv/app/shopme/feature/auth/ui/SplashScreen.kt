@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.auth.ui
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,14 +21,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -48,6 +52,7 @@ import com.mtv.app.shopme.feature.auth.contract.SplashDataListener
 import com.mtv.app.shopme.feature.auth.contract.SplashEventListener
 import com.mtv.app.shopme.feature.auth.contract.SplashNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
+import kotlinx.coroutines.delay
 
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
@@ -55,8 +60,8 @@ fun SplashScreenPreview() {
     SplashScreen(
         uiState = SplashStateListener(),
         uiData = SplashDataListener(),
-        uiEvent = SplashEventListener({}),
-        uiNavigation = SplashNavigationListener({})
+        uiEvent = SplashEventListener {},
+        uiNavigation = SplashNavigationListener {}
     )
 }
 
@@ -67,26 +72,24 @@ fun SplashScreen(
     uiEvent: SplashEventListener,
     uiNavigation: SplashNavigationListener
 ) {
+    LaunchedEffect(Unit) {
+        delay(2000)
+        uiNavigation.onNavigateToLogin()
+    }
 
     Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            AppColor.GreenSoft,
-                            AppColor.WhiteSoft,
-                            AppColor.White
-                        )
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        AppColor.GreenSoft,
+                        AppColor.WhiteSoft,
+                        AppColor.White
                     )
                 )
-        )
-
+            )
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -153,16 +156,16 @@ fun SplashScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(420.dp),
+                    .weight(1f)
+                    .heightIn(max = 280.dp),
                 contentAlignment = Alignment.Center
             ) {
-
                 Image(
                     painter = painterResource(id = R.drawable.image_food_1),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(320.dp),
+                        .fillMaxHeight(),
                     contentScale = ContentScale.Fit
                 )
             }
@@ -198,7 +201,7 @@ fun SplashScreen(
                 }
 
                 Button(
-                    onClick = { uiNavigation.onNavigateToLogin() },
+                    onClick = { },
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppColor.Green.copy(alpha = 0.8f)
