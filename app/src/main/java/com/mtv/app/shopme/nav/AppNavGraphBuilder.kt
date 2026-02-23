@@ -12,6 +12,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.mtv.app.shopme.feature.auth.route.ChangePinRoute
 import com.mtv.app.shopme.feature.auth.route.LoginRoute
 import com.mtv.app.shopme.feature.auth.route.PasswordRoute
 import com.mtv.app.shopme.feature.auth.route.RegisterRoute
@@ -22,16 +23,19 @@ import com.mtv.app.shopme.feature.customer.route.CafeRoute
 import com.mtv.app.shopme.feature.customer.route.CartRoute
 import com.mtv.app.shopme.feature.customer.route.ChatRoute
 import com.mtv.app.shopme.feature.customer.route.DetailRoute
-import com.mtv.app.shopme.feature.customer.route.EditAddressRoute
 import com.mtv.app.shopme.feature.customer.route.EditProfileRoute
 import com.mtv.app.shopme.feature.customer.route.HomeRoute
 import com.mtv.app.shopme.feature.customer.route.ChatListRoute
+import com.mtv.app.shopme.feature.customer.route.ChatSupportRoute
+import com.mtv.app.shopme.feature.customer.route.HelpRoute
 import com.mtv.app.shopme.feature.customer.route.NotifRoute
 import com.mtv.app.shopme.feature.customer.route.NotificationRoute
 import com.mtv.app.shopme.feature.customer.route.OrderHistoryRoute
 import com.mtv.app.shopme.feature.customer.route.OrderRoute
 import com.mtv.app.shopme.feature.customer.route.ProfileRoute
 import com.mtv.app.shopme.feature.customer.route.SearchRoute
+import com.mtv.app.shopme.feature.customer.route.SecurityRoute
+import com.mtv.app.shopme.feature.customer.route.SupportRoute
 import com.mtv.app.shopme.feature.seller.route.SellerChatDetailRoute
 import com.mtv.app.shopme.feature.seller.route.SellerChatListRoute
 import com.mtv.app.shopme.feature.seller.route.SellerDashboardRoute
@@ -60,6 +64,10 @@ fun NavGraphBuilder.authGraph(nav: NavHostController) {
 
     composable(AuthDestinations.PASSWORD_GRAPH) {
         PasswordRoute(nav)
+    }
+
+    composable(AuthDestinations.CHANGE_PIN_GRAPH) {
+        ChangePinRoute(nav)
     }
 }
 
@@ -114,11 +122,20 @@ fun NavGraphBuilder.profileGraph(nav: NavHostController) {
     composable(CustomerDestinations.SETTINGS_GRAPH) {
         SettingsRoute(nav)
     }
-    composable(CustomerDestinations.HELP_GRAPH) {
-        SettingsRoute(nav)
+    composable(CustomerDestinations.SUPPORT_GRAPH) {
+        SupportRoute(nav)
+    }
+    composable(CustomerDestinations.CHAT_SUPPORT_GRAPH) {
+        ChatSupportRoute(nav)
     }
     composable(CustomerDestinations.NOTIFICATION_GRAPH) {
         NotificationRoute(nav)
+    }
+    composable(CustomerDestinations.SECURITY_GRAPH) {
+        SecurityRoute(nav)
+    }
+    composable(CustomerDestinations.HELP_GRAPH) {
+        HelpRoute(nav)
     }
 }
 
