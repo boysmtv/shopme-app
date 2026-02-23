@@ -44,8 +44,8 @@ private fun orderEvent(vm: OrderViewModel) = OrderEventListener(
 )
 
 private fun orderNavigation(nav: NavController) = OrderNavigationListener(
-    onDetail = { orderId ->
-        nav.navigate("${CustomerDestinations.ORDER_DETAIL_GRAPH}/$orderId")
+    onDetail = { _ ->
+        nav.navigate(CustomerDestinations.ORDER_DETAIL_GRAPH)
     },
     onChatClick = {
         nav.navigate(CustomerBottomNavItem.Chat.route) {

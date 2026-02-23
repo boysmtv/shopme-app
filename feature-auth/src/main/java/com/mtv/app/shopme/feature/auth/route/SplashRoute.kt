@@ -19,7 +19,6 @@ import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
 import com.mtv.app.shopme.feature.auth.presentation.SplashViewModel
 import com.mtv.app.shopme.feature.auth.ui.SplashScreen
 import com.mtv.app.shopme.nav.AuthDestinations
-import com.mtv.app.shopme.nav.CustomerDestinations
 import com.mtv.app.shopme.nav.navigateAndPopSplash
 
 @Composable

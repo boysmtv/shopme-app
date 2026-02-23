@@ -9,7 +9,7 @@
 package com.mtv.app.shopme.nav
 
 object AuthDestinations {
-    const val SPLASH_GRAPH = "LOGIN_GRAPH"
+    const val SPLASH_GRAPH = "SPLASH_GRAPH"
     const val LOGIN_GRAPH = "LOGIN_GRAPH"
     const val REGISTER_GRAPH = "REGISTER_GRAPH"
     const val RESET_GRAPH = "RESET_GRAPH"

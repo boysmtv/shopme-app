@@ -7,8 +7,8 @@ import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.feature.auth.contract.SplashDataListener
 import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
