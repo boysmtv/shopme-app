@@ -42,4 +42,17 @@ class HelpViewModel @Inject constructor() :
             )
         )
     )
+
+    fun onToggleFaq(target: HelpFaq) {
+        val current = uiData.value
+
+        uiData.value = current.copy(
+            faq = current.faq.map {
+                when {
+                    it == target -> it.copy(expanded = !it.expanded)
+                    else -> it.copy(expanded = false)
+                }
+            }
+        )
+    }
 }

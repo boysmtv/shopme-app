@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -98,11 +99,12 @@ fun ProfileScreen(
                     )
                 )
             )
-            .padding(top = 32.dp)
+            .statusBarsPadding()
+            .padding(top = 24.dp)
     ) {
         HeaderProfile()
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Card(
             modifier = Modifier
@@ -245,7 +247,7 @@ fun HeaderProfile() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = 24.dp)
     ) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {

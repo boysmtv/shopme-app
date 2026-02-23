@@ -35,7 +35,10 @@ fun HelpRoute(nav: NavController) {
 }
 
 private fun helpEvent(vm: HelpViewModel) =
-    HelpEventListener()
+    HelpEventListener(
+        onRefresh = {},
+        onToggleFaq = vm::onToggleFaq
+    )
 
 private fun helpNavigation(nav: NavController) =
     HelpNavigationListener(

@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,6 +47,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -84,20 +86,17 @@ fun SettingsScreen(
     uiNavigation: SettingsNavigationListener
 ) {
 
-    val dynamicColors = colorScheme
-    val isDark = dynamicColors.background.luminance() < 0.5f
+    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(
-                        if (isDark) dynamicColors.primary else AppColor.Green,
-                        if (isDark) dynamicColors.primaryContainer else AppColor.GreenSoft
-                    )
+                    listOf(AppColor.Green, AppColor.GreenSoft)
                 )
             )
+            .statusBarsPadding()
     ) {
 
         TopBar(uiNavigation)
@@ -105,7 +104,7 @@ fun SettingsScreen(
         Surface(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            color = dynamicColors.background
+            color = AppColor.WhiteSoft
         ) {
 
             if (uiState.isLoading) {
@@ -203,7 +202,7 @@ fun SettingsGroup(
             title,
             fontFamily = PoppinsFont,
             fontSize = 14.sp,
-            color = colorScheme.onSurfaceVariant
+            color = AppColor.Gray
         )
 
         Spacer(Modifier.height(8.dp))
@@ -248,7 +247,7 @@ fun SettingsItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Icon(icon, null, tint = colorScheme.primary)
+        Icon(icon, null, tint = AppColor.Green)
 
         Spacer(Modifier.width(14.dp))
 
@@ -258,7 +257,7 @@ fun SettingsItem(
                 subtitle,
                 fontFamily = PoppinsFont,
                 fontSize = 12.sp,
-                color = colorScheme.onSurfaceVariant
+                color = AppColor.Gray
             )
         }
     }
@@ -282,7 +281,7 @@ fun SettingsSwitchItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Icon(icon, null, tint = colorScheme.primary)
+        Icon(icon, null, tint = AppColor.Green)
 
         Spacer(Modifier.width(14.dp))
 
@@ -292,7 +291,7 @@ fun SettingsSwitchItem(
                 subtitle,
                 fontFamily = PoppinsFont,
                 fontSize = 12.sp,
-                color = colorScheme.onSurfaceVariant
+                color = AppColor.Gray
             )
         }
 
@@ -303,7 +302,8 @@ fun SettingsSwitchItem(
                 onCheckedChange(it)
             },
             colors = SwitchDefaults.colors(
-                checkedThumbColor = colorScheme.primary
+                checkedThumbColor = AppColor.Green,
+                checkedTrackColor = AppColor.Green.copy(alpha = 0.5f)
             )
         )
     }
