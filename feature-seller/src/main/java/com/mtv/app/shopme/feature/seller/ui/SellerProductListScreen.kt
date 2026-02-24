@@ -27,7 +27,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
@@ -179,20 +178,16 @@ fun CleanStatItem(
     value: Int,
     isWarning: Boolean = false
 ) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Text(
             text = value.toString(),
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             color = if (isWarning) Color.Red else AppColor.Blue
         )
-
         Spacer(Modifier.height(4.dp))
-
         Text(
             text = label,
             fontSize = 12.sp,
