@@ -21,7 +21,6 @@ class EditProfileDataListener(
     val number: String = "23",
     val rt: String = "004",
     val rw: String = "005",
-    val map: String = "-6.2682185,106.8296376"
 )
 
 class EditProfileEventListener(
