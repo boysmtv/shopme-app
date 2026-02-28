@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.People
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Button
@@ -68,7 +69,6 @@ fun RegisterScreen(
 ) {
 
     var passwordVisible by remember { mutableStateOf(false) }
-    var confirmVisible by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -94,7 +94,6 @@ fun RegisterScreen(
                 )
             }
 
-            // CARD FORM (FULL SISA HEIGHT)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -121,7 +120,28 @@ fun RegisterScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // EMAIL
+                    Text("Name", fontFamily = PoppinsFont)
+                    Spacer(Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = uiData.email,
+                        onValueChange = uiEvent.onEmailChange,
+                        leadingIcon = {
+                            Icon(Icons.Outlined.People, contentDescription = null)
+                        },
+                        placeholder = {
+                            Text(
+                                "Enter your name",
+                                fontFamily = PoppinsFont,
+                                fontSize = 12.sp
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp)
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
                     Text("Email", fontFamily = PoppinsFont)
                     Spacer(Modifier.height(8.dp))
 
@@ -133,7 +153,7 @@ fun RegisterScreen(
                         },
                         placeholder = {
                             Text(
-                                "Enter Your Email",
+                                "Enter your email",
                                 fontFamily = PoppinsFont,
                                 fontSize = 12.sp
                             )
@@ -144,7 +164,6 @@ fun RegisterScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // PASSWORD
                     Text("Password", fontFamily = PoppinsFont)
                     Spacer(Modifier.height(8.dp))
 
@@ -177,46 +196,6 @@ fun RegisterScreen(
                         },
                         visualTransformation =
                             if (passwordVisible) VisualTransformation.None
-                            else PasswordVisualTransformation(),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp)
-                    )
-
-                    Spacer(Modifier.height(16.dp))
-
-                    // CONFIRM PASSWORD
-                    Text("Confirm Password", fontFamily = PoppinsFont)
-                    Spacer(Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = uiData.confirmPassword,
-                        onValueChange = uiEvent.onConfirmPasswordChange,
-                        leadingIcon = {
-                            Icon(Icons.Outlined.Lock, contentDescription = null)
-                        },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = { confirmVisible = !confirmVisible }
-                            ) {
-                                Icon(
-                                    imageVector = if (confirmVisible)
-                                        Icons.Outlined.Visibility
-                                    else
-                                        Icons.Outlined.VisibilityOff,
-                                    contentDescription = null,
-                                    tint = AppColor.Gray
-                                )
-                            }
-                        },
-                        placeholder = {
-                            Text(
-                                "Enter your confirm password",
-                                fontFamily = PoppinsFont,
-                                fontSize = 12.sp
-                            )
-                        },
-                        visualTransformation =
-                            if (confirmVisible) VisualTransformation.None
                             else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp)

@@ -238,7 +238,7 @@ fun LoginScreen(
                         }
 
                         Text(
-                            "Forget Password?",
+                            "Forgot Password?",
                             color = AppColor.Green,
                             fontFamily = PoppinsFont,
                             fontSize = 13.sp,
