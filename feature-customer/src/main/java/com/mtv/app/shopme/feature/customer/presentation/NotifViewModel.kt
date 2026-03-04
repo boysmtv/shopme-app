@@ -12,7 +12,7 @@ import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.core.provider.utils.SecurePrefs
 import com.mtv.app.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.domain.NotificationUseCase
+import com.mtv.app.shopme.domain.usecase.NotificationUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotifDataListener
 import com.mtv.app.shopme.feature.customer.contract.NotifStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
