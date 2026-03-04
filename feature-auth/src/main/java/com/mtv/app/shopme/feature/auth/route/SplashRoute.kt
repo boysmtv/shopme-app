@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.auth.contract.SplashDataListener
 import com.mtv.app.shopme.feature.auth.contract.SplashEventListener
 import com.mtv.app.shopme.feature.auth.contract.SplashNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
@@ -23,7 +22,7 @@ import com.mtv.app.shopme.nav.navigateAndPopSplash
 
 @Composable
 fun SplashRoute(nav: NavController) {
-    BaseRoute<SplashViewModel, SplashStateListener, SplashDataListener> { vm, base, uiState, uiData ->
+    BaseRoute<SplashViewModel, SplashStateListener, Unit> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             SplashScreen(
                 uiState = uiState,
@@ -36,7 +35,7 @@ fun SplashRoute(nav: NavController) {
 }
 
 private fun splashEvent(vm: SplashViewModel) = SplashEventListener(
-    onDismissActiveDialog = {}
+    doSplashScreen = vm::doSplash,
 )
 
 private fun splashNavigation(nav: NavController) = SplashNavigationListener(

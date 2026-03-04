@@ -8,7 +8,6 @@
 
 package com.mtv.app.shopme.feature.auth.ui
 
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,7 +23,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -48,33 +46,26 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.auth.contract.SplashDataListener
 import com.mtv.app.shopme.feature.auth.contract.SplashEventListener
 import com.mtv.app.shopme.feature.auth.contract.SplashNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
-import kotlinx.coroutines.delay
-
-@Preview(showBackground = true, device = Devices.PIXEL_4)
-@Composable
-fun SplashScreenPreview() {
-    SplashScreen(
-        uiState = SplashStateListener(),
-        uiData = SplashDataListener(),
-        uiEvent = SplashEventListener {},
-        uiNavigation = SplashNavigationListener {}
-    )
-}
+import com.mtv.based.core.network.utils.Resource
 
 @Composable
 fun SplashScreen(
     uiState: SplashStateListener,
-    uiData: SplashDataListener,
     uiEvent: SplashEventListener,
     uiNavigation: SplashNavigationListener
 ) {
     LaunchedEffect(Unit) {
-        delay(2000)
-        uiNavigation.onNavigateToLogin()
+        uiEvent.doSplashScreen()
+    }
+
+
+    LaunchedEffect(uiState.splashState) {
+        if (uiState.splashState is Resource.Success) {
+            uiNavigation.onNavigateToLogin()
+        }
     }
 
     Box(
@@ -209,7 +200,7 @@ fun SplashScreen(
                     modifier = Modifier.size(70.dp)
                 ) {
                     Text(
-                        text = "GO",
+                        text = ". . .",
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White,
                         fontFamily = PoppinsFont
@@ -218,4 +209,14 @@ fun SplashScreen(
             }
         }
     }
+}
+
+@Preview(showBackground = true, device = Devices.PIXEL_4)
+@Composable
+fun SplashScreenPreview() {
+    SplashScreen(
+        uiState = SplashStateListener(),
+        uiEvent = SplashEventListener {},
+        uiNavigation = SplashNavigationListener {}
+    )
 }

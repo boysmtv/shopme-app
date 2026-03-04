@@ -8,18 +8,14 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.based.core.network.utils.Resource
 
 data class SplashStateListener(
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading
-)
-
-data class SplashDataListener(
-    val emptyData: String? = null
+    val splashState: Resource<String> = Resource.Loading,
 )
 
 data class SplashEventListener(
-    val onDismissActiveDialog: () -> Unit
+    val doSplashScreen: () -> Unit,
 )
 
 data class SplashNavigationListener(
