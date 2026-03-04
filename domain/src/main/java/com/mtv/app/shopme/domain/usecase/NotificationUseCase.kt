@@ -1,24 +1,16 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: NotificationUseCase.kt
- *
- * Last modified by Dedy Wijaya on 20/02/26 15.13
- */
-
-package com.mtv.app.shopme.domain
+package com.mtv.app.shopme.domain.usecase
 
 import com.mtv.app.core.provider.based.BaseFirebaseUseCase
-import com.mtv.app.shopme.data.response.NotificationData
+import com.mtv.app.shopme.data.remote.response.NotificationData
 import com.mtv.based.core.network.datasource.FirebaseDataSource
 import com.mtv.based.core.network.di.IoDispatcher
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.core.network.utils.mapFirebaseExceptionToUiError
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import javax.inject.Inject
 
 class NotificationUseCase @Inject constructor(
     private val dataSource: FirebaseDataSource,
