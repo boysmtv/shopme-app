@@ -12,6 +12,8 @@ import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.core.provider.utils.SecurePrefs
 import com.mtv.app.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
+import com.mtv.app.shopme.domain.usecase.HomeFoodCategoryUseCase
+import com.mtv.app.shopme.domain.usecase.HomeFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeDataListener
 import com.mtv.app.shopme.feature.customer.contract.HomeStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +23,9 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val sessionManager: SessionManager,
-    private val securePrefs: SecurePrefs
+    private val securePrefs: SecurePrefs,
+    private val getHomeFoodUseCase: HomeFoodUseCase,
+    private val getHomeFoodCategoryUseCase: HomeFoodCategoryUseCase
 ) : BaseViewModel(), UiOwner<HomeStateListener, HomeDataListener> {
 
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
@@ -29,5 +33,14 @@ class HomeViewModel @Inject constructor(
 
     /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(HomeDataListener())
+
+//    fun getFood() = launchUseCase(
+//        loading = false,
+//        target = uiState.valueFlowOf(
+//            get = { it.nowPlayingState },
+//            set = { state -> copy(nowPlayingState = state) }
+//        ),
+//        block = { getHomeFoodUseCase(Unit) }
+//    )
 
 }

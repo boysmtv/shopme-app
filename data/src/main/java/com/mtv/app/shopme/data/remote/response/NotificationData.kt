@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 10/02/26 15.03
  */
 
-package com.mtv.app.shopme.data.response
+package com.mtv.app.shopme.data.remote.response
 
 import java.util.Date
 
