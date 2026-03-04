@@ -9,4 +9,6 @@ object ConstantPreferences {
     const val FCM_TOKEN = "FCM_TOKEN"
     const val FCM_CUSTOMER_NOTIFICATION = "FCM_CUSTOMER_NOTIFICATION"
     const val FCM_SELLER_NOTIFICATION = "FCM_SELLER_NOTIFICATION"
+
+    const val ACCESS_TOKEN = "ACCESS_TOKEN"
 }
