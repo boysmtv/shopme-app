@@ -245,7 +245,6 @@ fun OrderItemRow(
     price: String,
     imageUrl: String? = null
 ) {
-    var expanded by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -253,7 +252,6 @@ fun OrderItemRow(
             .shadow(4.dp, RoundedCornerShape(16.dp))
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
-            .clickable { expanded = !expanded }
             .padding(16.dp)
     ) {
         if (imageUrl != null) {
@@ -271,9 +269,7 @@ fun OrderItemRow(
             Spacer(Modifier.height(6.dp))
             Text("Qty: $qty", fontSize = 12.sp, color = Color.Gray)
             Spacer(Modifier.height(6.dp))
-            AnimatedVisibility(expanded) {
-                Text("Notes: Extra spicy, no onion", fontSize = 12.sp, color = Color.Gray)
-            }
+            Text("Notes: Extra spicy, no onion", fontSize = 12.sp, color = Color.Gray)
         }
 
         Text(price, fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFont)
