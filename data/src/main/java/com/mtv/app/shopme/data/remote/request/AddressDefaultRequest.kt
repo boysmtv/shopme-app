@@ -1,0 +1,16 @@
+/*
+ * Project: Shopme App
+ * Author: Boys.mtv@gmail.com
+ * File: CartInquiryRequest.kt
+ *
+ * Last modified by Dedy Wijaya on 07/03/26 13.24
+ */
+
+package com.mtv.app.shopme.data.remote.request
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class AddressDefaultRequest(
+    val id: String,
+)
