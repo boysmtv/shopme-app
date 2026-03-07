@@ -8,19 +8,24 @@
 
 package com.mtv.app.shopme.config
 
+import com.mtv.app.core.provider.utils.SecurePrefs
+import com.mtv.app.core.provider.utils.SessionManager
 import com.mtv.app.core.provider.utils.device.InstallationIdProvider
 import com.mtv.app.shopme.common.BuildConfig
+import com.mtv.app.shopme.common.ConstantPreferences
+import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
 import com.mtv.based.core.network.header.AdditionalHeaderProvider
 import javax.inject.Inject
 
 class AppAdditionalHeaderProvider @Inject constructor(
-    private val installationIdProvider: InstallationIdProvider
+    private val installationIdProvider: InstallationIdProvider,
+    private val securePrefs: SecurePrefs
 ) :
     AdditionalHeaderProvider {
 
     override fun provide(): Map<String, String> =
         mapOf(
-            "Authorization" to "Bearer ${BuildConfig.TMDB_BEARER}",
+            "Authorization" to "Bearer ${securePrefs.getString(ACCESS_TOKEN)}",
             "X-Device-Id" to installationIdProvider.getInstallationId(),
             "X-App-Name" to "MovieApp",
             "X-Version" to "1.0.0",

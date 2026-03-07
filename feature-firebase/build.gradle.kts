@@ -1,7 +1,9 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.signing)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
@@ -9,19 +11,16 @@ plugins {
 }
 
 android {
-    namespace = "com.mtv.app.shopme"
+    namespace = "com.mtv.app.shopme.feature.firebase"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.mtv.app.shopme"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -40,24 +39,13 @@ android {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
-
-    buildFeatures {
-        buildConfig = true
-        compose = true
-        viewBinding = true
-    }
 }
 
 dependencies {
-
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":common"))
     implementation(project(":nav"))
-    implementation(project(":feature-customer"))
-    implementation(project(":feature-seller"))
-    implementation(project(":feature-auth"))
-    implementation(project(":feature-firebase"))
 
     /* =========================
      * Core & Lifecycle
@@ -106,6 +94,7 @@ dependencies {
      * Dependency Injection (Hilt)
      * ========================= */
     implementation(libs.hilt.android)
+    implementation(libs.androidx.compose.foundation)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
@@ -117,6 +106,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
     implementation(libs.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
@@ -124,6 +114,7 @@ dependencies {
     /* =========================
      * Date & Time
      * ========================= */
+    implementation(libs.coil.compose)
     implementation(libs.threetenabp)
 
     /* =========================
