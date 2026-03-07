@@ -25,7 +25,7 @@ android {
     buildTypes {
         release {
             buildConfigField("String", "BASE_URL", "\"https://api.prod.com/\"")
-            buildConfigField("Boolean", "USE_KTOR", "true")
+            buildConfigField("Boolean", "USE_KTOR", "false")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -33,23 +33,11 @@ android {
             )
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://192.168.68.127:8080/\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.1.107:8080/\"")
             buildConfigField("Boolean", "USE_KTOR", "true")
 
-            // Tmdb Api
-            buildConfigField("String", "TMDB_URL", "\"https://api.themoviedb.org/\"")
-            buildConfigField("String", "TMDB_IMAGE_URL", "\"https://image.tmdb.org/t/p/w500/\"")
-
-            // Credential
-            buildConfigField("String", "TMDB_BEARER", "\"eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ZmIzYTg2OWRkYTIyNjRjNDQ4MjYxY2Q4YWRlMjExMCIsIm5iZiI6MTY2MDA0NTA3My44ODgsInN1YiI6IjYyZjI0NzExMTUxMWFhMDA3YTdjZjNlZSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.B_f1VYeJoWUsgw6h2T91pfBIgLkIOwogLR7k6dxM4pU\"")
-            buildConfigField("String", "TMDB_YOUTUBE_URL", "\"https://www.youtube.com/watch?v=\"")
-
-            // Firebase
             buildConfigField("String", "FIREBASE_PROJECT_ID", "\"app-movie-e85f3\"")
-            buildConfigField("String", "FIREBASE_USERS_COLLECTION", "\"users\"")
-            buildConfigField("String", "FIREBASE_DEVICE_COLLECTION", "\"device\"")
-            buildConfigField("String", "FIREBASE_DEVICE_LOG_COLLECTION", "\"device_log\"")
-            buildConfigField("String", "FIREBASE_LOGIN_LOG_COLLECTION", "\"login_log\"")
+            buildConfigField("String", "FIREBASE_DEFAULT_COLLECTION", "\"users\"")
         }
     }
 

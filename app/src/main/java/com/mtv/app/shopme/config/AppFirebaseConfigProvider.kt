@@ -17,7 +17,7 @@ class AppFirebaseConfigProvider : FirebaseConfigProvider {
     override fun provide(): FirebaseConfig =
         FirebaseConfig(
             projectId = BuildConfig.FIREBASE_PROJECT_ID,
-            defaultCollection = BuildConfig.FIREBASE_USERS_COLLECTION
+            defaultCollection = BuildConfig.FIREBASE_DEFAULT_COLLECTION
         )
 
 }
