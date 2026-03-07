@@ -35,7 +35,11 @@ fun CartRoute(nav: NavController) {
 }
 
 private fun cartEvent(vm: CartViewModel) = CartEventListener(
-    onDismissActiveDialog = {}
+    onQuantityClick = vm::doPostQuantity,
+    onInquiry = vm::doPostInquiry,
+    onValidate = vm::doPostValidate,
+    onVerifyPin = vm::doVerifyPin,
+    onDismissActiveDialog = vm::doDismissActiveDialog
 )
 
 private fun cartNavigation(nav: NavController) = CartNavigationListener(

@@ -8,11 +8,20 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.CartInquiryResponse
+import com.mtv.app.shopme.data.remote.response.CartItemResponse
+import com.mtv.app.shopme.data.remote.response.CartValidateResponse
+import com.mtv.app.shopme.data.remote.response.VerifyPinResponse
+import com.mtv.based.core.network.utils.Resource
 
 data class CartStateListener(
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
-    val activeDialog: com.mtv.app.shopme.feature.customer.contract.CartDialog? = null
+    val cartState: Resource<ApiResponse<CartItemResponse>> = Resource.Loading,
+    val quantityState: Resource<ApiResponse<Unit>> = Resource.Loading,
+    val inquiryState: Resource<ApiResponse<CartInquiryResponse>> = Resource.Loading,
+    val validateState: Resource<ApiResponse<CartValidateResponse>> = Resource.Loading,
+    val verifyPinState: Resource<ApiResponse<VerifyPinResponse>> = Resource.Loading,
+    val activeDialog: CartDialog? = null
 )
 
 data class CartDataListener(
@@ -20,6 +29,10 @@ data class CartDataListener(
 )
 
 data class CartEventListener(
+    val onQuantityClick: (String, Int) -> Unit = { _, _ -> },
+    val onInquiry: (String) -> Unit = { },
+    val onValidate: (String) -> Unit = { },
+    val onVerifyPin: (String, String) -> Unit = { _, _ -> },
     val onDismissActiveDialog: () -> Unit = {}
 )
 
