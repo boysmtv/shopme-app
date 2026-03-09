@@ -56,13 +56,15 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base64ToBitmap
-import com.mtv.app.shopme.data.ChatListItem
+import com.mtv.app.shopme.data.local.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatListDataListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListEventListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
 import com.mtv.app.shopme.feature.customer.presentation.mockChatList
+import com.mtv.app.shopme.feature.customer.presentation.mockChatListState
 import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.based.core.network.utils.Resource
 
 @Composable
 fun ChatListScreen(
@@ -118,11 +120,16 @@ fun ChatListScreen(
         HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
 
+        val chats = when (val state = uiState.chatListState) {
+            is Resource.Success -> state.data.data?.chatList ?: emptyList()
+            else -> mockChatList()
+        }
+
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(start = 20.dp, end = 20.dp)
         ) {
-            items(uiState.chatList) { item ->
+            items(chats) { item ->
                 ListChatItem(
                     data = item,
                     onClick = { uiNavigation.navigateToChat(item.id) }
@@ -269,7 +276,7 @@ fun ChatListScreenPreview() {
         ) {
             ChatListScreen(
                 uiState = ChatListStateListener(
-                    chatList = mockChatList()
+                    chatListState = mockChatListState()
                 ),
                 uiData = ChatListDataListener(),
                 uiEvent = ChatListEventListener(),

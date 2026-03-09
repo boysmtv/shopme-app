@@ -8,10 +8,12 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.ChatListItem
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.ChatListResponse
+import com.mtv.based.core.network.utils.Resource
 
 data class ChatListStateListener(
-    val chatList: List<ChatListItem> = emptyList()
+    val chatListState: Resource<ApiResponse<ChatListResponse>> = Resource.Loading,
 )
 
 data class ChatListDataListener(

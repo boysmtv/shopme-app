@@ -3,7 +3,7 @@
  * Author: Boys.mtv@gmail.com
  * File: ChatScreen.kt
  *
- * Last modified by ChatGPT on 12/02/26
+ * Last modified by Dedy Wijaya on 12/02/26
  */
 
 package com.mtv.app.shopme.feature.customer.ui
