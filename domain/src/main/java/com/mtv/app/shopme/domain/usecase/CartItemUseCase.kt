@@ -20,9 +20,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 class CartItemUseCase @Inject constructor(
     private val repository: NetworkRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<Unit, ApiResponse<CartItemResponse>>(dispatcher) {
+) : BaseUseCase<Unit, ApiResponse<List<CartItemResponse>>>(dispatcher) {
 
-    override suspend fun execute(param: Unit) = repository.request<ApiResponse<CartItemResponse>>(
+    override suspend fun execute(param: Unit) = repository.request<ApiResponse<List<CartItemResponse>>>(
         endpoint = ApiEndPoint.GetCart,
     )
 

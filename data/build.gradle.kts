@@ -42,6 +42,8 @@ android {
 
 dependencies {
 
+    implementation(project(":common"))
+
     /* =========================
      * Core & Lifecycle
      * ========================= */

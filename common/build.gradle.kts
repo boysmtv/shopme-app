@@ -58,8 +58,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":data"))
-
     /* =========================
      * Core & Lifecycle
      * ========================= */

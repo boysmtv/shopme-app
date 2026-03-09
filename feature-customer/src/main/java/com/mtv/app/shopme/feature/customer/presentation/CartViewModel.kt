@@ -15,9 +15,8 @@ import com.mtv.app.shopme.data.remote.request.CartInquiryRequest
 import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
 import com.mtv.app.shopme.data.remote.request.CartValidateRequest
 import com.mtv.app.shopme.data.remote.request.VerifyPinRequest
-import com.mtv.app.shopme.data.remote.response.CartValidateResponse
-import com.mtv.app.shopme.domain.usecase.CartItemUseCase
 import com.mtv.app.shopme.domain.usecase.CartInquiryUseCase
+import com.mtv.app.shopme.domain.usecase.CartItemUseCase
 import com.mtv.app.shopme.domain.usecase.CartQuantityUseCase
 import com.mtv.app.shopme.domain.usecase.CartValidateUseCase
 import com.mtv.app.shopme.domain.usecase.VerifyPinUseCase
@@ -45,17 +44,22 @@ class CartViewModel @Inject constructor(
     override val uiData = MutableStateFlow(CartDataListener())
 
     init {
-        doFetchCart()
+        //doFetchCart()
     }
 
     fun doFetchCart() {
         launchUseCase(
             target = uiState.valueFlowOf(
                 get = { it.cartState },
-                set = { state -> copy(cartState = state) }
+                set = { copy(cartState = it) }
             ),
             block = {
                 cartItemUseCase(Unit)
+            },
+            onSuccess = { response ->
+                uiData.update {
+                    it.copy(cartItems = response.data)
+                }
             }
         )
     }
