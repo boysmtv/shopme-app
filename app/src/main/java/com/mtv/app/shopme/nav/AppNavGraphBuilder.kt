@@ -10,8 +10,10 @@ package com.mtv.app.shopme.nav
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
 import com.mtv.app.shopme.feature.auth.route.ChangePinRoute
 import com.mtv.app.shopme.feature.auth.route.LoginRoute
 import com.mtv.app.shopme.feature.auth.route.PasswordRoute
@@ -44,7 +46,7 @@ import com.mtv.app.shopme.feature.seller.route.SellerOrderDetailRoute
 import com.mtv.app.shopme.feature.seller.route.SellerOrderRoute
 import com.mtv.app.shopme.feature.seller.route.SellerProductFormRoute
 import com.mtv.app.shopme.feature.seller.route.SellerProductListRoute
-import com.mtv.app.shopme.feature.seller.route.SellerProfileRoute
+import com.mtv.app.shopme.feature.seller.route.SellerStoreRoute
 
 fun NavGraphBuilder.authGraph(nav: NavHostController) {
     composable(AuthDestinations.SPLASH_GRAPH) {
@@ -97,6 +99,17 @@ fun NavGraphBuilder.homeGraph(nav: NavHostController) {
 fun NavGraphBuilder.detailGraph(nav: NavHostController) {
     composable(CustomerDestinations.DETAIL_GRAPH) {
         DetailRoute(nav)
+    }
+
+    composable(
+        route = CustomerDestinations.DETAIL_GRAPH_WITH_ID,
+        arguments = listOf(
+            navArgument("foodId") {
+                type = NavType.StringType
+            }
+        )
+    ) {
+        DetailRoute(nav = nav)
     }
 }
 
@@ -170,7 +183,7 @@ fun NavGraphBuilder.sellerGraph(nav: NavHostController) {
         }
 
         composable(SellerDestinations.PROFILE) {
-             SellerProfileRoute(nav)
+             SellerStoreRoute(nav)
         }
     }
 }

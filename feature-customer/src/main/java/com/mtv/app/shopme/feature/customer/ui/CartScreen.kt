@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -65,15 +65,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.feature.customer.contract.CartDataListener
 import com.mtv.app.shopme.feature.customer.contract.CartEventListener
 import com.mtv.app.shopme.feature.customer.contract.CartNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.CartStateListener
 import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun CartScreen(
@@ -85,6 +89,12 @@ fun CartScreen(
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var showPinSheet by remember { mutableStateOf(false) }
     var showSuccessDialog by remember { mutableStateOf(false) }
+
+    val cartItems = uiData.cartItems ?: emptyList()
+    val groupedByCafe = cartItems.groupBy { it.cafeId }
+    val grandTotal = cartItems.fold(BigDecimal.ZERO) { acc, item ->
+        acc + (item.price * item.quantity.toBigDecimal())
+    }
 
 //    if (showCheckoutDialog) {
 //        CheckoutConfirmationDialog(
@@ -161,8 +171,6 @@ fun CartScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        val groupedByCafe = cartItems.groupBy { it.cafeId }
-
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -199,7 +207,7 @@ fun CartScreen(
 
                     Text(
                         fontFamily = PoppinsFont,
-                        text = "$${"%.2f".format(grandTotal)}",
+                        text = grandTotal.toRupiah(),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -250,8 +258,10 @@ private fun CartHeader() {
 }
 
 @Composable
-fun CafeGroupCard(items: List<CartItem>) {
-    val cafeSubtotal = items.sumOf { it.totalPrice() }
+fun CafeGroupCard(items: List<CartItemResponse>) {
+    val cafeSubtotal = items.fold(BigDecimal.ZERO) { acc, item ->
+        acc + (item.price * item.quantity.toBigDecimal())
+    }
 
     Column(
         modifier = Modifier
@@ -374,34 +384,10 @@ fun CafeHeader(
 }
 
 @Composable
-fun CafeSubtotal(items: List<CartItem>) {
-    val subtotal = items.sumOf { it.price * it.quantity }
+fun CartItemRow(item: CartItemResponse) {
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(AppColor.GreenSoft.copy(alpha = 0.15f))
-            .padding(12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "Subtotal",
-            fontFamily = PoppinsFont,
-            fontSize = 14.sp,
-            color = AppColor.Gray
-        )
-        Text(
-            text = "$${"%.2f".format(subtotal)}",
-            fontFamily = PoppinsFont,
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp
-        )
-    }
-}
+    val isPreview = LocalInspectionMode.current
 
-
-@Composable
-fun CartItemRow(item: CartItem) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -409,14 +395,27 @@ fun CartItemRow(item: CartItem) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Image(
-            painter = painterResource(id = item.image),
-            contentDescription = null,
-            modifier = Modifier
-                .size(70.dp)
-                .clip(RoundedCornerShape(16.dp)),
-            contentScale = ContentScale.Crop
-        )
+        if (isPreview) {
+            Image(
+                painter = painterResource(R.drawable.image_burger),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            AsyncImage(
+                model = item.image,
+                placeholder = painterResource(R.drawable.image_burger),
+                error = painterResource(R.drawable.image_burger),
+                contentDescription = item.name,
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
 
         Spacer(Modifier.width(12.dp))
 
@@ -429,7 +428,7 @@ fun CartItemRow(item: CartItem) {
             ) {
                 Text(
                     fontFamily = PoppinsFont,
-                    text = item.title,
+                    text = item.name,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
@@ -528,103 +527,6 @@ fun QuantityCounter(quantity: Int) {
     }
 }
 
-val cartItems = listOf(
-    CartItem(
-        cafeId = "cafe_1",
-        cafeName = "Burger Queen",
-        title = "Classic Burger",
-        weight = "250g",
-        price = 9.99,
-        image = R.drawable.image_burger,
-        quantity = 2,
-        notes = "Extra cheese"
-    ),
-    CartItem(
-        cafeId = "cafe_1",
-        cafeName = "Burger Queen",
-        title = "Cheeseburger",
-        weight = "270g",
-        price = 10.49,
-        image = R.drawable.image_cheese_burger,
-        quantity = 1,
-    ),
-
-    CartItem(
-        cafeId = "cafe_2",
-        cafeName = "Pizza Palace",
-        title = "Pepperoni Pizza",
-        weight = "300g",
-        price = 10.99,
-        image = R.drawable.image_pizza,
-        quantity = 1,
-        notes = "Sedang"
-    ),
-    CartItem(
-        cafeId = "cafe_2",
-        cafeName = "Pizza Palace",
-        title = "Margherita Pizza",
-        weight = "280g",
-        price = 9.49,
-        image = R.drawable.image_platbread,
-        quantity = 2,
-        notes = "Banyakin Sambel"
-    ),
-
-    CartItem(
-        cafeId = "cafe_3",
-        cafeName = "Coffee Corner",
-        title = "Cappuccino",
-        weight = "200ml",
-        price = 4.99,
-        image = R.drawable.image_cheese_burger,
-        quantity = 2,
-        notes = "Jangan Pakai Kuah"
-    ),
-    CartItem(
-        cafeId = "cafe_3",
-        cafeName = "Coffee Corner",
-        title = "Latte",
-        weight = "250ml",
-        price = 5.49,
-        image = R.drawable.image_bakso,
-        quantity = 1
-    ),
-
-    CartItem(
-        cafeId = "cafe_4",
-        cafeName = "Sweet Bakery",
-        title = "Chocolate Croissant",
-        weight = "120g",
-        price = 3.99,
-        image = R.drawable.image_padang,
-        quantity = 3
-    ),
-    CartItem(
-        cafeId = "cafe_4",
-        cafeName = "Sweet Bakery",
-        title = "Blueberry Muffin",
-        weight = "130g",
-        price = 3.49,
-        image = R.drawable.image_pempek,
-        quantity = 2
-    )
-)
-
-fun CartItem.totalPrice(): Double = price * quantity
-val totalQuantity = cartItems.sumOf { it.quantity }
-val grandTotal = cartItems.sumOf { it.totalPrice() }
-
-data class CartItem(
-    val cafeId: String,
-    val cafeName: String,
-    val title: String,
-    val weight: String,
-    val price: Double,
-    val image: Int,
-    val quantity: Int,
-    val notes: String = EMPTY_STRING
-)
-
 enum class PaymentMethod {
     CASH,
     TRANSFER
@@ -633,7 +535,7 @@ enum class PaymentMethod {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PremiumCheckoutSheet(
-    total: Double,
+    total: BigDecimal,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -1134,7 +1036,9 @@ fun CartScreenPreview() {
         ) {
             CartScreen(
                 uiState = CartStateListener(),
-                uiData = CartDataListener(),
+                uiData = CartDataListener(
+                    cartItems = mockCartItems
+                ),
                 uiEvent = CartEventListener(),
                 uiNavigation = CartNavigationListener()
             )
@@ -1161,7 +1065,7 @@ fun PremiumCheckoutSheetPreview() {
                 .background(Color.White)
         ) {
             PremiumCheckoutSheet(
-                total = 129.97,
+                total = 129.toBigDecimal(),
                 onDismiss = {},
                 onConfirm = {}
             )
@@ -1199,4 +1103,90 @@ fun OrderSuccessDialogPreview() {
     OrderSuccessDialog(
         onConfirm = {}
     )
+}
+
+val mockCartItems = listOf(
+
+    CartItemResponse(
+        id = "1",
+        customerId = "cust_001",
+        foodId = "food_001",
+        quantity = 2,
+        notes = "Extra cheese",
+        cafeId = "cafe_1",
+        price = 12000.toBigDecimal(),
+        image = "https://example.com/images/burger.png",
+        name = "Classic Burger",
+        cafeName = "Burger Queen"
+    ),
+
+    CartItemResponse(
+        id = "2",
+        customerId = "cust_001",
+        foodId = "food_002",
+        quantity = 1,
+        notes = "Less sauce",
+        cafeId = "cafe_1",
+        price = 15000.toBigDecimal(),
+        image = "https://example.com/images/cheese_burger.png",
+        name = "Cheese Burger",
+        cafeName = "Burger Queen"
+    ),
+
+    CartItemResponse(
+        id = "3",
+        customerId = "cust_001",
+        foodId = "food_003",
+        quantity = 1,
+        notes = "Medium spicy",
+        cafeId = "cafe_2",
+        price = 30000.toBigDecimal(),
+        image = "https://example.com/images/pizza.png",
+        name = "Pepperoni Pizza",
+        cafeName = "Pizza Palace"
+    ),
+
+    CartItemResponse(
+        id = "4",
+        customerId = "cust_001",
+        foodId = "food_004",
+        quantity = 2,
+        notes = "Extra chili sauce",
+        cafeId = "cafe_2",
+        price = 28000.toBigDecimal(),
+        image = "https://example.com/images/margherita.png",
+        name = "Margherita Pizza",
+        cafeName = "Pizza Palace"
+    ),
+
+    CartItemResponse(
+        id = "5",
+        customerId = "cust_001",
+        foodId = "food_005",
+        quantity = 2,
+        notes = "No sugar",
+        cafeId = "cafe_3",
+        price = 18000.toBigDecimal(),
+        image = "https://example.com/images/cappuccino.png",
+        name = "Cappuccino",
+        cafeName = "Coffee Corner"
+    ),
+
+    CartItemResponse(
+        id = "6",
+        customerId = "cust_001",
+        foodId = "food_006",
+        quantity = 1,
+        notes = "",
+        cafeId = "cafe_3",
+        price = 20000.toBigDecimal(),
+        image = "https://example.com/images/latte.png",
+        name = "Latte",
+        cafeName = "Coffee Corner"
+    )
+)
+
+fun BigDecimal.toRupiah(): String {
+    val formatter = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
+    return formatter.format(this)
 }

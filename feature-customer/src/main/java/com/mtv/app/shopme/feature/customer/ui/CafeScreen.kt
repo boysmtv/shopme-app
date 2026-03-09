@@ -57,8 +57,8 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.common.mockFoodList
-import com.mtv.app.shopme.common.mockOwnerCafe
+import com.mtv.app.shopme.data.mockFoodList
+import com.mtv.app.shopme.data.mockOwnerCafe
 import com.mtv.app.shopme.data.FoodItemModel
 import com.mtv.app.shopme.feature.customer.contract.CafeDataListener
 import com.mtv.app.shopme.feature.customer.contract.CafeEventListener

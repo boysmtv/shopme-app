@@ -16,7 +16,7 @@ import com.mtv.app.shopme.data.remote.response.VerifyPinResponse
 import com.mtv.based.core.network.utils.Resource
 
 data class CartStateListener(
-    val cartState: Resource<ApiResponse<CartItemResponse>> = Resource.Loading,
+    val cartState: Resource<ApiResponse<List<CartItemResponse>>> = Resource.Loading,
     val quantityState: Resource<ApiResponse<Unit>> = Resource.Loading,
     val inquiryState: Resource<ApiResponse<CartInquiryResponse>> = Resource.Loading,
     val validateState: Resource<ApiResponse<CartValidateResponse>> = Resource.Loading,
@@ -25,7 +25,7 @@ data class CartStateListener(
 )
 
 data class CartDataListener(
-    val emptyData: String? = null
+    val cartItems: List<CartItemResponse>? = null,
 )
 
 data class CartEventListener(

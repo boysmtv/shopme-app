@@ -11,8 +11,8 @@ package com.mtv.app.shopme.feature.customer.presentation
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.common.mockFoodList
-import com.mtv.app.shopme.common.mockOwnerCafe
+import com.mtv.app.shopme.data.mockFoodList
+import com.mtv.app.shopme.data.mockOwnerCafe
 import com.mtv.app.shopme.data.FoodItemModel
 import com.mtv.app.shopme.data.OwnerCafeModel
 import com.mtv.app.shopme.feature.customer.contract.CafeDataListener

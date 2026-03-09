@@ -8,14 +8,22 @@
 
 package com.mtv.app.shopme.data.remote.response
 
+import com.mtv.app.shopme.common.serializer.BigDecimalSerializer
+import java.math.BigDecimal
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class CartItemResponse(
     val id: String,
-    val customerId: String,
-    val foodId: String,
+    val name: String,
+    val image: String,
     val quantity: Int,
     val notes: String,
-    val createdAt: String
+    val cafeId: String,
+    val cafeName: String,
+    val foodId: String,
+    val customerId: String,
+
+    @Serializable(with = BigDecimalSerializer::class)
+    val price: BigDecimal,
 )

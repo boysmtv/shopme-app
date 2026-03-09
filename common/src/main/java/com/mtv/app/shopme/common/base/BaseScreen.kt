@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.common.base
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +42,7 @@ fun BaseScreen(
             }
         }
         baseUiState.errorDialog?.let {
+            Log.e("BOY_LOG_ERROR", "Message: $it")
             DialogCenterV1(
                 state = it,
                 onDismiss = onDismissError
