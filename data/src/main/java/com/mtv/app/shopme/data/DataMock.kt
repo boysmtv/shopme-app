@@ -6,14 +6,7 @@
  * Last modified by Dedy Wijaya on 12/02/26 15.30
  */
 
-package com.mtv.app.shopme.common
-
-import com.mtv.app.shopme.data.CustomerModel
-import com.mtv.app.shopme.data.FoodItemModel
-import com.mtv.app.shopme.data.OrderItemModel
-import com.mtv.app.shopme.data.OrderModel
-import com.mtv.app.shopme.data.OrderStatus
-import com.mtv.app.shopme.data.OwnerCafeModel
+package com.mtv.app.shopme.data
 
 val mockFoodList = listOf(
     FoodItemModel(
@@ -105,26 +98,4 @@ val mockOwnerCafe = OwnerCafeModel(
     cafeCloseTime = "21:00",
     cafeImageUrl = "https://example.com/images/cafe.png",
     cafeRating = 4.5f
-)
-
-// MOCK CUSTOMERS
-val mockCustomers = listOf(
-    CustomerModel(
-        id = "cust001",
-        name = "Boy",
-        email = "boy@example.com",
-        phone = "08158844424",
-        defaultAddress = "Puri Lestari - Blok G06/01",
-        addresses = listOf("Puri Lestari - Blok G06/01", "Jl. Sudirman 12"),
-        profileImageUrl = "https://example.com/images/boy.png"
-    ),
-    CustomerModel(
-        id = "cust002",
-        name = "Alice",
-        email = "alice@example.com",
-        phone = "08129997766",
-        defaultAddress = "Jl. Merdeka 10",
-        addresses = listOf("Jl. Merdeka 10"),
-        profileImageUrl = "https://example.com/images/alice.png"
-    )
 )

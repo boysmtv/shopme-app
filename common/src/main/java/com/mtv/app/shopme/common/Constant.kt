@@ -8,5 +8,8 @@
 
 package com.mtv.app.shopme.common
 
-class Constant {
+object Constant {
+
+    const val PLATFORM = "Android"
+
 }

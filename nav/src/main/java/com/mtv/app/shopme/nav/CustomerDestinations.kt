@@ -13,6 +13,7 @@ object CustomerDestinations {
     const val HOME_GRAPH = "HOME_GRAPH"
     const val RESET_GRAPH = "FORGOT_GRAPH"
     const val DETAIL_GRAPH = "DETAIL_GRAPH"
+    const val DETAIL_GRAPH_WITH_ID = "DETAIL_GRAPH_WITH_ID/{foodId}"
     const val PROFILE_GRAPH = "PROFILE_GRAPH"
     const val EDIT_PROFILE_GRAPH = "EDIT_PROFILE_GRAPH"
     const val NOTIF_GRAPH = "NOTIF_GRAPH"
@@ -27,5 +28,7 @@ object CustomerDestinations {
     const val CHAT_SUPPORT_GRAPH = "CHAT_SUPPORT_GRAPH"
     const val NOTIFICATION_GRAPH = "NOTIFICATION_GRAPH"
     const val SECURITY_GRAPH = "SECURITY_GRAPH"
+
+    fun navigateToDetail(foodId: String) = "DETAIL_GRAPH_WITH_ID/$foodId"
 
 }

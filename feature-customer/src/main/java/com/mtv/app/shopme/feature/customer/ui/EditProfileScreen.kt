@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
+import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDataListener
 import com.mtv.app.shopme.feature.customer.contract.EditProfileEventListener
 import com.mtv.app.shopme.feature.customer.contract.EditProfileNavigationListener
@@ -79,7 +80,6 @@ data class UserAddress(
     var number: String,
     var rt: String,
     var rw: String,
-    var map: String,
     var isDefault: Boolean = false
 )
 
@@ -92,19 +92,21 @@ fun EditProfileScreen(
 ) {
 
     var selectedTab by remember { mutableIntStateOf(0) }
-    var name by remember { mutableStateOf(uiData.name) }
-    var phone by remember { mutableStateOf(uiData.phone) }
-    var email by remember { mutableStateOf(uiData.email) }
     var showAddAddress by remember { mutableStateOf(false) }
     val sheetController = rememberSheetController()
 
-    var addresses by remember {
-        mutableStateOf(
-            listOf(
-                UserAddress("1", "Griya Asri", "A", "12", "01", "02", "https://maps", true)
-            )
-        )
+    val customer = uiData.customerData
+
+    var name by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+
+    LaunchedEffect(customer) {
+        name = customer?.name.orEmpty()
+        phone = customer?.phone.orEmpty()
+        email = customer?.email.orEmpty()
     }
+    val addresses = uiData.addressData.orEmpty()
 
     val isValid = name.isNotBlank() && phone.length >= 10 && email.contains("@")
 
@@ -122,64 +124,63 @@ fun EditProfileScreen(
         PremiumHeader(uiNavigation)
 
         Card(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background)
         ) {
 
             Column(Modifier.padding(20.dp)) {
 
-                AnimatedTab(selectedTab) {
-                    selectedTab = it
-                }
+                AnimatedTab(selectedTab) { selectedTab = it }
 
                 Spacer(Modifier.height(24.dp))
 
-                AnimatedContent(targetState = selectedTab) { tab ->
+                AnimatedContent(selectedTab) { tab ->
+
                     if (tab == 0) {
+
                         ProfileSection(
-                            name,
-                            phone,
-                            email,
+                            name = name,
+                            phone = phone,
+                            email = email,
                             onNameChange = { name = it },
                             onPhoneChange = { phone = it },
                             onEmailChange = { email = it }
                         )
+
                     } else {
+
                         AddressSection(
                             addresses = addresses,
                             onAdd = { showAddAddress = true },
                             onDelete = { id ->
-                                addresses = addresses.filterNot { it.id == id }
+                                uiEvent.onDeleteAddress(id)
                             },
                             onSetDefault = { id ->
-                                addresses = addresses.map {
-                                    it.copy(isDefault = it.id == id)
-                                }
+                                uiEvent.onDefaultAddress(id)
                             }
                         )
                     }
                 }
 
-                Spacer(Modifier.height(20.dp))
-
-                Button(
-                    onClick = {
+                if (selectedTab == 0) {
+                    Spacer(Modifier.height(20.dp))
+                    Button(
+                        onClick = {
 //                        uiEvent.onSaveClicked(name, phone, email)
-                        uiNavigation.onBack()
-                    },
-                    enabled = isValid,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = AppColor.Green
-                    )
-                ) {
-                    Text(
-                        text = "Simpan Perubahan", color = Color.White,
-                        fontFamily = PoppinsFont,
-                    )
+                            uiNavigation.onBack()
+                        },
+                        enabled = isValid,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green)
+                    ) {
+                        Text(
+                            text = "Simpan Perubahan",
+                            color = Color.White,
+                            fontFamily = PoppinsFont
+                        )
+                    }
                 }
             }
         }
@@ -188,8 +189,15 @@ fun EditProfileScreen(
             AddAddressSheet(
                 controller = sheetController,
                 onDismiss = { showAddAddress = false },
-                onSave = { newAddress ->
-                    addresses = addresses + newAddress
+                onSave = { areaId, block, number, rt, rw ->
+                    uiEvent.onAddAddress(
+                        areaId,
+                        block,
+                        number,
+                        rt,
+                        rw,
+                        false
+                    )
                     showAddAddress = false
                 }
             )
@@ -239,13 +247,16 @@ fun PremiumHeader(nav: EditProfileNavigationListener) {
 
 @Composable
 fun AddressSection(
-    addresses: List<UserAddress>,
+    addresses: List<AddressResponse>,
     onAdd: () -> Unit,
     onDelete: (String) -> Unit,
     onSetDefault: (String) -> Unit
 ) {
+
     Column {
+
         addresses.forEach { address ->
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -257,41 +268,43 @@ fun AddressSection(
                 Column(Modifier.padding(16.dp)) {
 
                     Text(
-                        text = "${address.village} Blok ${address.block} No ${address.number}",
+                        text = "${address.areaId} Blok ${address.block} No ${address.number}",
                         fontWeight = FontWeight.SemiBold,
-                        fontFamily = PoppinsFont,
+                        fontFamily = PoppinsFont
                     )
 
                     Spacer(Modifier.height(4.dp))
 
                     Text(
                         text = "RT ${address.rt} / RW ${address.rw}",
-                        fontFamily = PoppinsFont,
+                        fontFamily = PoppinsFont
                     )
 
                     Spacer(Modifier.height(10.dp))
 
                     Row {
+
                         if (!address.isDefault) {
-                            TextButton(onClick = {
-                                onSetDefault(address.id)
-                            }) {
+
+                            TextButton(
+                                onClick = { onSetDefault(address.id) }
+                            ) {
                                 Text(
                                     text = "Jadikan Default",
-                                    fontFamily = PoppinsFont,
+                                    fontFamily = PoppinsFont
                                 )
                             }
                         }
 
                         Spacer(Modifier.weight(1f))
 
-                        TextButton(onClick = {
-                            onDelete(address.id)
-                        }) {
+                        TextButton(
+                            onClick = { onDelete(address.id) }
+                        ) {
                             Text(
                                 text = "Hapus",
                                 color = Color.Red,
-                                fontFamily = PoppinsFont,
+                                fontFamily = PoppinsFont
                             )
                         }
                     }
@@ -306,7 +319,7 @@ fun AddressSection(
         ) {
             Text(
                 text = "Tambah Alamat",
-                fontFamily = PoppinsFont,
+                fontFamily = PoppinsFont
             )
         }
     }
@@ -350,7 +363,7 @@ fun AnimatedTab(selected: Int, onChange: (Int) -> Unit) {
 fun AddAddressSheet(
     controller: SheetController,
     onDismiss: () -> Unit,
-    onSave: (UserAddress) -> Unit
+    onSave: (String, String, String, String, String) -> Unit
 ) {
 
     ModalBottomSheet(
@@ -369,10 +382,47 @@ fun AddAddressSheet(
         modifier = Modifier.fillMaxWidth()
     ) {
 
-        AddAddressSheetContentProduction(
-            controller = controller,
-            onSave = onSave
-        )
+        LaunchedEffect(Unit) {
+            controller.expand()
+        }
+
+        var areaId by remember { mutableStateOf("") }
+        var block by remember { mutableStateOf("") }
+        var number by remember { mutableStateOf("") }
+        var rt by remember { mutableStateOf("") }
+        var rw by remember { mutableStateOf("") }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+
+            BaseSimpleFormField("Blok", block) { block = it }
+            Spacer(Modifier.height(10.dp))
+
+            BaseSimpleFormField("No", number) { number = it }
+            Spacer(Modifier.height(10.dp))
+
+            BaseSimpleFormField("RT", rt) { rt = it }
+            Spacer(Modifier.height(10.dp))
+
+            BaseSimpleFormField("RW", rw) { rw = it }
+
+            Spacer(Modifier.height(20.dp))
+
+            Button(
+                onClick = {
+                    onSave(areaId, block, number, rt, rw)
+                    controller.hide()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green)
+            ) {
+                Text("Simpan Alamat", color = Color.White)
+            }
+        }
     }
 }
 
@@ -387,7 +437,6 @@ fun AddAddressSheetContentProduction(
     var number by remember { mutableStateOf("") }
     var rt by remember { mutableStateOf("") }
     var rw by remember { mutableStateOf("") }
-    var map by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -477,13 +526,8 @@ fun AddAddressSheetContentProduction(
             ) { rw = it }
         }
 
-        Spacer(Modifier.height(10.dp))
-
-        BaseSimpleFormField("Link Map / Catatan", map) { map = it }
-
         Spacer(Modifier.height(20.dp))
 
-        // ===== SAVE =====
         Button(
             onClick = {
                 onSave(
@@ -493,8 +537,7 @@ fun AddAddressSheetContentProduction(
                         block = block,
                         number = number,
                         rt = rt,
-                        rw = rw,
-                        map = map
+                        rw = rw
                     )
                 )
                 controller.hide()
@@ -576,9 +619,11 @@ class SheetController @OptIn(ExperimentalMaterial3Api::class) constructor(
 fun rememberSheetController(): SheetController {
     val scope = rememberCoroutineScope()
     val state = rememberModalBottomSheetState(
-        skipPartiallyExpanded = false
+        skipPartiallyExpanded = true
     )
-    return remember { SheetController(state, scope) }
+    return remember {
+        SheetController(state, scope)
+    }
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
@@ -599,8 +644,24 @@ fun EditProfileAddressTabPreview() {
     var selectedTab by remember { mutableIntStateOf(1) }
 
     val dummyAddresses = listOf(
-        UserAddress("1", "Griya Asri", "A", "12", "01", "02", "https://maps", true),
-        UserAddress("2", "Permata Indah", "B", "8", "03", "05", "https://maps", false)
+        AddressResponse(
+            id = "1",
+            areaId = "Griya Asri",
+            block = "A",
+            number = "12",
+            rt = "01",
+            rw = "02",
+            isDefault = true
+        ),
+        AddressResponse(
+            id = "2",
+            areaId = "Permata Indah",
+            block = "B",
+            number = "8",
+            rt = "03",
+            rw = "05",
+            isDefault = false
+        )
     )
 
     Column(
@@ -633,21 +694,6 @@ fun EditProfileAddressTabPreview() {
                     onDelete = {},
                     onSetDefault = {}
                 )
-
-                Spacer(Modifier.height(12.dp))
-
-                Button(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green)
-                ) {
-                    Text(
-                        text = "Simpan Perubahan",
-                        color = Color.White,
-                        fontFamily = PoppinsFont,
-                    )
-                }
             }
         }
     }

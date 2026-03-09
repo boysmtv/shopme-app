@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -76,19 +75,23 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.data.remote.response.AddressResponse
+import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.response.MenuSummary
+import com.mtv.app.shopme.data.remote.response.Stats
 import com.mtv.app.shopme.feature.customer.contract.DetailDataListener
 import com.mtv.app.shopme.feature.customer.contract.DetailEventListener
 import com.mtv.app.shopme.feature.customer.contract.DetailNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.DetailStateListener
+import com.mtv.app.shopme.feature.customer.utils.checkAddress
+import com.mtv.app.shopme.feature.customer.utils.checkName
+import com.mtv.based.core.network.utils.Resource
 
-data class SimilarItem(
-    val image: Int,
-    val title: String,
-    val price: Double
-)
 
 enum class OrderStatus {
     READY,
@@ -104,12 +107,9 @@ fun DetailScreen(
     uiEvent: DetailEventListener,
     uiNavigation: DetailNavigationListener
 ) {
-    val similarItems = listOf(
-        SimilarItem(R.drawable.image_cheese_burger, "Cheese Burger", 8.99),
-        SimilarItem(R.drawable.image_burger, "Double Cheese", 10.49),
-        SimilarItem(R.drawable.image_pizza, "Beef Burger", 9.29),
-        SimilarItem(R.drawable.image_platbread, "Veggie Burger", 7.99)
-    )
+    val customerData = uiData.customerData
+    val food = uiData.foodData
+    val similarFoods = uiData.foodSimilarData.orEmpty()
 
     var showSheet by remember { mutableStateOf(false) }
 
@@ -124,7 +124,12 @@ fun DetailScreen(
         ) {
             VariantBottomSheetContent(
                 onAddToCart = {
-                    uiNavigation.onAddToCart()
+                    uiEvent.onAddToCart(
+                        food?.id ?: "",
+                        "",
+                        "",
+                        ""
+                    )
                 },
                 onClose = {
                     showSheet = false
@@ -132,6 +137,10 @@ fun DetailScreen(
             )
 
         }
+    }
+
+    if (uiState.foodAddToCartState is Resource.Success) {
+        uiNavigation.onAddToCart()
     }
 
     Scaffold(
@@ -164,36 +173,35 @@ fun DetailScreen(
             item { DetailHeader() }
             item { Spacer(Modifier.height(16.dp)) }
 
-            item { DetailImage() }
+            item { DetailImage(food) }
             item { Spacer(Modifier.height(16.dp)) }
 
-            item { DetailTitle() }
+            item { DetailTitle(food) }
             item { Spacer(Modifier.height(6.dp)) }
 
             item {
                 DetailLocation(
+                    customerData = customerData,
                     onClickCafe = { uiNavigation.onClickCafe() }
                 )
             }
             item { Spacer(Modifier.height(12.dp)) }
 
-            item { DetailDescription() }
+            item { DetailDescription(food) }
             item { Spacer(Modifier.height(20.dp)) }
 
-            item { DetailStatsRow() }
+            item { DetailStatsRow(food) }
             item { Spacer(Modifier.height(22.dp)) }
-
-            item { SectionTitle("Bahan-bahan") }
-            item { Spacer(Modifier.height(12.dp)) }
-
-            item { IngredientsRow() }
-            item { Spacer(Modifier.height(20.dp)) }
 
             item { SectionTitle("Menu lainnya") }
             item { Spacer(Modifier.height(12.dp)) }
 
-            items(similarItems) { item ->
-                SimilarItemRow(item.image, item.title, item.price)
+            items(similarFoods) { item ->
+                SimilarItemRow(
+                    imageUrl = item.imageUrl,
+                    title = item.name,
+                    price = item.price
+                )
                 Spacer(Modifier.height(12.dp))
             }
         }
@@ -308,9 +316,22 @@ fun DetailHeader() {
     }
 }
 
+@Composable
+fun DetailImage(food: FoodResponse?) {
+    AsyncImage(
+        model = food?.imageUrl,
+        contentDescription = food?.name,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(240.dp)
+            .clip(RoundedCornerShape(8.dp)),
+        contentScale = ContentScale.Crop
+    )
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DetailImage() {
+fun DetailImageBisaDiGeser() {
     val images = listOf(
         R.drawable.image_burger,
         R.drawable.image_pizza,
@@ -368,9 +389,9 @@ fun DetailImage() {
 }
 
 @Composable
-fun DetailTitle() {
+fun DetailTitle(food: FoodResponse?) {
     Text(
-        text = "Double Beef Cheese Burger",
+        text = food?.name ?: "",
         fontSize = 24.sp,
         fontFamily = PoppinsFont,
         fontWeight = FontWeight.SemiBold
@@ -379,6 +400,7 @@ fun DetailTitle() {
 
 @Composable
 fun DetailLocation(
+    customerData: CustomerResponse?,
     onClickCafe: () -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -396,7 +418,7 @@ fun DetailLocation(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = "Mamah Al Cafe",
+                text = checkName(customerData),
                 color = Color.DarkGray,
                 fontSize = 14.sp,
                 fontFamily = PoppinsFont,
@@ -411,7 +433,7 @@ fun DetailLocation(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = "Puri Lestari - Blok H12/01",
+            text = checkAddress(customerData),
             color = Color.DarkGray,
             fontSize = 14.sp,
             fontFamily = PoppinsFont
@@ -420,9 +442,9 @@ fun DetailLocation(
 }
 
 @Composable
-fun DetailDescription() {
+fun DetailDescription(food: FoodResponse?) {
     Text(
-        "This is the heart and soul of the burger This is the heart and soul of the burger This is the heart and soul of the burger...",
+        text = food?.description ?: "",
         color = AppColor.Gray,
         fontSize = 14.sp,
         fontFamily = PoppinsFont
@@ -430,22 +452,30 @@ fun DetailDescription() {
 }
 
 @Composable
-fun DetailStatsRow() {
+fun DetailStatsRow(food: FoodResponse?) {
+
+    val status = when (food?.status) {
+        "READY" -> OrderStatus.READY
+        "PREORDER" -> OrderStatus.PREORDER
+        "JASTIP" -> OrderStatus.JASTIP
+        else -> OrderStatus.READY
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
-        StatusStatItem(OrderStatus.READY)
+        StatusStatItem(status)
 
         StatItem(
             icon = Icons.Default.Inventory2,
-            text = "Tersedia 20 Pcs"
+            text = "Tersedia ${food?.quantity ?: 0} Pcs"
         )
 
         StatItem(
             icon = Icons.Default.AccessTime,
-            text = "20–25 Min",
+            text = food?.estimate ?: "-"
         )
     }
 }
@@ -537,36 +567,12 @@ fun SectionTitle(title: String) {
     )
 }
 
-
 @Composable
-fun IngredientsRow() {
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        items(7) {
-            IngredientItem(R.drawable.ic_location_white)
-        }
-    }
-}
-
-@Composable
-fun IngredientItem(image: Int) {
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(AppColor.White),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(id = image),
-            contentDescription = null,
-            modifier = Modifier.size(32.dp),
-            tint = AppColor.Green
-        )
-    }
-}
-
-@Composable
-fun SimilarItemRow(image: Int, title: String, price: Double) {
+fun SimilarItemRow(
+    imageUrl: String,
+    title: String,
+    price: Double
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -575,9 +581,9 @@ fun SimilarItemRow(image: Int, title: String, price: Double) {
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = null,
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = title,
             modifier = Modifier
                 .size(42.dp)
                 .clip(RoundedCornerShape(4.dp)),
@@ -987,7 +993,11 @@ fun VariantSelector(
 fun DetailScreenPreview() {
     DetailScreen(
         uiState = DetailStateListener(),
-        uiData = DetailDataListener(),
+        uiData = DetailDataListener(
+            customerData = previewCustomer,
+            foodData = previewFood,
+            foodSimilarData = previewSimilar
+        ),
         uiEvent = DetailEventListener(),
         uiNavigation = DetailNavigationListener()
     )
@@ -1015,5 +1025,70 @@ fun VariantBottomSheetMockPreview() {
     }
 }
 
+private val previewFood = FoodResponse(
+    id = "1",
+    cafeId = "1",
+    name = "Bakso Telur Joss",
+    description = "Bakso enak dengan telur di dalamnya.",
+    price = 30000.0,
+    imageUrl = "https://picsum.photos/400",
+    category = "FOOD",
+    status = "READY",
+    quantity = 20,
+    estimate = "10-15 menit",
+    isActive = true,
+    createdAt = ""
+)
 
+
+private val previewSimilar = listOf(
+    FoodResponse(
+        id = "2",
+        cafeId = "1",
+        name = "Bakso Urat",
+        description = "",
+        price = 25000.0,
+        imageUrl = "https://picsum.photos/200",
+        category = "FOOD",
+        status = "READY",
+        quantity = 30,
+        estimate = "10 menit",
+        isActive = true,
+        createdAt = ""
+    ),
+    FoodResponse(
+        id = "3",
+        cafeId = "1",
+        name = "Bakso Mercon",
+        description = "",
+        price = 32000.0,
+        imageUrl = "https://picsum.photos/200",
+        category = "FOOD",
+        status = "READY",
+        quantity = 15,
+        estimate = "12 menit",
+        isActive = true,
+        createdAt = ""
+    )
+)
+
+
+val previewCustomer = CustomerResponse(
+    name = "Dedy Wijaya",
+    phone = "08123456789",
+    email = "boys.mtv@gmail.com",
+    address = AddressResponse(
+        id = "1",
+        areaId = "Puri Lestari",
+        block = "H2",
+        number = "21",
+        rt = "012",
+        rw = "002",
+        isDefault = true
+    ),
+    photo = "",
+    verified = true,
+    stats = Stats(0, 0, ""),
+    menuSummary = MenuSummary(0, 0, 0, 0, 0)
+)
 
