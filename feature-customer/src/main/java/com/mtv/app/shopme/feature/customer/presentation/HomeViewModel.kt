@@ -11,21 +11,25 @@ package com.mtv.app.shopme.feature.customer.presentation
 import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.core.provider.utils.SecurePrefs
 import com.mtv.app.core.provider.utils.SessionManager
+import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
+import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.domain.usecase.HomeFoodCategoryUseCase
+import com.mtv.app.shopme.common.valueFlowOf
+import com.mtv.app.shopme.data.remote.request.LoginRequest
+import com.mtv.app.shopme.domain.usecase.CustomerUseCase
 import com.mtv.app.shopme.domain.usecase.HomeFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeDataListener
 import com.mtv.app.shopme.feature.customer.contract.HomeStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val sessionManager: SessionManager,
     private val securePrefs: SecurePrefs,
-    private val getHomeFoodUseCase: HomeFoodUseCase,
-    private val getHomeFoodCategoryUseCase: HomeFoodCategoryUseCase
+    private val customerUseCase: CustomerUseCase,
+    private val homeFoodUseCase: HomeFoodUseCase,
 ) : BaseViewModel(), UiOwner<HomeStateListener, HomeDataListener> {
 
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
@@ -34,13 +38,46 @@ class HomeViewModel @Inject constructor(
     /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(HomeDataListener())
 
-//    fun getFood() = launchUseCase(
-//        loading = false,
-//        target = uiState.valueFlowOf(
-//            get = { it.nowPlayingState },
-//            set = { state -> copy(nowPlayingState = state) }
-//        ),
-//        block = { getHomeFoodUseCase(Unit) }
-//    )
+    init {
+        //getCustomer()
+        //getFood()
+    }
+
+    fun getCustomer() {
+        launchUseCase(
+            loading = false,
+            target = uiState.valueFlowOf(
+                get = { it.customerState },
+                set = { state -> copy(customerState = state) }
+            ),
+            block = {
+                customerUseCase(Unit)
+            },
+            onSuccess = { data ->
+                securePrefs.putObject(CUSTOMER_RESPONSE, data)
+
+                uiData.update {
+                    it.copy(customerData = data.data)
+                }
+            }
+        )
+    }
+
+    fun getFood() {
+        launchUseCase(
+            target = uiState.valueFlowOf(
+                get = { it.foodState },
+                set = { state -> copy(foodState = state) }
+            ),
+            block = {
+                homeFoodUseCase(Unit)
+            },
+            onSuccess = { data ->
+                uiData.update {
+                    it.copy(foodData = data.data)
+                }
+            }
+        )
+    }
 
 }

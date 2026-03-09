@@ -40,8 +40,8 @@ private fun homeEvent(vm: HomeViewModel) = HomeEventListener(
 )
 
 private fun homeNavigation(nav: NavController) = HomeNavigationListener(
-    onNavigateToDetail = {
-        nav.navigate(CustomerDestinations.DETAIL_GRAPH)
+    onNavigateToDetail = { foodId ->
+        nav.navigate(CustomerDestinations.navigateToDetail(foodId))
     },
     onNavigateToSearch = {
         nav.navigate(CustomerBottomNavItem.Search.route) {
