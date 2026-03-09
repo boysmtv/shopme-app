@@ -8,11 +8,14 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.ChatResponse
+import com.mtv.based.core.network.utils.Resource
 
 data class ChatStateListener(
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
-    val activeDialog: com.mtv.app.shopme.feature.customer.contract.ChatDialog? = null
+    val chatState: Resource<ApiResponse<ChatResponse>> = Resource.Loading,
+    val chatSendMessageState: Resource<ApiResponse<Unit>> = Resource.Loading,
+    val chatReadAllMessageState: Resource<ApiResponse<Unit>> = Resource.Loading,
 )
 
 data class ChatDataListener(
@@ -20,13 +23,10 @@ data class ChatDataListener(
 )
 
 data class ChatEventListener(
-    val onDismissActiveDialog: () -> Unit = {}
+    val onSendMessage: (String, String) -> Unit = { _, _ -> },
+    val onReadAllMessage: (String, String) -> Unit = { _, _ -> },
 )
 
 data class ChatNavigationListener(
     val onBack: () -> Unit = {}
 )
-
-sealed class ChatDialog {
-    object Success : ChatDialog()
-}

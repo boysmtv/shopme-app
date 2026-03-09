@@ -34,7 +34,8 @@ fun ChatRoute(nav: NavController) {
 }
 
 private fun chatEvent(vm: ChatViewModel) = ChatEventListener(
-    onDismissActiveDialog = { }
+    onSendMessage = vm::doSendMessage,
+    onReadAllMessage = vm::doReadAllMessage,
 )
 
 private fun chatNavigation(nav: NavController) = ChatNavigationListener(

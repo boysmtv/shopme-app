@@ -12,29 +12,62 @@ import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.core.provider.utils.SecurePrefs
 import com.mtv.app.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.data.ChatListItem
+import com.mtv.app.shopme.common.valueFlowOf
+import com.mtv.app.shopme.data.local.ChatListItem
+import com.mtv.app.shopme.data.local.NotificationItem
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
+import com.mtv.app.shopme.data.remote.response.ChatListResponse
+import com.mtv.app.shopme.domain.usecase.ChatListUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatListDataListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
-import com.mtv.app.shopme.feature.customer.firebase.NotifItem
+import com.mtv.based.core.network.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
-    private val sessionManager: SessionManager,
-    private val securePrefs: SecurePrefs
+    private val chatListUseCase: ChatListUseCase
 ) : BaseViewModel(), UiOwner<ChatListStateListener, ChatListDataListener> {
 
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
     override val uiState = MutableStateFlow(
         ChatListStateListener(
-            chatList = mockChatList()
+            chatListState = mockChatListState()
         )
     )
 
     /** UI DATA : DATA PERSIST (Prefs) */
     override val uiData = MutableStateFlow(ChatListDataListener())
+
+    fun goFetchChatList() {
+        launchUseCase(
+            target = uiState.valueFlowOf(
+                get = { it.chatListState },
+                set = { state -> copy(chatListState = state) }
+            ),
+            block = {
+                chatListUseCase(Unit)
+            }
+        )
+    }
+
+}
+
+fun mockChatListState(): Resource<ApiResponse<ChatListResponse>> {
+    return Resource.Success(
+        ApiResponse(
+            timestamp = "2026-02-13T10:00:00",
+            status = 200,
+            code = "SUCCESS",
+            message = "Success",
+            traceId = "mock-trace-id",
+            data = ChatListResponse(
+                chatList = mockChatList()
+            )
+        )
+    )
 }
 
 fun mockChatList() = listOf(
@@ -110,7 +143,7 @@ fun mockChatList() = listOf(
     )
 )
 
-val previewNotification = NotifItem(
+val previewNotification = NotificationItem(
     title = "Watch Fast & Furious 7",
     message = "Ini masuk ke semua device yang subscribe topic",
     photo = "https://i.pinimg.com/236x/94/25/fa/9425faaad20d8f527e178a34435734be.jpg",
