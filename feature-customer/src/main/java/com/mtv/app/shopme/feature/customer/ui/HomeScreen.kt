@@ -3,7 +3,7 @@
  * Author: Boys.mtv@gmail.com
  * File: HomeScreen.kt
  *
- * Last modified by ChatGPT on 12/02/26
+ * Last modified by Dedy Wijaya on 12/02/26
  */
 
 package com.mtv.app.shopme.feature.customer.ui
@@ -57,16 +57,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.InterFont
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.common.mockFoodList
-import com.mtv.app.shopme.data.FoodItemModel
+import com.mtv.app.shopme.data.remote.response.AddressResponse
+import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.response.MenuSummary
+import com.mtv.app.shopme.data.remote.response.Stats
 import com.mtv.app.shopme.feature.customer.contract.HomeDataListener
 import com.mtv.app.shopme.feature.customer.contract.HomeEventListener
 import com.mtv.app.shopme.feature.customer.contract.HomeNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.HomeStateListener
+import com.mtv.app.shopme.feature.customer.utils.checkAddress
+import com.mtv.app.shopme.feature.customer.utils.checkName
 import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
 import kotlinx.coroutines.launch
 
@@ -80,6 +86,8 @@ fun HomeScreen(
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+    val foods = uiData.foodData.orEmpty()
 
     Column(
         modifier = Modifier
@@ -100,6 +108,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         HomeHeader(
+            customerData = uiData.customerData,
             onNotifClick = {
                 uiNavigation.onNavigateToNotif()
             }
@@ -145,14 +154,14 @@ fun HomeScreen(
             }
 
             gridItems(
-                data = mockFoodList,
+                data = foods,
                 columnCount = 2,
                 horizontalSpacing = 16.dp,
                 verticalSpacing = 16.dp
             ) { item ->
                 FoodCard(
                     item = item,
-                    onClickDetail = { uiNavigation.onNavigateToDetail() }
+                    onClickDetail = { uiNavigation.onNavigateToDetail(item.id) }
                 )
             }
         }
@@ -226,6 +235,7 @@ fun <T> LazyListScope.gridItems(
 
 @Composable
 private fun HomeHeader(
+    customerData: CustomerResponse?,
     onNotifClick: () -> Unit
 ) {
     Row(
@@ -250,17 +260,17 @@ private fun HomeHeader(
                 modifier = Modifier.padding(start = 12.dp)
             ) {
                 Text(
-                    text = "Puri Lestari - Blok G06/01",
+                    text = checkAddress(customerData),
                     color = Color.DarkGray.copy(alpha = 0.8f),
                     fontSize = 12.sp,
                     fontFamily = PoppinsFont,
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.titleSmall,
                 )
 
                 Spacer(Modifier.height(2.dp))
 
                 Text(
-                    text = "Dedy Wijaya",
+                    text = checkName(customerData),
                     color = Color.Black,
                     fontSize = 14.sp,
                     fontFamily = PoppinsFont,
@@ -408,7 +418,7 @@ fun CategoryItem(title: String) {
 
 @Composable
 fun FoodCard(
-    item: FoodItemModel,
+    item: FoodResponse,
     onClickDetail: () -> Unit
 ) {
     Card(
@@ -425,31 +435,11 @@ fun FoodCard(
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column {
-//            Image(
-//                painter = rememberAsyncImagePainter(item.imageUrl),
-//                contentDescription = item.name,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(100.dp),
-//                contentScale = ContentScale.Crop
-//            )
-
-            val imageRes = when (item.id) {
-                0 -> R.drawable.image_burger
-                1 -> R.drawable.image_pizza
-                2 -> R.drawable.image_platbread
-                3 -> R.drawable.image_cheese_burger
-                4 -> R.drawable.image_bakso
-                5 -> R.drawable.image_pempek
-                6 -> R.drawable.image_padang
-                7 -> R.drawable.image_sate
-                else -> R.drawable.image_burger
-            }
 
             Box {
-                Image(
-                    painter = painterResource(imageRes),
-                    contentDescription = null,
+                AsyncImage(
+                    model = item.imageUrl,
+                    contentDescription = item.name,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(100.dp),
@@ -501,22 +491,30 @@ fun FoodCard(
     }
 }
 
-//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-//@Composable
-//fun HomeHeaderPreview() {
-//    HomeHeader()
-//}
-//
-//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-//@Composable
-//fun HomePromoPreview() {
-//    HomePromoBanner()
-//}
-
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun HomeScreenPreview() {
     val navController = rememberNavController()
+
+    val previewCustomer = CustomerResponse(
+        name = "Dedy Wijaya",
+        phone = "08123456789",
+        email = "boys.mtv@gmail.com",
+        address = AddressResponse(
+            id = "1",
+            areaId = "Puri Lestari",
+            block = "H2",
+            number = "21",
+            rt = "012",
+            rw = "002",
+            isDefault = true
+        ),
+        photo = "",
+        verified = true,
+        stats = Stats(0, 0, ""),
+        menuSummary = MenuSummary(0, 0, 0, 0, 0)
+    )
+
     Scaffold(
         bottomBar = {
             CustomerBottomNavigationBar(navController)
@@ -530,7 +528,9 @@ fun HomeScreenPreview() {
         ) {
             HomeScreen(
                 uiState = HomeStateListener(),
-                uiData = HomeDataListener(),
+                uiData = HomeDataListener(
+                    customerData = previewCustomer
+                ),
                 uiEvent = HomeEventListener({}),
                 uiNavigation = HomeNavigationListener({})
             )

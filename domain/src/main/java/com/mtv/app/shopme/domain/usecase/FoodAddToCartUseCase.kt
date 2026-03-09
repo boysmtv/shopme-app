@@ -1,9 +1,9 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: HomeFoodUseCase.kt
+ * File: FoodDetailUseCase.kt
  *
- * Last modified by Dedy Wijaya on 03/03/26 11.36
+ * Last modified by Dedy Wijaya on 03/03/26 11.39
  */
 
 package com.mtv.app.shopme.domain.usecase
@@ -11,18 +11,20 @@ package com.mtv.app.shopme.domain.usecase
 import com.mtv.app.core.provider.based.BaseUseCase
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.based.core.network.di.IoDispatcher
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 
-class HomeFoodUseCase @Inject constructor(
-    @IoDispatcher dispatcher: CoroutineDispatcher,
+class FoodAddToCartUseCase @Inject constructor(
     private val repository: NetworkRepository,
-) : BaseUseCase<Unit, ApiResponse<List<FoodResponse>>>(dispatcher) {
+    @IoDispatcher dispatcher: CoroutineDispatcher
+) : BaseUseCase<FoodAddToCartRequest, ApiResponse<Unit>>(dispatcher) {
 
-    override suspend fun execute(param: Unit) = repository.request<ApiResponse<List<FoodResponse>>>(
-        endpoint = ApiEndPoint.GetHomeFood
+    override suspend fun execute(param: FoodAddToCartRequest) = repository.request<ApiResponse<Unit>>(
+        endpoint = ApiEndPoint.FoodsDetail(param.foodId),
+        body = param
     )
+
 }

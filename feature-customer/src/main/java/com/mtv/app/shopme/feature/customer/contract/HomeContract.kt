@@ -8,15 +8,20 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.based.core.network.utils.Resource
 
 data class HomeStateListener(
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
-    val activeDialog: com.mtv.app.shopme.feature.customer.contract.HomeDialog? = null
+    val customerState: Resource<ApiResponse<CustomerResponse>> = Resource.Loading,
+    val foodState: Resource<ApiResponse<List<FoodResponse>>> = Resource.Loading,
+    val activeDialog: HomeDialog? = null
 )
 
 data class HomeDataListener(
-    val emptyData: String? = null
+    val customerData: CustomerResponse? = null,
+    val foodData: List<FoodResponse>? = null
 )
 
 data class HomeEventListener(
@@ -24,7 +29,7 @@ data class HomeEventListener(
 )
 
 data class HomeNavigationListener(
-    val onNavigateToDetail: () -> Unit = {},
+    val onNavigateToDetail: (String) -> Unit = {},
     val onNavigateToSearch: () -> Unit = {},
     val onNavigateToNotif: () -> Unit = {},
 )
