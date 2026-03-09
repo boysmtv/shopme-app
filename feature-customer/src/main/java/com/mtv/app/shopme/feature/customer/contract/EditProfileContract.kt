@@ -8,27 +8,28 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-class EditProfileStateListener {
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.AddressResponse
+import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.based.core.network.utils.Resource
 
-}
+data class EditProfileStateListener(
+    val customerState: Resource<ApiResponse<CustomerResponse>> = Resource.Loading,
+    val addressState: Resource<ApiResponse<List<AddressResponse>>> = Resource.Loading,
+    val addressAddState: Resource<ApiResponse<Unit>> = Resource.Loading,
+    val addressDeleteState: Resource<ApiResponse<Unit>> = Resource.Loading,
+    val addressDefaultState: Resource<ApiResponse<Unit>> = Resource.Loading,
+)
 
-class EditProfileDataListener(
-    val name: String = "Dedy Wijaya",
-    val phone: String = "08158844424",
-    val email: String = "Boys.mtv@gmail.com",
-    val village: String = "Puri Lestari",
-    val block: String = "H12",
-    val number: String = "23",
-    val rt: String = "004",
-    val rw: String = "005",
+data class EditProfileDataListener(
+    val customerData: CustomerResponse? = null,
+    val addressData: List<AddressResponse>? = null
 )
 
 class EditProfileEventListener(
-    val onSaveClicked: (
-        name: String,
-        phone: String,
-        email: String,
-    ) -> Unit = { _, _, _ -> }
+    val onAddAddress: (String, String, String, String, String, Boolean) -> Unit = { _, _, _, _, _, _ -> },
+    val onDeleteAddress: (String) -> Unit = {},
+    val onDefaultAddress: (String) -> Unit = {},
 )
 
 class EditProfileNavigationListener(

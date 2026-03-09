@@ -36,6 +36,7 @@ fun DetailRoute(nav: NavController) {
 }
 
 private fun detailEvent(vm: DetailViewModel) = DetailEventListener(
+    onAddToCart = vm::doAddToCart,
     onDismissActiveDialog = {}
 )
 

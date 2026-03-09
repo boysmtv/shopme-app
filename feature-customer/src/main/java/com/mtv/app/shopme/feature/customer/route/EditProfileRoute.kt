@@ -34,9 +34,9 @@ fun EditProfileRoute(nav: NavController) {
 }
 
 private fun editProfileEvent(vm: EditProfileViewModel) = EditProfileEventListener(
-    onSaveClicked = { name, phone, email ->
-        vm.onSaveProfile(name, phone, email)
-    }
+    onAddAddress = vm::doAddAddress,
+    onDeleteAddress = vm::doDeleteAddress,
+    onDefaultAddress = vm::doDefaultAddress
 )
 
 private fun editProfileNavigation(nav: NavController) = EditProfileNavigationListener(
