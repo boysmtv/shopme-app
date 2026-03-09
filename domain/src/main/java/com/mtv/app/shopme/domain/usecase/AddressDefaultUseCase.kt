@@ -9,18 +9,9 @@
 package com.mtv.app.shopme.domain.usecase
 
 import com.mtv.app.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.request.AddressAddRequest
+import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.AddressDefaultRequest
-import com.mtv.app.shopme.data.remote.request.AddressDeleteRequest
-import com.mtv.app.shopme.data.remote.request.LoginRequest
-import com.mtv.app.shopme.data.remote.request.RegisterRequest
-import com.mtv.app.shopme.data.remote.request.SplashRequest
-import com.mtv.app.shopme.data.remote.response.AddressResponse
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.LoginResponse
-import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.based.core.network.di.IoDispatcher
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
