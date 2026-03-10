@@ -9,14 +9,17 @@
 package com.mtv.app.shopme.feature.customer.contract
 
 import androidx.navigation.NavController
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.based.core.network.utils.Resource
 
 data class ProfileStateListener(
-    val activeDialog: com.mtv.app.shopme.feature.customer.contract.ProfileDialog? = null
+    val customerState: Resource<ApiResponse<CustomerResponse>> = Resource.Loading,
+    val activeDialog: ProfileDialog? = null
 )
 
 data class ProfileDataListener(
-    val userName: String = "Dedy Wijaya",
-    val email: String = "dedy.wijaya@email.com"
+    val customerData: CustomerResponse? = null,
 )
 
 data class ProfileEventListener(
