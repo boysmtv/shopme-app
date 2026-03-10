@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
@@ -36,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -59,6 +60,11 @@ import com.mtv.app.shopme.feature.auth.contract.RegisterDataListener
 import com.mtv.app.shopme.feature.auth.contract.RegisterEventListener
 import com.mtv.app.shopme.feature.auth.contract.RegisterNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.RegisterStateListener
+import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.OK_STRING
 
 @Composable
 fun RegisterScreen(
@@ -69,6 +75,21 @@ fun RegisterScreen(
 ) {
 
     var passwordVisible by remember { mutableStateOf(false) }
+
+    if (uiState.registerState is Resource.Success) {
+        DialogCenterV1(
+            state = DialogStateV1(
+                type = DialogType.SUCCESS,
+                title = stringResource(R.string.success),
+                message = stringResource(R.string.success_register),
+                primaryButtonText = OK_STRING
+            ),
+            onDismiss = {
+                uiEvent.onDismissActiveDialog()
+                uiNavigation.onNavigateToLogin()
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -124,8 +145,8 @@ fun RegisterScreen(
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
-                        value = uiData.email,
-                        onValueChange = uiEvent.onEmailChange,
+                        value = uiData.name,
+                        onValueChange = uiEvent.onNameChange,
                         leadingIcon = {
                             Icon(Icons.Outlined.People, contentDescription = null)
                         },
@@ -204,7 +225,13 @@ fun RegisterScreen(
                     Spacer(Modifier.height(24.dp))
 
                     Button(
-                        onClick = uiEvent.onRegisterClick,
+                        onClick = {
+                            uiEvent.onRegisterClick(
+                                uiData.name,
+                                uiData.email,
+                                uiData.password
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
@@ -243,20 +270,8 @@ fun RegisterScreen(
 fun RegisterScreenPreview() {
     RegisterScreen(
         uiState = RegisterStateListener(),
-        uiData = RegisterDataListener(
-            email = "",
-            password = "",
-            confirmPassword = ""
-        ),
-        uiEvent = RegisterEventListener(
-            onEmailChange = {},
-            onPasswordChange = {},
-            onConfirmPasswordChange = {},
-            onRegisterClick = {}
-        ),
-        uiNavigation = RegisterNavigationListener(
-            onNavigateToLogin = {},
-            onBack = {}
-        )
+        uiData = RegisterDataListener(),
+        uiEvent = RegisterEventListener(),
+        uiNavigation = RegisterNavigationListener()
     )
 }

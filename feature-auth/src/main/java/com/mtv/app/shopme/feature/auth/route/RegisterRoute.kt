@@ -27,12 +27,11 @@ fun RegisterRoute(nav: NavController) {
                 uiState = uiState,
                 uiData = uiData,
                 uiEvent = RegisterEventListener(
+                    onNameChange = vm::updateName,
                     onEmailChange = vm::updateEmail,
                     onPasswordChange = vm::updatePassword,
-                    onConfirmPasswordChange = vm::updateConfirmPassword,
-                    onRegisterClick = {
-                        nav.popBackStack()
-                    }
+                    onRegisterClick = vm::doRegister,
+                    onDismissActiveDialog = vm::doDismissActiveDialog
                 ),
                 uiNavigation = RegisterNavigationListener(
                     onNavigateToLogin = { nav.popBackStack() },

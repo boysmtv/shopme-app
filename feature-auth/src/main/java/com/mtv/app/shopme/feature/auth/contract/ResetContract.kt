@@ -15,7 +15,7 @@ data class ResetStateListener(
 )
 
 data class ResetDataListener(
-    val email: String = ""
+    val email: String = "Boys.mtv@gmail.com"
 )
 
 data class ResetEventListener(

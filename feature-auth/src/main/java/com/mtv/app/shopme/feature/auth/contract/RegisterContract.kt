@@ -8,26 +8,47 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING
 
 data class RegisterStateListener(
-    val registerState: ResourceFirebase<String> = ResourceFirebase.Loading
+    val registerState: Resource<ApiResponse<Unit>> = Resource.Loading,
+    val activeDialog: RegisterDialog? = null
 )
 
 data class RegisterDataListener(
-    val email: String = "",
-    val password: String = "",
-    val confirmPassword: String = ""
+    val name: String = "Dedy Wijaya",
+    val email: String = "Boys.mtv@gmail.com",
+    val password: String = "Mbi123456.",
 )
 
+//data class RegisterDataListener(
+//    val name: String = EMPTY_STRING,
+//    val email: String = EMPTY_STRING,
+//    val password: String = EMPTY_STRING,
+//)
+
 data class RegisterEventListener(
-    val onEmailChange: (String) -> Unit,
-    val onPasswordChange: (String) -> Unit,
-    val onConfirmPasswordChange: (String) -> Unit,
-    val onRegisterClick: () -> Unit
+    val onNameChange: (String) -> Unit = {},
+    val onEmailChange: (String) -> Unit = {},
+    val onPasswordChange: (String) -> Unit = {},
+    val onRegisterClick: (String, String, String) -> Unit = { _, _, _ -> },
+    val onDismissActiveDialog: () -> Unit = {}
 )
 
 data class RegisterNavigationListener(
-    val onNavigateToLogin: () -> Unit,
-    val onBack: () -> Unit
+    val onNavigateToLogin: () -> Unit = {},
+    val onBack: () -> Unit = {}
 )
+
+sealed class RegisterDialog {
+
+    data class Error(
+        val message: String = ERROR_STRING
+    ) : RegisterDialog()
+
+    object Success : RegisterDialog()
+
+}
