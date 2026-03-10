@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.feature.customer.firebase.NotifItem
+import com.mtv.app.shopme.data.local.NotificationItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING
 
@@ -18,11 +18,11 @@ data class NotifStateListener(
 )
 
 data class NotifDataListener(
-    val localNotification: List<NotifItem> = emptyList(),
+    val localNotification: List<NotificationItem> = emptyList(),
 )
 
 data class NotifEventListener(
-    val onNotificationClicked: (item: NotifItem) -> Unit,
+    val onNotificationClicked: (item: NotificationItem) -> Unit,
     val onGetNotification: () -> Unit,
     val onClearNotification: () -> Unit,
     val onDismissActiveDialog: () -> Unit,

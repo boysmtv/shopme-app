@@ -48,12 +48,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.data.local.NotificationItem
 import com.mtv.app.shopme.feature.customer.contract.NotifDataListener
 import com.mtv.app.shopme.feature.customer.contract.NotifDialog
 import com.mtv.app.shopme.feature.customer.contract.NotifEventListener
 import com.mtv.app.shopme.feature.customer.contract.NotifNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.NotifStateListener
-import com.mtv.app.shopme.feature.customer.firebase.NotifItem
 import com.mtv.app.shopme.feature.customer.presentation.previewNotification
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
@@ -134,7 +134,7 @@ fun NotificationScreen(
 
 @Composable
 fun NotificationItemCard(
-    item: NotifItem,
+    item: NotificationItem,
     onClick: () -> Unit = {}
 ) {
     Row(
