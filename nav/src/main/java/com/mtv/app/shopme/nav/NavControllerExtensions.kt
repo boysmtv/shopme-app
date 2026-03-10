@@ -15,3 +15,9 @@ fun NavController.navigateAndPopSplash(route: String) {
         popUpTo(AuthDestinations.SPLASH_GRAPH) { inclusive = true }
     }
 }
+
+fun NavController.navigateAndPopLogin(route: String) {
+    this.navigate(route) {
+        popUpTo(AuthDestinations.LOGIN_GRAPH) { inclusive = true }
+    }
+}

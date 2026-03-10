@@ -68,6 +68,7 @@ import com.mtv.app.shopme.feature.auth.contract.LoginDataListener
 import com.mtv.app.shopme.feature.auth.contract.LoginEventListener
 import com.mtv.app.shopme.feature.auth.contract.LoginNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.LoginStateListener
+import com.mtv.based.core.network.utils.Resource
 
 @Composable
 fun LoginScreen(
@@ -78,6 +79,10 @@ fun LoginScreen(
 ) {
 
     var remember by remember { mutableStateOf(false) }
+
+    if (uiState.loginState is Resource.Success){
+        uiNavigation.onNavigateToHome()
+    }
 
     Box(
         modifier = Modifier
@@ -250,9 +255,13 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Login Button
                     Button(
-                        onClick = uiEvent.onLoginClick,
+                        onClick = {
+                            uiEvent.onLoginClick(
+                                uiData.email,
+                                uiData.password
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
@@ -353,19 +362,8 @@ private fun SocialButton(icon: Int) {
 fun LoginScreenPreview() {
     LoginScreen(
         uiState = LoginStateListener(),
-        uiData = LoginDataListener(
-            email = "",
-            password = ""
-        ),
-        uiEvent = LoginEventListener(
-            onEmailChange = {},
-            onPasswordChange = {},
-            onLoginClick = {}
-        ),
-        uiNavigation = LoginNavigationListener(
-            onNavigateToRegister = {},
-            onNavigateToForgotPassword = {},
-            onBack = {}
-        )
+        uiData = LoginDataListener(),
+        uiEvent = LoginEventListener(),
+        uiNavigation = LoginNavigationListener()
     )
 }

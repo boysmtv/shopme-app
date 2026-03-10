@@ -20,6 +20,7 @@ import com.mtv.app.shopme.feature.auth.presentation.LoginViewModel
 import com.mtv.app.shopme.feature.auth.ui.LoginScreen
 import com.mtv.app.shopme.nav.AuthDestinations
 import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.navigateAndPopLogin
 
 @Composable
 fun LoginRoute(nav: NavController) {
@@ -31,14 +32,14 @@ fun LoginRoute(nav: NavController) {
                 uiEvent = LoginEventListener(
                     onEmailChange = vm::updateEmail,
                     onPasswordChange = vm::updatePassword,
-                    onLoginClick = {
-                        nav.navigate(CustomerDestinations.HOME_GRAPH)
-                    }
+                    onLoginClick = vm::doLogin
                 ),
                 uiNavigation = LoginNavigationListener(
+                    onNavigateToHome = {
+                        nav.navigateAndPopLogin(CustomerDestinations.HOME_GRAPH)
+                    },
                     onNavigateToRegister = { nav.navigate(AuthDestinations.REGISTER_GRAPH) },
                     onNavigateToForgotPassword = { nav.navigate(AuthDestinations.RESET_GRAPH) },
-                    onBack = { nav.popBackStack() }
                 )
             )
         }
