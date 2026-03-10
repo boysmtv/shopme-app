@@ -35,7 +35,8 @@ fun SearchRoute(nav: NavController) {
 }
 
 private fun searchEvent(vm: SearchViewModel) = SearchEventListener(
-    onQueryChanged = { }
+    onQueryChanged = vm::doSearch,
+    onLoadNextPage = vm::loadNextPage
 )
 
 private fun searchNavigation(nav: NavController) = SearchNavigationListener(
