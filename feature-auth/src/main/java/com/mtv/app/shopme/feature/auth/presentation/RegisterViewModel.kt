@@ -8,26 +8,30 @@
 
 package com.mtv.app.shopme.feature.auth.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.core.provider.based.BaseViewModel
 import com.mtv.app.shopme.common.base.UiOwner
+import com.mtv.app.shopme.common.valueFlowOf
+import com.mtv.app.shopme.data.remote.request.RegisterRequest
+import com.mtv.app.shopme.domain.usecase.RegisterUseCase
 import com.mtv.app.shopme.feature.auth.contract.RegisterDataListener
+import com.mtv.app.shopme.feature.auth.contract.RegisterDialog
 import com.mtv.app.shopme.feature.auth.contract.RegisterStateListener
-import com.mtv.based.core.network.utils.ResourceFirebase
-import com.mtv.based.core.network.utils.UiErrorFirebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor() :
-    BaseViewModel(),
-    UiOwner<RegisterStateListener, RegisterDataListener> {
+class RegisterViewModel @Inject constructor(
+    private val registerUseCase: RegisterUseCase
+) : BaseViewModel(), UiOwner<RegisterStateListener, RegisterDataListener> {
 
     override val uiState = MutableStateFlow(RegisterStateListener())
     override val uiData = MutableStateFlow(RegisterDataListener())
+
+    fun updateName(value: String) {
+        uiData.value = uiData.value.copy(name = value)
+    }
 
     fun updateEmail(value: String) {
         uiData.value = uiData.value.copy(email = value)
@@ -37,27 +41,40 @@ class RegisterViewModel @Inject constructor() :
         uiData.value = uiData.value.copy(password = value)
     }
 
-    fun updateConfirmPassword(value: String) {
-        uiData.value = uiData.value.copy(confirmPassword = value)
+    fun doRegister(
+        name: String,
+        email: String,
+        password: String
+    ) {
+        launchUseCase(
+            target = uiState.valueFlowOf(
+                get = { it.registerState },
+                set = { state -> copy(registerState = state) }
+            ),
+            block = {
+                registerUseCase(
+                    RegisterRequest(
+                        name = name,
+                        email = email,
+                        password = password
+                    )
+                )
+            },
+            onSuccess = {
+                uiState.update {
+                    it.copy(
+                        activeDialog = RegisterDialog.Success
+                    )
+                }
+            }
+        )
     }
 
-    fun register(onSuccess: () -> Unit) {
-        viewModelScope.launch {
-            uiState.value =
-                uiState.value.copy(registerState = ResourceFirebase.Loading)
-
-            delay(800)
-
-            if (uiData.value.password == uiData.value.confirmPassword &&
-                uiData.value.email.isNotEmpty()
-            ) {
-                uiState.value =
-                    uiState.value.copy(registerState = ResourceFirebase.Success("Register Success"))
-                onSuccess()
-            } else {
-                uiState.value =
-                    uiState.value.copy(registerState = ResourceFirebase.Error(UiErrorFirebase.Unknown("Password not match")))
-            }
+    fun doDismissActiveDialog() {
+        uiState.update {
+            it.copy(
+                activeDialog = null,
+            )
         }
     }
 }
