@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: SellerProfileScreen.kt
+ * File: SellerStoreScreen.kt
  *
  * Last modified by Dedy Wijaya on 20/02/26 10.01
  */
@@ -63,10 +63,10 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreStateListener
 
 @Immutable
 data class ProfileMenuItemModel(
@@ -77,43 +77,43 @@ data class ProfileMenuItemModel(
 )
 
 @Composable
-fun SellerProfileScreen(
-    uiState: SellerProfileStateListener,
-    uiData: SellerProfileDataListener,
-    uiEvent: SellerProfileEventListener,
-    uiNavigation: SellerProfileNavigationListener
+fun SellerStoreScreen(
+    uiState: SellerStoreStateListener,
+    uiData: SellerStoreDataListener,
+    uiEvent: SellerStoreEventListener,
+    uiNavigation: SellerStoreNavigationListener
 ) {
 
     val menuItems = listOf(
         ProfileMenuItemModel(
-            "Order History",
-            "Order information",
-            Icons.AutoMirrored.Filled.ReceiptLong,
-            uiNavigation.navigateToChangePassword
+            title = "Order History",
+            subtitle = "Order information",
+            icon = Icons.AutoMirrored.Filled.ReceiptLong,
+            onClick = uiNavigation.navigateToChangePassword
         ),
         ProfileMenuItemModel(
-            "Store Settings",
-            "Manage your store",
-            Icons.Default.Store,
-            uiNavigation.navigateToStoreSettings
+            title = "Store Settings",
+            subtitle = "Manage your store",
+            icon = Icons.Default.Store,
+            onClick = uiNavigation.navigateToStoreSettings
         ),
         ProfileMenuItemModel(
-            "Payment Methods",
-            "Manage payout account",
-            Icons.Default.AccountBalance,
-            uiNavigation.navigateToBankAccount
+            title = "Payment Methods",
+            subtitle = "Manage payout account",
+            icon = Icons.Default.AccountBalance,
+            onClick = uiNavigation.navigateToBankAccount
         ),
         ProfileMenuItemModel(
-            "Change Password",
-            "Update your password",
-            Icons.Default.Lock,
-            uiNavigation.navigateToChangePassword
+            title = "Change Password",
+            subtitle = "Update your password",
+            icon = Icons.Default.Lock,
+            onClick = uiNavigation.navigateToChangePassword
         ),
         ProfileMenuItemModel(
-            "To be Customer",
-            "Back to customer for buy something",
-            Icons.Default.Lock,
-            uiNavigation.navigateToChangePassword
+            title = "Back to Customer",
+            subtitle = "Back to customer for buy something",
+            icon = Icons.Default.Lock,
+            onClick = uiNavigation.navigateToChangePassword
         )
     )
 
@@ -131,7 +131,7 @@ fun SellerProfileScreen(
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SellerProfileTopBar(
+            SellerStoreTopBar(
                 onBack = uiNavigation.navigateToChangePassword,
                 onLogout = uiEvent.onLogout
             )
@@ -146,7 +146,7 @@ fun SellerProfileScreen(
                 .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             item {
-                SellerProfileHeader(
+                SellerStoreHeader(
                     uiData = uiData,
                     uiEvent = uiEvent
                 )
@@ -167,7 +167,7 @@ fun SellerProfileScreen(
 
 
 @Composable
-fun SellerProfileTopBar(
+fun SellerStoreTopBar(
     onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
@@ -292,9 +292,9 @@ fun ProfileMenuItem(
 }
 
 @Composable
-fun SellerProfileHeader(
-    uiData: SellerProfileDataListener,
-    uiEvent: SellerProfileEventListener
+fun SellerStoreHeader(
+    uiData: SellerStoreDataListener,
+    uiEvent: SellerStoreEventListener
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -384,11 +384,11 @@ fun SellerProfileHeader(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 SellerActionButton(
-                    text = "Edit Profile",
+                    text = "Edit Store",
                     background = AppColor.Blue,
                     textColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    onClick = uiEvent.onEditProfile
+                    onClick = uiEvent.onEditStore
                 )
 
                 SellerActionButton(
@@ -432,10 +432,10 @@ fun SellerActionButton(
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
-fun SellerProfileScreenPreview() {
-    SellerProfileScreen(
-        uiState = SellerProfileStateListener(),
-        uiData = SellerProfileDataListener(
+fun SellerStoreScreenPreview() {
+    SellerStoreScreen(
+        uiState = SellerStoreStateListener(),
+        uiData = SellerStoreDataListener(
             sellerName = "Dedy Wijaya",
             email = "seller@email.com",
             phone = "08123456789",
@@ -443,11 +443,11 @@ fun SellerProfileScreenPreview() {
             storeAddress = "Jakarta, Indonesia",
             isOnline = true
         ),
-        uiEvent = SellerProfileEventListener(
+        uiEvent = SellerStoreEventListener(
             onToggleOnline = {},
-            onEditProfile = {},
+            onEditStore = {},
             onLogout = {}
         ),
-        uiNavigation = SellerProfileNavigationListener({}, {}, {})
+        uiNavigation = SellerStoreNavigationListener({}, {}, {})
     )
 }

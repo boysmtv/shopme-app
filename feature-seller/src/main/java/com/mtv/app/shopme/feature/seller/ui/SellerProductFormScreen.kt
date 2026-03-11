@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +34,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -45,6 +48,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -64,6 +68,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -106,7 +111,7 @@ fun SellerProductFormScreen(
     uiEvent: SellerProductFormEventListener,
     uiNavigation: SellerProductFormNavigationListener,
     initialStep: ProductStep = ProductStep.BASIC,
-    previewVariantGroups: SnapshotStateList<VariantGroupUi>? = null
+    previewVariantGroups: SnapshotStateList<VariantGroupUi>? = null,
 ) {
     var currentStep by remember(initialStep) {
         mutableStateOf(initialStep)
@@ -116,7 +121,6 @@ fun SellerProductFormScreen(
         mutableStateListOf()
     }
 
-
     var productName by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
@@ -124,7 +128,6 @@ fun SellerProductFormScreen(
     var isActive by remember { mutableStateOf(true) }
     var availability by remember { mutableStateOf(Availability.READY) }
     val imageUris = remember { mutableStateListOf<Uri?>(null, null, null, null, null) }
-
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -342,39 +345,45 @@ fun SellerProductFormScreen(
                         ModernCard {
                             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-                                OutlinedTextField(
+                                ModernOutlinedField(
                                     value = productName,
                                     onValueChange = { productName = it },
-                                    label = {
-                                        Text(
-                                            fontFamily = PoppinsFont, text = "Product Name"
-                                        )
-                                    },
+                                    label = "Product Name",
+                                    icon = Icons.Default.Inventory2,
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
-                                OutlinedTextField(
+                                ModernOutlinedField(
                                     value = description,
                                     onValueChange = { description = it },
-                                    label = {
-                                        Text(
-                                            fontFamily = PoppinsFont, text = "Description"
-                                        )
-                                    },
-                                    minLines = 2,
+                                    label = "Description",
+                                    icon = Icons.Default.Description,
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
                                 Row(
-                                    Modifier.fillMaxWidth(),
-                                    horizontalArrangement =
-                                        Arrangement.SpaceBetween,
-                                    verticalAlignment =
-                                        Alignment.CenterVertically
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(AppColor.BlueSoft.copy(alpha = 0.15f))
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        fontFamily = PoppinsFont, text = "Active Product"
-                                    )
+
+                                    Column {
+                                        Text(
+                                            "Active Product",
+                                            fontFamily = PoppinsFont,
+                                            fontWeight = FontWeight.Medium
+                                        )
+
+                                        Text(
+                                            "Show this product to customers",
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+                                    }
                                     Switch(
                                         checked = isActive,
                                         onCheckedChange = { isActive = it },
@@ -382,12 +391,9 @@ fun SellerProductFormScreen(
                                             checkedThumbColor = Color.White,
                                             checkedTrackColor = AppColor.Blue,
                                             uncheckedThumbColor = Color.White,
-                                            uncheckedTrackColor = AppColor.BlueSoft,
-                                            checkedBorderColor = AppColor.Blue,
-                                            uncheckedBorderColor = AppColor.Gray
+                                            uncheckedTrackColor = AppColor.BlueSoft
                                         )
                                     )
-
                                 }
                             }
                         }
@@ -401,32 +407,21 @@ fun SellerProductFormScreen(
 
                         ModernCard {
                             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-
-                                OutlinedTextField(
+                                ModernOutlinedField(
                                     value = price,
                                     onValueChange = {
                                         price = it.filter { c -> c.isDigit() }
                                     },
-                                    label = { Text(fontFamily = PoppinsFont, text = "Base Price") },
-                                    visualTransformation =
-                                        RupiahVisualTransformation(),
-                                    keyboardOptions =
-                                        KeyboardOptions(
-                                            keyboardType =
-                                                KeyboardType.Number
-                                        ),
+                                    label = "Base Price",
+                                    keyboardType = KeyboardType.Number,
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
-                                OutlinedTextField(
+                                ModernOutlinedField(
                                     value = stock,
                                     onValueChange = { stock = it },
-                                    label = { Text(fontFamily = PoppinsFont, text = "Stock") },
-                                    keyboardOptions =
-                                        KeyboardOptions(
-                                            keyboardType =
-                                                KeyboardType.Number
-                                        ),
+                                    label = "Stock",
+                                    keyboardType = KeyboardType.Number,
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
@@ -477,16 +472,189 @@ fun SellerProductFormScreen(
                 ProductStep.REVIEW -> {
 
                     item {
-                        SectionTitle("Review")
+
+                        SectionTitle("Review Product")
+
                         Spacer(Modifier.height(8.dp))
 
                         ModernCard {
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Text(fontFamily = PoppinsFont, text = "Name: $productName")
-                                Text(fontFamily = PoppinsFont, text = "Price: ${formatRupiah(price)}")
-                                Text(fontFamily = PoppinsFont, text = "Stock: $stock")
-                                Text(fontFamily = PoppinsFont, text = "Status: ${availability.name}")
-                                Text(fontFamily = PoppinsFont, text = "Variant Groups: ${variantGroups.size}")
+
+                            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                                // Product Name
+                                Column {
+                                    Text(
+                                        text = "Product Name",
+                                        fontFamily = PoppinsFont,
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
+                                    )
+
+                                    Text(
+                                        text = productName.ifEmpty { "-" },
+                                        fontFamily = PoppinsFont,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 16.sp
+                                    )
+                                }
+
+                                // Description
+                                Column {
+                                    Text(
+                                        text = "Description",
+                                        fontFamily = PoppinsFont,
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
+                                    )
+
+                                    Text(
+                                        text = description.ifEmpty { "-" },
+                                        fontFamily = PoppinsFont
+                                    )
+                                }
+
+                                // Price & Stock
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+
+                                    Column {
+                                        Text(
+                                            "Price",
+                                            fontFamily = PoppinsFont,
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+
+                                        Text(
+                                            formatRupiah(price),
+                                            fontFamily = PoppinsFont,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = AppColor.Blue
+                                        )
+                                    }
+
+                                    Column {
+                                        Text(
+                                            "Stock",
+                                            fontFamily = PoppinsFont,
+                                            fontSize = 12.sp,
+                                            color = Color.Gray
+                                        )
+
+                                        Text(
+                                            stock.ifEmpty { "0" },
+                                            fontFamily = PoppinsFont,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                    }
+                                }
+
+                                // Availability Badge
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                    Text(
+                                        text = "Status",
+                                        fontFamily = PoppinsFont,
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
+                                    )
+
+                                    Spacer(Modifier.width(8.dp))
+
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(AppColor.BlueSoft)
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = availability.name,
+                                            fontFamily = PoppinsFont,
+                                            color = AppColor.Blue,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+
+                                // Active Badge
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                    Text(
+                                        text = "Visibility",
+                                        fontFamily = PoppinsFont,
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
+                                    )
+
+                                    Spacer(Modifier.width(8.dp))
+
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(20.dp))
+                                            .background(
+                                                if (isActive)
+                                                    Color(0xFFE8F5E9)
+                                                else
+                                                    Color(0xFFFFEBEE)
+                                            )
+                                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(
+                                            text = if (isActive) "Active" else "Hidden",
+                                            fontFamily = PoppinsFont,
+                                            color = if (isActive) Color(0xFF2E7D32) else Color.Red,
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+
+                                // Variants
+                                if (variantGroups.isNotEmpty()) {
+
+                                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
+                                        Text(
+                                            "Variants",
+                                            fontFamily = PoppinsFont,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+
+                                        variantGroups.forEach { group ->
+
+                                            Column {
+
+                                                Text(
+                                                    group.name,
+                                                    fontFamily = PoppinsFont,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+
+                                                Spacer(Modifier.height(4.dp))
+
+                                                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+
+                                                    group.options.forEach { option ->
+
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .clip(RoundedCornerShape(20.dp))
+                                                                .background(AppColor.BlueSoft)
+                                                                .padding(horizontal = 10.dp, vertical = 4.dp)
+                                                        ) {
+                                                            Text(
+                                                                "${option.name} (+${formatRupiah(option.price)})",
+                                                                fontFamily = PoppinsFont,
+                                                                fontSize = 12.sp
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -551,7 +719,9 @@ fun ModernCard(content: @Composable ColumnScope.() -> Unit) {
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             content = content
         )
@@ -584,52 +754,35 @@ fun VariantGroupCard(
     group: VariantGroupUi,
     onAddOption: () -> Unit
 ) {
+
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
-        OutlinedTextField(
+        ModernOutlinedField(
             value = group.name,
             onValueChange = { group.name = it },
-            label = {
-                Text(
-                    fontFamily = PoppinsFont,
-                    text = "Variant Group Name"
-                )
-            },
+            label = "Variant Group Name",
+            icon = Icons.Default.Inventory2,
             modifier = Modifier.fillMaxWidth()
         )
 
         group.options.forEach { option ->
+
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
 
-                OutlinedTextField(
+                ModernOutlinedField(
                     value = option.name,
                     onValueChange = { option.name = it },
-                    label = {
-                        Text(
-                            fontFamily = PoppinsFont,
-                            text = "Option"
-                        )
-                    },
+                    label = "Option",
                     modifier = Modifier.weight(1f)
                 )
 
-                OutlinedTextField(
+                ModernOutlinedField(
                     value = option.price,
                     onValueChange = {
                         option.price = it.filter { c -> c.isDigit() }
                     },
-                    label = {
-                        Text(
-                            fontFamily = PoppinsFont,
-                            text = "+ Price"
-                        )
-                    },
-                    visualTransformation =
-                        RupiahVisualTransformation(),
-                    keyboardOptions =
-                        KeyboardOptions(
-                            keyboardType = KeyboardType.Number
-                        ),
+                    label = "+ Price",
+                    keyboardType = KeyboardType.Number,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -637,8 +790,8 @@ fun VariantGroupCard(
 
         TextButton(onClick = onAddOption) {
             Text(
-                fontFamily = PoppinsFont,
-                text = "+ Add Option"
+                text = "+ Add Option",
+                fontFamily = PoppinsFont
             )
         }
     }
@@ -673,6 +826,50 @@ class RupiahVisualTransformation : VisualTransformation {
             }
         )
     }
+}
+
+@Composable
+fun ModernOutlinedField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    icon: ImageVector? = null,
+    modifier: Modifier = Modifier,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    singleLine: Boolean = true
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        singleLine = singleLine,
+        shape = RoundedCornerShape(14.dp),
+        label = {
+            Text(
+                text = label,
+                fontFamily = PoppinsFont
+            )
+        },
+        leadingIcon = icon?.let {
+            {
+                Icon(
+                    imageVector = it,
+                    contentDescription = null,
+                    tint = AppColor.Blue
+                )
+            }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType
+        ),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = AppColor.Blue,
+            unfocusedBorderColor = Color(0xFFE5E7EB),
+            focusedContainerColor = Color(0xFFF8FAFC),
+            unfocusedContainerColor = Color(0xFFF8FAFC),
+            cursorColor = AppColor.Blue
+        )
+    )
 }
 
 @Preview(name = "Step 1 - Basic", showBackground = true, device = Devices.PIXEL_4_XL)
@@ -720,7 +917,6 @@ fun PreviewStepVariant() {
                     options = mutableStateListOf(
                         VariantOptionUi("Small", "10000"),
                         VariantOptionUi("Medium", "12000"),
-                        VariantOptionUi("Large", "15000")
                     )
                 ),
                 VariantGroupUi(
@@ -735,7 +931,11 @@ fun PreviewStepVariant() {
     }
 }
 
-@Preview(name = "Step 4 - Review", showBackground = true, device = Devices.PIXEL_4_XL)
+@Preview(
+    name = "Step 4 - Review",
+    showBackground = true,
+    device = Devices.PIXEL_4_XL
+)
 @Composable
 fun PreviewStepReview() {
     MaterialTheme {

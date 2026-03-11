@@ -1,18 +1,18 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: SellerProfileContract.kt
+ * File: SellerStoreContract.kt
  *
  * Last modified by Dedy Wijaya on 20/02/26 10.00
  */
 
 package com.mtv.app.shopme.feature.seller.contract
 
-class SellerProfileStateListener(
+class SellerStoreStateListener(
     var isLoading: Boolean = false
 )
 
-class SellerProfileDataListener(
+class SellerStoreDataListener(
     var sellerName: String = "",
     var email: String = "",
     var phone: String = "",
@@ -21,13 +21,13 @@ class SellerProfileDataListener(
     var isOnline: Boolean = true
 )
 
-class SellerProfileEventListener(
+class SellerStoreEventListener(
     val onToggleOnline: () -> Unit,
-    val onEditProfile: () -> Unit,
+    val onEditStore: () -> Unit,
     val onLogout: () -> Unit
 )
 
-class SellerProfileNavigationListener(
+class SellerStoreNavigationListener(
     val navigateToEditProfile: () -> Unit = {},
     val navigateToStoreSettings: () -> Unit = {},
     val navigateToBankAccount: () -> Unit = {},

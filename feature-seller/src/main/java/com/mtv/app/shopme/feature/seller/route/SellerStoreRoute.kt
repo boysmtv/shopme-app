@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: SellerProfileRoute.kt
+ * File: SellerStoreRoute.kt
  *
  * Last modified by Dedy Wijaya on 20/02/26 10.01
  */
@@ -12,18 +12,18 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProfileStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerProfileViewModel
-import com.mtv.app.shopme.feature.seller.ui.SellerProfileScreen
+import com.mtv.app.shopme.feature.seller.ui.SellerStoreScreen
 
 @Composable
-fun SellerProfileRoute(nav: NavController) {
-    BaseRoute<SellerProfileViewModel, SellerProfileStateListener, SellerProfileDataListener> { vm, base, uiState, uiData ->
+fun SellerStoreRoute(nav: NavController) {
+    BaseRoute<SellerProfileViewModel, SellerStoreStateListener, SellerStoreDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
-            SellerProfileScreen(
+            SellerStoreScreen(
                 uiState = uiState,
                 uiData = uiData,
                 uiEvent = sellerProfileEvent(vm),
@@ -34,14 +34,14 @@ fun SellerProfileRoute(nav: NavController) {
 }
 
 private fun sellerProfileEvent(vm: SellerProfileViewModel) =
-    SellerProfileEventListener(
+    SellerStoreEventListener(
         onToggleOnline = vm::toggleOnline,
-        onEditProfile = {},
+        onEditStore = {},
         onLogout = vm::logout
     )
 
 private fun sellerProfileNavigation(nav: NavController) =
-    SellerProfileNavigationListener(
+    SellerStoreNavigationListener(
         navigateToEditProfile = { nav.navigate("seller_edit_profile") },
         navigateToStoreSettings = { nav.navigate("seller_store_settings") },
         navigateToBankAccount = { nav.navigate("seller_bank_account") },
