@@ -8,11 +8,11 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-
 import com.mtv.app.core.provider.based.BaseUseCase
+import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.request.SplashRequest
-import com.mtv.based.core.network.datasource.FirebaseDataSource
+import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.based.core.network.di.IoDispatcher
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
@@ -21,9 +21,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 class SplashUseCase @Inject constructor(
     private val repository: NetworkRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<SplashRequest, String>(dispatcher) {
+) : BaseUseCase<SplashRequest, ApiResponse<SplashResponse>>(dispatcher) {
 
-    override suspend fun execute(param: SplashRequest) = repository.request<String>(
+    override suspend fun execute(param: SplashRequest) = repository.request<ApiResponse<SplashResponse>>(
         endpoint = ApiEndPoint.PostSplashScreen,
         body = param
     )

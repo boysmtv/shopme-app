@@ -8,10 +8,12 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.based.core.network.utils.Resource
 
 data class SplashStateListener(
-    val splashState: Resource<String> = Resource.Loading,
+    val splashState: Resource<ApiResponse<SplashResponse>> = Resource.Loading,
 )
 
 data class SplashEventListener(
@@ -19,5 +21,6 @@ data class SplashEventListener(
 )
 
 data class SplashNavigationListener(
-    val onNavigateToLogin: () -> Unit,
+    val onNavigateToHome: () -> Unit = {},
+    val onNavigateToLogin: () -> Unit = {},
 )

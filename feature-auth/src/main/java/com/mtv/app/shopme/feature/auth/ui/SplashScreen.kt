@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,10 +62,12 @@ fun SplashScreen(
         uiEvent.doSplashScreen()
     }
 
-
     LaunchedEffect(uiState.splashState) {
         if (uiState.splashState is Resource.Success) {
-            uiNavigation.onNavigateToLogin()
+            uiState.splashState.data.data?.let {
+                if (it.isAuthenticated) uiNavigation.onNavigateToHome()
+                else uiNavigation.onNavigateToLogin()
+            }
         }
     }
 
@@ -199,11 +202,10 @@ fun SplashScreen(
                     ),
                     modifier = Modifier.size(70.dp)
                 ) {
-                    Text(
-                        text = ". . .",
-                        fontWeight = FontWeight.SemiBold,
+                    CircularProgressIndicator(
                         color = Color.White,
-                        fontFamily = PoppinsFont
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
