@@ -14,6 +14,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SplashRequest(
     var deviceId: String,
+    var platform: String,
+    var fcmToken: String?,
+    var appVersionName: String,
+    var appVersionCode: Long,
     var deviceInfo: DeviceInfo,
     var createdAt: String,
 )

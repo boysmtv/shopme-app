@@ -18,6 +18,7 @@ import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
 import com.mtv.app.shopme.feature.auth.presentation.SplashViewModel
 import com.mtv.app.shopme.feature.auth.ui.SplashScreen
 import com.mtv.app.shopme.nav.AuthDestinations
+import com.mtv.app.shopme.nav.CustomerDestinations
 import com.mtv.app.shopme.nav.navigateAndPopSplash
 
 @Composable
@@ -26,7 +27,6 @@ fun SplashRoute(nav: NavController) {
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             SplashScreen(
                 uiState = uiState,
-                uiData = uiData,
                 uiEvent = splashEvent(vm),
                 uiNavigation = splashNavigation(nav)
             )
@@ -39,6 +39,9 @@ private fun splashEvent(vm: SplashViewModel) = SplashEventListener(
 )
 
 private fun splashNavigation(nav: NavController) = SplashNavigationListener(
+    onNavigateToHome = {
+        nav.navigateAndPopSplash(CustomerDestinations.HOME_GRAPH)
+    },
     onNavigateToLogin = {
         nav.navigateAndPopSplash(AuthDestinations.LOGIN_GRAPH)
     }
