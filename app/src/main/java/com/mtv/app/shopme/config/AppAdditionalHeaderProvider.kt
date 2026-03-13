@@ -20,8 +20,7 @@ import javax.inject.Inject
 class AppAdditionalHeaderProvider @Inject constructor(
     private val installationIdProvider: InstallationIdProvider,
     private val securePrefs: SecurePrefs
-) :
-    AdditionalHeaderProvider {
+) : AdditionalHeaderProvider {
 
     override fun provide(): Map<String, String> =
         mapOf(
