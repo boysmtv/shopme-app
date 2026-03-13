@@ -175,7 +175,7 @@ fun SellerTab(selected: Int, onChange: (Int) -> Unit) {
 }
 
 @Composable
-fun StorePhotoSection(
+private fun StorePhotoSection(
     imageUrl: String?,
     onUpload: () -> Unit
 ) {

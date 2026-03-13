@@ -1025,7 +1025,7 @@ fun VariantBottomSheetMockPreview() {
     }
 }
 
-private val previewFood = FoodResponse(
+val previewFood = FoodResponse(
     id = "1",
     cafeId = "1",
     name = "Bakso Telur Joss",
@@ -1041,7 +1041,7 @@ private val previewFood = FoodResponse(
 )
 
 
-private val previewSimilar = listOf(
+val previewSimilar = listOf(
     FoodResponse(
         id = "2",
         cafeId = "1",
