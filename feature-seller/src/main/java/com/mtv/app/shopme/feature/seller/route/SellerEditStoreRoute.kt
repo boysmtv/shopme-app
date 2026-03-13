@@ -12,7 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreDataListener
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreNavigationListener
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerEditStoreViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerEditStoreScreen
 
@@ -35,13 +38,11 @@ private fun sellerEditStoreEvent(vm: SellerEditStoreViewModel) =
         onStoreNameChange = vm::onStoreNameChange,
         onPhoneChange = vm::onPhoneChange,
         onDescriptionChange = vm::onDescriptionChange,
-
         onVillageChange = vm::onVillageChange,
         onBlockChange = vm::onBlockChange,
         onNumberChange = vm::onNumberChange,
         onRtChange = vm::onRtChange,
         onRwChange = vm::onRwChange,
-
         onUploadPhoto = vm::onUploadPhoto,
         onSave = vm::saveStore
     )
