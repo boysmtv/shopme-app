@@ -21,7 +21,7 @@ class AppNetworkConfigProvider : NetworkConfigProvider {
 //            isDebug = BuildConfig.DEBUG
 //        )
         AppNetworkConfig(
-            baseUrl = "http://192.168.100.20:8080/",
+            baseUrl = "http://192.168.100.50:8080/",
             useKtor = true,
             isDebug = true
         )
