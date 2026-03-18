@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AddressResponse(
     val id: String,
-    val areaId: String,
+    val village: String,
     val block: String,
     val number: String,
     val rt: String,

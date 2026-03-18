@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AddressAddRequest(
-    val areaId: String,
+    val villageId: String,
     val block: String,
     val number: String,
     val rt: String,
