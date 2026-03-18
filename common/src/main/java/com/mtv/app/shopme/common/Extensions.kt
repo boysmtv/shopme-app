@@ -6,19 +6,10 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mtv.app.core.provider.based.BaseUiState
 import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.based.core.network.utils.ErrorMessages
-import kotlin.collections.toMutableList
-import kotlin.getOrElse
-import kotlin.runCatching
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonBuilder
-import kotlinx.serialization.serializer
 
 /** HELPER MAPPING FLOW */
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)

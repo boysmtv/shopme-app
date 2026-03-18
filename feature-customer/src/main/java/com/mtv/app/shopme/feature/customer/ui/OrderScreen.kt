@@ -435,55 +435,6 @@ fun ModernEmptyOrder() {
     }
 }
 
-@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-@Composable
-fun OrderScreenPreview() {
-    val dummyOrders = listOf(
-        OrderModel(
-            id = "A001",
-            customerId = "C001",
-            cafeId = "Mamah Al Cafe",
-            items = listOf(
-                OrderItemModel(foodId = 0, quantity = 2, price = 15000.0),
-                OrderItemModel(foodId = 3, quantity = 1, price = 15000.0)
-            ),
-            totalPrice = 45000.0,
-            status = OrderStatus.ORDERED,
-            paymentMethod = PaymentMethod.TRANSFER
-        ),
-        OrderModel(
-            id = "A002",
-            customerId = "C001",
-            cafeId = "Mamah Al Cafe",
-            items = listOf(
-                OrderItemModel(foodId = 1, quantity = 1, price = 30000.0)
-            ),
-            totalPrice = 30000.0,
-            status = OrderStatus.DELIVERING,
-            paymentMethod = PaymentMethod.TRANSFER
-        ),
-        OrderModel(
-            id = "A003",
-            customerId = "C001",
-            cafeId = "Mamah Al Cafe",
-            items = listOf(
-                OrderItemModel(foodId = 2, quantity = 1, price = 20000.0),
-                OrderItemModel(foodId = 5, quantity = 2, price = 16000.0)
-            ),
-            totalPrice = 52000.0,
-            status = OrderStatus.COMPLETED,
-            paymentMethod = PaymentMethod.TRANSFER
-        )
-    )
-
-    OrderScreen(
-        uiState = OrderStateListener(isLoading = false),
-        uiData = OrderDataListener(orders = dummyOrders),
-        uiEvent = OrderEventListener(),
-        uiNavigation = OrderNavigationListener()
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UploadProofSheet(
@@ -658,6 +609,55 @@ fun UploadProofSheet(
             Spacer(Modifier.height(6.dp))
         }
     }
+}
+
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
+@Composable
+fun OrderScreenPreview() {
+    val dummyOrders = listOf(
+        OrderModel(
+            id = "A001",
+            customerId = "C001",
+            cafeId = "Mamah Al Cafe",
+            items = listOf(
+                OrderItemModel(foodId = 0, quantity = 2, price = 15000.0),
+                OrderItemModel(foodId = 3, quantity = 1, price = 15000.0)
+            ),
+            totalPrice = 45000.0,
+            status = OrderStatus.ORDERED,
+            paymentMethod = PaymentMethod.TRANSFER
+        ),
+        OrderModel(
+            id = "A002",
+            customerId = "C001",
+            cafeId = "Mamah Al Cafe",
+            items = listOf(
+                OrderItemModel(foodId = 1, quantity = 1, price = 30000.0)
+            ),
+            totalPrice = 30000.0,
+            status = OrderStatus.DELIVERING,
+            paymentMethod = PaymentMethod.TRANSFER
+        ),
+        OrderModel(
+            id = "A003",
+            customerId = "C001",
+            cafeId = "Mamah Al Cafe",
+            items = listOf(
+                OrderItemModel(foodId = 2, quantity = 1, price = 20000.0),
+                OrderItemModel(foodId = 5, quantity = 2, price = 16000.0)
+            ),
+            totalPrice = 52000.0,
+            status = OrderStatus.COMPLETED,
+            paymentMethod = PaymentMethod.TRANSFER
+        )
+    )
+
+    OrderScreen(
+        uiState = OrderStateListener(isLoading = false),
+        uiData = OrderDataListener(orders = dummyOrders),
+        uiEvent = OrderEventListener(),
+        uiNavigation = OrderNavigationListener()
+    )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
