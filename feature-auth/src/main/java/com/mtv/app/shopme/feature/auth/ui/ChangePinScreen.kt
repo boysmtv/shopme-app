@@ -69,6 +69,7 @@ import com.mtv.app.shopme.feature.auth.contract.ChangePinDataListener
 import com.mtv.app.shopme.feature.auth.contract.ChangePinEventListener
 import com.mtv.app.shopme.feature.auth.contract.ChangePinNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.ChangePinStateListener
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
 fun ChangePinScreen(
@@ -145,7 +146,7 @@ fun ChangePinScreen(
 
                 AnimatedVisibility(uiState.error != null) {
                     Text(
-                        uiState.error ?: "",
+                        uiState.error ?: EMPTY_STRING,
                         color = Color.Red,
                         fontSize = 12.sp
                     )
@@ -201,7 +202,7 @@ fun PinSection(
 
             repeat(6) { index ->
 
-                val digit = value.getOrNull(index)?.toString() ?: ""
+                val digit = value.getOrNull(index)?.toString() ?: EMPTY_STRING
 
                 OutlinedTextField(
                     value = digit,

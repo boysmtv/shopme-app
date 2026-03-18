@@ -8,6 +8,8 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+
 data class ChatSupportStateListener(
     val isLoading: Boolean = false,
     val isSending: Boolean = false
@@ -15,7 +17,7 @@ data class ChatSupportStateListener(
 
 data class ChatSupportDataListener(
     val messages: List<SupportMessage> = emptyList(),
-    val currentMessage: String = "",
+    val currentMessage: String = EMPTY_STRING,
     val isAgentTyping: Boolean = false
 )
 

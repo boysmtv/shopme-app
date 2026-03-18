@@ -14,6 +14,7 @@ import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportDataListener
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportStateListener
 import com.mtv.app.shopme.feature.customer.contract.SupportMessage
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.delay
@@ -57,7 +58,7 @@ class ChatSupportViewModel @Inject constructor() :
 
         uiData.value = uiData.value.copy(
             messages = uiData.value.messages + newMessage,
-            currentMessage = "",
+            currentMessage = EMPTY_STRING,
             isAgentTyping = true
         )
 
