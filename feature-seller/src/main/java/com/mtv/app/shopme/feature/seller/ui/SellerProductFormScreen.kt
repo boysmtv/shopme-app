@@ -88,19 +88,20 @@ import com.mtv.app.shopme.feature.seller.contract.SellerProductFormDataListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormStateListener
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 
 enum class Availability { READY, PREORDER, JASTIP }
 enum class ProductStep { BASIC, PRICING, VARIANT, REVIEW }
 
 data class VariantGroupUi(
-    var name: String = "",
+    var name: String = EMPTY_STRING,
     var options: SnapshotStateList<VariantOptionUi> = mutableStateListOf()
 )
 
 data class VariantOptionUi(
-    var name: String = "",
-    var price: String = ""
+    var name: String = EMPTY_STRING,
+    var price: String = EMPTY_STRING
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -121,10 +122,10 @@ fun SellerProductFormScreen(
         mutableStateListOf()
     }
 
-    var productName by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
-    var stock by remember { mutableStateOf("") }
+    var productName by remember { mutableStateOf(EMPTY_STRING) }
+    var description by remember { mutableStateOf(EMPTY_STRING) }
+    var price by remember { mutableStateOf(EMPTY_STRING) }
+    var stock by remember { mutableStateOf(EMPTY_STRING) }
     var isActive by remember { mutableStateOf(true) }
     var availability by remember { mutableStateOf(Availability.READY) }
     val imageUris = remember { mutableStateListOf<Uri?>(null, null, null, null, null) }
@@ -808,7 +809,7 @@ class RupiahVisualTransformation : VisualTransformation {
         val digits = text.text.filter { it.isDigit() }
         if (digits.isEmpty())
             return TransformedText(
-                AnnotatedString(""),
+                AnnotatedString(EMPTY_STRING),
                 OffsetMapping.Identity
             )
 

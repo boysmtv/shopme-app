@@ -12,14 +12,15 @@ import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class SearchStateListener(
     val searchFoodState: Resource<ApiResponse<PageResponse<FoodResponse>>> = Resource.Loading,
 )
 
 data class SearchDataListener(
-    val query: String = "",
-    val results: List<String> = emptyList()
+    val query: String = EMPTY_STRING,
+    val results: List<FoodResponse> = emptyList()
 )
 
 data class SearchEventListener(
@@ -28,7 +29,7 @@ data class SearchEventListener(
 )
 
 data class SearchNavigationListener(
-    val onDetailClick: () -> Unit = {},
+    val onDetailClick: (String) -> Unit = {},
     val onBack: () -> Unit = {},
 )
 

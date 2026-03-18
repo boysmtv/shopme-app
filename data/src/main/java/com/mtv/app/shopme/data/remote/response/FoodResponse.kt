@@ -8,20 +8,52 @@
 
 package com.mtv.app.shopme.data.remote.response
 
+import com.mtv.app.shopme.common.serializer.BigDecimalSerializer
+import com.mtv.app.shopme.common.serializer.LocalDateTimeSerializer
+import com.mtv.app.shopme.data.dto.FoodCategory
+import com.mtv.app.shopme.data.dto.FoodStatus
+import java.math.BigDecimal
 import kotlinx.serialization.Serializable
+import org.threeten.bp.LocalDateTime
+
 
 @Serializable
 data class FoodResponse(
     val id: String,
     val cafeId: String,
     val name: String,
+    val cafeName: String,
+    val cafeAddress: String,
     val description: String,
-    val price: Double,
-    val imageUrl: String,
-    val category: String,
-    val status: String,
-    val quantity: Int,
+
+    @Serializable(with = BigDecimalSerializer::class)
+    val price: BigDecimal,
+
+    val category: FoodCategory,
+    val status: FoodStatus,
+    val quantity: Long,
     val estimate: String,
     val isActive: Boolean,
-    val createdAt: String
+
+    @Serializable(with = LocalDateTimeSerializer::class)
+    val createdAt: LocalDateTime,
+
+    val images: List<String>,
+    val variants: List<FoodVariantResponse>
+)
+
+@Serializable
+data class FoodVariantResponse(
+    val id: String,
+    val name: String,
+    val options: List<FoodOptionResponse>
+)
+
+@Serializable
+data class FoodOptionResponse(
+    val id: String,
+    val name: String,
+
+    @Serializable(with = BigDecimalSerializer::class)
+    val price: BigDecimal
 )

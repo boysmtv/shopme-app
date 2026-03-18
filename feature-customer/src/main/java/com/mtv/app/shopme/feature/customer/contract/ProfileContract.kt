@@ -8,7 +8,6 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import androidx.navigation.NavController
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.based.core.network.utils.Resource
@@ -24,6 +23,7 @@ data class ProfileDataListener(
 
 data class ProfileEventListener(
     val onDismissDialog: () -> Unit = {},
+    val onCheckTncCafe: () -> Unit = {},
 )
 
 data class ProfileNavigationListener(
@@ -32,7 +32,8 @@ data class ProfileNavigationListener(
     val onSettings: () -> Unit = {},
     val onHelpCenter: () -> Unit = {},
     val onOrder: () -> Unit = {},
-    val onNavigateToSeller: (navController: NavController) -> Unit = {}
+    val onNavigateToTnc: () -> Unit = {},
+    val onNavigateToSeller: () -> Unit = {}
 )
 
 sealed class ProfileDialog {

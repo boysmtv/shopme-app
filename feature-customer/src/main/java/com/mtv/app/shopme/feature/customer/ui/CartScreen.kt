@@ -71,6 +71,7 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.dto.FoodStatus
+import com.mtv.app.shopme.data.dto.PaymentMethod
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.feature.customer.contract.CartDataListener
 import com.mtv.app.shopme.feature.customer.contract.CartEventListener
@@ -528,11 +529,6 @@ fun QuantityCounter(quantity: Int) {
             )
         }
     }
-}
-
-enum class PaymentMethod {
-    CASH,
-    TRANSFER
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

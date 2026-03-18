@@ -8,8 +8,8 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreDataListener
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreStateListener

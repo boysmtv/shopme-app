@@ -16,20 +16,26 @@ import androidx.activity.enableEdgeToEdge
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.messaging
-import com.mtv.app.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.feature.firebase.NotificationRepository
 import com.mtv.app.shopme.nav.AppNavigation
+import com.mtv.based.core.provider.utils.SessionManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.getValue
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var sessionManager: SessionManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setupFcmToken()
         setContent {
-            AppNavigation()
+            AppNavigation(sessionManager)
         }
     }
 

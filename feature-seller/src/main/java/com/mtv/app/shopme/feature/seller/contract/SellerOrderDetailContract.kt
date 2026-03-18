@@ -8,16 +8,17 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.app.shopme.data.OrderStatus
+import com.mtv.app.shopme.data.dto.OrderStatus
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class SellerOrderDetailStateListener(
-    val orderId: String = "",
+    val orderId: String = EMPTY_STRING,
     val currentStatus: OrderStatus = OrderStatus.ORDERED
 )
 
 data class SellerOrderDetailDataListener(
-    val customerName: String = "",
-    val total: String = ""
+    val customerName: String = EMPTY_STRING,
+    val total: String = EMPTY_STRING
 )
 
 data class SellerOrderDetailEventListener(

@@ -11,7 +11,7 @@ package com.mtv.app.shopme.feature.firebase
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.mtv.app.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.data.local.NotificationItem
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 

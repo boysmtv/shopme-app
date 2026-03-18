@@ -22,8 +22,8 @@ data class LoginDataListener(
 )
 
 //data class LoginDataListener(
-//    val email: String = "",
-//    val password: String = ""
+//    val email: String = EMPTY_STRING,
+//    val password: String = EMPTY_STRING
 //)
 
 data class LoginEventListener(

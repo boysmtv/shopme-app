@@ -8,6 +8,8 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+
 class SellerProductFormStateListener(
     var isSaving: Boolean = false
 )
@@ -26,10 +28,10 @@ class SellerProductFormNavigationListener(
 )
 
 data class ProductItem(
-    val id: String = "",
-    val name: String = "",
-    val price: String = "",
+    val id: String = EMPTY_STRING,
+    val name: String = EMPTY_STRING,
+    val price: String = EMPTY_STRING,
     val stock: Int = 0,
-    val category: String = "",
-    val description: String = ""
+    val category: String = EMPTY_STRING,
+    val description: String = EMPTY_STRING
 )

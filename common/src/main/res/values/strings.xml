@@ -15,5 +15,6 @@
     <string name="reset_password_success">Reset Password Successfully</string>
     <string name="enter_your_email_reset_password">Enter your email and we’ll send you a reset link.</string>
     <string name="successfully_update_profile">Successfully Update Profile</string>
+    <string name="successfully_delete_address">Successfully Delete Address</string>
     <string name="success_clear_notif">Successfully clear your notification</string>
 </resources>

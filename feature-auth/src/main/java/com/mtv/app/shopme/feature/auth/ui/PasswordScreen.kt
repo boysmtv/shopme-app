@@ -57,6 +57,7 @@ import com.mtv.app.shopme.feature.auth.contract.PasswordDataListener
 import com.mtv.app.shopme.feature.auth.contract.PasswordEventListener
 import com.mtv.app.shopme.feature.auth.contract.PasswordNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.PasswordStateListener
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
 fun PasswordScreen(
@@ -238,9 +239,9 @@ fun PasswordScreenPreview() {
     PasswordScreen(
         uiState = PasswordStateListener(),
         uiData = PasswordDataListener(
-            currentPassword = "",
-            newPassword = "",
-            confirmPassword = ""
+            currentPassword = EMPTY_STRING,
+            newPassword = EMPTY_STRING,
+            confirmPassword = EMPTY_STRING
         ),
         uiEvent = PasswordEventListener(
             onCurrentPasswordChange = {},

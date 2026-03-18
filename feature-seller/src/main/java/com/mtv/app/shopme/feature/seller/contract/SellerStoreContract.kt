@@ -8,16 +8,18 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+
 class SellerStoreStateListener(
     var isLoading: Boolean = false
 )
 
 class SellerStoreDataListener(
-    var sellerName: String = "",
-    var email: String = "",
-    var phone: String = "",
-    var storeName: String = "",
-    var storeAddress: String = "",
+    var sellerName: String = EMPTY_STRING,
+    var email: String = EMPTY_STRING,
+    var phone: String = EMPTY_STRING,
+    var storeName: String = EMPTY_STRING,
+    var storeAddress: String = EMPTY_STRING,
     var isOnline: Boolean = true
 )
 

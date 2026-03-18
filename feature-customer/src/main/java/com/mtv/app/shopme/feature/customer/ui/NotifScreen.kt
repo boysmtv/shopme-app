@@ -60,6 +60,7 @@ import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import com.mtv.based.uicomponent.core.component.toolbar.BaseToolbar
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.OK_STRING
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.WARNING_STRING
 
@@ -257,7 +258,7 @@ fun InitialAvatar(
     textColor: Color = Color.Black
 ) {
     val initial = remember(text) {
-        text.trim().firstOrNull()?.uppercase()?.plus(".") ?: ""
+        text.trim().firstOrNull()?.uppercase()?.plus(".") ?: EMPTY_STRING
     }
 
     Box(

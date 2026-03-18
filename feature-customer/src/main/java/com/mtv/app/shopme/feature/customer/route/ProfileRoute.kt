@@ -26,18 +26,25 @@ fun ProfileRoute(nav: NavController) {
     BaseRoute<ProfileViewModel, ProfileStateListener, ProfileDataListener> { vm, base, uiState, uiData ->
         BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
             ProfileScreen(
-                navController = nav,
                 uiState = uiState,
                 uiData = uiData,
-                uiEvent = profileEvent(vm),
+                uiEvent = profileEvent(vm, nav),
                 uiNavigation = profileNavigation(nav)
             )
         }
     }
 }
 
-private fun profileEvent(vm: ProfileViewModel) = ProfileEventListener(
-    onDismissDialog = vm::dismissDialog
+private fun profileEvent(vm: ProfileViewModel, nav: NavController) = ProfileEventListener(
+    onDismissDialog = vm::dismissDialog,
+    onCheckTncCafe = {
+        val navigation = profileNavigation(nav)
+        if (vm.doCheckTncCafe()) {
+            navigation.onNavigateToTnc()
+        } else {
+            navigation.onNavigateToSeller()
+        }
+    }
 )
 
 private fun profileNavigation(nav: NavController) = ProfileNavigationListener(
@@ -46,6 +53,7 @@ private fun profileNavigation(nav: NavController) = ProfileNavigationListener(
     onSettings = { nav.navigate(CustomerDestinations.SETTINGS_GRAPH) },
     onHelpCenter = { nav.navigate(CustomerDestinations.HELP_GRAPH) },
     onOrder = { nav.navigate(CustomerDestinations.ORDER_GRAPH) },
+    onNavigateToTnc = { nav.navigate(SellerDestinations.SELLER_CREATE_TNC_GRAPH) },
     onNavigateToSeller = {
         nav.navigate(SellerDestinations.SELLER_GRAPH) {
             popUpTo(0) { inclusive = true }

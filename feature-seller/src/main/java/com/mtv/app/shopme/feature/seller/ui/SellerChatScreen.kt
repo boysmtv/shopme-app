@@ -55,6 +55,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailStateListener
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 
 @Composable
@@ -64,7 +65,7 @@ fun SellerChatScreen(
     uiEvent: SellerChatDetailEventListener,
     uiNavigation: SellerChatDetailNavigationListener,
 ) {
-    var messageInput by remember { mutableStateOf("") }
+    var messageInput by remember { mutableStateOf(EMPTY_STRING) }
     val messages = remember { mutableStateListOf<SellerChatDetailMessage>().apply { addAll(uiState.messages) } }
 
     Column(
@@ -127,7 +128,7 @@ fun SellerChatScreen(
                     if (messageInput.isNotBlank()) {
                         messages.add(SellerChatDetailMessage(messageInput, true))
                         uiEvent.onSendMessage?.invoke(messageInput)
-                        messageInput = ""
+                        messageInput = EMPTY_STRING
                     }
                 },
                 modifier = Modifier

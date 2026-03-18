@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mtv.app.core.provider.based.BaseUiState
-import com.mtv.app.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.based.BaseUiState
+import com.mtv.based.core.provider.based.BaseViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

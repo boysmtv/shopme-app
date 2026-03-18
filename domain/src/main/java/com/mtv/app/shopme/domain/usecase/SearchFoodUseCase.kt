@@ -8,11 +8,10 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.core.provider.based.BaseUseCase
+import com.mtv.based.core.provider.based.BaseUseCase
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.SearchFoodRequest
-import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.based.core.network.di.IoDispatcher

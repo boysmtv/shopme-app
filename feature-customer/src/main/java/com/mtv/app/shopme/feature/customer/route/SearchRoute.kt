@@ -35,13 +35,13 @@ fun SearchRoute(nav: NavController) {
 }
 
 private fun searchEvent(vm: SearchViewModel) = SearchEventListener(
-    onQueryChanged = vm::doSearch,
+    onQueryChanged = vm::onQueryChanged,
     onLoadNextPage = vm::loadNextPage
 )
 
 private fun searchNavigation(nav: NavController) = SearchNavigationListener(
     onBack = { nav.popBackStack() },
-    onDetailClick = {
-        nav.navigate(CustomerDestinations.DETAIL_GRAPH)
+    onDetailClick = { foodId ->
+        nav.navigate(CustomerDestinations.navigateToDetail(foodId))
     }
 )

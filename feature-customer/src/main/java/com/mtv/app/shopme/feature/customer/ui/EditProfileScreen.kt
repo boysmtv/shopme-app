@@ -9,36 +9,51 @@
 package com.mtv.app.shopme.feature.customer.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -50,12 +65,16 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
@@ -64,24 +83,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
 import com.mtv.app.shopme.data.remote.response.AddressResponse
+import com.mtv.app.shopme.data.remote.response.VillageResponse
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDataListener
+import com.mtv.app.shopme.feature.customer.contract.EditProfileDialog
 import com.mtv.app.shopme.feature.customer.contract.EditProfileEventListener
 import com.mtv.app.shopme.feature.customer.contract.EditProfileNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.EditProfileStateListener
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.OK_STRING
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-
-data class UserAddress(
-    val id: String,
-    var village: String,
-    var block: String,
-    var number: String,
-    var rt: String,
-    var rw: String,
-    var isDefault: Boolean = false
-)
 
 @Composable
 fun EditProfileScreen(
@@ -97,18 +114,33 @@ fun EditProfileScreen(
 
     val customer = uiData.customerData
 
-    var name by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(EMPTY_STRING) }
+    var phone by remember { mutableStateOf(EMPTY_STRING) }
+    var email by remember { mutableStateOf(EMPTY_STRING) }
+    var photo by remember { mutableStateOf("https://i.pinimg.com/736x/b8/8d/d8/b88dd895727e06f977a7443a8f6d13c0.jpg") }
+
+    val addresses = uiData.addressData.orEmpty()
+    val villages = uiData.villageData.orEmpty()
+
+    val isValid = name.isNotBlank() && phone.length >= 10 && email.contains("@")
 
     LaunchedEffect(customer) {
         name = customer?.name.orEmpty()
         phone = customer?.phone.orEmpty()
         email = customer?.email.orEmpty()
     }
-    val addresses = uiData.addressData.orEmpty()
 
-    val isValid = name.isNotBlank() && phone.length >= 10 && email.contains("@")
+    if (uiState.activeDialog is EditProfileDialog.SuccessUpdateProfile) {
+        DialogCenterV1(
+            state = DialogStateV1(
+                type = DialogType.SUCCESS,
+                title = stringResource(R.string.success),
+                message = stringResource(R.string.successfully_update_profile),
+                primaryButtonText = OK_STRING
+            ),
+            onDismiss = { uiEvent.onDismissActiveDialog() }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -135,7 +167,10 @@ fun EditProfileScreen(
 
                 Spacer(Modifier.height(24.dp))
 
-                AnimatedContent(selectedTab) { tab ->
+                AnimatedContent(
+                    targetState = selectedTab,
+                    label = "EditProfileTabAnimation"
+                ) { tab ->
 
                     if (tab == 0) {
 
@@ -167,8 +202,9 @@ fun EditProfileScreen(
                     Spacer(Modifier.height(20.dp))
                     Button(
                         onClick = {
-//                        uiEvent.onSaveClicked(name, phone, email)
-                            uiNavigation.onBack()
+                            uiEvent.onUpdateProfile(
+                                name, phone, photo
+                            )
                         },
                         enabled = isValid,
                         modifier = Modifier.fillMaxWidth(),
@@ -188,15 +224,16 @@ fun EditProfileScreen(
         if (showAddAddress) {
             AddAddressSheet(
                 controller = sheetController,
+                villages = villages,
                 onDismiss = { showAddAddress = false },
-                onSave = { areaId, block, number, rt, rw ->
+                onSave = { villageId, block, number, rt, rw, isDefault ->
                     uiEvent.onAddAddress(
-                        areaId,
+                        villageId,
                         block,
                         number,
                         rt,
                         rw,
-                        false
+                        isDefault
                     )
                     showAddAddress = false
                 }
@@ -253,36 +290,84 @@ fun AddressSection(
     onSetDefault: (String) -> Unit
 ) {
 
-    Column {
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(bottom = 20.dp)
+    ) {
 
-        addresses.forEach { address ->
+        items(addresses) { address ->
 
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 14.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = AppColor.GreenSoft)
+                border = if (address.isDefault)
+                    BorderStroke(1.5.dp, Color(0xFF2E7D32))
+                else null,
+                colors = CardDefaults.cardColors(
+                    containerColor =
+                        if (address.isDefault) Color(0xFFE8F5E9)
+                        else Color.White
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
 
-                Column(Modifier.padding(16.dp)) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
 
-                    Text(
-                        text = "${address.areaId} Blok ${address.block} No ${address.number}",
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = PoppinsFont
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
-                    Spacer(Modifier.height(4.dp))
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = Color(0xFF2E7D32)
+                        )
+
+                        Spacer(modifier = Modifier.width(6.dp))
+
+                        Text(
+                            text = "${address.village} - Blok ${address.block}/${address.number}",
+                            fontWeight = FontWeight.SemiBold,
+                            fontFamily = PoppinsFont,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        if (address.isDefault) {
+
+                            Surface(
+                                shape = RoundedCornerShape(50),
+                                color = Color(0xFF2E7D32)
+                            ) {
+                                Text(
+                                    text = "Default",
+                                    color = Color.White,
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(
+                                        horizontal = 10.dp,
+                                        vertical = 4.dp
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     Text(
                         text = "RT ${address.rt} / RW ${address.rw}",
-                        fontFamily = PoppinsFont
+                        fontFamily = PoppinsFont,
+                        color = Color.Gray
                     )
 
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
                         if (!address.isDefault) {
 
@@ -290,19 +375,19 @@ fun AddressSection(
                                 onClick = { onSetDefault(address.id) }
                             ) {
                                 Text(
-                                    text = "Jadikan Default",
+                                    text = "Set as Default",
                                     fontFamily = PoppinsFont
                                 )
                             }
                         }
 
-                        Spacer(Modifier.weight(1f))
+                        Spacer(modifier = Modifier.weight(1f))
 
                         TextButton(
                             onClick = { onDelete(address.id) }
                         ) {
                             Text(
-                                text = "Hapus",
+                                text = "Delete",
                                 color = Color.Red,
                                 fontFamily = PoppinsFont
                             )
@@ -312,15 +397,28 @@ fun AddressSection(
             }
         }
 
-        OutlinedButton(
-            onClick = onAdd,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(50)
-        ) {
-            Text(
-                text = "Tambah Alamat",
-                fontFamily = PoppinsFont
-            )
+        item {
+
+            OutlinedButton(
+                onClick = onAdd,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 10.dp),
+                shape = RoundedCornerShape(50)
+            ) {
+
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = "Tambah Alamat",
+                    fontFamily = PoppinsFont
+                )
+            }
         }
     }
 }
@@ -362,22 +460,14 @@ fun AnimatedTab(selected: Int, onChange: (Int) -> Unit) {
 @Composable
 fun AddAddressSheet(
     controller: SheetController,
+    villages: List<VillageResponse>,
     onDismiss: () -> Unit,
-    onSave: (String, String, String, String, String) -> Unit
+    onSave: (String, String, String, String, String, Boolean) -> Unit
 ) {
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = controller.sheetState,
-        dragHandle = {
-            Box(
-                Modifier
-                    .padding(vertical = 10.dp)
-                    .size(width = 40.dp, height = 4.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.Gray.copy(.4f))
-            )
-        },
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -386,172 +476,196 @@ fun AddAddressSheet(
             controller.expand()
         }
 
-        var areaId by remember { mutableStateOf("") }
-        var block by remember { mutableStateOf("") }
-        var number by remember { mutableStateOf("") }
-        var rt by remember { mutableStateOf("") }
-        var rw by remember { mutableStateOf("") }
+        var selectedVillage by rememberSaveable { mutableStateOf<VillageResponse?>(null) }
+        var block by rememberSaveable { mutableStateOf(EMPTY_STRING) }
+        var number by rememberSaveable { mutableStateOf(EMPTY_STRING) }
+        var rt by rememberSaveable { mutableStateOf(EMPTY_STRING) }
+        var rw by rememberSaveable { mutableStateOf(EMPTY_STRING) }
+        var isDefault by rememberSaveable { mutableStateOf(false) }
+
+        val isValid =
+            selectedVillage != null &&
+                    block.isNotBlank() &&
+                    number.isNotBlank() &&
+                    rt.isNotBlank() &&
+                    rw.isNotBlank()
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .imePadding()
                 .padding(20.dp)
         ) {
 
-            BaseSimpleFormField("Blok", block) { block = it }
-            Spacer(Modifier.height(10.dp))
+            VillageDropdown(
+                villages = villages,
+                selectedVillage = selectedVillage,
+                onSelected = { selectedVillage = it }
+            )
 
-            BaseSimpleFormField("No", number) { number = it }
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(16.dp))
 
-            BaseSimpleFormField("RT", rt) { rt = it }
-            Spacer(Modifier.height(10.dp))
+            Row {
+                BaseSimpleFormField(
+                    label = "Blok",
+                    value = block,
+                    maxChar = 3,
+                    modifier = Modifier.weight(1f)
+                ) { block = it }
 
-            BaseSimpleFormField("RW", rw) { rw = it }
+                Spacer(Modifier.width(12.dp))
 
-            Spacer(Modifier.height(20.dp))
+                BaseSimpleFormField(
+                    label = "No",
+                    value = number,
+                    maxChar = 3,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.weight(1f)
+                ) { number = it }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Row {
+
+                BaseSimpleFormField(
+                    label = "RT",
+                    value = rt,
+                    maxChar = 3,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.weight(1f)
+                ) { rt = it }
+
+                Spacer(Modifier.width(12.dp))
+
+                BaseSimpleFormField(
+                    label = "RW",
+                    value = rw,
+                    maxChar = 3,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.weight(1f)
+                ) { rw = it }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = isDefault,
+                        role = Role.Checkbox,
+                        onValueChange = { isDefault = it }
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Checkbox(
+                    checked = isDefault,
+                    onCheckedChange = null
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(
+                    text = "Jadikan alamat utama",
+                    fontFamily = PoppinsFont
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
 
             Button(
+                enabled = isValid,
                 onClick = {
-                    onSave(areaId, block, number, rt, rw)
+                    onSave(
+                        selectedVillage!!.id,
+                        block,
+                        number,
+                        rt,
+                        rw,
+                        isDefault
+                    )
                     controller.hide()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green)
             ) {
-                Text("Simpan Alamat", color = Color.White)
+                Text(
+                    "Simpan Alamat",
+                    color = Color.White,
+                    fontFamily = PoppinsFont
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddAddressSheetContentProduction(
-    controller: SheetController,
-    onSave: (UserAddress) -> Unit
+fun VillageDropdown(
+    villages: List<VillageResponse>,
+    selectedVillage: VillageResponse?,
+    onSelected: (VillageResponse) -> Unit
 ) {
 
-    var village by remember { mutableStateOf("") }
-    var block by remember { mutableStateOf("") }
-    var number by remember { mutableStateOf("") }
-    var rt by remember { mutableStateOf("") }
-    var rw by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .imePadding()
-            .padding(20.dp)
+    val rotation by animateFloatAsState(
+        targetValue = if (expanded) 180f else 0f,
+        label = "dropdownRotation"
+    )
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
     ) {
 
-        // ===== HEADER =====
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = "Tambah Alamat",
-                fontFamily = PoppinsFont,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
-
-            Spacer(Modifier.weight(1f))
-
-            TextButton(onClick = { controller.partial() }) {
-                Text(
-                    text = "Half",
-                    fontFamily = PoppinsFont,
+        BaseSimpleFormField(
+            label = "Nama Perumahan",
+            value = selectedVillage?.name ?: "",
+            readOnly = true,
+            modifier = Modifier
+                .menuAnchor(
+                    type = ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                    enabled = true
+                )
+                .fillMaxWidth(),
+            trailingIcon = {
+                Icon(
+                    Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    modifier = Modifier.rotate(rotation)
                 )
             }
+        ) {}
 
-            TextButton(onClick = { controller.expand() }) {
-                Text(
-                    text = "Full",
-                    fontFamily = PoppinsFont,
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 250.dp)
+        ) {
+
+            villages.forEach { village ->
+
+                DropdownMenuItem(
+                    text = {
+                        Text(
+                            text = village.name,
+                            fontFamily = PoppinsFont
+                        )
+                    },
+                    onClick = {
+                        onSelected(village)
+                        expanded = false
+                    }
                 )
+
             }
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        // ===== MAP PICKER SLOT =====
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(AppColor.GreenSoft),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Map Picker (Google Maps)", color = AppColor.Green,
-                fontFamily = PoppinsFont,
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // ===== FORM =====
-        BaseSimpleFormField("Nama Perumahan", village) { village = it }
-        Spacer(Modifier.height(10.dp))
-
-        Row {
-            BaseSimpleFormField("Blok", block, modifier = Modifier.weight(1f)) { block = it }
-            Spacer(Modifier.width(8.dp))
-            BaseSimpleFormField(
-                "No",
-                number,
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier.weight(1f)
-            ) { number = it }
-        }
-
-        Spacer(Modifier.height(10.dp))
-
-        Row {
-            BaseSimpleFormField(
-                "RT",
-                rt,
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier.weight(1f)
-            ) { rt = it }
-
-            Spacer(Modifier.width(8.dp))
-
-            BaseSimpleFormField(
-                "RW",
-                rw,
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier.weight(1f)
-            ) { rw = it }
-        }
-
-        Spacer(Modifier.height(20.dp))
-
-        Button(
-            onClick = {
-                onSave(
-                    UserAddress(
-                        id = System.currentTimeMillis().toString(),
-                        village = village,
-                        block = block,
-                        number = number,
-                        rt = rt,
-                        rw = rw
-                    )
-                )
-                controller.hide()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green)
-        ) {
-            Text(
-                text = "Simpan Alamat", color = Color.White,
-                fontFamily = PoppinsFont,
-            )
         }
     }
 }
@@ -585,7 +699,8 @@ fun ProfileSection(
         BaseSimpleFormField(
             label = "Email",
             value = email,
-            keyboardType = KeyboardType.Email
+            keyboardType = KeyboardType.Email,
+            readOnly = true
         ) { onEmailChange(it) }
 
         Spacer(Modifier.height(10.dp))
@@ -629,9 +744,31 @@ fun rememberSheetController(): SheetController {
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun EditProfileScreenPreview() {
+
+    val villages = listOf(
+        VillageResponse("1", "Puri Lestari"),
+        VillageResponse("2", "Grama Puri Persada"),
+        VillageResponse("3", "Kirana Cikarang")
+    )
+
+    val addresses = listOf(
+        AddressResponse(
+            id = "1",
+            village = "Puri Lestari",
+            block = "A",
+            number = "10",
+            rt = "01",
+            rw = "02",
+            isDefault = true
+        )
+    )
+
     EditProfileScreen(
         uiState = EditProfileStateListener(),
-        uiData = EditProfileDataListener(),
+        uiData = EditProfileDataListener(
+            addressData = addresses,
+            villageData = villages
+        ),
         uiEvent = EditProfileEventListener(),
         uiNavigation = EditProfileNavigationListener()
     )
@@ -646,7 +783,7 @@ fun EditProfileAddressTabPreview() {
     val dummyAddresses = listOf(
         AddressResponse(
             id = "1",
-            areaId = "Griya Asri",
+            village = "Griya Asri",
             block = "A",
             number = "12",
             rt = "01",
@@ -655,7 +792,7 @@ fun EditProfileAddressTabPreview() {
         ),
         AddressResponse(
             id = "2",
-            areaId = "Permata Indah",
+            village = "Permata Indah",
             block = "B",
             number = "8",
             rt = "03",
@@ -699,30 +836,30 @@ fun EditProfileAddressTabPreview() {
     }
 }
 
-
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
-fun AddAddressSheetProductionPreview() {
+fun AddAddressSheetPreview() {
 
     val controller = rememberSheetController()
+
+    val villages = listOf(
+        VillageResponse("1", "Puri Lestari"),
+        VillageResponse("2", "Grama Puri Persada"),
+        VillageResponse("3", "Kirana Cikarang")
+    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFDDDDDD)),
+            .background(Color(0xFFEDEDED)),
         contentAlignment = Alignment.BottomCenter
     ) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(Color.White)
-        ) {
-            AddAddressSheetContentProduction(
-                controller = controller,
-                onSave = {}
-            )
-        }
+        AddAddressSheet(
+            controller = controller,
+            villages = villages,
+            onDismiss = {},
+            onSave = { _, _, _, _, _, _ -> }
+        )
     }
 }
