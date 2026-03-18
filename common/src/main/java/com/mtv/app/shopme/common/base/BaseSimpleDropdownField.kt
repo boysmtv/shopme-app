@@ -170,7 +170,7 @@ fun BaseSimpleDropdownField(
 //@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 //@Composable
 //fun BaseSimpleDropdownFieldPreview() {
-//    var selected by remember { mutableStateOf("") }
+//    var selected by remember { mutableStateOf(EMPTY_STRING) }
 //
 //    Column(
 //        modifier = Modifier
@@ -190,7 +190,7 @@ fun BaseSimpleDropdownField(
 //@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 //@Composable
 //fun BaseSimpleDropdownFieldDialogPreview() {
-//    var selected by remember { mutableStateOf("") }
+//    var selected by remember { mutableStateOf(EMPTY_STRING) }
 //    var expanded by remember { mutableStateOf(true) }
 //
 //    Column(

@@ -40,6 +40,8 @@ import com.mtv.app.shopme.feature.customer.route.SecurityRoute
 import com.mtv.app.shopme.feature.customer.route.SupportRoute
 import com.mtv.app.shopme.feature.seller.route.SellerChatDetailRoute
 import com.mtv.app.shopme.feature.seller.route.SellerChatListRoute
+import com.mtv.app.shopme.feature.seller.route.SellerCreateCafeRoute
+import com.mtv.app.shopme.feature.seller.route.SellerCreateCafeTncRoute
 import com.mtv.app.shopme.feature.seller.route.SellerDashboardRoute
 import com.mtv.app.shopme.feature.seller.route.SellerNotifRoute
 import com.mtv.app.shopme.feature.seller.route.SellerOrderDetailRoute
@@ -156,6 +158,18 @@ fun NavGraphBuilder.orderGraph(nav: NavHostController) {
     composable(CustomerDestinations.CAFE_GRAPH) {
         CafeRoute(nav)
     }
+
+    composable(
+        route = CustomerDestinations.CAFE_GRAPH_WITH_ID,
+        arguments = listOf(
+            navArgument("cafeId") {
+                type = NavType.StringType
+            }
+        )
+    ) {
+        CafeRoute(nav = nav)
+    }
+
     composable(CustomerDestinations.ORDER_GRAPH) {
         OrderRoute(nav)
     }
@@ -189,6 +203,13 @@ fun NavGraphBuilder.sellerGraph(nav: NavHostController) {
 }
 
 fun NavGraphBuilder.sellerDetailGraph(nav: NavHostController) {
+    composable(SellerDestinations.SELLER_CREATE_TNC_GRAPH) {
+        SellerCreateCafeTncRoute(nav)
+    }
+    composable(SellerDestinations.SELLER_CREATE_GRAPH) {
+        SellerCreateCafeRoute(nav)
+    }
+
     composable(SellerDestinations.SELLER_ORDER_DETAIL_GRAPH) {
         SellerOrderDetailRoute(nav)
     }
