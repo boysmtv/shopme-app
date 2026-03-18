@@ -23,8 +23,7 @@ class AddressDefaultUseCase @Inject constructor(
 ) : BaseUseCase<AddressDefaultRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: AddressDefaultRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.PatchAddress,
-        body = param
+        endpoint = ApiEndPoint.PatchAddress(param.id),
     )
 
 }
