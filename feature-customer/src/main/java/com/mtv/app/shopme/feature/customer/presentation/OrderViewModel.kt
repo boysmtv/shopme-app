@@ -7,11 +7,11 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.mtv.app.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.based.BaseViewModel
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.data.OrderItemModel
-import com.mtv.app.shopme.data.OrderModel
-import com.mtv.app.shopme.data.OrderStatus
+import com.mtv.app.shopme.data.dto.OrderItemModel
+import com.mtv.app.shopme.data.dto.OrderModel
+import com.mtv.app.shopme.data.dto.OrderStatus
 import com.mtv.app.shopme.feature.customer.contract.OrderDataListener
 import com.mtv.app.shopme.feature.customer.contract.OrderStateListener
 import kotlinx.coroutines.flow.MutableStateFlow

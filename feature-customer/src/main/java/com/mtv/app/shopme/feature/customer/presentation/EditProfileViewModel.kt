@@ -8,35 +8,37 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import androidx.lifecycle.viewModelScope
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.app.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.valueFlowOf
 import com.mtv.app.shopme.data.remote.request.AddressAddRequest
 import com.mtv.app.shopme.data.remote.request.AddressDefaultRequest
 import com.mtv.app.shopme.data.remote.request.AddressDeleteRequest
-import com.mtv.app.shopme.data.remote.request.ChatMessageSendRequest
+import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
 import com.mtv.app.shopme.domain.usecase.AddressAddUseCase
 import com.mtv.app.shopme.domain.usecase.AddressDefaultUseCase
 import com.mtv.app.shopme.domain.usecase.AddressDeleteUseCase
 import com.mtv.app.shopme.domain.usecase.AddressUseCase
+import com.mtv.app.shopme.domain.usecase.CustomerUpdateUseCase
 import com.mtv.app.shopme.domain.usecase.CustomerUseCase
+import com.mtv.app.shopme.domain.usecase.VillageUseCase
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDataListener
+import com.mtv.app.shopme.feature.customer.contract.EditProfileDialog
 import com.mtv.app.shopme.feature.customer.contract.EditProfileStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
     private val securePrefs: SecurePrefs,
     private val customerUseCase: CustomerUseCase,
+    private val customerUpdateUseCase: CustomerUpdateUseCase,
     private val addressUseCase: AddressUseCase,
+    private val villageUseCase: VillageUseCase,
     private val addressAddUseCase: AddressAddUseCase,
     private val addressDeleteUseCase: AddressDeleteUseCase,
     private val addressDefaultUseCase: AddressDefaultUseCase,
@@ -49,13 +51,13 @@ class EditProfileViewModel @Inject constructor(
     override val uiData = MutableStateFlow(EditProfileDataListener())
 
     init {
-        //getCustomer()
-        //getAddress()
+        doFetchProfile()
+        doFetchAddress()
+        doFetchVillage()
     }
 
-    fun getCustomer() {
+    fun doFetchProfile() {
         launchUseCase(
-            loading = false,
             target = uiState.valueFlowOf(
                 get = { it.customerState },
                 set = { state -> copy(customerState = state) }
@@ -73,7 +75,7 @@ class EditProfileViewModel @Inject constructor(
         )
     }
 
-    fun getAddress() {
+    fun doFetchAddress() {
         launchUseCase(
             loading = false,
             target = uiState.valueFlowOf(
@@ -91,8 +93,55 @@ class EditProfileViewModel @Inject constructor(
         )
     }
 
+    fun doFetchVillage() {
+        launchUseCase(
+            loading = false,
+            target = uiState.valueFlowOf(
+                get = { it.villageState },
+                set = { state -> copy(villageState = state) }
+            ),
+            block = {
+                villageUseCase(Unit)
+            },
+            onSuccess = { data ->
+                uiData.update {
+                    it.copy(villageData = data.data)
+                }
+            }
+        )
+    }
+
+    fun doUpdateProfile(
+        name: String,
+        phone: String,
+        photo: String,
+    ) {
+        launchUseCase(
+            target = uiState.valueFlowOf(
+                get = { it.customerUpdateState },
+                set = { state -> copy(customerUpdateState = state) }
+            ),
+            block = {
+                customerUpdateUseCase(
+                    CustomerUpdateRequest(
+                        name = name,
+                        phone = phone,
+                        photo = photo
+                    )
+                )
+            },
+            onSuccess = {
+                uiState.update {
+                    it.copy(
+                        activeDialog = EditProfileDialog.SuccessUpdateProfile
+                    )
+                }
+            }
+        )
+    }
+
     fun doAddAddress(
-        areaId: String,
+        villageId: String,
         block: String,
         number: String,
         rt: String,
@@ -107,7 +156,7 @@ class EditProfileViewModel @Inject constructor(
             block = {
                 addressAddUseCase(
                     AddressAddRequest(
-                        areaId = areaId,
+                        villageId = villageId,
                         block = block,
                         number = number,
                         rt = rt,
@@ -115,6 +164,9 @@ class EditProfileViewModel @Inject constructor(
                         isDefault = isDefault
                     )
                 )
+            },
+            onSuccess = {
+                doFetchAddress()
             }
         )
     }
@@ -133,6 +185,9 @@ class EditProfileViewModel @Inject constructor(
                         id = id,
                     )
                 )
+            },
+            onSuccess = {
+                doFetchAddress()
             }
         )
     }
@@ -151,7 +206,18 @@ class EditProfileViewModel @Inject constructor(
                         id = id,
                     )
                 )
+            },
+            onSuccess = {
+                doFetchAddress()
             }
         )
+    }
+
+    fun doDismissActiveDialog() {
+        uiState.update {
+            it.copy(
+                activeDialog = null,
+            )
+        }
     }
 }

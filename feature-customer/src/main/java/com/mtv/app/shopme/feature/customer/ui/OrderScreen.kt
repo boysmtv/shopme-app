@@ -66,10 +66,10 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.data.OrderItemModel
-import com.mtv.app.shopme.data.OrderModel
-import com.mtv.app.shopme.data.OrderStatus
-import com.mtv.app.shopme.data.PaymentMethod
+import com.mtv.app.shopme.data.dto.OrderItemModel
+import com.mtv.app.shopme.data.dto.OrderModel
+import com.mtv.app.shopme.data.dto.OrderStatus
+import com.mtv.app.shopme.data.dto.PaymentMethod
 import com.mtv.app.shopme.feature.customer.contract.OrderDataListener
 import com.mtv.app.shopme.feature.customer.contract.OrderEventListener
 import com.mtv.app.shopme.feature.customer.contract.OrderNavigationListener

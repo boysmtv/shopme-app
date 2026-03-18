@@ -10,7 +10,6 @@ package com.mtv.app.shopme.feature.auth.contract
 
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING
 
 data class RegisterStateListener(

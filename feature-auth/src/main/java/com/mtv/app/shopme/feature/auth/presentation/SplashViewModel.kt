@@ -1,12 +1,17 @@
 package com.mtv.app.shopme.feature.auth.presentation
 
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.app.core.provider.utils.device.DeviceInfoProvider
-import com.mtv.app.core.provider.utils.device.InstallationIdProvider
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.device.DeviceInfoProvider
+import com.mtv.based.core.provider.utils.device.InstallationIdProvider
+import com.mtv.app.shopme.common.Constant.PLATFORM
+import com.mtv.app.shopme.common.ConstantPreferences.FCM_TOKEN
+import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.config.AppInfoProvider
+import com.mtv.app.shopme.common.valueFlowOf
 import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.request.SplashRequest
 import com.mtv.app.shopme.data.remote.response.AppConfig
 import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.app.shopme.data.remote.response.User
@@ -34,35 +39,34 @@ class SplashViewModel @Inject constructor(
     override val uiData = MutableStateFlow(Unit)
 
     fun doSplash() {
-//        launchUseCase(
-//            loading = false,
-//            target = uiState.valueFlowOf(
-//                get = { it.splashState },
-//                set = { state -> copy(splashState = state) }
-//            ),
-//            block = {
-//                splashUseCase(
-//                    SplashRequest(
-//                        deviceId = installationIdProvider.getInstallationId(),
-//                        fcmToken = securePrefs.getString(FCM_TOKEN),
-//                        appVersionName = appInfoProvider.versionName,
-//                        appVersionCode = appInfoProvider.versionCode,
-//                        deviceInfo = deviceInfoProvider.getAllDeviceInfo(),
-//                        platform = PLATFORM,
-//                        createdAt = System.currentTimeMillis().toString()
-//                    )
-//                )
-//            },
-//            onSuccess = { data ->
-//                securePrefs.putObject(SPLASH_RESPONSE, data.data)
-//            }
-//        )
-
-        uiState.update {
-            it.copy(
-                splashState = Resource.Success(mockApi)
-            )
-        }
+        launchUseCase(
+            loading = false,
+            target = uiState.valueFlowOf(
+                get = { it.splashState },
+                set = { state -> copy(splashState = state) }
+            ),
+            block = {
+                splashUseCase(
+                    SplashRequest(
+                        deviceId = installationIdProvider.getInstallationId(),
+                        fcmToken = securePrefs.getString(FCM_TOKEN),
+                        appVersionName = appInfoProvider.versionName,
+                        appVersionCode = appInfoProvider.versionCode,
+                        deviceInfo = deviceInfoProvider.getAllDeviceInfo(),
+                        platform = PLATFORM,
+                        createdAt = System.currentTimeMillis().toString()
+                    )
+                )
+            },
+            onSuccess = { data ->
+                securePrefs.putObject(SPLASH_RESPONSE, data.data)
+            }
+        )
+//        uiState.update {
+//            it.copy(
+//                splashState = Resource.Success(mockApi)
+//            )
+//        }
     }
 
     val mockApi = ApiResponse(

@@ -67,6 +67,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerStoreDataListener
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreStateListener
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Immutable
 data class ProfileMenuItemModel(
@@ -224,7 +225,7 @@ fun ProfileMenuItem(
 
     val scale by animateFloatAsState(
         targetValue = if (pressed) 0.97f else 1f,
-        label = ""
+        label = EMPTY_STRING
     )
 
     Card(

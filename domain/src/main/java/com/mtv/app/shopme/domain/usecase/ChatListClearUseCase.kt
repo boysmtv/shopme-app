@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.core.provider.based.BaseUseCase
+import com.mtv.based.core.provider.based.BaseUseCase
 import com.mtv.based.core.network.di.IoDispatcher
 import com.mtv.based.core.network.model.NetworkResponse
 import com.mtv.based.core.network.repository.NetworkRepository

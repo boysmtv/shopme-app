@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.core.provider.based.BaseUseCase
+import com.mtv.based.core.provider.based.BaseUseCase
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.request.SplashRequest

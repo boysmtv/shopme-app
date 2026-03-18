@@ -9,15 +9,16 @@
 package com.mtv.app.shopme.feature.auth.contract
 
 import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class PasswordStateListener(
     val changePasswordState: ResourceFirebase<String> = ResourceFirebase.Loading
 )
 
 data class PasswordDataListener(
-    val currentPassword: String = "",
-    val newPassword: String = "",
-    val confirmPassword: String = ""
+    val currentPassword: String = EMPTY_STRING,
+    val newPassword: String = EMPTY_STRING,
+    val confirmPassword: String = EMPTY_STRING
 )
 
 data class PasswordEventListener(

@@ -61,6 +61,7 @@ import com.mtv.app.shopme.feature.customer.contract.HelpEventListener
 import com.mtv.app.shopme.feature.customer.contract.HelpFaq
 import com.mtv.app.shopme.feature.customer.contract.HelpNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.HelpStateListener
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
 fun HelpScreen(
@@ -190,7 +191,7 @@ fun HelpFaqItem(
                 val rotation =
                     androidx.compose.animation.core.animateFloatAsState(
                         if (faq.expanded) 180f else 0f,
-                        label = ""
+                        label = EMPTY_STRING
                     )
 
                 Icon(

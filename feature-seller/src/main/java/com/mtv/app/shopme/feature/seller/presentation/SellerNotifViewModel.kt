@@ -9,8 +9,8 @@
 package com.mtv.app.shopme.feature.seller.presentation
 
 import com.google.protobuf.LazyStringArrayList.emptyList
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_SELLER_NOTIFICATION
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifData
@@ -18,6 +18,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerNotifDialog
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifState
 import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
 import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -43,7 +44,7 @@ class SellerNotifViewModel @Inject constructor(
 
 //        uiData.update { it.copy(localNotification = local) }
         uiState.update {
-            it.copy(notificationState = ResourceFirebase.Success(""))
+            it.copy(notificationState = ResourceFirebase.Success(EMPTY_STRING))
         }
     }
 

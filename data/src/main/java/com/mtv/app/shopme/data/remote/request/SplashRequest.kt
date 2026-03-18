@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.data.remote.request
 
-import com.mtv.app.core.provider.utils.device.DeviceInfo
+import com.mtv.based.core.provider.utils.device.DeviceInfo
 import kotlinx.serialization.Serializable
 
 @Serializable

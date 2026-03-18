@@ -1,6 +1,6 @@
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.core.provider.based.BaseFirebaseUseCase
+import com.mtv.based.core.provider.based.BaseFirebaseUseCase
 import com.mtv.app.shopme.data.local.NotificationData
 import com.mtv.based.core.network.datasource.FirebaseDataSource
 import com.mtv.based.core.network.di.IoDispatcher

@@ -15,6 +15,7 @@ import android.graphics.Matrix
 import android.net.Uri
 import android.util.Base64
 import androidx.exifinterface.media.ExifInterface
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.io.ByteArrayOutputStream
 import kotlin.apply
 import kotlin.io.use
@@ -51,7 +52,7 @@ fun uriToBase64(
         .openInputStream(uri)
         ?.use {
             BitmapFactory.decodeStream(it, null, bitmapOptions)
-        } ?: return ""
+        } ?: return EMPTY_STRING
 
     val fixedBitmap = fixBitmapOrientation(context, uri, decodedBitmap)
 
@@ -68,7 +69,7 @@ fun base64ToBitmap(base64: String): Bitmap? {
     return try {
         val cleanBase64 = base64
             .substringAfter("base64,", base64)
-            .replace("\n", "")
+            .replace("\n", EMPTY_STRING)
 
         val decoded = Base64.decode(cleanBase64, Base64.DEFAULT)
         BitmapFactory.decodeByteArray(decoded, 0, decoded.size)

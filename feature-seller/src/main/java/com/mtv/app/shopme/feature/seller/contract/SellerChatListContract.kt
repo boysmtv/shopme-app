@@ -8,12 +8,14 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+
 data class SellerChatListStateListener(
     val chatList: List<SellerChatListItem> = emptyList()
 )
 
 data class SellerChatListDataListener(
-    val unused: String = ""
+    val unused: String = EMPTY_STRING
 )
 
 class SellerChatListEventListener(

@@ -14,7 +14,7 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.viewModelScope
-import com.mtv.app.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.based.BaseViewModel
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.feature.customer.contract.SupportDataListener
 import com.mtv.app.shopme.feature.customer.contract.SupportStateListener

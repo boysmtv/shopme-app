@@ -9,8 +9,8 @@
 package com.mtv.app.shopme.feature.auth.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
 import com.mtv.app.shopme.common.base.UiOwner

@@ -5,13 +5,25 @@
  *
  * Last modified by Dedy Wijaya on 12/02/26 15.16
  */
+
 package com.mtv.app.shopme.feature.customer.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,17 +31,29 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -40,12 +64,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.mtv.app.shopme.common.*
-import com.mtv.app.shopme.data.FoodItemModel
-import com.mtv.app.shopme.feature.customer.contract.*
-import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import coil.compose.AsyncImage
+import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.data.mockFoodList
+import com.mtv.app.shopme.data.dto.FoodCategory
+import com.mtv.app.shopme.data.dto.FoodItemModel
+import com.mtv.app.shopme.data.dto.FoodStatus
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.response.PageResponse
+import com.mtv.app.shopme.domain.mapper.toUiModel
+import com.mtv.app.shopme.feature.customer.contract.SearchDataListener
+import com.mtv.app.shopme.feature.customer.contract.SearchEventListener
+import com.mtv.app.shopme.feature.customer.contract.SearchNavigationListener
+import com.mtv.app.shopme.feature.customer.contract.SearchStateListener
+import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import java.math.BigDecimal
+import kotlinx.coroutines.flow.distinctUntilChanged
+import org.threeten.bp.LocalDateTime
 
 @Composable
 fun SearchScreen(
@@ -57,21 +96,25 @@ fun SearchScreen(
 
     val listState = rememberLazyListState()
 
-    val items = uiData.results.ifEmpty {
-        mockFoodList
-    }
+    val items: List<FoodItemModel> = uiData.results.map { it.toUiModel() }
 
     LaunchedEffect(listState) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
-        }.collect { lastVisible ->
-
-            val total = listState.layoutInfo.totalItemsCount
-
-            if (lastVisible != null && lastVisible >= total - 2 && total > 0) {
-                uiEvent.onLoadNextPage()
-            }
         }
+            .distinctUntilChanged()
+            .collect { lastVisible ->
+
+                val total = listState.layoutInfo.totalItemsCount
+
+                if (
+                    lastVisible != null &&
+                    lastVisible >= total - 2 &&
+                    total > 0
+                ) {
+                    uiEvent.onLoadNextPage()
+                }
+            }
     }
 
     Column(
@@ -96,31 +139,49 @@ fun SearchScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
+        val isLoading = uiState.searchFoodState is Resource.Loading
+        if (uiData.query.isNotEmpty() && items.isEmpty() && !isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No result found")
+            }
+        } else {
 
-            itemsIndexed(items) { index, food ->
+            if (uiState.searchFoodState is Resource.Loading && items.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Loading...")
+                }
+            }
 
-                SearchItem(
-                    movie = food as FoodItemModel,
-                    onClickItem = {
-                        uiNavigation.onDetailClick()
-                    },
-                    previewDrawable = when (index) {
-                        0 -> R.drawable.image_burger
-                        1 -> R.drawable.image_pizza
-                        2 -> R.drawable.image_platbread
-                        3 -> R.drawable.image_cheese_burger
-                        4 -> R.drawable.image_bakso
-                        5 -> R.drawable.image_pempek
-                        6 -> R.drawable.image_padang
-                        7 -> R.drawable.image_sate
-                        else -> null
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                itemsIndexed(
+                    items = items,
+                    key = { _, item -> item.id }
+                ) { index, food ->
+
+                    SearchItem(
+                        movie = food,
+                        onClickItem = {
+                            uiNavigation.onDetailClick(it)
+                        },
+                        previewDrawable = getPreviewDrawable(index)
+                    )
+                }
+
+                item {
+                    if (uiState.searchFoodState is Resource.Loading && items.isNotEmpty()) {
+                        Text("Loading more...")
                     }
-                )
+                }
             }
         }
     }
@@ -131,7 +192,7 @@ fun SearchHeader(
     uiData: SearchDataListener,
     uiEvent: SearchEventListener
 ) {
-    var query by remember { mutableStateOf(uiData.query) }
+    var query by remember(uiData.query) { mutableStateOf(uiData.query) }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -195,8 +256,8 @@ fun SearchHeader(
                 if (query.isNotEmpty()) {
                     IconButton(
                         onClick = {
-                            query = ""
-                            uiEvent.onQueryChanged("")
+                            query = EMPTY_STRING
+                            uiEvent.onQueryChanged(EMPTY_STRING)
                         }
                     ) {
                         Icon(Icons.Default.Clear, contentDescription = null)
@@ -223,7 +284,7 @@ fun SearchHeader(
 @Composable
 fun SearchItem(
     movie: FoodItemModel,
-    onClickItem: (Int) -> Unit,
+    onClickItem: (String) -> Unit,
     previewDrawable: Int? = null
 ) {
 
@@ -249,23 +310,22 @@ fun SearchItem(
                     RoundedCornerShape(8.dp)
                 )
 
-            if (previewDrawable != null) {
-
+            if (previewDrawable != null && movie.imageUrl.isEmpty()) {
                 Image(
                     painter = painterResource(previewDrawable),
                     contentDescription = null,
                     modifier = imageModifier,
                     contentScale = ContentScale.Crop
                 )
-
             } else {
-
-                Box(
-                    modifier = imageModifier.background(Color.LightGray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No Image", fontSize = 12.sp)
-                }
+                AsyncImage(
+                    model = movie.imageUrl,
+                    contentDescription = null,
+                    modifier = imageModifier,
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(previewDrawable ?: R.drawable.no_image),
+                    error = painterResource(previewDrawable ?: R.drawable.no_image)
+                )
             }
 
             Spacer(Modifier.width(12.dp))
@@ -288,7 +348,7 @@ fun SearchItem(
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text = movie.desc,
+                    text = movie.description,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     fontSize = 10.sp,
@@ -305,7 +365,7 @@ fun SearchItem(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Mamah Al Cafe", fontSize = 10.sp)
+                    Text(movie.cafeName, fontSize = 10.sp)
                 }
 
                 Spacer(Modifier.height(2.dp))
@@ -318,7 +378,7 @@ fun SearchItem(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Puri Lestari - Blok H12/01", fontSize = 10.sp)
+                    Text(movie.cafeAddress, fontSize = 10.sp)
                 }
             }
         }
@@ -330,11 +390,51 @@ fun SearchItem(
     }
 }
 
+fun getPreviewDrawable(index: Int): Int? = when (index) {
+    0 -> R.drawable.image_burger
+    1 -> R.drawable.image_pizza
+    2 -> R.drawable.image_platbread
+    3 -> R.drawable.image_cheese_burger
+    4 -> R.drawable.image_bakso
+    5 -> R.drawable.image_pempek
+    6 -> R.drawable.image_padang
+    7 -> R.drawable.image_sate
+    else -> null
+}
+
+
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SearchScreenPreview() {
 
     val navController = rememberNavController()
+
+    val mockResults = mockFoodResponses()
+
+    val mockData = SearchDataListener(
+        query = "burger",
+        results = mockResults
+    )
+
+    val mockState = SearchStateListener(
+        searchFoodState = Resource.Success(
+            ApiResponse(
+                code = "SUCCESS",
+                message = "Success",
+                data = PageResponse(
+                    content = mockResults,
+                    page = 0,
+                    size = mockResults.size,
+                    totalElements = mockResults.size,
+                    totalPages = 1,
+                    last = true
+                ),
+                timestamp = "",
+                status = 200,
+                traceId = ""
+            )
+        )
+    )
 
     Scaffold(
         bottomBar = {
@@ -350,11 +450,152 @@ fun SearchScreenPreview() {
         ) {
 
             SearchScreen(
-                uiState = SearchStateListener(),
-                uiData = SearchDataListener(),
+                uiState = mockState,
+                uiData = mockData,
                 uiEvent = SearchEventListener(),
                 uiNavigation = SearchNavigationListener()
             )
         }
     }
+}
+
+fun mockFoodResponses(): List<FoodResponse> {
+    return listOf(
+        FoodResponse(
+            id = "1",
+            cafeId = "cafe_1",
+            name = "Burger Cheese",
+            cafeName = "Cafe Jakarta",
+            cafeAddress = "Jl. Sudirman No.1",
+            description = "Delicious burger with melted cheese",
+            price = BigDecimal("25000"),
+            category = FoodCategory.FOOD,
+            status = FoodStatus.READY,
+            quantity = 10,
+            estimate = "10-15 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "2",
+            cafeId = "cafe_2",
+            name = "Pizza Pepperoni",
+            cafeName = "Pizza House",
+            cafeAddress = "Jl. Thamrin No.10",
+            description = "Hot pizza with pepperoni",
+            price = BigDecimal("50000"),
+            category = FoodCategory.FOOD,
+            status = FoodStatus.READY,
+            quantity = 5,
+            estimate = "15-20 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "3",
+            cafeId = "cafe_3",
+            name = "Bakso Urat",
+            cafeName = "Bakso Pak Kumis",
+            cafeAddress = "Jl. Asia Afrika",
+            description = "Bakso kenyal dengan kuah gurih",
+            price = BigDecimal("20000"),
+            category = FoodCategory.FOOD,
+            status = FoodStatus.READY,
+            quantity = 20,
+            estimate = "5-10 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "4",
+            cafeId = "cafe_4",
+            name = "Nasi Goreng Spesial",
+            cafeName = "Warung Nusantara",
+            cafeAddress = "Jl. Malioboro",
+            description = "Nasi goreng dengan telur dan ayam",
+            price = BigDecimal("30000"),
+            category = FoodCategory.FOOD,
+            status = FoodStatus.READY,
+            quantity = 15,
+            estimate = "10-15 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "5",
+            cafeId = "cafe_5",
+            name = "Sate Ayam",
+            cafeName = "Sate Madura",
+            cafeAddress = "Jl. Diponegoro",
+            description = "Sate ayam dengan bumbu kacang",
+            price = BigDecimal("28000"),
+            category = FoodCategory.FOOD,
+            status = FoodStatus.READY,
+            quantity = 25,
+            estimate = "10-15 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "6",
+            cafeId = "cafe_6",
+            name = "Ice Matcha Latte",
+            cafeName = "Matcha House",
+            cafeAddress = "Jl. Braga",
+            description = "Minuman matcha creamy dan segar",
+            price = BigDecimal("28000"),
+            category = FoodCategory.DRINK,
+            status = FoodStatus.READY,
+            quantity = 40,
+            estimate = "5-10 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "7",
+            cafeId = "cafe_7",
+            name = "Cappuccino",
+            cafeName = "Coffee Corner",
+            cafeAddress = "Jl. Sudirman",
+            description = "Kopi cappuccino dengan foam lembut",
+            price = BigDecimal("32000"),
+            category = FoodCategory.DRINK,
+            status = FoodStatus.READY,
+            quantity = 30,
+            estimate = "5 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "8",
+            cafeId = "cafe_8",
+            name = "French Fries",
+            cafeName = "Snack Bar",
+            cafeAddress = "Jl. Gatot Subroto",
+            description = "Kentang goreng crispy dengan saus",
+            price = BigDecimal("18000"),
+            category = FoodCategory.SNACK, // ⬅️ pastikan enum ada
+            status = FoodStatus.READY,
+            quantity = 50,
+            estimate = "5-10 min",
+            isActive = true,
+            createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
+            images = listOf(""),
+            variants = emptyList()
+        )
+    )
 }

@@ -8,9 +8,9 @@
 
 package com.mtv.app.shopme.config
 
-import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.app.core.provider.utils.SessionManager
-import com.mtv.app.core.provider.utils.device.InstallationIdProvider
+import com.mtv.based.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.utils.device.InstallationIdProvider
 import com.mtv.app.shopme.common.BuildConfig
 import com.mtv.app.shopme.common.ConstantPreferences
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN

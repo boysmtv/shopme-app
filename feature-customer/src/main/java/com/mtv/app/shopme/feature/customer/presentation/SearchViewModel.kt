@@ -8,9 +8,10 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.app.core.provider.utils.SessionManager
+import androidx.lifecycle.viewModelScope
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.valueFlowOf
 import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
@@ -22,7 +23,11 @@ import com.mtv.app.shopme.feature.customer.contract.SearchStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -39,12 +44,46 @@ class SearchViewModel @Inject constructor(
     private var isLastPage = false
     private var isLoading = false
 
-    fun doSearch(name: String, page: Int = 0) {
+    private val queryFlow = MutableStateFlow("")
+
+    init {
+        observeSearch()
+        doSearch("", 0)
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observeSearch() {
+        viewModelScope.launch {
+            queryFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .collect { query ->
+                    currentPage = 0
+                    isLastPage = false
+                    doSearch(query, 0)
+                }
+        }
+    }
+
+    fun onQueryChanged(query: String) {
+        uiData.update { it.copy(query = query) }
+        queryFlow.value = query
+    }
+
+    fun doSearch(name: String, page: Int = 0, showLoading: Boolean = true) {
 
         if (isLoading) return
         isLoading = true
 
+        if (page == 0) {
+            currentPage = 0
+            isLastPage = false
+        }
+
+        uiData.update { it.copy(query = name) }
+
         launchUseCase(
+            loading = showLoading,
             target = uiState.valueFlowOf(
                 get = { it.searchFoodState },
                 set = { state -> copy(searchFoodState = state) }
@@ -54,14 +93,25 @@ class SearchViewModel @Inject constructor(
                     SearchFoodRequest(
                         name = name,
                         page = page,
-                        size = 10
+                        size = 10,
+                        sort = "name,asc"
                     )
                 )
             },
             onSuccess = { response ->
-                response.data?.let {
-                    currentPage = it.page
-                    isLastPage = it.last
+
+                val pageData = response.data ?: return@launchUseCase
+
+                currentPage = pageData.page
+                isLastPage = pageData.last
+
+                uiData.update { current ->
+                    val newList = if (page == 0) {
+                        pageData.content
+                    } else {
+                        current.results + pageData.content
+                    }
+                    current.copy(results = newList)
                 }
             },
             onComplete = {
@@ -72,9 +122,12 @@ class SearchViewModel @Inject constructor(
 
     fun loadNextPage() {
         if (isLastPage) return
+        if (isLoading) return
+
         doSearch(
             name = uiData.value.query,
-            page = currentPage + 1
+            page = currentPage + 1,
+            showLoading = false
         )
     }
 

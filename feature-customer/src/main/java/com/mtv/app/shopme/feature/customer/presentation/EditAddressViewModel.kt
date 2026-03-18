@@ -9,9 +9,9 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.app.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.feature.customer.contract.EditAddressDataListener
 import com.mtv.app.shopme.feature.customer.contract.EditAddressStateListener

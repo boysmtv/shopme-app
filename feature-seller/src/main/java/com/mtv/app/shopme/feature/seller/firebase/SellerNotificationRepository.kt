@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.feature.seller.firebase
 
-import com.mtv.app.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_SELLER_NOTIFICATION
 import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
 

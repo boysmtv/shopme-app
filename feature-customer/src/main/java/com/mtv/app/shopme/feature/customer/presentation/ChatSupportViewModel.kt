@@ -9,7 +9,7 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.mtv.app.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.based.BaseViewModel
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportDataListener
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportStateListener

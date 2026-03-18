@@ -62,6 +62,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.InterFont
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
@@ -74,6 +75,7 @@ import com.mtv.app.shopme.feature.customer.contract.HomeStateListener
 import com.mtv.app.shopme.feature.customer.utils.checkAddress
 import com.mtv.app.shopme.feature.customer.utils.checkName
 import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import kotlinx.coroutines.launch
 
 @Composable
@@ -438,7 +440,7 @@ fun FoodCard(
 
             Box {
                 AsyncImage(
-                    model = item.imageUrl,
+                    model = item.images.first(),
                     contentDescription = item.name,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -481,7 +483,7 @@ fun FoodCard(
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text = "$${item.price}",
+                    text = item.price.toRupiah(),
                     fontFamily = InterFont,
                     fontWeight = FontWeight.Medium,
                     color = AppColor.Green
@@ -502,16 +504,16 @@ fun HomeScreenPreview() {
         email = "boys.mtv@gmail.com",
         address = AddressResponse(
             id = "1",
-            areaId = "Puri Lestari",
+            village = "Puri Lestari",
             block = "H2",
             number = "21",
             rt = "012",
             rw = "002",
             isDefault = true
         ),
-        photo = "",
+        photo = EMPTY_STRING,
         verified = true,
-        stats = Stats(0, 0, ""),
+        stats = Stats(0, 0, EMPTY_STRING),
         menuSummary = MenuSummary(0, 0, 0, 0, 0)
     )
 

@@ -8,9 +8,9 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.app.core.provider.based.BaseViewModel
-import com.mtv.app.core.provider.utils.SecurePrefs
-import com.mtv.app.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.valueFlowOf
@@ -36,12 +36,11 @@ class ProfileViewModel @Inject constructor(
     override val uiData = MutableStateFlow(ProfileDataListener())
 
     init {
-        //getCustomer()
+        getCustomer()
     }
 
     fun getCustomer() {
         launchUseCase(
-            loading = false,
             target = uiState.valueFlowOf(
                 get = { it.customerState },
                 set = { state -> copy(customerState = state) }
@@ -59,12 +58,20 @@ class ProfileViewModel @Inject constructor(
         )
     }
 
+    fun doCheckTncCafe(): Boolean {
+        return false
+    }
+
     fun showLogoutDialog() {
-        uiState.value = uiState.value.copy(activeDialog = ProfileDialog.LogoutConfirm)
+        uiState.update {
+            it.copy(activeDialog = ProfileDialog.LogoutConfirm)
+        }
     }
 
     fun dismissDialog() {
-        uiState.value = uiState.value.copy(activeDialog = null)
+        uiState.update {
+            it.copy(activeDialog = null)
+        }
     }
 
 }

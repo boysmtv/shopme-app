@@ -19,9 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.mtv.based.core.provider.utils.SessionManager
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    sessionManager: SessionManager
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -56,7 +59,10 @@ fun AppNavigation() {
                 .fillMaxSize()
                 .background(Color.Transparent)
         ) {
-            AppNavGraph(navController)
+            AppNavGraph(
+                navController = navController,
+                sessionManager = sessionManager
+            )
         }
     }
 }

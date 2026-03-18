@@ -8,23 +8,25 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+
 data class SellerEditStoreStateListener(
     var isLoading: Boolean = false
 )
 
 
 data class SellerEditStoreDataListener(
-    var storeName: String = "",
-    var phone: String = "",
-    var minOrder: String = "",
-    var storeOpen: String = "",
-    var description: String = "",
+    var storeName: String = EMPTY_STRING,
+    var phone: String = EMPTY_STRING,
+    var minOrder: String = EMPTY_STRING,
+    var storeOpen: String = EMPTY_STRING,
+    var description: String = EMPTY_STRING,
     var storePhoto: String? = null,
-    var village: String = "",
-    var block: String = "",
-    var number: String = "",
-    var rt: String = "",
-    var rw: String = ""
+    var village: String = EMPTY_STRING,
+    var block: String = EMPTY_STRING,
+    var number: String = EMPTY_STRING,
+    var rt: String = EMPTY_STRING,
+    var rw: String = EMPTY_STRING
 )
 
 data class SellerEditStoreEventListener(

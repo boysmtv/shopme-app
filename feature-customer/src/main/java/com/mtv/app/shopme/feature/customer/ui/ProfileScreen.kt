@@ -59,7 +59,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
@@ -79,7 +78,6 @@ import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
     uiState: ProfileStateListener,
     uiData: ProfileDataListener,
     uiEvent: ProfileEventListener,
@@ -230,7 +228,7 @@ fun ProfileScreen(
                         title = "Menjadi Penjual",
                         icon = Icons.Default.CardTravel,
                         onClickMenu = {
-                            uiNavigation.onNavigateToSeller(navController)
+                            uiEvent.onCheckTncCafe()
                         }
                     )
                     ProfileMenuItem(
@@ -420,7 +418,7 @@ fun ProfileScreenPreview() {
         email = "boys.mtv@gmail.com",
         address = AddressResponse(
             id = "89a3c44a-b9c7-412f-83fd-f4f1ed66c6da",
-            areaId = "Puri Lestari",
+            village = "Puri Lestari",
             block = "H2",
             number = "21",
             rt = "012",
@@ -456,7 +454,6 @@ fun ProfileScreenPreview() {
                 .background(Color.White)
         ) {
             ProfileScreen(
-                navController = navController,
                 uiState = ProfileStateListener(),
                 uiData = ProfileDataListener(
                     customerData = previewCustomer

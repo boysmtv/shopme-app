@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
     implementation(project(":common"))
+    implementation(project(":core"))
     implementation(project(":nav"))
     implementation(project(":feature-customer"))
     implementation(project(":feature-seller"))

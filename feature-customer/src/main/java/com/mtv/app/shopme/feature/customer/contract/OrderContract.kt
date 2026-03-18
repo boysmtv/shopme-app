@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.OrderModel
+import com.mtv.app.shopme.data.dto.OrderModel
 
 data class OrderStateListener(
     val isLoading: Boolean = false,

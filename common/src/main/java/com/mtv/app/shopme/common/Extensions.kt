@@ -4,12 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.mtv.app.core.provider.based.BaseUiState
-import com.mtv.app.core.provider.based.BaseViewModel
+import com.mtv.based.core.provider.based.BaseUiState
+import com.mtv.based.core.provider.based.BaseViewModel
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Locale
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+
 
 /** HELPER MAPPING FLOW */
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)
@@ -62,7 +65,8 @@ inline fun <reified VM, UI_STATE, UI_DATA> BaseRoute(
     content(vm, baseUiState, uiState, uiData)
 }
 
-/** GENERIC UPDATE DATA */
-fun <T> updateUiDataListener(stateFlow: MutableStateFlow<T>, block: T.() -> T) {
-    stateFlow.update { it.block() }
+fun BigDecimal.toRupiah(): String {
+    val formatter = NumberFormat.getCurrencyInstance(Locale.Builder().setLanguage("id").setRegion("ID").build())
+    formatter.maximumFractionDigits = 0
+    return formatter.format(this).replace("Rp", "Rp ")
 }
