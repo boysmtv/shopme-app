@@ -20,6 +20,7 @@ object CustomerDestinations {
     const val CHAT_GRAPH = "CHAT_GRAPH"
     const val ORDER_GRAPH = "ORDER_GRAPH"
     const val CAFE_GRAPH = "CAFE_GRAPH"
+    const val CAFE_GRAPH_WITH_ID = "CAFE_GRAPH_WITH_ID/{cafeId}"
     const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
     const val ORDER_HISTORY_GRAPH = "ORDER_HISTORY_GRAPH"
     const val SETTINGS_GRAPH = "SETTINGS_GRAPH"
@@ -30,5 +31,7 @@ object CustomerDestinations {
     const val SECURITY_GRAPH = "SECURITY_GRAPH"
 
     fun navigateToDetail(foodId: String) = "DETAIL_GRAPH_WITH_ID/$foodId"
+
+    fun navigateToCafe(cafeId: String) = "CAFE_GRAPH_WITH_ID/$cafeId"
 
 }

@@ -15,6 +15,7 @@ import com.mtv.app.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.valueFlowOf
+import com.mtv.app.shopme.data.remote.request.CartVariantRequest
 import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.app.shopme.domain.usecase.FoodAddToCartUseCase
 import com.mtv.app.shopme.domain.usecase.FoodDetailUseCase
@@ -88,9 +89,9 @@ class DetailViewModel @Inject constructor(
 
     fun doAddToCart(
         foodId: String,
-        sizeId: String,
-        variantId: String,
-        additionalId: String,
+        variants: List<CartVariantRequest>,
+        quantity: Int,
+        note: String,
     ) {
         launchUseCase(
             loading = false,
@@ -102,9 +103,9 @@ class DetailViewModel @Inject constructor(
                 foodAddToCartUseCase(
                     FoodAddToCartRequest(
                         foodId = foodId,
-                        sizeId = sizeId,
-                        variantId = variantId,
-                        additionalId = additionalId
+                        variants = variants,
+                        quantity = quantity,
+                        note = note
                     )
                 )
             }

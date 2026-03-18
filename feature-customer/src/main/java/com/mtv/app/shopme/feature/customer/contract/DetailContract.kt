@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.customer.contract
 
 import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.request.CartVariantRequest
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.based.core.network.utils.Resource
@@ -33,7 +34,7 @@ data class DetailDataListener(
 
 data class DetailEventListener(
     val onGetFoodDetail: (String) -> Unit = {},
-    val onAddToCart: (String, String, String, String) -> Unit = { _, _, _, _ -> },
+    val onAddToCart: (String, List<CartVariantRequest>, Int, String) -> Unit = { _, _, _, _ -> },
     val onDismissActiveDialog: () -> Unit = {}
 )
 
@@ -41,7 +42,7 @@ data class DetailNavigationListener(
     val onBack: () -> Unit = {},
     val onChatClick: () -> Unit = {},
     val onAddToCart: () -> Unit = {},
-    val onClickCafe: () -> Unit = {}
+    val onClickCafe: (String) -> Unit = {}
 )
 
 sealed class DetailDialog {
