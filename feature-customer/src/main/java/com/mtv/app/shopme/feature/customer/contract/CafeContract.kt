@@ -8,13 +8,17 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.FoodItemModel
-import com.mtv.app.shopme.data.OwnerCafeModel
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.app.shopme.data.dto.FoodItemModel
+import com.mtv.app.shopme.data.dto.OwnerCafeModel
+import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.response.CafeResponse
+import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.based.core.network.utils.Resource
 
 data class CafeStateListener(
-    val loadingState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
-    val activeDialog: com.mtv.app.shopme.feature.customer.contract.CafeDialog? = null
+    val cafeState: Resource<ApiResponse<CafeResponse>> = Resource.Loading,
+    val foodsState: Resource<ApiResponse<List<FoodResponse>>> = Resource.Loading,
+    val activeDialog: CafeDialog? = null,
 )
 
 data class CafeDataListener(
@@ -29,7 +33,7 @@ data class CafeEventListener(
 
 data class CafeNavigationListener(
     val onBack: () -> Unit = {},
-    val onNavigateToDetail: () -> Unit = {},
+    val onNavigateToDetail: (String) -> Unit = {},
     val onNavigateToChat: () -> Unit = {},
     val onNavigateToWhatsapp: () -> Unit = {}
 )

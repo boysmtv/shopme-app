@@ -54,12 +54,14 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.data.mockFoodList
-import com.mtv.app.shopme.data.mockOwnerCafe
-import com.mtv.app.shopme.data.FoodItemModel
+import com.mtv.app.shopme.common.toRupiah
+import com.mtv.app.shopme.data.dto.mockFoodList
+import com.mtv.app.shopme.data.dto.mockOwnerCafe
+import com.mtv.app.shopme.data.dto.FoodItemModel
 import com.mtv.app.shopme.feature.customer.contract.CafeDataListener
 import com.mtv.app.shopme.feature.customer.contract.CafeEventListener
 import com.mtv.app.shopme.feature.customer.contract.CafeNavigationListener
@@ -103,7 +105,7 @@ fun CafeScreen(
                 CafeHeader(
                     uiData = uiData,
                     onChatClick = { uiNavigation.onNavigateToChat() },
-                    onWhatsappClick = { uiNavigation.onNavigateToWhatsapp },
+                    onWhatsappClick = { uiNavigation.onNavigateToWhatsapp() },
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -119,14 +121,14 @@ fun CafeScreen(
             }
 
             gridItems(
-                data = mockFoodList,
+                data = uiData.foods,
                 columnCount = 2,
                 horizontalSpacing = 16.dp,
                 verticalSpacing = 16.dp
             ) { item ->
                 CafeFoodItem(
                     item = item,
-                    onClickDetail = { uiNavigation.onNavigateToDetail() }
+                    onClickDetail = { uiNavigation.onNavigateToDetail(it) }
                 )
             }
         }
@@ -205,20 +207,22 @@ fun CafeHeader(
     ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(R.drawable.image_burger),
+                AsyncImage(
+                    model = uiData.cafe?.imageUrl,
                     contentDescription = null,
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(20.dp)),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.image_burger),
+                    error = painterResource(R.drawable.image_burger)
                 )
 
                 Spacer(Modifier.width(16.dp))
 
                 Column {
                     Text(
-                        text = uiData.cafe?.cafeName.orEmpty(),
+                        text = uiData.cafe?.name.orEmpty(),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = PoppinsFont
@@ -227,7 +231,7 @@ fun CafeHeader(
                     Spacer(Modifier.height(4.dp))
 
                     Text(
-                        text = uiData.cafe?.cafeAddress.orEmpty(),
+                        text = uiData.cafe?.address.orEmpty(),
                         fontSize = 13.sp,
                         color = Color.Gray,
                         fontFamily = PoppinsFont
@@ -236,7 +240,7 @@ fun CafeHeader(
                     Spacer(Modifier.height(6.dp))
 
                     Text(
-                        text = "⏰ ${uiData.cafe?.cafeOpenTime} - ${uiData.cafe?.cafeCloseTime}",
+                        text = "⏰ ${uiData.cafe?.openTime} - ${uiData.cafe?.closeTime}",
                         fontSize = 12.sp,
                         color = AppColor.Green,
                         fontFamily = PoppinsFont
@@ -263,7 +267,7 @@ fun CafeHeader(
                 Spacer(Modifier.width(6.dp))
 
                 Text(
-                    text = "Minimal Order Rp 10.000",
+                    text = "Minimal Order ${uiData.cafe?.minimalOrder?.toRupiah()}",
                     fontSize = 12.sp,
                     color = AppColor.Green,
                     fontFamily = PoppinsFont,
@@ -274,7 +278,7 @@ fun CafeHeader(
             Spacer(Modifier.height(14.dp))
 
             Text(
-                text = "Menyajikan berbagai pilihan makanan favorit seperti nasi goreng spesial, mie ayam gurih, ayam crispy renyah, hingga minuman segar yang dibuat dari bahan pilihan setiap hari.",
+                text = uiData.cafe?.description.orEmpty(),
                 fontSize = 12.sp,
                 color = AppColor.Gray,
                 fontFamily = PoppinsFont,
@@ -348,7 +352,7 @@ fun ActionButton(
 @Composable
 fun CafeFoodItem(
     item: FoodItemModel,
-    onClickDetail: (FoodItemModel) -> Unit
+    onClickDetail: (String) -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(18.dp),
@@ -356,35 +360,24 @@ fun CafeFoodItem(
         modifier = Modifier
             .then(
                 if (item.isActive) {
-                    Modifier.clickable { onClickDetail(item) }
+                    Modifier.clickable { onClickDetail(item.id) }
                 } else {
                     Modifier
                 }
             )
     ) {
         Column {
-
             Box {
-                val imageRes = when (item.id) {
-                    0 -> R.drawable.image_burger
-                    1 -> R.drawable.image_pizza
-                    2 -> R.drawable.image_platbread
-                    3 -> R.drawable.image_cheese_burger
-                    4 -> R.drawable.image_bakso
-                    5 -> R.drawable.image_pempek
-                    6 -> R.drawable.image_padang
-                    7 -> R.drawable.image_sate
-                    else -> R.drawable.image_burger
-                }
-
                 Box {
-                    Image(
-                        painter = painterResource(imageRes),
+                    AsyncImage(
+                        model = item.imageUrl,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(100.dp),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        placeholder = painterResource(R.drawable.no_image),
+                        error = painterResource(R.drawable.no_image)
                     )
 
                     if (!item.isActive) {
@@ -443,7 +436,7 @@ fun CafeFoodItem(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "$${item.price}",
+                        text = item.price.toRupiah(),
                         color = AppColor.Green,
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = PoppinsFont

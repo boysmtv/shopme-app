@@ -48,7 +48,7 @@ private fun cafeNavigation(nav: NavController) = CafeNavigationListener(
     onNavigateToWhatsapp = {
         nav.navigate(CustomerDestinations.CHAT_GRAPH)
     },
-    onNavigateToDetail = {
-        nav.navigate(CustomerDestinations.DETAIL_GRAPH)
+    onNavigateToDetail = { foodId ->
+        nav.navigate(CustomerDestinations.navigateToDetail(foodId))
     }
 )
