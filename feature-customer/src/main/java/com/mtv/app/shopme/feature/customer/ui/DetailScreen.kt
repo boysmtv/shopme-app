@@ -9,13 +9,13 @@
 package com.mtv.app.shopme.feature.customer.ui
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,11 +37,13 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PriceChange
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
@@ -51,12 +53,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -79,9 +83,15 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.toRupiah
+import com.mtv.app.shopme.data.dto.FoodCategory
+import com.mtv.app.shopme.data.dto.FoodStatus
+import com.mtv.app.shopme.data.remote.request.CartVariantRequest
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.app.shopme.data.remote.response.FoodOptionResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummary
 import com.mtv.app.shopme.data.remote.response.Stats
 import com.mtv.app.shopme.feature.customer.contract.DetailDataListener
@@ -90,14 +100,11 @@ import com.mtv.app.shopme.feature.customer.contract.DetailNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.DetailStateListener
 import com.mtv.app.shopme.feature.customer.utils.checkAddress
 import com.mtv.app.shopme.feature.customer.utils.checkName
+import com.mtv.app.shopme.feature.customer.utils.checkPrice
 import com.mtv.based.core.network.utils.Resource
-
-
-enum class OrderStatus {
-    READY,
-    PREORDER,
-    JASTIP
-}
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import java.math.BigDecimal
+import org.threeten.bp.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,7 +114,7 @@ fun DetailScreen(
     uiEvent: DetailEventListener,
     uiNavigation: DetailNavigationListener
 ) {
-    val customerData = uiData.customerData
+    uiData.customerData
     val food = uiData.foodData
     val similarFoods = uiData.foodSimilarData.orEmpty()
 
@@ -122,20 +129,20 @@ fun DetailScreen(
             onDismissRequest = { showSheet = false },
             sheetState = sheetState
         ) {
-            VariantBottomSheetContent(
-                onAddToCart = {
-                    uiEvent.onAddToCart(
-                        food?.id ?: "",
-                        "",
-                        "",
-                        ""
-                    )
-                },
-                onClose = {
-                    showSheet = false
-                }
-            )
-
+            food?.let { food ->
+                VariantBottomSheetContent(
+                    food = food,
+                    onAddToCart = { variants, qty, note ->
+                        uiEvent.onAddToCart(
+                            food.id,
+                            variants,
+                            qty,
+                            note
+                        )
+                    },
+                    onClose = { showSheet = false }
+                )
+            }
         }
     }
 
@@ -173,16 +180,41 @@ fun DetailScreen(
             item { DetailHeader() }
             item { Spacer(Modifier.height(16.dp)) }
 
-            item { DetailImage(food) }
+            item {
+                if (!food?.images.isNullOrEmpty()) {
+                    DetailImage(food.images)
+                }
+            }
             item { Spacer(Modifier.height(16.dp)) }
 
             item { DetailTitle(food) }
             item { Spacer(Modifier.height(6.dp)) }
 
             item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PriceChange,
+                        contentDescription = null,
+                        tint = AppColor.Green
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = checkPrice(food),
+                        color = Color.DarkGray,
+                        fontSize = 16.sp,
+                        fontFamily = PoppinsFont,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            item { Spacer(Modifier.height(6.dp)) }
+            item {
                 DetailLocation(
-                    customerData = customerData,
-                    onClickCafe = { uiNavigation.onClickCafe() }
+                    food = food,
+                    onClickCafe = { uiNavigation.onClickCafe(it) }
                 )
             }
             item { Spacer(Modifier.height(12.dp)) }
@@ -198,9 +230,10 @@ fun DetailScreen(
 
             items(similarFoods) { item ->
                 SimilarItemRow(
-                    imageUrl = item.imageUrl,
+                    imageUrl = item.images.first(),
                     title = item.name,
-                    price = item.price
+                    price = item.price,
+                    status = item.status
                 )
                 Spacer(Modifier.height(12.dp))
             }
@@ -316,31 +349,13 @@ fun DetailHeader() {
     }
 }
 
-@Composable
-fun DetailImage(food: FoodResponse?) {
-    AsyncImage(
-        model = food?.imageUrl,
-        contentDescription = food?.name,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(240.dp)
-            .clip(RoundedCornerShape(8.dp)),
-        contentScale = ContentScale.Crop
-    )
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DetailImageBisaDiGeser() {
-    val images = listOf(
-        R.drawable.image_burger,
-        R.drawable.image_pizza,
-        R.drawable.image_platbread,
-        R.drawable.image_cheese_burger,
-        R.drawable.image_padang,
-        R.drawable.image_sate,
-        R.drawable.image_pempek,
-    )
+fun DetailImage(
+    images: List<String>
+) {
+
+    if (images.isEmpty()) return
 
     val pagerState = rememberPagerState(
         pageCount = { images.size }
@@ -356,13 +371,16 @@ fun DetailImageBisaDiGeser() {
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) { page ->
-            Image(
-                painter = painterResource(images[page]),
+
+            AsyncImage(
+                model = images[page],
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.no_image),
+                error = painterResource(R.drawable.no_image)
             )
         }
 
@@ -372,15 +390,18 @@ fun DetailImageBisaDiGeser() {
                 .padding(bottom = 12.dp),
             horizontalArrangement = Arrangement.Center
         ) {
+
             repeat(images.size) { index ->
+
                 val isSelected = pagerState.currentPage == index
+
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(if (isSelected) 10.dp else 8.dp)
                         .background(
-                            color = if (isSelected) Color.White else Color.LightGray,
-                            shape = CircleShape
+                            if (isSelected) Color.White else Color.LightGray,
+                            CircleShape
                         )
                 )
             }
@@ -391,7 +412,7 @@ fun DetailImageBisaDiGeser() {
 @Composable
 fun DetailTitle(food: FoodResponse?) {
     Text(
-        text = food?.name ?: "",
+        text = food?.name ?: EMPTY_STRING,
         fontSize = 24.sp,
         fontFamily = PoppinsFont,
         fontWeight = FontWeight.SemiBold
@@ -400,14 +421,14 @@ fun DetailTitle(food: FoodResponse?) {
 
 @Composable
 fun DetailLocation(
-    customerData: CustomerResponse?,
-    onClickCafe: () -> Unit
+    food: FoodResponse?,
+    onClickCafe: (String) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Row(
             modifier = Modifier
                 .clickable {
-                    onClickCafe()
+                    food?.let { onClickCafe(it.cafeId) }
                 },
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -418,7 +439,7 @@ fun DetailLocation(
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = checkName(customerData),
+                text = food?.cafeName.orEmpty(),
                 color = Color.DarkGray,
                 fontSize = 14.sp,
                 fontFamily = PoppinsFont,
@@ -433,7 +454,7 @@ fun DetailLocation(
         )
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = checkAddress(customerData),
+            text = food?.cafeAddress.orEmpty(),
             color = Color.DarkGray,
             fontSize = 14.sp,
             fontFamily = PoppinsFont
@@ -444,7 +465,7 @@ fun DetailLocation(
 @Composable
 fun DetailDescription(food: FoodResponse?) {
     Text(
-        text = food?.description ?: "",
+        text = food?.description ?: EMPTY_STRING,
         color = AppColor.Gray,
         fontSize = 14.sp,
         fontFamily = PoppinsFont
@@ -454,19 +475,12 @@ fun DetailDescription(food: FoodResponse?) {
 @Composable
 fun DetailStatsRow(food: FoodResponse?) {
 
-    val status = when (food?.status) {
-        "READY" -> OrderStatus.READY
-        "PREORDER" -> OrderStatus.PREORDER
-        "JASTIP" -> OrderStatus.JASTIP
-        else -> OrderStatus.READY
-    }
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
-        StatusStatItem(status)
+        StatusStatItem(food?.status ?: FoodStatus.UNKNOWN)
 
         StatItem(
             icon = Icons.Default.Inventory2,
@@ -482,25 +496,31 @@ fun DetailStatsRow(food: FoodResponse?) {
 
 @Composable
 fun StatusStatItem(
-    status: OrderStatus,
+    status: FoodStatus,
 ) {
     val (icon, color, text) = when (status) {
-        OrderStatus.READY -> Triple(
+        FoodStatus.READY -> Triple(
             Icons.Default.CheckCircle,
             Color(0xFF4CAF50),
             "Ready"
         )
 
-        OrderStatus.PREORDER -> Triple(
+        FoodStatus.PREORDER -> Triple(
             Icons.Default.Schedule,
             Color(0xFFFF9800),
             "Pre-order"
         )
 
-        OrderStatus.JASTIP -> Triple(
+        FoodStatus.JASTIP -> Triple(
             Icons.Default.LocalShipping,
             Color(0xFF2196F3),
             "Jastip"
+        )
+
+        FoodStatus.UNKNOWN -> Triple(
+            Icons.Default.Downloading,
+            Color(0xFFA3A3A3),
+            "Loading"
         )
     }
 
@@ -571,7 +591,8 @@ fun SectionTitle(title: String) {
 fun SimilarItemRow(
     imageUrl: String,
     title: String,
-    price: Double
+    price: BigDecimal,
+    status: FoodStatus
 ) {
     Row(
         modifier = Modifier
@@ -604,7 +625,7 @@ fun SimilarItemRow(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text = "$${price}",
+                text = price.toRupiah(),
                 color = AppColor.Green,
                 fontSize = 14.sp,
                 fontFamily = PoppinsFont
@@ -614,7 +635,7 @@ fun SimilarItemRow(
         Box(
             contentAlignment = Alignment.Center
         ) {
-            StatusStatItem(OrderStatus.PREORDER)
+            StatusStatItem(status)
         }
 
         Spacer(Modifier.width(16.dp))
@@ -638,36 +659,21 @@ fun SimilarItemRow(
 
 @Composable
 fun VariantBottomSheetContent(
-    onAddToCart: () -> Unit,
+    food: FoodResponse,
+    onAddToCart: (List<CartVariantRequest>, Int, String) -> Unit,
     onClose: () -> Unit
 ) {
+
     var quantity by remember { mutableIntStateOf(1) }
-    var selectedSize by remember { mutableStateOf("Medium") }
-    var selectedSpicy by remember { mutableStateOf("Normal") }
-    var extraCheese by remember { mutableStateOf(false) }
-    var doublePatty by remember { mutableStateOf(true) }
+    var note by remember { mutableStateOf(EMPTY_STRING) }
 
-    val basePrice = 35000
-
-    val sizePrice = when (selectedSize) {
-        "Medium" -> 0
-        "Large" -> 5000
-        else -> 0
+    val selectedOptions = remember {
+        mutableStateMapOf<String, FoodOptionResponse>()
     }
 
-    val spicyPrice = when (selectedSpicy) {
-        "Normal" -> 0
-        "Sedang" -> 2000
-        "Pedas 🔥" -> 3000
-        else -> 0
-    }
-
-    val toppingPrice =
-        (if (extraCheese) 5000 else 0) +
-                (if (doublePatty) 12000 else 0)
-
-    val singlePrice = basePrice + sizePrice + spicyPrice + toppingPrice
-    val totalPrice = singlePrice * quantity
+    val variantPrice = selectedOptions.values.sumOf { it.price }
+    val singlePrice = food.price + variantPrice
+    val totalPrice = singlePrice * BigDecimal(quantity)
 
     Column(
         modifier = Modifier
@@ -688,166 +694,94 @@ fun VariantBottomSheetContent(
                 fontFamily = PoppinsFont
             )
 
-            IconButton(
-                onClick = { onClose() }
-            ) {
+            IconButton(onClick = onClose) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Close",
+                    contentDescription = null,
                     tint = AppColor.Green
                 )
             }
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(12.dp))
 
-        Text(
-            text = "Ukuran",
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = PoppinsFont
-        )
-        Spacer(Modifier.height(8.dp))
+        food.variants.forEach { variant ->
 
-        VariantSelector(
-            options = listOf("Medium", "Large"),
-            selected = selectedSize,
-            onSelect = { selectedSize = it }
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            text = "Level Pedas",
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = PoppinsFont
-        )
-        Spacer(Modifier.height(8.dp))
-
-        VariantSelector(
-            options = listOf("Normal", "Sedang", "Pedas 🔥"),
-            selected = selectedSpicy,
-            onSelect = { selectedSpicy = it }
-        )
-
-        Spacer(Modifier.height(16.dp))
-        HorizontalDivider(color = AppColor.GreenSoft, modifier = Modifier.height(1.dp))
-
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = "Tambahan",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = PoppinsFont
-        )
-
-        Spacer(Modifier.height(16.dp))
-        Column(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            AddOnItem(
-                title = "Extra Cheese",
-                price = 5000,
-                selected = extraCheese,
-                onClick = { extraCheese = !extraCheese }
-            )
-
-            AddOnItem(
-                title = "Double Patty",
-                price = 12000,
-                selected = doublePatty,
-                onClick = { doublePatty = !doublePatty }
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            PriceRow("Harga", basePrice)
-            if (sizePrice > 0) PriceRow("Ukuran ($selectedSize)", sizePrice)
-            if (spicyPrice > 0) PriceRow("Level ($selectedSpicy)", spicyPrice)
-            if (extraCheese) PriceRow("Extra Cheese", 5000)
-            if (doublePatty) PriceRow("Double Patty", 12000)
-        }
-
-        Spacer(Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(AppColor.Green.copy(alpha = 0.08f))
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
             Text(
-                text = "Jumlah",
-                fontFamily = PoppinsFont,
-                fontWeight = FontWeight.SemiBold
+                text = variant.name,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = PoppinsFont
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (quantity > 1) AppColor.Green else Color.Gray.copy(alpha = 0.3f)
-                        )
-                        .clickable {
-                            if (quantity > 1) quantity--
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "-",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+            Spacer(Modifier.height(8.dp))
+
+            VariantSelectorDynamic(
+                options = variant.options,
+                selected = selectedOptions[variant.id],
+                onSelect = {
+                    selectedOptions[variant.id] = it
                 }
+            )
 
-                Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.height(16.dp))
+        }
 
+        Text(
+            text = "Catatan",
+            fontWeight = FontWeight.SemiBold,
+            fontFamily = PoppinsFont
+        )
+
+        Spacer(Modifier.height(6.dp))
+
+        OutlinedTextField(
+            value = note,
+            onValueChange = { note = it },
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = {
                 Text(
-                    text = quantity.toString(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
+                    text = "Contoh: jangan pedas, nasi dipisah",
                     fontFamily = PoppinsFont
                 )
+            },
+            shape = RoundedCornerShape(12.dp),
+            maxLines = 3
+        )
 
-                Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.height(16.dp))
 
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clip(CircleShape)
-                        .background(AppColor.Green)
-                        .clickable {
-                            quantity++
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "+",
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+        HorizontalDivider()
+
+        Spacer(Modifier.height(16.dp))
+
+        Column {
+
+            PriceRow("Harga", food.price)
+
+            selectedOptions.values.forEach {
+                if (it.price > BigDecimal.ZERO) {
+                    PriceRow(it.name, it.price)
                 }
             }
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
+
+        QuantitySelector(
+            quantity = quantity,
+            onDecrease = {
+                if (quantity > 1) quantity--
+            },
+            onIncrease = {
+                quantity++
+            }
+        )
+
+        Spacer(Modifier.height(12.dp))
 
         Text(
-            modifier = Modifier
-                .fillMaxWidth(),
-            text = "Total: Rp $totalPrice",
+            modifier = Modifier.fillMaxWidth(),
+            text = "Total: ${totalPrice.toRupiah()}",
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
             color = AppColor.Green,
@@ -858,116 +792,54 @@ fun VariantBottomSheetContent(
         Spacer(Modifier.height(16.dp))
 
         Button(
-            onClick = { onAddToCart() },
+            onClick = {
+
+                val variantRequests = selectedOptions.map { (variantId, option) ->
+                    CartVariantRequest(
+                        variantId = variantId,
+                        optionId = option.id
+                    )
+                }
+
+                onAddToCart(variantRequests, quantity, note)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(AppColor.Green),
             shape = RoundedCornerShape(16.dp)
         ) {
+
             Icon(
                 imageVector = Icons.Default.ShoppingCart,
                 contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
+                tint = Color.White
             )
 
             Spacer(Modifier.width(8.dp))
 
             Text(
-                text = "Tambah ($quantity) • Rp $totalPrice",
+                text = "Tambah ($quantity)",
                 color = Color.White,
                 fontSize = 16.sp,
-                fontFamily = PoppinsFont,
+                fontFamily = PoppinsFont
             )
         }
     }
 }
 
 @Composable
-fun PriceRow(label: String, price: Int) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            fontFamily = PoppinsFont,
-            fontSize = 14.sp
-        )
-
-        Text(
-            text = "+ Rp $price",
-            fontFamily = PoppinsFont,
-            fontSize = 14.sp
-        )
-    }
-
-    Spacer(Modifier.height(6.dp))
-}
-
-
-@Composable
-fun AddOnItem(
-    title: String,
-    price: Int,
-    selected: Boolean,
-    onClick: () -> Unit
+fun VariantSelectorDynamic(
+    options: List<FoodOptionResponse>,
+    selected: FoodOptionResponse?,
+    onSelect: (FoodOptionResponse) -> Unit
 ) {
-    val borderColor =
-        if (selected) AppColor.Green else Color.Gray.copy(alpha = 0.3f)
-
-    val backgroundColor =
-        if (selected) AppColor.Green.copy(alpha = 0.08f) else Color.White
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(backgroundColor)
-            .border(1.dp, borderColor, RoundedCornerShape(16.dp))
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                fontFamily = PoppinsFont,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                text = "+ Rp $price",
-                fontSize = 13.sp,
-                color = AppColor.Green
-            )
-        }
-
-        if (selected) {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = null,
-                tint = AppColor.Green
-            )
-        }
-    }
-}
-
-
-@Composable
-fun VariantSelector(
-    options: List<String>,
-    selected: String,
-    onSelect: (String) -> Unit
-) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         options.forEach { option ->
-            val isSelected = option == selected
-
+            val isSelected = option.id == selected?.id
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
@@ -978,14 +850,103 @@ fun VariantSelector(
                     .clickable { onSelect(option) }
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
+
                 Text(
-                    option,
+                    text = option.name,
                     color = if (isSelected) Color.White else AppColor.Green,
                     fontFamily = PoppinsFont
                 )
             }
         }
     }
+}
+
+@Composable
+fun QuantitySelector(
+    quantity: Int,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(AppColor.Green.copy(alpha = 0.08f))
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Text(
+            text = "Jumlah",
+            fontFamily = PoppinsFont,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (quantity > 1) AppColor.Green else Color.Gray
+                    )
+                    .clickable {
+                        if (quantity > 1) onDecrease()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("-", color = Color.White)
+            }
+
+            Spacer(Modifier.width(12.dp))
+
+            Text(
+                text = quantity.toString(),
+                fontFamily = PoppinsFont
+            )
+
+            Spacer(Modifier.width(12.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(CircleShape)
+                    .background(AppColor.Green)
+                    .clickable { onIncrease() },
+                contentAlignment = Alignment.Center
+            ) {
+                Text("+", color = Color.White)
+            }
+        }
+    }
+}
+
+@Composable
+fun PriceRow(
+    label: String,
+    price: BigDecimal
+) {
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Text(
+            text = label,
+            fontFamily = PoppinsFont
+        )
+
+        Text(
+            text = "+ ${price.toRupiah()}",
+            fontFamily = PoppinsFont
+        )
+    }
+
+    Spacer(Modifier.height(6.dp))
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
@@ -1006,72 +967,127 @@ fun DetailScreenPreview() {
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun VariantBottomSheetMockPreview() {
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColor.Gray),
         contentAlignment = Alignment.BottomCenter
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                 .background(Color.White)
         ) {
+
             VariantBottomSheetContent(
-                {}, {}
+                food = previewFood,
+                onAddToCart = { _, _, _ -> },
+                onClose = {}
             )
+
         }
     }
 }
 
-private val previewFood = FoodResponse(
-    id = "1",
-    cafeId = "1",
-    name = "Bakso Telur Joss",
-    description = "Bakso enak dengan telur di dalamnya.",
-    price = 30000.0,
-    imageUrl = "https://picsum.photos/400",
-    category = "FOOD",
-    status = "READY",
-    quantity = 20,
-    estimate = "10-15 menit",
-    isActive = true,
-    createdAt = ""
-)
-
-
-private val previewSimilar = listOf(
+private val previewFood by lazy {
     FoodResponse(
-        id = "2",
+        id = "1",
         cafeId = "1",
-        name = "Bakso Urat",
-        description = "",
-        price = 25000.0,
-        imageUrl = "https://picsum.photos/200",
-        category = "FOOD",
-        status = "READY",
-        quantity = 30,
-        estimate = "10 menit",
+        name = "Bakso Telur Joss",
+        cafeName = "Cafe Sejati",
+        cafeAddress = "Puri Lestari - Blok G06/01",
+        description = "Bakso enak dengan telur di dalamnya.",
+        price = BigDecimal("30000"),
+        category = FoodCategory.FOOD,
+        status = FoodStatus.READY,
+        quantity = 20,
+        estimate = "10-15 menit",
         isActive = true,
-        createdAt = ""
-    ),
-    FoodResponse(
-        id = "3",
-        cafeId = "1",
-        name = "Bakso Mercon",
-        description = "",
-        price = 32000.0,
-        imageUrl = "https://picsum.photos/200",
-        category = "FOOD",
-        status = "READY",
-        quantity = 15,
-        estimate = "12 menit",
-        isActive = true,
-        createdAt = ""
+        createdAt = LocalDateTime.parse("2026-03-07T13:48:00"),
+        images = listOf("https://picsum.photos/400"),
+        variants = listOf(
+            FoodVariantResponse(
+                id = "v1",
+                name = "Ukuran",
+                options = listOf(
+                    FoodOptionResponse(
+                        id = "o1",
+                        name = "Regular",
+                        price = BigDecimal.ZERO
+                    ),
+                    FoodOptionResponse(
+                        id = "o2",
+                        name = "Large",
+                        price = BigDecimal(5000)
+                    )
+                )
+            ),
+            FoodVariantResponse(
+                id = "v1",
+                name = "Level",
+                options = listOf(
+                    FoodOptionResponse(
+                        id = "o1",
+                        name = "Tidak Pedas",
+                        price = BigDecimal.ZERO
+                    ),
+                    FoodOptionResponse(
+                        id = "o2",
+                        name = "Sedang",
+                        price = BigDecimal.ZERO
+                    ),
+                    FoodOptionResponse(
+                        id = "o2",
+                        name = "Pedas",
+                        price = BigDecimal.ZERO
+                    )
+                )
+            )
+        )
     )
-)
+}
 
+private val previewSimilar by lazy {
+    listOf(
+        FoodResponse(
+            id = "2",
+            cafeId = "1",
+            name = "Bakso Urat",
+            cafeName = "Cafe Sejati",
+            cafeAddress = "Puri Lestari - Blok G06/01",
+            description = "Bakso urat kenyal",
+            price = BigDecimal("25000"),
+            category = FoodCategory.FOOD,
+            status = FoodStatus.READY,
+            quantity = 30,
+            estimate = "10 menit",
+            isActive = true,
+            createdAt = LocalDateTime.parse("2026-03-07T13:48:00"),
+            images = listOf("https://picsum.photos/200"),
+            variants = emptyList()
+        ),
+        FoodResponse(
+            id = "3",
+            cafeId = "1",
+            name = "Bakso Telur Joss",
+            cafeName = "Cafe Sejati",
+            cafeAddress = "Puri Lestari - Blok G06/01",
+            description = "Bakso pedas dengan sambal mercon.",
+            price = BigDecimal(32000),
+            category = FoodCategory.FOOD,
+            status = FoodStatus.READY,
+            quantity = 15,
+            estimate = "12 menit",
+            isActive = true,
+            createdAt = LocalDateTime.parse("2026-03-07T13:48:00"),
+            images = listOf("https://picsum.photos/200"),
+            variants = emptyList()
+        )
+    )
+}
 
 val previewCustomer = CustomerResponse(
     name = "Dedy Wijaya",
@@ -1079,16 +1095,15 @@ val previewCustomer = CustomerResponse(
     email = "boys.mtv@gmail.com",
     address = AddressResponse(
         id = "1",
-        areaId = "Puri Lestari",
+        village = "Puri Lestari",
         block = "H2",
         number = "21",
         rt = "012",
         rw = "002",
         isDefault = true
     ),
-    photo = "",
+    photo = EMPTY_STRING,
     verified = true,
-    stats = Stats(0, 0, ""),
+    stats = Stats(0, 0, EMPTY_STRING),
     menuSummary = MenuSummary(0, 0, 0, 0, 0)
 )
-

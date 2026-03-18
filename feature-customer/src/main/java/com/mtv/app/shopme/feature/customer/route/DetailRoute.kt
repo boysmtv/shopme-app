@@ -55,5 +55,7 @@ private fun detailNavigation(nav: NavController) = DetailNavigationListener(
             }
         }
     },
-    onClickCafe = { nav.navigate(CustomerDestinations.CAFE_GRAPH) }
+    onClickCafe = { foodId ->
+        nav.navigate(CustomerDestinations.navigateToCafe(foodId))
+    }
 )
