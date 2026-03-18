@@ -8,15 +8,17 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+
 data class ChangePinStateListener(
     val loading: Boolean = false,
     val error: String? = null
 )
 
 data class ChangePinDataListener(
-    val oldPin: String = "",
-    val newPin: String = "",
-    val confirmPin: String = ""
+    val oldPin: String = EMPTY_STRING,
+    val newPin: String = EMPTY_STRING,
+    val confirmPin: String = EMPTY_STRING
 )
 
 data class ChangePinEventListener(

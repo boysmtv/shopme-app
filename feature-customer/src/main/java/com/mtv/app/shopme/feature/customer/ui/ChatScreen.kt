@@ -192,7 +192,7 @@ fun ChatScreen(
                 onClick = {
                     if (userMessage.isNotEmpty()) {
                         messages.add(ChatMessage(userMessage, true))
-                        userMessage = ""
+                        userMessage = EMPTY_STRING
                     }
                 },
                 modifier = Modifier

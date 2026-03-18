@@ -69,12 +69,15 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.toRupiah
+import com.mtv.app.shopme.data.dto.FoodStatus
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.feature.customer.contract.CartDataListener
 import com.mtv.app.shopme.feature.customer.contract.CartEventListener
 import com.mtv.app.shopme.feature.customer.contract.CartNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.CartStateListener
 import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Locale
@@ -432,7 +435,7 @@ fun CartItemRow(item: CartItemResponse) {
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 14.sp
                 )
-                StatusStatItem(OrderStatus.READY)
+                StatusStatItem(FoodStatus.READY)
             }
 
             Spacer(Modifier.height(6.dp))
@@ -756,7 +759,7 @@ fun PinVerificationSheet(
         skipPartiallyExpanded = true
     )
 
-    var pin by remember { mutableStateOf(value = "") }
+    var pin by remember { mutableStateOf(value = EMPTY_STRING) }
     var isError by remember { mutableStateOf(value = false) }
 
     val correctPin = "123456"
@@ -850,7 +853,7 @@ fun PinVerificationSheet(
                                 onSuccess()
                             } else {
                                 isError = true
-                                pin = ""
+                                pin = EMPTY_STRING
                             }
                         }
                     }
@@ -877,7 +880,7 @@ fun PinKeypad(
         "1", "2", "3",
         "4", "5", "6",
         "7", "8", "9",
-        "", "0", "del"
+        EMPTY_STRING, "0", "del"
     )
 
     Column(
@@ -919,7 +922,7 @@ fun PinKeypad(
                                 modifier = Modifier.size(size = 20.dp)
                             )
 
-                            "" -> Spacer(modifier = Modifier.size(size = size))
+                            EMPTY_STRING -> Spacer(modifier = Modifier.size(size = size))
 
                             else -> Text(
                                 text = key,
@@ -1177,7 +1180,7 @@ val mockCartItems = listOf(
         customerId = "cust_001",
         foodId = "food_006",
         quantity = 1,
-        notes = "",
+        notes = EMPTY_STRING,
         cafeId = "cafe_3",
         price = 20000.toBigDecimal(),
         image = "https://example.com/images/latte.png",
@@ -1185,8 +1188,3 @@ val mockCartItems = listOf(
         cafeName = "Coffee Corner"
     )
 )
-
-fun BigDecimal.toRupiah(): String {
-    val formatter = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
-    return formatter.format(this)
-}
