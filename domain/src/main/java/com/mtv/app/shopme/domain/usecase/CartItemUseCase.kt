@@ -23,7 +23,7 @@ class CartItemUseCase @Inject constructor(
 ) : BaseUseCase<Unit, ApiResponse<List<CartItemResponse>>>(dispatcher) {
 
     override suspend fun execute(param: Unit) = repository.request<ApiResponse<List<CartItemResponse>>>(
-        endpoint = ApiEndPoint.GetCart,
+        endpoint = ApiEndPoint.Cart.Get,
     )
 
 }

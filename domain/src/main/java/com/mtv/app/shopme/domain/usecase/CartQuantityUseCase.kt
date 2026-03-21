@@ -23,7 +23,8 @@ class CartQuantityUseCase @Inject constructor(
 ) : BaseUseCase<CartQuantityRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: CartQuantityRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.PostQuantityCart,
+        endpoint = ApiEndPoint.Cart.Quantity(param.cartId),
+        body = param
     )
 
 }
