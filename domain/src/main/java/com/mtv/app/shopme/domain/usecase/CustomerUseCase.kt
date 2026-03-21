@@ -28,7 +28,7 @@ class CustomerUseCase @Inject constructor(
 ) : BaseUseCase<Unit, ApiResponse<CustomerResponse>>(dispatcher) {
 
     override suspend fun execute(param: Unit) = repository.request<ApiResponse<CustomerResponse>>(
-        endpoint = ApiEndPoint.GetCustomer,
+        endpoint = ApiEndPoint.Customer.Get,
     )
 
 }
