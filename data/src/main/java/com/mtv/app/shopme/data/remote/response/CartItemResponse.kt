@@ -26,4 +26,6 @@ data class CartItemResponse(
 
     @Serializable(with = BigDecimalSerializer::class)
     val price: BigDecimal,
+
+    val variants: List<CartItemVariantResponse> = emptyList()
 )
