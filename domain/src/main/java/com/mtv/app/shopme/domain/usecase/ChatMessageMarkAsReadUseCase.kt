@@ -23,7 +23,7 @@ class ChatMessageMarkAsReadUseCase @Inject constructor(
 ) : BaseUseCase<ChatMessageMarkAsReadRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: ChatMessageMarkAsReadRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.PostChatMessageAllRead,
+        endpoint = ApiEndPoint.Chat.MarkAllRead,
         body = param
     )
 

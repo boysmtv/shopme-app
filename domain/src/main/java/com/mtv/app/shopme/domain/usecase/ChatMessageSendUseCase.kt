@@ -23,7 +23,7 @@ class ChatMessageSendUseCase @Inject constructor(
 ) : BaseUseCase<ChatMessageSendRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: ChatMessageSendRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.PostChatMessage,
+        endpoint = ApiEndPoint.Chat.SendMessage,
         body = param
     )
 
