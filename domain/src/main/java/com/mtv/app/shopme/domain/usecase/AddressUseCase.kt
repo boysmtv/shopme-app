@@ -23,7 +23,7 @@ class AddressUseCase @Inject constructor(
 ) : BaseUseCase<Unit, ApiResponse<List<AddressResponse>>>(dispatcher) {
 
     override suspend fun execute(param: Unit) = repository.request<ApiResponse<List<AddressResponse>>>(
-        endpoint = ApiEndPoint.GetAddress,
+        endpoint = ApiEndPoint.Address.Get,
     )
 
 }

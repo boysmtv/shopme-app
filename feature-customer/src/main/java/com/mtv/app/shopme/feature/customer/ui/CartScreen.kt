@@ -43,12 +43,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,15 +77,18 @@ import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.dto.FoodStatus
 import com.mtv.app.shopme.data.dto.PaymentMethod
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
+import com.mtv.app.shopme.data.remote.response.CartItemVariantResponse
 import com.mtv.app.shopme.feature.customer.contract.CartDataListener
+import com.mtv.app.shopme.feature.customer.contract.CartDialog
 import com.mtv.app.shopme.feature.customer.contract.CartEventListener
 import com.mtv.app.shopme.feature.customer.contract.CartNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.CartStateListener
+import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
-import java.text.NumberFormat
-import java.util.Locale
+import kotlinx.coroutines.launch
 
 @Composable
 fun CartScreen(
@@ -92,152 +99,235 @@ fun CartScreen(
 ) {
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var showPinSheet by remember { mutableStateOf(false) }
-    var showSuccessDialog by remember { mutableStateOf(false) }
+    var selectedCartIds by remember { mutableStateOf<List<String>>(emptyList()) }
+    var selectedPaymentMethod by remember { mutableStateOf(PaymentMethod.CASH) }
 
     val cartItems = uiData.cartItems ?: emptyList()
-    val groupedByCafe = cartItems.groupBy { it.cafeId }
-    val grandTotal = cartItems.fold(BigDecimal.ZERO) { acc, item ->
-        acc + (item.price * item.quantity.toBigDecimal())
+    if (cartItems.isEmpty()) {
+        EmptyCartView()
+        return
     }
 
-//    if (showCheckoutDialog) {
-//        CheckoutConfirmationDialog(
-//            total = grandTotal,
-//            onDismiss = { showCheckoutDialog = false },
-//            onConfirm = {
-//                showCheckoutDialog = false
-//                uiNavigation.onNavigateToOrder()
-//            }
-//        )
-//    }
+    val groupedByCafe = cartItems.groupBy { it.cafeId }
+
+    val grandTotal = cartItems.fold(BigDecimal.ZERO) { acc, item ->
+        val itemTotal = item.price +
+                item.variants.fold(BigDecimal.ZERO) { acc, variant ->
+                    acc + variant.price
+                }
+
+        acc + (itemTotal * item.quantity.toBigDecimal())
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     if (showCheckoutDialog) {
         PremiumCheckoutSheet(
             total = grandTotal,
             onDismiss = { showCheckoutDialog = false },
-            onConfirm = {
+            onConfirm = { paymentMethod ->
+                selectedPaymentMethod = paymentMethod
                 showCheckoutDialog = false
-                showPinSheet = true
+                uiEvent.onGetSession()
             }
         )
+    }
+
+    LaunchedEffect(uiState.sessionTokenState) {
+        if (uiState.sessionTokenState is Resource.Success) {
+            showPinSheet = true
+            uiEvent.onResetSessionTokenState()
+        }
     }
 
     if (showPinSheet) {
         PinVerificationSheet(
+            isLoading = uiState.verifyPinState is Resource.Loading,
+            isError = uiState.verifyPinState is Resource.Error,
             onDismiss = { showPinSheet = false },
-            onSuccess = {
-                showPinSheet = false
-                showSuccessDialog = true
+            onSuccess = { pin ->
+                uiData.sessionToken?.let { session ->
+                    uiEvent.onVerifyPin(
+                        session.token,
+                        pin
+                    )
+                }
             }
         )
     }
 
-    if (showSuccessDialog) {
+    var isOrderCreated by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.verifyPinState) {
+        when (uiState.verifyPinState) {
+
+            is Resource.Success -> {
+                if (!isOrderCreated) {
+                    isOrderCreated = true
+
+                    showPinSheet = false
+                    uiEvent.onCreateOrder(
+                        selectedCartIds,
+                        selectedPaymentMethod,
+                        uiData.sessionToken?.token.orEmpty()
+                    )
+                }
+
+                uiEvent.onResetVerifyPinState()
+            }
+
+            is Resource.Error -> {
+                scope.launch {
+                    snackbarHostState.showSnackbar("PIN salah")
+                }
+
+                isOrderCreated = false
+                uiEvent.onResetVerifyPinState()
+            }
+
+            else -> Unit
+        }
+    }
+
+    if (uiState.activeDialog is CartDialog.Success) {
         OrderSuccessDialog(
             onConfirm = {
-                showSuccessDialog = false
+                isOrderCreated = false // 🔥 ini yang miss
+                uiEvent.onDismissActiveDialog()
                 uiNavigation.onNavigateToOrder()
             }
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppColor.White)
-            .padding(start = 16.dp, end = 16.dp)
-            .height(56.dp)
-            .statusBarsPadding()
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        CartHeader()
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Total ${cartItems.size} Items",
-                fontFamily = PoppinsFont,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = "Clear Cart",
-                fontFamily = PoppinsFont,
-                fontSize = 14.sp,
-                color = AppColor.Green,
-                fontWeight = FontWeight.Medium
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            groupedByCafe.forEach { (_, items) ->
-                item {
-                    CafeGroupCard(items)
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
 
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
+                .fillMaxSize()
+                .background(AppColor.White)
+                .padding(start = 16.dp, end = 16.dp)
+                .statusBarsPadding()
         ) {
+            CartHeader()
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Column {
-                    Text(
-                        fontFamily = PoppinsFont,
-                        text = "Total shopping cart",
-                        color = AppColor.Gray,
-                        fontSize = 12.sp,
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    Text(
-                        fontFamily = PoppinsFont,
-                        text = grandTotal.toRupiah(),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
-                    onClick = {
-                        showCheckoutDialog = true
-                    },
-                    colors = ButtonDefaults.buttonColors(AppColor.Green),
-                    shape = RoundedCornerShape(18.dp),
+                Text(
+                    text = "Total ${cartItems.size} Items",
+                    fontFamily = PoppinsFont,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "Clear Cart",
+                    fontFamily = PoppinsFont,
+                    fontSize = 14.sp,
+                    color = AppColor.Green,
+                    fontWeight = FontWeight.Medium,
                     modifier = Modifier
-                        .height(42.dp)
+                        .clickable {
+                            uiEvent.onClearCart()
+                        }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyColumn(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                groupedByCafe.forEach { (_, items) ->
+                    item {
+                        CafeGroupCard(
+                            uiState = uiState,
+                            uiEvent = uiEvent,
+                            itemResponses = items,
+                            onNavigateToDetail = { uiNavigation.onNavigateToDetail(it) },
+                            onDeleteFoodByCafe = { uiEvent.onClearFoodByCafe(it) }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        fontFamily = PoppinsFont,
-                        text = "Checkout",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                    )
+
+                    Column {
+                        Text(
+                            fontFamily = PoppinsFont,
+                            text = "Total shopping cart",
+                            color = AppColor.Gray,
+                            fontSize = 12.sp,
+                        )
+
+                        Spacer(Modifier.height(8.dp))
+
+                        Text(
+                            fontFamily = PoppinsFont,
+                            text = grandTotal.toRupiah(),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = {
+                            if (cartItems.isEmpty()) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("Keranjang masih kosong")
+                                }
+                                return@Button
+                            }
+                            selectedCartIds = cartItems.map { it.id }
+                            showCheckoutDialog = true
+                        },
+                        enabled = cartItems.isNotEmpty(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (cartItems.isNotEmpty()) AppColor.Green else Color.Gray
+                        ),
+                        shape = RoundedCornerShape(18.dp),
+                        modifier = Modifier
+                            .height(42.dp)
+                    ) {
+                        Text(
+                            fontFamily = PoppinsFont,
+                            text = "Checkout",
+                            color = Color.White,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    }
                 }
             }
         }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        )
     }
 }
 
@@ -262,9 +352,20 @@ private fun CartHeader() {
 }
 
 @Composable
-fun CafeGroupCard(items: List<CartItemResponse>) {
-    val cafeSubtotal = items.fold(BigDecimal.ZERO) { acc, item ->
-        acc + (item.price * item.quantity.toBigDecimal())
+fun CafeGroupCard(
+    uiState: CartStateListener,
+    uiEvent: CartEventListener,
+    itemResponses: List<CartItemResponse>,
+    onNavigateToDetail: (foodId: String) -> Unit,
+    onDeleteFoodByCafe: (foodId: String) -> Unit
+) {
+    val cafeSubtotal = itemResponses.fold(BigDecimal.ZERO) { acc, item ->
+        val itemTotal = item.price +
+                item.variants.fold(BigDecimal.ZERO) { acc, variant ->
+                    acc + variant.price
+                }
+
+        acc + (itemTotal * item.quantity.toBigDecimal())
     }
 
     Column(
@@ -294,7 +395,7 @@ fun CafeGroupCard(items: List<CartItemResponse>) {
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = items.first().cafeName,
+                    text = itemResponses.first().cafeName,
                     fontFamily = PoppinsFont,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold
@@ -305,7 +406,11 @@ fun CafeGroupCard(items: List<CartItemResponse>) {
                 imageVector = Icons.Default.Delete,
                 contentDescription = null,
                 tint = AppColor.Green,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+                        onDeleteFoodByCafe(itemResponses.first().cafeId)
+                    }
             )
         }
 
@@ -313,10 +418,23 @@ fun CafeGroupCard(items: List<CartItemResponse>) {
 
         HorizontalDivider(color = AppColor.Gray, modifier = Modifier.height(1.dp))
 
-        items.forEachIndexed { index, item ->
-            CartItemRow(item)
+        itemResponses.forEachIndexed { index, item ->
+            CartItemRow(
+                itemResponse = item,
+                onFoodClick = { onNavigateToDetail(item.foodId) },
+                onMinusClick = {
+                    if (item.quantity == 1) {
+                        uiEvent.onQuantityClick(item.id, 0)
+                    } else {
+                        uiEvent.onQuantityClick(item.id, item.quantity - 1)
+                    }
+                },
+                onPlusClick = {
+                    uiEvent.onQuantityClick(item.id, item.quantity + 1)
+                }
+            )
 
-            if (index != items.lastIndex) {
+            if (index != itemResponses.lastIndex) {
                 HorizontalDivider(
                     color = Color.LightGray.copy(alpha = 0.3f),
                     thickness = 1.dp
@@ -330,7 +448,7 @@ fun CafeGroupCard(items: List<CartItemResponse>) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(
-                    AppColor.GreenSoft.copy(alpha = 0.7f),
+                    AppColor.GreenSoft.copy(alpha = 0.9f),
                     RoundedCornerShape(12.dp)
                 )
                 .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -338,14 +456,14 @@ fun CafeGroupCard(items: List<CartItemResponse>) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Total ${items.size} items",
+                text = "Total ${itemResponses.size} items",
                 fontFamily = PoppinsFont,
                 fontSize = 13.sp,
                 color = AppColor.Gray
             )
 
             Text(
-                text = "$${"%.2f".format(cafeSubtotal)}",
+                text = cafeSubtotal.toRupiah(),
                 fontFamily = PoppinsFont,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
@@ -356,39 +474,12 @@ fun CafeGroupCard(items: List<CartItemResponse>) {
 
 
 @Composable
-fun CafeHeader(
-    cafeName: String,
-    onClear: () -> Unit
+fun CartItemRow(
+    itemResponse: CartItemResponse,
+    onFoodClick: () -> Unit,
+    onMinusClick: () -> Unit,
+    onPlusClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(AppColor.White)
-            .padding(vertical = 12.dp, horizontal = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = cafeName,
-            fontFamily = PoppinsFont,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        Text(
-            text = "Clear",
-            fontFamily = PoppinsFont,
-            fontSize = 13.sp,
-            color = Color.Red,
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .padding(horizontal = 6.dp, vertical = 2.dp)
-        )
-    }
-}
-
-@Composable
-fun CartItemRow(item: CartItemResponse) {
 
     val isPreview = LocalInspectionMode.current
 
@@ -396,7 +487,7 @@ fun CartItemRow(item: CartItemResponse) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
 
         if (isPreview) {
@@ -404,18 +495,18 @@ fun CartItemRow(item: CartItemResponse) {
                 painter = painterResource(R.drawable.image_burger),
                 contentDescription = null,
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(50.dp)
                     .clip(RoundedCornerShape(4.dp)),
                 contentScale = ContentScale.Crop
             )
         } else {
             AsyncImage(
-                model = item.image,
+                model = itemResponse.image,
                 placeholder = painterResource(R.drawable.image_burger),
                 error = painterResource(R.drawable.image_burger),
-                contentDescription = item.name,
+                contentDescription = itemResponse.name,
                 modifier = Modifier
-                    .size(42.dp)
+                    .size(50.dp)
                     .clip(RoundedCornerShape(4.dp)),
                 contentScale = ContentScale.Crop
             )
@@ -432,23 +523,33 @@ fun CartItemRow(item: CartItemResponse) {
             ) {
                 Text(
                     fontFamily = PoppinsFont,
-                    text = item.name,
+                    text = itemResponse.name,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .clickable {
+                            onFoodClick()
+                        }
                 )
                 StatusStatItem(FoodStatus.READY)
             }
 
-            Spacer(Modifier.height(6.dp))
-
             Text(
                 fontFamily = PoppinsFont,
-                text = "Notes: ${item.notes}",
+                text = "Notes: ${itemResponse.notes}",
                 color = Color.DarkGray,
                 fontSize = 12.sp
             )
 
             Spacer(Modifier.height(6.dp))
+
+            Text(
+                text = itemResponse.variants.joinToString(", ") { it.optionName },
+                fontSize = 11.sp,
+                color = Color.Gray
+            )
+
+            Spacer(Modifier.height(2.dp))
 
             Row(
                 Modifier.fillMaxWidth(),
@@ -457,19 +558,27 @@ fun CartItemRow(item: CartItemResponse) {
             ) {
                 Text(
                     fontFamily = PoppinsFont,
-                    text = "$${item.price}",
+                    text = itemResponse.price.toRupiah(),
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
                 )
 
-                QuantityCounter(item.quantity)
+                QuantityCounter(
+                    quantity = itemResponse.quantity,
+                    onMinusClick = { onMinusClick() },
+                    onPlusClick = { onPlusClick() }
+                )
             }
         }
     }
 }
 
 @Composable
-fun QuantityCounter(quantity: Int) {
+fun QuantityCounter(
+    quantity: Int,
+    onMinusClick: () -> Unit,
+    onPlusClick: () -> Unit,
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -491,14 +600,22 @@ fun QuantityCounter(quantity: Int) {
                     imageVector = Icons.Default.Delete,
                     contentDescription = null,
                     tint = Color.Red,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clickable {
+                            onMinusClick()
+                        }
                 )
             } else {
                 Icon(
                     imageVector = Icons.Default.Remove,
                     contentDescription = null,
                     tint = AppColor.Gray,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clickable {
+                            onMinusClick()
+                        }
                 )
             }
         }
@@ -525,7 +642,11 @@ fun QuantityCounter(quantity: Int) {
                 Icons.Default.Add,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier
+                    .size(18.dp)
+                    .clickable {
+                        onPlusClick()
+                    }
             )
         }
     }
@@ -536,7 +657,7 @@ fun QuantityCounter(quantity: Int) {
 fun PremiumCheckoutSheet(
     total: BigDecimal,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: (PaymentMethod) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -672,7 +793,7 @@ fun PremiumCheckoutSheet(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "$${"%.2f".format(total)}",
+                text = total.toRupiah(),
                 fontFamily = PoppinsFont,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -695,7 +816,7 @@ fun PremiumCheckoutSheet(
                 }
 
                 Button(
-                    onClick = onConfirm,
+                    onClick = { onConfirm(paymentMethod) },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(AppColor.Green),
                     shape = RoundedCornerShape(14.dp)
@@ -748,17 +869,29 @@ fun PaymentPill(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PinVerificationSheet(
+    isLoading: Boolean,
+    isError: Boolean,
     onDismiss: () -> Unit,
-    onSuccess: () -> Unit
+    onSuccess: (String) -> Unit
 ) {
+
+    var pin by remember { mutableStateOf(value = EMPTY_STRING) }
+    var isSubmitted by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
-    var pin by remember { mutableStateOf(value = EMPTY_STRING) }
-    var isError by remember { mutableStateOf(value = false) }
+    LaunchedEffect(Unit) {
+        pin = EMPTY_STRING
+        isSubmitted = false
+    }
 
-    val correctPin = "123456"
+    LaunchedEffect(isError) {
+        if (isError) {
+            pin = EMPTY_STRING
+            isSubmitted = false
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -839,18 +972,14 @@ fun PinVerificationSheet(
             Spacer(modifier = Modifier.height(height = 28.dp))
 
             PinKeypad(
+                isLoading = isLoading,
                 onNumberClick = { number ->
                     if (pin.length < 6) {
                         pin += number
-                        isError = false
 
-                        if (pin.length == 6) {
-                            if (pin == correctPin) {
-                                onSuccess()
-                            } else {
-                                isError = true
-                                pin = EMPTY_STRING
-                            }
+                        if (pin.length == 6 && !isLoading && !isSubmitted) {
+                            isSubmitted = true
+                            onSuccess(pin)
                         }
                     }
                 },
@@ -868,6 +997,7 @@ fun PinVerificationSheet(
 
 @Composable
 fun PinKeypad(
+    isLoading: Boolean,
     onNumberClick: (String) -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -901,7 +1031,7 @@ fun PinKeypad(
                                 color = AppColor.Green.copy(alpha = 0.1f),
                                 shape = CircleShape
                             )
-                            .clickable(enabled = key.isNotEmpty()) {
+                            .clickable(enabled = key.isNotEmpty() && !isLoading) {
                                 when (key) {
                                     "del" -> onDeleteClick()
                                     else -> onNumberClick(key)
@@ -1018,6 +1148,43 @@ fun OrderSuccessDialog(
     }
 }
 
+@Composable
+fun EmptyCartView() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = null,
+            tint = AppColor.Gray,
+            modifier = Modifier.size(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Keranjang kamu kosong 😢",
+            fontFamily = PoppinsFont,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Yuk tambah menu dulu",
+            fontFamily = PoppinsFont,
+            fontSize = 13.sp,
+            color = AppColor.Gray
+        )
+    }
+}
+
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun CartScreenPreview() {
@@ -1064,7 +1231,7 @@ fun PremiumCheckoutSheetPreview() {
                 .background(Color.White)
         ) {
             PremiumCheckoutSheet(
-                total = 129.toBigDecimal(),
+                total = mockCartItems.first().price,
                 onDismiss = {},
                 onConfirm = {}
             )
@@ -1072,37 +1239,39 @@ fun PremiumCheckoutSheetPreview() {
     }
 }
 
-@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-@Composable
-fun PinKeypadPreview() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0x66000000)),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.60f)
-                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(Color.White)
-        ) {
-            PinVerificationSheet(
-                onDismiss = {},
-                onSuccess = {}
-            )
-        }
-    }
-}
-
-@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-@Composable
-fun OrderSuccessDialogPreview() {
-    OrderSuccessDialog(
-        onConfirm = {}
-    )
-}
+//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
+//@Composable
+//fun PinKeypadPreview() {
+//    Box(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color(0x66000000)),
+//        contentAlignment = Alignment.BottomCenter
+//    ) {
+//        Box(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .fillMaxHeight(.60f)
+//                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+//                .background(Color.White)
+//        ) {
+//            PinVerificationSheet(
+//                isLoading = false,
+//                isError = false,
+//                onDismiss = {},
+//                onSuccess = {}
+//            )
+//        }
+//    }
+//}
+//
+//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
+//@Composable
+//fun OrderSuccessDialogPreview() {
+//    OrderSuccessDialog(
+//        onConfirm = {}
+//    )
+//}
 
 val mockCartItems = listOf(
 
@@ -1113,10 +1282,26 @@ val mockCartItems = listOf(
         quantity = 2,
         notes = "Extra cheese",
         cafeId = "cafe_1",
+        cafeName = "Burger Queen",
         price = 12000.toBigDecimal(),
         image = "https://example.com/images/burger.png",
         name = "Classic Burger",
-        cafeName = "Burger Queen"
+        variants = listOf(
+            CartItemVariantResponse(
+                variantId = "v1",
+                variantName = "Size",
+                optionId = "o1",
+                optionName = "Large",
+                price = 3000.toBigDecimal()
+            ),
+            CartItemVariantResponse(
+                variantId = "v2",
+                variantName = "Cheese",
+                optionId = "o2",
+                optionName = "Extra Cheese",
+                price = 2000.toBigDecimal()
+            )
+        )
     ),
 
     CartItemResponse(
@@ -1126,10 +1311,19 @@ val mockCartItems = listOf(
         quantity = 1,
         notes = "Less sauce",
         cafeId = "cafe_1",
+        cafeName = "Burger Queen",
         price = 15000.toBigDecimal(),
         image = "https://example.com/images/cheese_burger.png",
         name = "Cheese Burger",
-        cafeName = "Burger Queen"
+        variants = listOf(
+            CartItemVariantResponse(
+                variantId = "v1",
+                variantName = "Size",
+                optionId = "o1",
+                optionName = "Medium",
+                price = 0.toBigDecimal()
+            )
+        )
     ),
 
     CartItemResponse(
@@ -1139,10 +1333,19 @@ val mockCartItems = listOf(
         quantity = 1,
         notes = "Medium spicy",
         cafeId = "cafe_2",
+        cafeName = "Pizza Palace",
         price = 30000.toBigDecimal(),
         image = "https://example.com/images/pizza.png",
         name = "Pepperoni Pizza",
-        cafeName = "Pizza Palace"
+        variants = listOf(
+            CartItemVariantResponse(
+                variantId = "v1",
+                variantName = "Crust",
+                optionId = "o1",
+                optionName = "Thin Crust",
+                price = 2000.toBigDecimal()
+            )
+        )
     ),
 
     CartItemResponse(
@@ -1152,10 +1355,19 @@ val mockCartItems = listOf(
         quantity = 2,
         notes = "Extra chili sauce",
         cafeId = "cafe_2",
+        cafeName = "Pizza Palace",
         price = 28000.toBigDecimal(),
         image = "https://example.com/images/margherita.png",
         name = "Margherita Pizza",
-        cafeName = "Pizza Palace"
+        variants = listOf(
+            CartItemVariantResponse(
+                variantId = "v1",
+                variantName = "Size",
+                optionId = "o1",
+                optionName = "Large",
+                price = 5000.toBigDecimal()
+            )
+        )
     ),
 
     CartItemResponse(
@@ -1165,10 +1377,19 @@ val mockCartItems = listOf(
         quantity = 2,
         notes = "No sugar",
         cafeId = "cafe_3",
+        cafeName = "Coffee Corner",
         price = 18000.toBigDecimal(),
         image = "https://example.com/images/cappuccino.png",
         name = "Cappuccino",
-        cafeName = "Coffee Corner"
+        variants = listOf(
+            CartItemVariantResponse(
+                variantId = "v1",
+                variantName = "Sugar",
+                optionId = "o1",
+                optionName = "No Sugar",
+                price = 0.toBigDecimal()
+            )
+        )
     ),
 
     CartItemResponse(
@@ -1176,11 +1397,12 @@ val mockCartItems = listOf(
         customerId = "cust_001",
         foodId = "food_006",
         quantity = 1,
-        notes = EMPTY_STRING,
+        notes = "",
         cafeId = "cafe_3",
+        cafeName = "Coffee Corner",
         price = 20000.toBigDecimal(),
         image = "https://example.com/images/latte.png",
         name = "Latte",
-        cafeName = "Coffee Corner"
+        variants = emptyList()
     )
 )
