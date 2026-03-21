@@ -23,7 +23,7 @@ class AddressAddUseCase @Inject constructor(
 ) : BaseUseCase<AddressAddRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: AddressAddRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.PostAddress,
+        endpoint = ApiEndPoint.Address.Create,
         body = param
     )
 

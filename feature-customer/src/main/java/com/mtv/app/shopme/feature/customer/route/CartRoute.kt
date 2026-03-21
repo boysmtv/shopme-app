@@ -35,16 +35,23 @@ fun CartRoute(nav: NavController) {
 }
 
 private fun cartEvent(vm: CartViewModel) = CartEventListener(
-    onQuantityClick = vm::doPostQuantity,
-    onInquiry = vm::doPostInquiry,
-    onValidate = vm::doPostValidate,
+    onGetSession = vm::doGetSession,
+    onResetSessionTokenState = vm::resetSessionTokenState,
     onVerifyPin = vm::doVerifyPin,
-    onDismissActiveDialog = vm::doDismissActiveDialog
+    onResetVerifyPinState = vm::resetVerifyPinState,
+    onCreateOrder = vm::doCreateOrder,
+    onQuantityClick = vm::doPostQuantity,
+    onClearFoodByCafe = vm::doClearCartByCafe,
+    onClearCart = vm::doClearCart,
+    onDismissActiveDialog = vm::doDismissActiveDialog,
 )
 
 private fun cartNavigation(nav: NavController) = CartNavigationListener(
-    onBack = { nav.popBackStack() },
+    onNavigateToDetail = { foodId ->
+        nav.navigate(CustomerDestinations.navigateToDetail(foodId))
+    },
     onNavigateToOrder = {
         nav.navigate(CustomerDestinations.ORDER_GRAPH)
     },
+    onBack = { nav.popBackStack() },
 )

@@ -23,7 +23,7 @@ class AddressDeleteUseCase @Inject constructor(
 ) : BaseUseCase<AddressDeleteRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: AddressDeleteRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.DeleteAddress(param.id),
+        endpoint = ApiEndPoint.Address.Delete(param.id),
     )
 
 }
