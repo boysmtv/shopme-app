@@ -42,7 +42,8 @@ data class DetailNavigationListener(
     val onBack: () -> Unit = {},
     val onChatClick: () -> Unit = {},
     val onAddToCart: () -> Unit = {},
-    val onClickCafe: (String) -> Unit = {}
+    val onClickCafe: (String) -> Unit = {},
+    val onNavigateToDetail: (String) -> Unit = {}
 )
 
 sealed class DetailDialog {

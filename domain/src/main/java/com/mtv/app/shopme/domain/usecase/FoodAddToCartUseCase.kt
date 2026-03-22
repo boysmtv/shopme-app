@@ -23,7 +23,7 @@ class FoodAddToCartUseCase @Inject constructor(
 ) : BaseUseCase<FoodAddToCartRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: FoodAddToCartRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.PostCart,
+        endpoint = ApiEndPoint.Cart.Add,
         body = param
     )
 

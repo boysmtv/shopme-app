@@ -23,7 +23,7 @@ class FoodDetailUseCase @Inject constructor(
 ) : BaseUseCase<String, ApiResponse<FoodResponse>>(dispatcher) {
 
     override suspend fun execute(param: String) = repository.request<ApiResponse<FoodResponse>>(
-        endpoint = ApiEndPoint.FoodsDetail(param),
+        endpoint = ApiEndPoint.Foods.Detail(param),
     )
 
 }
