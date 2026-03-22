@@ -23,7 +23,7 @@ class FoodSimilarUseCase @Inject constructor(
 ) : BaseUseCase<String, ApiResponse<List<FoodResponse>>>(dispatcher) {
 
     override suspend fun execute(param: String) = repository.request<ApiResponse<List<FoodResponse>>>(
-        endpoint = ApiEndPoint.FoodsSimilar(param),
+        endpoint = ApiEndPoint.Foods.GetSimilarByCafe(param),
     )
 
 }

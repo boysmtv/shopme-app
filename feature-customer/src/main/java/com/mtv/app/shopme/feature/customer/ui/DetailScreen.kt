@@ -34,17 +34,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Downloading
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PriceChange
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -69,9 +64,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -98,8 +93,8 @@ import com.mtv.app.shopme.feature.customer.contract.DetailDataListener
 import com.mtv.app.shopme.feature.customer.contract.DetailEventListener
 import com.mtv.app.shopme.feature.customer.contract.DetailNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.DetailStateListener
-import com.mtv.app.shopme.feature.customer.utils.checkAddress
-import com.mtv.app.shopme.feature.customer.utils.checkName
+import com.mtv.app.shopme.feature.customer.utils.StatItem
+import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.app.shopme.feature.customer.utils.checkPrice
 import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
@@ -117,6 +112,7 @@ fun DetailScreen(
     uiData.customerData
     val food = uiData.foodData
     val similarFoods = uiData.foodSimilarData.orEmpty()
+    val filteredFoods = similarFoods.filter { it.id != food?.id }
 
     var showSheet by remember { mutableStateOf(false) }
 
@@ -228,12 +224,12 @@ fun DetailScreen(
             item { SectionTitle("Menu lainnya") }
             item { Spacer(Modifier.height(12.dp)) }
 
-            items(similarFoods) { item ->
+            items(filteredFoods) { item ->
                 SimilarItemRow(
-                    imageUrl = item.images.first(),
-                    title = item.name,
-                    price = item.price,
-                    status = item.status
+                    foodResponse = item,
+                    onClickSimilarFood = {
+                        uiNavigation.onNavigateToDetail(item.id)
+                    }
                 )
                 Spacer(Modifier.height(12.dp))
             }
@@ -494,89 +490,6 @@ fun DetailStatsRow(food: FoodResponse?) {
     }
 }
 
-@Composable
-fun StatusStatItem(
-    status: FoodStatus,
-) {
-    val (icon, color, text) = when (status) {
-        FoodStatus.READY -> Triple(
-            Icons.Default.CheckCircle,
-            Color(0xFF4CAF50),
-            "Ready"
-        )
-
-        FoodStatus.PREORDER -> Triple(
-            Icons.Default.Schedule,
-            Color(0xFFFF9800),
-            "Pre-order"
-        )
-
-        FoodStatus.JASTIP -> Triple(
-            Icons.Default.LocalShipping,
-            Color(0xFF2196F3),
-            "Jastip"
-        )
-
-        FoodStatus.UNKNOWN -> Triple(
-            Icons.Default.Downloading,
-            Color(0xFFA3A3A3),
-            "Loading"
-        )
-    }
-
-    Row(
-        modifier = Modifier
-            .background(
-                color = color.copy(alpha = 0.12f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = text,
-            tint = color,
-            modifier = Modifier.size(16.dp)
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = text,
-            color = color,
-            fontFamily = PoppinsFont
-        )
-    }
-}
-
-@Composable
-fun StatItem(
-    icon: ImageVector,
-    text: String
-) {
-    Row(
-        modifier = Modifier
-            .background(
-                color = AppColor.Green.copy(alpha = 0.12f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = AppColor.Green,
-            modifier = Modifier.size(16.dp)
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = text,
-            color = AppColor.Green,
-            fontFamily = PoppinsFont
-        )
-    }
-}
-
 
 @Composable
 fun SectionTitle(title: String) {
@@ -589,22 +502,23 @@ fun SectionTitle(title: String) {
 
 @Composable
 fun SimilarItemRow(
-    imageUrl: String,
-    title: String,
-    price: BigDecimal,
-    status: FoodStatus
+    foodResponse: FoodResponse,
+    onClickSimilarFood: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .border(1.dp, Color.Black.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable {
+                onClickSimilarFood()
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = imageUrl,
-            contentDescription = title,
+            model = foodResponse.images.first(),
+            contentDescription = foodResponse.name,
             modifier = Modifier
                 .size(42.dp)
                 .clip(RoundedCornerShape(4.dp)),
@@ -617,7 +531,7 @@ fun SimilarItemRow(
                 .padding(start = 12.dp)
         ) {
             Text(
-                text = title,
+                text = foodResponse.name,
                 fontWeight = FontWeight.Medium,
                 fontFamily = PoppinsFont
             )
@@ -625,7 +539,7 @@ fun SimilarItemRow(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text = price.toRupiah(),
+                text = foodResponse.price.toRupiah(),
                 color = AppColor.Green,
                 fontSize = 14.sp,
                 fontFamily = PoppinsFont
@@ -633,26 +547,11 @@ fun SimilarItemRow(
         }
 
         Box(
-            contentAlignment = Alignment.Center
-        ) {
-            StatusStatItem(status)
-        }
-
-        Spacer(Modifier.width(16.dp))
-
-        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(AppColor.Green),
-            contentAlignment = Alignment.Center
+                .padding(end = 12.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = AppColor.White
-            )
+            StatusStatItem(foodResponse.status)
         }
     }
 }
@@ -737,10 +636,14 @@ fun VariantBottomSheetContent(
         OutlinedTextField(
             value = note,
             onValueChange = { note = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
             placeholder = {
                 Text(
-                    text = "Contoh: jangan pedas, nasi dipisah",
+                    text = "Contoh: Jangan pakai sambal, nasi dipisah",
+                    fontSize = 12.sp,
+                    fontStyle = FontStyle.Italic,
                     fontFamily = PoppinsFont
                 )
             },

@@ -41,7 +41,7 @@ private fun detailEvent(vm: DetailViewModel) = DetailEventListener(
 )
 
 private fun detailNavigation(nav: NavController) = DetailNavigationListener(
-    onBack = {},
+    onBack = { nav.popBackStack() },
     onChatClick = {
         nav.navigate(CustomerDestinations.CHAT_GRAPH)
     },
@@ -57,5 +57,8 @@ private fun detailNavigation(nav: NavController) = DetailNavigationListener(
     },
     onClickCafe = { foodId ->
         nav.navigate(CustomerDestinations.navigateToCafe(foodId))
+    },
+    onNavigateToDetail = { foodId ->
+        nav.navigate(CustomerDestinations.navigateToDetail(foodId))
     }
 )
