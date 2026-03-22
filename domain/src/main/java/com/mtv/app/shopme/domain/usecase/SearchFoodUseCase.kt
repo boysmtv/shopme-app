@@ -27,7 +27,7 @@ class SearchFoodUseCase @Inject constructor(
 
     override suspend fun execute(param: SearchFoodRequest) =
         repository.request<ApiResponse<PageResponse<FoodResponse>>>(
-            endpoint = ApiEndPoint.GetSearch,
+            endpoint = ApiEndPoint.Foods.Search,
             options = RequestOptions(
                 query = mapOf(
                     "name" to param.name,
