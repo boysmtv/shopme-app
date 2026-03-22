@@ -25,7 +25,7 @@ class RegisterUseCase @Inject constructor(
 ) : BaseUseCase<RegisterRequest, ApiResponse<Unit>>(dispatcher) {
 
     override suspend fun execute(param: RegisterRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.PostRegister,
+        endpoint = ApiEndPoint.Auth.Register,
         body = param
     )
 

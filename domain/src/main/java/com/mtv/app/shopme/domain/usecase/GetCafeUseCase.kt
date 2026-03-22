@@ -23,6 +23,6 @@ class GetCafeUseCase @Inject constructor(
 ) : BaseUseCase<String, ApiResponse<CafeResponse>>(dispatcher) {
 
     override suspend fun execute(param: String) = repository.request<ApiResponse<CafeResponse>>(
-        endpoint = ApiEndPoint.GetCafeById(param),
+        endpoint = ApiEndPoint.Cafe.Detail(param),
     )
 }

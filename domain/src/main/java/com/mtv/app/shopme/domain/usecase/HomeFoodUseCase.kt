@@ -23,6 +23,6 @@ class HomeFoodUseCase @Inject constructor(
 ) : BaseUseCase<Unit, ApiResponse<List<FoodResponse>>>(dispatcher) {
 
     override suspend fun execute(param: Unit) = repository.request<ApiResponse<List<FoodResponse>>>(
-        endpoint = ApiEndPoint.GetHomeFood
+        endpoint = ApiEndPoint.Foods.GetAll
     )
 }

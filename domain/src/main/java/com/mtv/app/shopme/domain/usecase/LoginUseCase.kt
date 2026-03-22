@@ -27,7 +27,7 @@ class LoginUseCase @Inject constructor(
 ) : BaseUseCase<LoginRequest, ApiResponse<LoginResponse>>(dispatcher) {
 
     override suspend fun execute(param: LoginRequest) = repository.request<ApiResponse<LoginResponse>>(
-        endpoint = ApiEndPoint.PostLogin,
+        endpoint = ApiEndPoint.Auth.Login,
         body = param
     )
 

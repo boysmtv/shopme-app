@@ -1,28 +1,29 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: GetFoodsByCafeUseCase.kt
+ * File: CartUseCase.kt
  *
- * Last modified by Dedy Wijaya on 18/03/26 01.29
+ * Last modified by Dedy Wijaya on 03/03/26 11.55
  */
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.based.core.network.di.IoDispatcher
 import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.based.core.provider.based.BaseUseCase
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 
-class GetFoodsByCafeUseCase @Inject constructor(
+class GetSessionTokenUseCase @Inject constructor(
     private val repository: NetworkRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<String, ApiResponse<List<FoodResponse>>>(dispatcher) {
+) : BaseUseCase<Unit, ApiResponse<SessionTokenResponse>>(dispatcher) {
 
-    override suspend fun execute(param: String) = repository.request<ApiResponse<List<FoodResponse>>>(
-        endpoint = ApiEndPoint.Foods.GetByCafeId(param),
+    override suspend fun execute(param: Unit) = repository.request<ApiResponse<SessionTokenResponse>>(
+        endpoint = ApiEndPoint.Order.GetSession,
     )
+
 }
