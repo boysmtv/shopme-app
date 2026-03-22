@@ -24,7 +24,7 @@ class SplashUseCase @Inject constructor(
 ) : BaseUseCase<SplashRequest, ApiResponse<SplashResponse>>(dispatcher) {
 
     override suspend fun execute(param: SplashRequest) = repository.request<ApiResponse<SplashResponse>>(
-        endpoint = ApiEndPoint.PostSplashScreen,
+        endpoint = ApiEndPoint.Misc.Splash,
         body = param
     )
 

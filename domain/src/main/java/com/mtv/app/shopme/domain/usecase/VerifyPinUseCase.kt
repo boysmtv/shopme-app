@@ -25,7 +25,7 @@ class VerifyPinUseCase @Inject constructor(
 
 
     override suspend fun execute(param: VerifyPinRequest) = repository.request<ApiResponse<VerifyPinResponse>>(
-        endpoint = ApiEndPoint.PostVerifyPin,
+        endpoint = ApiEndPoint.Customer.VerifyPin,
     )
 
 }

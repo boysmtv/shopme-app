@@ -24,7 +24,7 @@ class VillageUseCase @Inject constructor(
 ) : BaseUseCase<Unit, ApiResponse<List<VillageResponse>>>(dispatcher) {
 
     override suspend fun execute(param: Unit) = repository.request<ApiResponse<List<VillageResponse>>>(
-        endpoint = ApiEndPoint.GetVillage,
+        endpoint = ApiEndPoint.Village.Get,
     )
 
 }
