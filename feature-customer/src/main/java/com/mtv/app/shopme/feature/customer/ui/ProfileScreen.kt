@@ -65,8 +65,8 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.MenuSummary
-import com.mtv.app.shopme.data.remote.response.Stats
+import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
+import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.feature.customer.contract.ProfileDataListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileEventListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileNavigationListener
@@ -74,7 +74,7 @@ import com.mtv.app.shopme.feature.customer.contract.ProfileStateListener
 import com.mtv.app.shopme.feature.customer.utils.checkAddress
 import com.mtv.app.shopme.feature.customer.utils.checkName
 import com.mtv.app.shopme.feature.customer.utils.checkPhone
-import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.app.shopme.nav.customer.CustomerBottomNavigationBar
 
 @Composable
 fun ProfileScreen(
@@ -427,12 +427,12 @@ fun ProfileScreenPreview() {
         ),
         photo = "https://rakyatsulsel.fajar.co.id/wp-content/uploads/2025/03/g_p_o_potret_davina_karamoy_berhijab_saat_umrah_dipuji_makin_cantik_saat_tidak_pakai_makeup_p_davina_karamoy-20240925-007-non_fotografer_kly.jpg",
         verified = true,
-        stats = Stats(
+        stats = StatsResponse(
             totalOrders = 24,
             activeOrders = 2,
             membership = "GOLD"
         ),
-        menuSummary = MenuSummary(
+        menuSummary = MenuSummaryResponse(
             ordered = 12,
             cooking = 2,
             shipping = 1,

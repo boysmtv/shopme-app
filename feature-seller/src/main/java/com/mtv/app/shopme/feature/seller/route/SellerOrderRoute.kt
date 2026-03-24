@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerOrderNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerOrderViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerOrderScreen
-import com.mtv.app.shopme.nav.SellerDestinations
+import com.mtv.app.shopme.nav.seller.SellerDestinations
 
 @Composable
 fun SellerOrderRoute(nav: NavController) {

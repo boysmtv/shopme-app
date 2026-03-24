@@ -40,7 +40,11 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     implementation(project(":common"))
+    implementation(project(":feature-auth"))
+    implementation(project(":feature-customer"))
+    implementation(project(":feature-seller"))
 
     /* =========================
      * Core & Lifecycle

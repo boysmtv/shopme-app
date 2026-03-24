@@ -68,9 +68,9 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.data.dto.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.data.dto.FoodItemModel
-import com.mtv.app.shopme.data.dto.FoodStatus
+import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
@@ -79,7 +79,7 @@ import com.mtv.app.shopme.feature.customer.contract.SearchDataListener
 import com.mtv.app.shopme.feature.customer.contract.SearchEventListener
 import com.mtv.app.shopme.feature.customer.contract.SearchNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SearchStateListener
-import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.app.shopme.nav.customer.CustomerBottomNavigationBar
 import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal

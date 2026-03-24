@@ -79,16 +79,16 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.data.dto.FoodCategory
-import com.mtv.app.shopme.data.dto.FoodStatus
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.data.remote.request.CartVariantRequest
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.FoodOptionResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
-import com.mtv.app.shopme.data.remote.response.MenuSummary
-import com.mtv.app.shopme.data.remote.response.Stats
+import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
+import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.feature.customer.contract.DetailDataListener
 import com.mtv.app.shopme.feature.customer.contract.DetailEventListener
 import com.mtv.app.shopme.feature.customer.contract.DetailNavigationListener
@@ -1007,6 +1007,6 @@ val previewCustomer = CustomerResponse(
     ),
     photo = EMPTY_STRING,
     verified = true,
-    stats = Stats(0, 0, EMPTY_STRING),
-    menuSummary = MenuSummary(0, 0, 0, 0, 0)
+    stats = StatsResponse(0, 0, EMPTY_STRING),
+    menuSummary = MenuSummaryResponse(0, 0, 0, 0, 0)
 )

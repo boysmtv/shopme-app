@@ -10,8 +10,8 @@ package com.mtv.app.shopme.data.remote.response
 
 import com.mtv.app.shopme.common.serializer.BigDecimalSerializer
 import com.mtv.app.shopme.common.serializer.LocalDateTimeSerializer
-import com.mtv.app.shopme.data.dto.FoodCategory
-import com.mtv.app.shopme.data.dto.FoodStatus
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
 import java.math.BigDecimal
 import kotlinx.serialization.Serializable
 import org.threeten.bp.LocalDateTime
@@ -37,6 +37,7 @@ data class FoodResponse(
 
     @Serializable(with = LocalDateTimeSerializer::class)
     val createdAt: LocalDateTime,
+    val updatedAt: Long,
 
     val images: List<String>,
     val variants: List<FoodVariantResponse>

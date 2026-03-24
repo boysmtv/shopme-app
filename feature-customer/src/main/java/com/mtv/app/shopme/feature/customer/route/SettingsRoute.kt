@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.customer.contract.SettingsNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SettingsStateListener
 import com.mtv.app.shopme.feature.customer.presentation.SettingsViewModel
 import com.mtv.app.shopme.feature.customer.ui.SettingsScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun SettingsRoute(nav: NavController) {

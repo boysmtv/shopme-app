@@ -8,95 +8,62 @@
 
 package com.mtv.app.shopme.feature.customer.ui
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.*
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
-import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.common.InterFont
-import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.*
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.data.remote.response.AddressResponse
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
-import com.mtv.app.shopme.data.remote.response.MenuSummary
-import com.mtv.app.shopme.data.remote.response.Stats
-import com.mtv.app.shopme.feature.customer.contract.HomeDataListener
-import com.mtv.app.shopme.feature.customer.contract.HomeEventListener
-import com.mtv.app.shopme.feature.customer.contract.HomeNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.HomeStateListener
-import com.mtv.app.shopme.feature.customer.utils.checkAddress
-import com.mtv.app.shopme.feature.customer.utils.checkName
-import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
+import com.mtv.app.shopme.data.mock.HomeUiMock
+import com.mtv.app.shopme.domain.model.*
+import com.mtv.app.shopme.feature.customer.contract.HomeUiState
+import com.mtv.app.shopme.feature.customer.utils.*
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    uiState: HomeStateListener,
-    uiData: HomeDataListener,
-    uiEvent: HomeEventListener,
-    uiNavigation: HomeNavigationListener
+    state: HomeUiState,
+    onClickFood: (String) -> Unit,
+    onClickSearch: () -> Unit,
+    onClickNotif: () -> Unit,
+    onRefresh: () -> Unit,
 ) {
 
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-
-    val foods = uiData.foodData.orEmpty()
+    if (state.isFoodsLoading && state.foods.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LinearProgressIndicator()
+        }
+        return
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(
+                    listOf(
                         AppColor.GreenSoft,
                         AppColor.WhiteSoft,
                         AppColor.White
@@ -107,65 +74,125 @@ fun HomeScreen(
             .padding(horizontal = 20.dp)
     ) {
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
         HomeHeader(
-            customerData = uiData.customerData,
-            onNotifClick = {
-                uiNavigation.onNavigateToNotif()
-            }
+            customerData = state.customer,
+            onNotifClick = onClickNotif
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize()
-        ) {
+        state.error?.let {
+            ErrorBanner(
+                message = it.message,
+                onDismiss = onRefresh
+            )
+        }
 
-            item {
-                Column {
-                    HomeSearch(
-                        onClick = {
-                            uiNavigation.onNavigateToSearch()
-                        }
-                    )
+        Spacer(Modifier.height(8.dp))
 
-                    Spacer(Modifier.height(16.dp))
+        HomeContent(
+            state = state,
+            onClickFood = onClickFood,
+            onClickSearch = onClickSearch
+        )
+    }
+}
 
-                    HomePromoBanner()
+@Composable
+private fun HomeContent(
+    state: HomeUiState,
+    onClickFood: (String) -> Unit,
+    onClickSearch: () -> Unit
+) {
 
-                    Spacer(Modifier.height(16.dp))
+    val listState = rememberSaveable(saver = LazyListState.Saver) {
+        LazyListState()
+    }
 
-                    HomeMenuBar()
+    val scope = rememberCoroutineScope()
 
-                    Spacer(Modifier.height(20.dp))
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        item {
+            Column {
+
+                HomeSearch { onClickSearch() }
+
+                Spacer(Modifier.height(16.dp))
+
+                HomePromoBanner()
+
+                Spacer(Modifier.height(16.dp))
+
+                HomeMenuBar()
+
+                Spacer(Modifier.height(20.dp))
+            }
+        }
+
+        item {
+            HomeMenuTitle {
+                scope.launch {
+                    listState.animateScrollToItem(1)
                 }
             }
+        }
 
-            item(key = "top_choice_section") {
-                HomeMenuTitle(
-                    onSeeAllClick = {
-                        coroutineScope.launch {
-                            listState.animateScrollToItem(
-                                index = 1
-                            )
-                        }
-                    }
+        gridItems(
+            data = state.foods,
+            columnCount = 2,
+            horizontalSpacing = 16.dp,
+            verticalSpacing = 16.dp
+        ) { item ->
+
+            FoodCard(
+                item = item,
+                onClickDetail = { onClickFood(item.id) }
+            )
+        }
+
+        if (state.isLoading && state.foods.isNotEmpty()) {
+            item {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 )
             }
+        }
 
-            gridItems(
-                data = foods,
-                columnCount = 2,
-                horizontalSpacing = 16.dp,
-                verticalSpacing = 16.dp
-            ) { item ->
-                FoodCard(
-                    item = item,
-                    onClickDetail = { uiNavigation.onNavigateToDetail(item.id) }
-                )
+        if (state.foods.isEmpty() && !state.isLoading) {
+            item {
+                EmptyState()
             }
+        }
+    }
+}
+
+@Composable
+private fun EmptyState() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Icon(
+                imageVector = Icons.Default.Fastfood,
+                contentDescription = null,
+                tint = Color.Gray
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text("No food available", color = Color.Gray)
         }
     }
 }
@@ -237,7 +264,7 @@ fun <T> LazyListScope.gridItems(
 
 @Composable
 private fun HomeHeader(
-    customerData: CustomerResponse?,
+    customerData: Customer?,
     onNotifClick: () -> Unit
 ) {
     Row(
@@ -420,7 +447,7 @@ fun CategoryItem(title: String) {
 
 @Composable
 fun FoodCard(
-    item: FoodResponse,
+    item: Food,
     onClickDetail: () -> Unit
 ) {
     Card(
@@ -493,48 +520,50 @@ fun FoodCard(
     }
 }
 
+@Composable
+private fun ErrorBanner(
+    message: String,
+    onDismiss: () -> Unit = {}
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Red.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+            .clickable { onDismiss() }
+            .padding(8.dp)
+    ) {
+        Text(
+            text = message,
+            color = Color.Red,
+            fontSize = 12.sp
+        )
+    }
+}
+
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun HomeScreenPreview() {
-    val navController = rememberNavController()
 
-    val previewCustomer = CustomerResponse(
-        name = "Dedy Wijaya",
-        phone = "08123456789",
-        email = "boys.mtv@gmail.com",
-        address = AddressResponse(
-            id = "1",
-            village = "Puri Lestari",
-            block = "H2",
-            number = "21",
-            rt = "012",
-            rw = "002",
-            isDefault = true
-        ),
-        photo = EMPTY_STRING,
-        verified = true,
-        stats = Stats(0, 0, EMPTY_STRING),
-        menuSummary = MenuSummary(0, 0, 0, 0, 0)
+    val state = HomeUiState(
+        customer = HomeUiMock.customer(),
+        foods = HomeUiMock.foods(),
+        isLoading = false,
+        error = null
     )
 
     Scaffold(
         bottomBar = {
-            CustomerBottomNavigationBar(navController)
+            CustomerBottomNavigationBar(rememberNavController())
         }
     ) { padding ->
         Box(
             modifier = Modifier
                 .padding(bottom = padding.calculateBottomPadding())
                 .fillMaxSize()
-                .background(Color.White)
         ) {
             HomeScreen(
-                uiState = HomeStateListener(),
-                uiData = HomeDataListener(
-                    customerData = previewCustomer
-                ),
-                uiEvent = HomeEventListener({}),
-                uiNavigation = HomeNavigationListener({})
+                state = state,
+                onEvent = {}
             )
         }
     }

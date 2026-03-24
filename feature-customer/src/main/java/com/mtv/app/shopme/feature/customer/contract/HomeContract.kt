@@ -8,32 +8,33 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Customer
+import com.mtv.app.shopme.domain.model.Food
+import com.mtv.based.core.network.utils.UiError
 
-data class HomeStateListener(
-    val customerState: Resource<ApiResponse<CustomerResponse>> = Resource.Loading,
-    val foodState: Resource<ApiResponse<List<FoodResponse>>> = Resource.Loading,
-    val activeDialog: HomeDialog? = null
+data class HomeUiState(
+    val customer: Customer? = null,
+    val foods: List<Food> = emptyList(),
+
+    val isCustomerLoading: Boolean = false,
+    val isFoodsLoading: Boolean = false,
+
+    val isCustomerFresh: Boolean = false,
+    val isFoodsFresh: Boolean = false
 )
 
-data class HomeDataListener(
-    val customerData: CustomerResponse? = null,
-    val foodData: List<FoodResponse>? = null
-)
+sealed class HomeEvent {
+    object Load : HomeEvent()
+    object Refresh : HomeEvent()
+    object DismissError : HomeEvent()
 
-data class HomeEventListener(
-    val onDismissActiveDialog: () -> Unit
-)
+    object ClickSearch : HomeEvent()
+    object ClickNotif : HomeEvent()
+    data class ClickFood(val id: String) : HomeEvent()
+}
 
-data class HomeNavigationListener(
-    val onNavigateToDetail: (String) -> Unit = {},
-    val onNavigateToSearch: () -> Unit = {},
-    val onNavigateToNotif: () -> Unit = {},
-)
-
-sealed class HomeDialog {
-    object Success : HomeDialog()
+sealed class HomeEffect {
+    object NavigateToSearch : HomeEffect()
+    object NavigateToNotif : HomeEffect()
+    data class NavigateToDetail(val id: String) : HomeEffect()
 }

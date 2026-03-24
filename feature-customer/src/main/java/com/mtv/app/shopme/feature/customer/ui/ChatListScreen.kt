@@ -63,7 +63,7 @@ import com.mtv.app.shopme.feature.customer.contract.ChatListNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
 import com.mtv.app.shopme.feature.customer.presentation.mockChatList
 import com.mtv.app.shopme.feature.customer.presentation.mockChatListState
-import com.mtv.app.shopme.nav.CustomerBottomNavigationBar
+import com.mtv.app.shopme.nav.customer.CustomerBottomNavigationBar
 import com.mtv.based.core.network.utils.Resource
 
 @Composable

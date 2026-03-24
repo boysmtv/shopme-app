@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.customer.contract.ChatListNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
 import com.mtv.app.shopme.feature.customer.presentation.ChatListViewModel
 import com.mtv.app.shopme.feature.customer.ui.ChatListScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun ChatListRoute(nav: NavController) {

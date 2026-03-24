@@ -42,10 +42,10 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+    implementation(project(":common"))
     implementation(project(":data"))
     implementation(project(":domain"))
-    implementation(project(":common"))
-    implementation(project(":nav"))
 
     /* =========================
      * Core & Lifecycle
@@ -143,8 +143,11 @@ dependencies {
     /* =========================
      * Testing
      * ========================= */
-    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
 
 }

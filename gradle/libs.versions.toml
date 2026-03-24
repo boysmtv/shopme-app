@@ -34,9 +34,13 @@ mtvCore = "1.0.0"
 navigationCompose = "2.8.0"
 okhttp = "4.11.0"
 retrofit = "2.9.0"
+room = "2.6.1"
 threetenabp = "1.4.6"
 uiTooling = "1.10.1"
 uiToolingPreview = "1.10.1"
+mockk = "1.13.10"
+turbine = "1.1.0"
+coroutinesTest = "1.7.3"
 
 [libraries]
 
@@ -107,10 +111,24 @@ threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref 
 exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
 core-youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "core" }
 
+# --- Room ---
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
 # --- Testing ---
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitExt" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+# --- Mockk ---
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+
+# --- Turbine (Flow Testing) ---
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+
+# --- Coroutines Test ---
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 
 # --- MTV Core Libraries ---
 mtv-core-network = { group = "com.mtv.based.core", name = "network", version.ref = "mtvCore" }

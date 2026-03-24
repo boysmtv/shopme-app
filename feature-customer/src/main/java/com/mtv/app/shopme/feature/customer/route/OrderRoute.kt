@@ -18,8 +18,8 @@ import com.mtv.app.shopme.feature.customer.contract.OrderNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.OrderStateListener
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
 import com.mtv.app.shopme.feature.customer.ui.OrderScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
-import com.mtv.app.shopme.nav.CustomerBottomNavItem
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerBottomNavItem
 
 @Composable
 fun OrderRoute(nav: NavController) {

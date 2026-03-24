@@ -64,7 +64,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerDashboardDataListener
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardStateListener
-import com.mtv.app.shopme.nav.SellerBottomNavigationBar
+import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
 import kotlin.math.max
 
 @Composable

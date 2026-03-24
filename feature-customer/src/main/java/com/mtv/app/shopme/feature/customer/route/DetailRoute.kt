@@ -18,8 +18,8 @@ import com.mtv.app.shopme.feature.customer.contract.DetailNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.DetailStateListener
 import com.mtv.app.shopme.feature.customer.presentation.DetailViewModel
 import com.mtv.app.shopme.feature.customer.ui.DetailScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
-import com.mtv.app.shopme.nav.CustomerBottomNavItem
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerBottomNavItem
 
 @Composable
 fun DetailRoute(nav: NavController) {

@@ -18,9 +18,9 @@ import com.mtv.app.shopme.feature.auth.contract.LoginNavigationListener
 import com.mtv.app.shopme.feature.auth.contract.LoginStateListener
 import com.mtv.app.shopme.feature.auth.presentation.LoginViewModel
 import com.mtv.app.shopme.feature.auth.ui.LoginScreen
-import com.mtv.app.shopme.nav.AuthDestinations
-import com.mtv.app.shopme.nav.CustomerDestinations
-import com.mtv.app.shopme.nav.navigateAndPopLogin
+import com.mtv.app.shopme.nav.auth.AuthDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
+import com.mtv.app.shopme.nav.extensions.navigateAndPopLogin
 
 @Composable
 fun LoginRoute(nav: NavController) {

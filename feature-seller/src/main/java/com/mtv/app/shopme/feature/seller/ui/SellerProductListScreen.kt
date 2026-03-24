@@ -58,7 +58,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerProductListEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListStateListener
 import com.mtv.app.shopme.feature.seller.model.SellerProduct
-import com.mtv.app.shopme.nav.SellerBottomNavigationBar
+import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
 
 @Composable
 fun SellerProductListScreen(

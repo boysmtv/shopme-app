@@ -8,76 +8,100 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
-import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.common.valueFlowOf
-import com.mtv.app.shopme.data.remote.request.LoginRequest
 import com.mtv.app.shopme.domain.usecase.CustomerUseCase
 import com.mtv.app.shopme.domain.usecase.HomeFoodUseCase
-import com.mtv.app.shopme.feature.customer.contract.HomeDataListener
-import com.mtv.app.shopme.feature.customer.contract.HomeStateListener
+import com.mtv.app.shopme.feature.customer.contract.HomeUiState
+import com.mtv.based.core.provider.based.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val securePrefs: SecurePrefs,
     private val customerUseCase: CustomerUseCase,
     private val homeFoodUseCase: HomeFoodUseCase,
-) : BaseViewModel(), UiOwner<HomeStateListener, HomeDataListener> {
+) : BaseViewModel() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(HomeStateListener())
+    private val _state = MutableStateFlow(HomeUiState())
+    val state: StateFlow<HomeUiState> = _state
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(HomeDataListener())
+    private var isLoaded = false
 
-    init {
-        getCustomer()
-        getFood()
+    fun load() {
+        if (isLoaded) return
+        isLoaded = true
+
+        refresh()
     }
 
-    fun getCustomer() {
-        launchUseCase(
-            loading = false,
-            target = uiState.valueFlowOf(
-                get = { it.customerState },
-                set = { state -> copy(customerState = state) }
-            ),
-            block = {
-                customerUseCase(Unit)
+    fun refresh() {
+        observeCustomer()
+        observeFoods()
+    }
+
+    private fun observeCustomer() {
+        observeDataFlow(
+            flow = customerUseCase(),
+            onLoad = {
+                _state.update {
+                    it.copy(
+                        isCustomerLoading = true
+                    )
+                }
             },
             onSuccess = { data ->
-                securePrefs.putObject(CUSTOMER_RESPONSE, data)
-
-                uiData.update {
-                    it.copy(customerData = data.data)
+                _state.update {
+                    it.copy(
+                        customer = data,
+                        isCustomerLoading = false,
+                        isCustomerFresh = true
+                    )
                 }
+            },
+            onError = { error, data ->
+                _state.update {
+                    it.copy(
+                        customer = data,
+                        isCustomerLoading = false
+                    )
+                }
+                showError(error)
             }
         )
     }
 
-    fun getFood() {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.foodState },
-                set = { state -> copy(foodState = state) }
-            ),
-            block = {
-                homeFoodUseCase(Unit)
+    private fun observeFoods() {
+        observeDataFlow(
+            flow = homeFoodUseCase(),
+            onLoad = {
+                _state.update {
+                    it.copy(
+                        foods = it.foods,
+                        isFoodsLoading = true
+                    )
+                }
             },
             onSuccess = { data ->
-                uiData.update {
-                    it.copy(foodData = data.data)
+                _state.update {
+                    it.copy(
+                        foods = data,
+                        isFoodsLoading = false,
+                        isFoodsFresh = true
+                    )
                 }
+            },
+
+            onError = { error, data ->
+                _state.update {
+                    it.copy(
+                        foods = data ?: emptyList(),
+                        isFoodsLoading = false
+                    )
+                }
+                showError(error)
             }
         )
     }
-
 }

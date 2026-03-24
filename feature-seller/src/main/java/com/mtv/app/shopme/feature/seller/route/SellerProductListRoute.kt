@@ -10,7 +10,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerProductListNavigationLis
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerProductListViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerProductListScreen
-import com.mtv.app.shopme.nav.SellerDestinations
+import com.mtv.app.shopme.nav.seller.SellerDestinations
 
 @Composable
 fun SellerProductListRoute(nav: NavController) {

@@ -38,10 +38,14 @@ android {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
-
+    implementation(project(":domain"))
+    implementation(project(":core"))
     implementation(project(":common"))
 
     /* =========================
@@ -122,6 +126,13 @@ dependencies {
     implementation(libs.firebase.messaging.ktx)
 
     /* =========================
+     * Room
+     * ========================= */
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    /* =========================
      * Internal / Maven Local Libraries
      * ========================= */
 
@@ -137,8 +148,11 @@ dependencies {
     /* =========================
      * Testing
      * ========================= */
-    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
 
 }

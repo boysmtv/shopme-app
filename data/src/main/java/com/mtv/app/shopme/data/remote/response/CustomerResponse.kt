@@ -18,19 +18,20 @@ data class CustomerResponse(
     val address: AddressResponse?,
     val photo: String?,
     val verified: Boolean?,
-    val stats: Stats?,
-    val menuSummary: MenuSummary?
+    val stats: StatsResponse?,
+    val menuSummary: MenuSummaryResponse?,
+    val updatedAt: Long
 )
 
 @Serializable
-data class Stats(
+data class StatsResponse(
     val totalOrders: Int,
     val activeOrders: Int,
     val membership: String
 )
 
 @Serializable
-data class MenuSummary(
+data class MenuSummaryResponse(
     val ordered: Int,
     val cooking: Int,
     val shipping: Int,

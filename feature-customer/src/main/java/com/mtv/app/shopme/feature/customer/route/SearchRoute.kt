@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.customer.contract.SearchNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SearchStateListener
 import com.mtv.app.shopme.feature.customer.presentation.SearchViewModel
 import com.mtv.app.shopme.feature.customer.ui.SearchScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun SearchRoute(nav: NavController) {
