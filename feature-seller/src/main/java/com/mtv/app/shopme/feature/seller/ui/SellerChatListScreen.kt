@@ -60,7 +60,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerChatListEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListStateListener
-import com.mtv.app.shopme.nav.SellerBottomNavigationBar
+import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
 
 @Composable
 fun SellerChatListScreen(

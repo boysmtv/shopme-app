@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.customer.contract.HelpNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.HelpStateListener
 import com.mtv.app.shopme.feature.customer.presentation.HelpViewModel
 import com.mtv.app.shopme.feature.customer.ui.HelpScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun HelpRoute(nav: NavController) {

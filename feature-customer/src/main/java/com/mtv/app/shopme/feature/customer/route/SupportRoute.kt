@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.customer.contract.SupportNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SupportStateListener
 import com.mtv.app.shopme.feature.customer.presentation.SupportViewModel
 import com.mtv.app.shopme.feature.customer.ui.SupportScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun SupportRoute(nav: NavController) {

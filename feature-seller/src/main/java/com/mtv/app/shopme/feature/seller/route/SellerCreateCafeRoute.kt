@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeNavigationList
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerCreateCafeViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerCreateCafeScreen
-import com.mtv.app.shopme.nav.SellerDestinations
+import com.mtv.app.shopme.nav.seller.SellerDestinations
 
 @Composable
 fun SellerCreateCafeRoute(nav: NavController) {

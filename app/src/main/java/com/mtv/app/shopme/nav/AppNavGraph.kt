@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.mtv.app.shopme.common.navbar.auth.AuthDestinations
 import com.mtv.based.core.provider.utils.SessionManager
 
 @Composable

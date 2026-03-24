@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.data.dto.FoodStatus
+import com.mtv.app.shopme.domain.model.FoodStatus
 
 @Composable
 fun StatusStatItem(

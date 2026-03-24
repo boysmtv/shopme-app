@@ -1,0 +1,24 @@
+/*
+ * Project: Shopme App
+ * Author: Boys.mtv@gmail.com
+ * File: NavController.kt
+ *
+ * Last modified by Dedy Wijaya on 31/12/2025 11.08
+ */
+
+package com.mtv.app.shopme.nav.extensions
+
+import androidx.navigation.NavController
+import com.mtv.app.shopme.common.navbar.auth.AuthDestinations
+
+fun NavController.navigateAndPopSplash(route: String) {
+    this.navigate(route) {
+        popUpTo(AuthDestinations.SPLASH_GRAPH) { inclusive = true }
+    }
+}
+
+fun NavController.navigateAndPopLogin(route: String) {
+    this.navigate(route) {
+        popUpTo(AuthDestinations.LOGIN_GRAPH) { inclusive = true }
+    }
+}

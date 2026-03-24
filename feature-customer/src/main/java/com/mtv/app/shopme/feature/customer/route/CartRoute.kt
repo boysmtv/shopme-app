@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.customer.contract.CartNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.CartStateListener
 import com.mtv.app.shopme.feature.customer.presentation.CartViewModel
 import com.mtv.app.shopme.feature.customer.ui.CartScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun CartRoute(nav: NavController) {

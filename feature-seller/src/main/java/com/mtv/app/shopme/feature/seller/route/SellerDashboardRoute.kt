@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerDashboardNavigationListe
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardStateListener
 import com.mtv.app.shopme.feature.seller.presentation.SellerDashboardViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerDashboardScreen
-import com.mtv.app.shopme.nav.SellerDestinations
+import com.mtv.app.shopme.nav.seller.SellerDestinations
 
 @Composable
 fun SellerDashboardRoute(nav: NavController) {

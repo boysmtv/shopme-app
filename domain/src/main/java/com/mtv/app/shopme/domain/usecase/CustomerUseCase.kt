@@ -8,27 +8,11 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.request.LoginRequest
-import com.mtv.app.shopme.data.remote.request.RegisterRequest
-import com.mtv.app.shopme.data.remote.request.SplashRequest
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.LoginResponse
-import com.mtv.app.shopme.data.remote.response.SplashResponse
-import com.mtv.based.core.network.di.IoDispatcher
-import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.app.shopme.domain.repository.HomeRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 
 class CustomerUseCase @Inject constructor(
-    private val repository: NetworkRepository,
-    @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<Unit, ApiResponse<CustomerResponse>>(dispatcher) {
-
-    override suspend fun execute(param: Unit) = repository.request<ApiResponse<CustomerResponse>>(
-        endpoint = ApiEndPoint.Customer.Get,
-    )
-
+    private val repository: HomeRepository
+) {
+    operator fun invoke() = repository.getCustomer()
 }

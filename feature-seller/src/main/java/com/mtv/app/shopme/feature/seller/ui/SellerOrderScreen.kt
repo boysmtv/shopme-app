@@ -60,7 +60,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerOrderDataListener
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderEventListener
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderNavigationListener
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderStateListener
-import com.mtv.app.shopme.nav.SellerBottomNavigationBar
+import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
 
 @Composable
 fun SellerOrderScreen(

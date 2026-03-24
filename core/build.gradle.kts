@@ -41,10 +41,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":data"))
-    implementation(project(":domain"))
-    implementation(project(":common"))
-
     /* =========================
      * Core & Lifecycle
      * ========================= */
@@ -121,6 +117,13 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth.interop)
     implementation(libs.firebase.messaging.ktx)
+
+    /* =========================
+     * Room
+     * ========================= */
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
 
     /* =========================
      * Internal / Maven Local Libraries

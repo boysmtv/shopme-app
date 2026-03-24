@@ -18,8 +18,8 @@ import com.mtv.app.shopme.feature.customer.contract.ProfileNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileStateListener
 import com.mtv.app.shopme.feature.customer.presentation.ProfileViewModel
 import com.mtv.app.shopme.feature.customer.ui.ProfileScreen
-import com.mtv.app.shopme.nav.CustomerDestinations
-import com.mtv.app.shopme.nav.SellerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerDestinations
+import com.mtv.app.shopme.nav.seller.SellerDestinations
 
 @Composable
 fun ProfileRoute(nav: NavController) {

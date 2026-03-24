@@ -18,7 +18,7 @@ import com.mtv.app.shopme.feature.customer.contract.SecurityNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.SecurityStateListener
 import com.mtv.app.shopme.feature.customer.presentation.SecurityViewModel
 import com.mtv.app.shopme.feature.customer.ui.SecurityScreen
-import com.mtv.app.shopme.nav.AuthDestinations
+import com.mtv.app.shopme.nav.auth.AuthDestinations
 
 @Composable
 fun SecurityRoute(nav: NavController) {

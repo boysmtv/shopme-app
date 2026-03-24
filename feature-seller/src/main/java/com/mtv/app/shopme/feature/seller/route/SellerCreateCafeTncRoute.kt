@@ -15,7 +15,7 @@ import com.mtv.app.shopme.common.base.BaseScreen
 import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.app.shopme.feature.seller.presentation.SellerCreateCafeTncViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerCreateCafeTncScreen
-import com.mtv.app.shopme.nav.SellerDestinations
+import com.mtv.app.shopme.nav.seller.SellerDestinations
 
 @Composable
 fun SellerCreateCafeTncRoute(nav: NavController) {

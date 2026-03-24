@@ -26,7 +26,7 @@ import com.mtv.app.shopme.feature.customer.route.CartRoute
 import com.mtv.app.shopme.feature.customer.route.ChatRoute
 import com.mtv.app.shopme.feature.customer.route.DetailRoute
 import com.mtv.app.shopme.feature.customer.route.EditProfileRoute
-import com.mtv.app.shopme.feature.customer.route.HomeRoute
+import com.mtv.app.shopme.nav.route.HomeRoute
 import com.mtv.app.shopme.feature.customer.route.ChatListRoute
 import com.mtv.app.shopme.feature.customer.route.ChatSupportRoute
 import com.mtv.app.shopme.feature.customer.route.HelpRoute
@@ -49,6 +49,10 @@ import com.mtv.app.shopme.feature.seller.route.SellerOrderRoute
 import com.mtv.app.shopme.feature.seller.route.SellerProductFormRoute
 import com.mtv.app.shopme.feature.seller.route.SellerProductListRoute
 import com.mtv.app.shopme.feature.seller.route.SellerStoreRoute
+import com.mtv.app.shopme.common.navbar.auth.AuthDestinations
+import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavItem
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
+import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
 
 fun NavGraphBuilder.authGraph(nav: NavHostController) {
     composable(AuthDestinations.SPLASH_GRAPH) {

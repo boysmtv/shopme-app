@@ -58,6 +58,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+
     /* =========================
      * Core & Lifecycle
      * ========================= */
