@@ -8,100 +8,87 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
+import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.CustomerUseCase
 import com.mtv.app.shopme.domain.usecase.HomeFoodUseCase
+import com.mtv.app.shopme.feature.customer.contract.HomeEffect
+import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
-import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val customerUseCase: CustomerUseCase,
     private val homeFoodUseCase: HomeFoodUseCase,
-) : BaseViewModel() {
+) : BaseEventViewModel<HomeEvent, HomeEffect>() {
 
     private val _state = MutableStateFlow(HomeUiState())
-    val state: StateFlow<HomeUiState> = _state
-
-    private var isLoaded = false
+    val uiState = _state.asStateFlow()
+    override fun onEvent(event: HomeEvent) {
+        when (event) {
+            is HomeEvent.Load -> load()
+            is HomeEvent.DismissDialog -> dismissDialog()
+            is HomeEvent.ClickFood -> emitEffect(HomeEffect.NavigateToDetail(event.id))
+            is HomeEvent.ClickSearch -> emitEffect(HomeEffect.NavigateToSearch)
+            is HomeEvent.ClickNotif -> emitEffect(HomeEffect.NavigateToNotif)
+        }
+    }
 
     fun load() {
-        if (isLoaded) return
-        isLoaded = true
-
-        refresh()
-    }
-
-    fun refresh() {
         observeCustomer()
         observeFoods()
-    }
-
-    private fun observeCustomer() {
-        observeDataFlow(
-            flow = customerUseCase(),
-            onLoad = {
-                _state.update {
-                    it.copy(
-                        isCustomerLoading = true
-                    )
-                }
-            },
-            onSuccess = { data ->
-                _state.update {
-                    it.copy(
-                        customer = data,
-                        isCustomerLoading = false,
-                        isCustomerFresh = true
-                    )
-                }
-            },
-            onError = { error, data ->
-                _state.update {
-                    it.copy(
-                        customer = data,
-                        isCustomerLoading = false
-                    )
-                }
-                showError(error)
-            }
-        )
     }
 
     private fun observeFoods() {
         observeDataFlow(
             flow = homeFoodUseCase(),
-            onLoad = {
+            onState = { state ->
                 _state.update {
-                    it.copy(
-                        foods = it.foods,
-                        isFoodsLoading = true
-                    )
+                    it.copy(foods = state)
                 }
             },
-            onSuccess = { data ->
-                _state.update {
-                    it.copy(
-                        foods = data,
-                        isFoodsLoading = false,
-                        isFoodsFresh = true
-                    )
-                }
-            },
-
-            onError = { error, data ->
-                _state.update {
-                    it.copy(
-                        foods = data ?: emptyList(),
-                        isFoodsLoading = false
-                    )
-                }
-                showError(error)
+            onError = {
+                showError(it)
             }
         )
     }
+
+    private fun observeCustomer() {
+        observeDataFlow(
+            flow = customerUseCase(),
+            onState = { state ->
+                _state.update {
+                    it.copy(customer = state)
+                }
+            },
+            onError = {
+                showError(it)
+            }
+        )
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = {
+                    dismissDialog()
+                }
+            )
+        )
+    }
+
 }
