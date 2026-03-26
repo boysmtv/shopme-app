@@ -11,4 +11,5 @@ package com.mtv.app.shopme.core.cache
 class DefaultCachePolicy : CachePolicy {
     override val customerTtl: Long = 5 * 60 * 1000
     override val foodsTtl: Long = 2 * 60 * 1000
+    override val cartTtl = 1 * 60 * 1000L
 }

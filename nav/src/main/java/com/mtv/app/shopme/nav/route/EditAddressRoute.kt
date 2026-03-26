@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 13/02/26 11.06
  */
 
-package com.mtv.app.shopme.feature.customer.route
+package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.customer.ui.EditAddressScreen
 @Composable
 fun EditAddressRoute(nav: NavController) {
     BaseRoute<EditAddressViewModel, EditAddressStateListener, EditAddressDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             EditAddressScreen(
                 uiState = uiState,
                 uiData = uiData,

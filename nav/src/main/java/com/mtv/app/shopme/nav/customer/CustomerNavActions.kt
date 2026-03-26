@@ -31,4 +31,9 @@ object CustomerNavActions {
     fun toNotif(nav: NavController) {
         nav.navigate(CustomerDestinations.NOTIF_GRAPH)
     }
+
+    fun toOrder(nav: NavController) {
+        nav.navigate(CustomerDestinations.ORDER_GRAPH)
+    }
+
 }
