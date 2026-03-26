@@ -35,29 +35,17 @@ import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.data.mock.HomeUiMock
 import com.mtv.app.shopme.domain.model.*
+import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
 import com.mtv.app.shopme.feature.customer.utils.*
+import com.mtv.based.core.network.utils.LoadState
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     state: HomeUiState,
-    onClickFood: (String) -> Unit,
-    onClickSearch: () -> Unit,
-    onClickNotif: () -> Unit,
-    onRefresh: () -> Unit,
+    event: (HomeEvent) -> Unit
 ) {
-
-    if (state.isFoodsLoading && state.foods.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LinearProgressIndicator()
-        }
-        return
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,26 +64,27 @@ fun HomeScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        HomeHeader(
-            customerData = state.customer,
-            onNotifClick = onClickNotif
-        )
+        when (val customerState = state.customer) {
+            is LoadState.Loading -> {
+                HomeHeaderSkeleton()
+            }
+
+            is LoadState.Success -> {
+                HomeHeader(
+                    customerData = customerState.data,
+                    onNotifClick = { event(HomeEvent.ClickNotif) }
+                )
+            }
+
+            else -> Unit
+        }
 
         Spacer(Modifier.height(16.dp))
 
-        state.error?.let {
-            ErrorBanner(
-                message = it.message,
-                onDismiss = onRefresh
-            )
-        }
-
-        Spacer(Modifier.height(8.dp))
-
         HomeContent(
             state = state,
-            onClickFood = onClickFood,
-            onClickSearch = onClickSearch
+            onClickFood = { event(HomeEvent.ClickFood(it)) },
+            onClickSearch = { event(HomeEvent.ClickSearch) }
         )
     }
 }
@@ -143,33 +132,32 @@ private fun HomeContent(
             }
         }
 
-        gridItems(
-            data = state.foods,
-            columnCount = 2,
-            horizontalSpacing = 16.dp,
-            verticalSpacing = 16.dp
-        ) { item ->
-
-            FoodCard(
-                item = item,
-                onClickDetail = { onClickFood(item.id) }
-            )
-        }
-
-        if (state.isLoading && state.foods.isNotEmpty()) {
-            item {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                )
+        when (val foodsState = state.foods) {
+            is LoadState.Loading -> {
+                item {
+                    FoodSkeletonGrid()
+                }
             }
-        }
 
-        if (state.foods.isEmpty() && !state.isLoading) {
-            item {
-                EmptyState()
+            is LoadState.Success -> {
+                gridItems(
+                    data = foodsState.data,
+                    columnCount = 2,
+                    horizontalSpacing = 16.dp,
+                    verticalSpacing = 16.dp
+                ) { item ->
+                    FoodCard(
+                        item = item,
+                        onClickDetail = { onClickFood(item.id) }
+                    )
+                }
+
+                if (foodsState.data.isEmpty()) {
+                    item { EmptyState() }
+                }
             }
+
+            else -> Unit
         }
     }
 }
@@ -520,35 +508,13 @@ fun FoodCard(
     }
 }
 
-@Composable
-private fun ErrorBanner(
-    message: String,
-    onDismiss: () -> Unit = {}
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.Red.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-            .clickable { onDismiss() }
-            .padding(8.dp)
-    ) {
-        Text(
-            text = message,
-            color = Color.Red,
-            fontSize = 12.sp
-        )
-    }
-}
-
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun HomeScreenPreview() {
 
     val state = HomeUiState(
-        customer = HomeUiMock.customer(),
-        foods = HomeUiMock.foods(),
-        isLoading = false,
-        error = null
+        customer = LoadState.Success(HomeUiMock.customer()),
+        foods = LoadState.Success(HomeUiMock.foods()),
     )
 
     Scaffold(
@@ -563,8 +529,75 @@ fun HomeScreenPreview() {
         ) {
             HomeScreen(
                 state = state,
-                onEvent = {}
+                event = {}
             )
+        }
+    }
+}
+
+@Composable
+fun HomeHeaderSkeleton() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+
+            // Avatar / Icon placeholder
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray.copy(alpha = 0.4f))
+            )
+
+            Column(
+                modifier = Modifier.padding(start = 12.dp)
+            ) {
+
+                // Address skeleton
+                Box(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(12.dp)
+                        .background(Color.LightGray.copy(alpha = 0.4f))
+                )
+
+                Spacer(Modifier.height(6.dp))
+
+                // Name skeleton
+                Box(
+                    modifier = Modifier
+                        .width(80.dp)
+                        .height(14.dp)
+                        .background(Color.LightGray.copy(alpha = 0.4f))
+                )
+            }
+        }
+
+        // Notification icon skeleton
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color.LightGray.copy(alpha = 0.4f))
+        )
+    }
+}
+
+@Composable
+fun FoodSkeletonGrid() {
+    Column {
+        repeat(4) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .background(Color.LightGray.copy(alpha = 0.3f))
+            )
+            Spacer(Modifier.height(16.dp))
         }
     }
 }

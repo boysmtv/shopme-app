@@ -27,7 +27,8 @@ fun CustomerEntity.toDomain(): Customer {
         photo = photo,
         verified = true,
         stats = null,
-        menuSummary = null
+        menuSummary = null,
+        updatedAt = 0L
     )
 }
 
@@ -47,7 +48,8 @@ fun FoodEntity.toDomain(): Food {
         isActive = isActive,
         createdAt = LocalDateTime.now(),
         images = listOf(image),
-        variants = emptyList()
+        variants = emptyList(),
+        updatedAt = 0L
     )
 }
 
@@ -58,7 +60,8 @@ fun Customer.toEntity(): CustomerEntity {
         address = address?.let {
             "${it.village} Blok ${it.block} No ${it.number}"
         }.orEmpty(),
-        photo = photo
+        photo = photo,
+        updatedAt = 0L
     )
 }
 

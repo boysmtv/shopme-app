@@ -8,8 +8,6 @@
 
 package com.mtv.app.shopme.data.mapper
 
-import com.mtv.app.shopme.core.database.entity.CustomerEntity
-import com.mtv.app.shopme.core.database.entity.FoodEntity
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.FoodOptionResponse

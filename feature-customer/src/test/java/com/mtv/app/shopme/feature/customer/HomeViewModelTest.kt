@@ -6,7 +6,6 @@ import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.usecase.CustomerUseCase
-import com.mtv.app.shopme.domain.usecase.GetHomeDataUseCase
 import com.mtv.app.shopme.domain.usecase.HomeFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
@@ -55,7 +54,7 @@ class HomeViewModelTest {
         coEvery { customerUseCase() } returns flowOf(Resource.Success(customer))
         coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(foods))
 
-        viewModel.state.test {
+        viewModel.uiState.test {
             viewModel.onEvent(HomeEvent.Load)
 
             skipItems(1) // skip initial state
@@ -79,7 +78,7 @@ class HomeViewModelTest {
         coEvery { customerUseCase() } returns flowOf(Resource.Error(error))
         coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(emptyList()))
 
-        viewModel.state.test {
+        viewModel.uiState.test {
             viewModel.onEvent(HomeEvent.Load)
 
             skipItems(1)
@@ -97,7 +96,7 @@ class HomeViewModelTest {
         coEvery { customerUseCase() } returns flowOf(Resource.Success(fakeCustomer()))
         coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(foods))
 
-        viewModel.state.test {
+        viewModel.uiState.test {
             viewModel.onEvent(HomeEvent.Load)
 
             skipItems(1)
@@ -130,13 +129,13 @@ class HomeViewModelTest {
 
         viewModel.onEvent(HomeEvent.Load)
 
-        viewModel.state.test {
+        viewModel.uiState.test {
             skipItems(1)
 
             val errorState = awaitItem()
             assert(errorState.error != null)
 
-            viewModel.onEvent(HomeEvent.DismissError)
+            viewModel.onEvent(HomeEvent.DismissDialog)
 
             val cleared = awaitItem()
             assert(cleared.error == null)
