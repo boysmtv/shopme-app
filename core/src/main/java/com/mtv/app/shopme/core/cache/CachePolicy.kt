@@ -11,4 +11,5 @@ package com.mtv.app.shopme.core.cache
 interface CachePolicy {
     val customerTtl: Long
     val foodsTtl: Long
+    val cartTtl: Long
 }

@@ -17,13 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.mtv.based.core.provider.based.BaseUiState
+import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 
 @Composable
 fun BaseScreen(
     baseUiState: BaseUiState,
-    onDismissError: () -> Unit,
+    dismissDialog: () -> Unit,
     content: @Composable () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -41,12 +42,20 @@ fun BaseScreen(
                 LoadingV2()
             }
         }
-        baseUiState.errorDialog?.let {
-            Log.e("BOY_LOG_ERROR", "Message: $it")
-            DialogCenterV1(
-                state = it,
-                onDismiss = onDismissError
-            )
+        baseUiState.dialog?.let { dialog ->
+            when (dialog) {
+                is UiDialog.Center -> {
+                    DialogCenterV1(
+                        state = dialog.state,
+                        onPrimaryClick = dialog.onPrimary,
+                        onSecondaryClick = dialog.onSecondary,
+                        onDismiss = {
+                            dialog.onDismiss?.invoke()
+                            dismissDialog()
+                        }
+                    )
+                }
+            }
         }
     }
 }

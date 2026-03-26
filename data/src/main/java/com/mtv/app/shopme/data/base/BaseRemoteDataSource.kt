@@ -11,6 +11,7 @@ package com.mtv.app.shopme.data.base
 import com.mtv.app.shopme.core.error.ApiException
 import com.mtv.based.core.network.endpoint.IApiEndPoint
 import com.mtv.based.core.network.model.NetworkResponse
+import com.mtv.based.core.network.model.RequestOptions
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 
@@ -20,14 +21,15 @@ abstract class BaseRemoteDataSource @Inject constructor(
 
     protected suspend inline fun <reified R : Any> request(
         endpoint: IApiEndPoint,
-        body: Any? = null
+        body: Any? = null,
+        options: RequestOptions = RequestOptions()
     ): R {
         val response: NetworkResponse<R> = network.request(
             endpoint = endpoint,
-            body = body
+            body = body,
+            options = options
         )
-
-        return response.data
-            ?: throw ApiException.EmptyBody()
+        return response.data ?: throw ApiException.EmptyBody()
     }
+
 }

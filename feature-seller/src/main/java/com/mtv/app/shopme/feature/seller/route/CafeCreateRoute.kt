@@ -23,7 +23,7 @@ fun CafeCreateRoute(nav: NavController) {
     BaseRoute<CafeCreateViewModel, CafeCreateStateListener, CafeCreateDataListener> { vm, base, uiState, uiData ->
         BaseScreen(
             baseUiState = base,
-            onDismissError = vm::dismissError
+            dismissDialog = vm::dismissError
         ) {
 
             CafeCreateScreen(
