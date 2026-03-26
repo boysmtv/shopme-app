@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.data.dto
 
+import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 
@@ -17,10 +18,6 @@ data class OrderItemModel(
     val price: Double = 0.0
 )
 
-enum class PaymentMethod {
-    CASH,
-    TRANSFER
-}
 data class OrderModel(
     val id: String = EMPTY_STRING,
     val customerId: String = EMPTY_STRING,

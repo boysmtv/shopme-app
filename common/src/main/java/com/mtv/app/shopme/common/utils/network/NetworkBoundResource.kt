@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.common.utils.network
 
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.network.utils.ResourceOffline
 import com.mtv.based.core.network.utils.UiError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,18 +27,19 @@ import kotlinx.coroutines.flow.map
 inline fun <Result : Any, Request> networkBoundResource(
     crossinline query: () -> Flow<Result?>,
     crossinline fetch: suspend () -> Request,
-    crossinline saveFetchResult: suspend (Request) -> Unit,
     crossinline shouldFetch: (Result?) -> Boolean,
+    crossinline saveFetchResult: suspend (Request) -> Unit,
     crossinline errorMapper: (Throwable) -> UiError,
     crossinline retryPolicy: suspend (suspend () -> Request) -> Request
-): Flow<Resource<Result>> {
+): Flow<ResourceOffline<Result>> {
 
     return query()
         .distinctUntilChanged()
         .flatMapLatest { localData ->
             flow {
                 currentCoroutineContext().ensureActive()
-                emit(Resource.Loading(localData))
+
+                emit(ResourceOffline.Loading(localData))
 
                 if (shouldFetch(localData)) {
                     try {
@@ -46,7 +48,7 @@ inline fun <Result : Any, Request> networkBoundResource(
                     } catch (e: Throwable) {
                         if (e is CancellationException) throw e
                         emit(
-                            Resource.Error(
+                            ResourceOffline.Error(
                                 error = errorMapper(e),
                                 data = localData
                             )
@@ -55,12 +57,13 @@ inline fun <Result : Any, Request> networkBoundResource(
                 }
 
                 var first = true
+
                 emitAll(
                     query()
                         .filterNotNull()
                         .distinctUntilChanged()
                         .map { newData ->
-                            Resource.Success(
+                            ResourceOffline.Success(
                                 data = newData,
                                 isFresh = first.also { first = false }
                             )

@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 21/02/26 09.58
  */
 
-package com.mtv.app.shopme.feature.customer.route
+package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.customer.ui.OrderHistoryScreen
 @Composable
 fun OrderHistoryRoute(nav: NavController) {
     BaseRoute<OrderHistoryViewModel, OrderHistoryStateListener, OrderHistoryDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             OrderHistoryScreen(
                 uiState = uiState,
                 uiData = uiData,
