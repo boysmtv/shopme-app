@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 22/02/26 11.13
  */
 
-package com.mtv.app.shopme.feature.customer.route
+package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.customer.ui.ChatSupportScreen
 @Composable
 fun ChatSupportRoute(nav: NavController) {
     BaseRoute<ChatSupportViewModel, ChatSupportStateListener, ChatSupportDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             ChatSupportScreen(
                 uiState = uiState,
                 uiData = uiData,

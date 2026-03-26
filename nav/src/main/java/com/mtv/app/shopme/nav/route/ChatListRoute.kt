@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 13/02/26 13.34
  */
 
-package com.mtv.app.shopme.feature.customer.route
+package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -23,7 +23,7 @@ import com.mtv.app.shopme.nav.customer.CustomerDestinations
 @Composable
 fun ChatListRoute(nav: NavController) {
     BaseRoute<ChatListViewModel, ChatListStateListener, ChatListDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             ChatListScreen(
                 uiState = uiState,
                 uiData = uiData,

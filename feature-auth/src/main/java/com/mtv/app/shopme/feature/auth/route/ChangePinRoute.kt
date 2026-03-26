@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.auth.ui.ChangePinScreen
 @Composable
 fun ChangePinRoute(nav: NavController) {
     BaseRoute<ChangePinViewModel, ChangePinStateListener, ChangePinDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             ChangePinScreen(
                 uiState = uiState,
                 uiData = uiData,
