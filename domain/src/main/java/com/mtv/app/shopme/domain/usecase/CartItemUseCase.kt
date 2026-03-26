@@ -8,22 +8,11 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.CartItemResponse
-import com.mtv.based.core.network.di.IoDispatcher
-import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 
 class CartItemUseCase @Inject constructor(
-    private val repository: NetworkRepository,
-    @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<Unit, ApiResponse<List<CartItemResponse>>>(dispatcher) {
-
-    override suspend fun execute(param: Unit) = repository.request<ApiResponse<List<CartItemResponse>>>(
-        endpoint = ApiEndPoint.Cart.Get,
-    )
-
+    private val repository: CartRepository
+) {
+    operator fun invoke() = repository.getCart()
 }
