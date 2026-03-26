@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 14/02/26 22.34
  */
 
-package com.mtv.app.shopme.feature.customer.route
+package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -23,7 +23,7 @@ import com.mtv.app.shopme.nav.customer.CustomerDestinations
 @Composable
 fun CafeRoute(nav: NavController) {
     BaseRoute<CafeViewModel, CafeStateListener, CafeDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             CafeScreen(
                 uiState = uiState,
                 uiData = uiData,

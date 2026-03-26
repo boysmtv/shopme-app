@@ -9,45 +9,26 @@
 package com.mtv.app.shopme.common.base
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.mtv.based.core.provider.based.BaseUiState
-import com.mtv.based.core.provider.based.BaseViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import androidx.compose.runtime.LaunchedEffect
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 /** BASE ROUTE */
 @Composable
-inline fun <reified VM, UI_STATE, UI_DATA> BaseRoute(
-    content: @Composable (
-        vm: VM,
-        baseUiState: BaseUiState,
-        uiState: UI_STATE,
-        uiData: UI_DATA
-    ) -> Unit
-) where VM : BaseViewModel, VM : UiOwner<UI_STATE, UI_DATA> {
-
-    val vm: VM = hiltViewModel()
-
-    val baseUiState by vm.baseUiState.collectAsState()
-    val uiState by vm.uiState.collectAsState()
-    val uiData by vm.uiData.collectAsState()
-
-    content(vm, baseUiState, uiState, uiData)
+fun <EVENT, EFFECT> BaseRoute(
+    viewModel: BaseEventViewModel<EVENT, EFFECT>,
+    onLoad: EVENT? = null,
+    onEffect: (EFFECT) -> Unit,
+    onEvent: (EVENT) -> Unit,
+    content: @Composable () -> Unit
+) {
+    LaunchedEffect(true) {
+        onLoad?.let { onEvent(it) }
+    }
+    LaunchedEffect(viewModel.effect) {
+        viewModel.effect.collectLatest { effect ->
+            onEffect(effect)
+        }
+    }
+    content.invoke()
 }
-
-/** UiStateOwner */
-interface UiStateOwner<UI_STATE> {
-    val uiState: StateFlow<UI_STATE>
-}
-
-/** UiDataOwner */
-interface UiDataOwner<UI_DATA> {
-    val uiData: StateFlow<UI_DATA>
-}
-
-/** UiOwner */
-interface UiOwner<UI_STATE, UI_DATA> :
-    UiStateOwner<UI_STATE>,
-    UiDataOwner<UI_DATA>
