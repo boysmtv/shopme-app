@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.data.remote.request
 
-import com.mtv.app.shopme.data.dto.PaymentMethod
+import com.mtv.app.shopme.domain.model.PaymentMethod
 import kotlinx.serialization.Serializable
 
 @Serializable
