@@ -8,23 +8,13 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
-import com.mtv.based.core.network.di.IoDispatcher
-import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.app.shopme.domain.model.param.CartQuantityParam
+import com.mtv.app.shopme.domain.model.param.CreateOrderParam
+import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 
 class CartQuantityUseCase @Inject constructor(
-    private val repository: NetworkRepository,
-    @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<CartQuantityRequest, ApiResponse<Unit>>(dispatcher) {
-
-    override suspend fun execute(param: CartQuantityRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.Cart.Quantity(param.cartId),
-        body = param
-    )
-
+    private val repository: CartRepository
+) {
+    operator fun invoke(param: CartQuantityParam) = repository.updateQuantity(param)
 }
