@@ -24,7 +24,7 @@ fun SellerOrderDetailRoute(nav: NavController) {
     BaseRoute<SellerOrderDetailViewModel, SellerOrderDetailStateListener, SellerOrderDetailDataListener> { vm, base, uiState, uiData ->
         BaseScreen(
             baseUiState = base,
-            onDismissError = vm::dismissError
+            dismissDialog = vm::dismissError
         ) {
             SellerOrderDetailScreen(
                 uiState = uiState,

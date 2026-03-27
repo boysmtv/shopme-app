@@ -29,7 +29,7 @@ fun SellerPaymentMethodRoute(nav: NavController) {
 
         BaseScreen(
             baseUiState = base,
-            onDismissError = vm::dismissError
+            dismissDialog = vm::dismissError
         ) {
 
             SellerPaymentMethodScreen(

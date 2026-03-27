@@ -14,11 +14,6 @@ data class SellerPaymentMethodStateListener(
     val isLoading: Boolean = false
 )
 
-data class PaymentMethod(
-    val title: String,
-    val description: String
-)
-
 data class SellerPaymentMethodDataListener(
     val cashEnabled: Boolean = false,
     val bankEnabled: Boolean = false,

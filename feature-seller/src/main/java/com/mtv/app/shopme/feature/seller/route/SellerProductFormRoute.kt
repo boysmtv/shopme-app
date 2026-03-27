@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.seller.ui.SellerProductFormScreen
 @Composable
 fun SellerProductFormRoute(nav: NavController) {
     BaseRoute<SellerProductFormViewModel, SellerProductFormStateListener, SellerProductFormDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SellerProductFormScreen(
                 uiState = uiState,
                 uiData = uiData,
