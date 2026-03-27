@@ -11,25 +11,30 @@ package com.mtv.app.shopme.feature.customer.contract
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
+import com.mtv.app.shopme.domain.model.Food
+import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
-data class SearchStateListener(
-    val searchFoodState: Resource<ApiResponse<PageResponse<FoodResponse>>> = Resource.Loading,
+data class SearchUiState(
+    val query: String = "",
+    val foods: LoadState<List<SearchFood>> = LoadState.Idle,
+    val isLoadingMore: Boolean = false,
+    val isLastPage: Boolean = false,
+    val page: Int = 0
 )
 
-data class SearchDataListener(
-    val query: String = EMPTY_STRING,
-    val results: List<FoodResponse> = emptyList()
-)
+sealed class SearchEvent {
+    object Load : SearchEvent()
+    object LoadNextPage : SearchEvent()
+    object BackClicked : SearchEvent()
 
-data class SearchEventListener(
-    val onQueryChanged: (String) -> Unit = {},
-    val onLoadNextPage: () -> Unit = {}
-)
+    data class QueryChanged(val query: String) : SearchEvent()
+    data class ClickFood(val id: String) : SearchEvent()
+}
 
-data class SearchNavigationListener(
-    val onDetailClick: (String) -> Unit = {},
-    val onBack: () -> Unit = {},
-)
-
+sealed class SearchEffect {
+    object NavigateBack : SearchEffect()
+    data class NavigateToDetail(val id: String) : SearchEffect()
+}

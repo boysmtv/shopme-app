@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.auth.ui.RegisterScreen
 @Composable
 fun RegisterRoute(nav: NavController) {
     BaseRoute<RegisterViewModel, RegisterStateListener, RegisterDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             RegisterScreen(
                 uiState = uiState,
                 uiData = uiData,

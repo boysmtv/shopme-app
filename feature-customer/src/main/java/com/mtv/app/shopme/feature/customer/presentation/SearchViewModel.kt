@@ -9,21 +9,26 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.common.valueFlowOf
-import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
+import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.data.remote.request.SearchFoodRequest
-import com.mtv.app.shopme.domain.usecase.CartItemUseCase
+import com.mtv.app.shopme.domain.model.Food
+import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.model.param.SearchParam
 import com.mtv.app.shopme.domain.usecase.SearchFoodUseCase
-import com.mtv.app.shopme.feature.customer.contract.SearchDataListener
-import com.mtv.app.shopme.feature.customer.contract.SearchStateListener
+import com.mtv.app.shopme.feature.customer.contract.SearchEffect
+import com.mtv.app.shopme.feature.customer.contract.SearchEvent
+import com.mtv.app.shopme.feature.customer.contract.SearchUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
@@ -31,24 +36,37 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchFoodUseCase: SearchFoodUseCase,
-) : BaseViewModel(), UiOwner<SearchStateListener, SearchDataListener> {
+    private val searchFoodUseCase: SearchFoodUseCase
+) : BaseEventViewModel<SearchEvent, SearchEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(SearchStateListener())
-
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(SearchDataListener())
-
-    private var currentPage = 0
-    private var isLastPage = false
-    private var isLoading = false
+    private val _state = MutableStateFlow(SearchUiState())
+    val uiState = _state.asStateFlow()
 
     private val queryFlow = MutableStateFlow("")
 
     init {
         observeSearch()
-        doSearch("", 0)
+    }
+
+    override fun onEvent(event: SearchEvent) {
+        when (event) {
+            is SearchEvent.Load -> doSearch("")
+
+            is SearchEvent.QueryChanged -> {
+                _state.update { it.copy(query = event.query) }
+                queryFlow.value = event.query
+            }
+
+            is SearchEvent.LoadNextPage -> loadNextPage()
+
+            is SearchEvent.BackClicked -> {
+                emitEffect(SearchEffect.NavigateBack)
+            }
+
+            is SearchEvent.ClickFood -> {
+                emitEffect(SearchEffect.NavigateToDetail(event.id))
+            }
+        }
     }
 
     @OptIn(FlowPreview::class)
@@ -57,78 +75,99 @@ class SearchViewModel @Inject constructor(
             queryFlow
                 .debounce(500)
                 .distinctUntilChanged()
-                .collect { query ->
-                    currentPage = 0
-                    isLastPage = false
-                    doSearch(query, 0)
+                .collect {
+                    doSearch(it, 0)
                 }
         }
     }
 
-    fun onQueryChanged(query: String) {
-        uiData.update { it.copy(query = query) }
-        queryFlow.value = query
-    }
+    private fun doSearch(query: String, page: Int = 0) {
 
-    fun doSearch(name: String, page: Int = 0, showLoading: Boolean = true) {
+        val param = SearchParam(
+            name = query,
+            page = page
+        )
 
-        if (isLoading) return
-        isLoading = true
+        observeDataFlow(
+            flow = searchFoodUseCase(param),
+            onState = { state ->
+                when (state) {
 
-        if (page == 0) {
-            currentPage = 0
-            isLastPage = false
-        }
-
-        uiData.update { it.copy(query = name) }
-
-        launchUseCase(
-            loading = showLoading,
-            target = uiState.valueFlowOf(
-                get = { it.searchFoodState },
-                set = { state -> copy(searchFoodState = state) }
-            ),
-            block = {
-                searchFoodUseCase(
-                    SearchFoodRequest(
-                        name = name,
-                        page = page,
-                        size = 10,
-                        sort = "name,asc"
-                    )
-                )
-            },
-            onSuccess = { response ->
-
-                val pageData = response.data ?: return@launchUseCase
-
-                currentPage = pageData.page
-                isLastPage = pageData.last
-
-                uiData.update { current ->
-                    val newList = if (page == 0) {
-                        pageData.content
-                    } else {
-                        current.results + pageData.content
+                    is LoadState.Loading -> {
+                        if (page == 0) {
+                            _state.update {
+                                it.copy(foods = LoadState.Loading)
+                            }
+                        } else {
+                            _state.update {
+                                it.copy(isLoadingMore = true)
+                            }
+                        }
                     }
-                    current.copy(results = newList)
+
+                    is LoadState.Success -> {
+                        val data = state.data
+                        val currentList = _state.value.getDataOrEmpty()
+                        val newList = if (data.page == 0) {
+                            data.content
+                        } else {
+                            currentList + data.content
+                        }
+
+                        _state.update {
+                            it.copy(
+                                foods = LoadState.Success(newList),
+                                page = data.page,
+                                isLastPage = data.last,
+                                isLoadingMore = false
+                            )
+                        }
+                    }
+
+                    is LoadState.Error -> {
+                        _state.update {
+                            it.copy(
+                                foods = LoadState.Error(state.error),
+                                isLoadingMore = false
+                            )
+                        }
+                        showError(state.error)
+                    }
+
+                    else -> Unit
                 }
-            },
-            onComplete = {
-                isLoading = false
             }
         )
     }
 
-    fun loadNextPage() {
-        if (isLastPage) return
-        if (isLoading) return
+    private fun loadNextPage() {
+        val state = _state.value
+
+        if (state.isLastPage) return
+        if (state.isLoadingMore) return
 
         doSearch(
-            name = uiData.value.query,
-            page = currentPage + 1,
-            showLoading = false
+            query = state.query,
+            page = state.page + 1
         )
     }
 
+    private fun SearchUiState.getDataOrEmpty(): List<SearchFood> {
+        return (foods as? LoadState.Success)?.data ?: emptyList()
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = {
+                    dismissDialog()
+                }
+            )
+        )
+    }
 }

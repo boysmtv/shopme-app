@@ -37,6 +37,8 @@ import com.mtv.app.shopme.data.mock.HomeUiMock
 import com.mtv.app.shopme.domain.model.*
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerHomeHeaderSkeleton
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerFoodSkeletonGrid
 import com.mtv.app.shopme.feature.customer.utils.*
 import com.mtv.based.core.network.utils.LoadState
 import kotlinx.coroutines.launch
@@ -66,7 +68,7 @@ fun HomeScreen(
 
         when (val customerState = state.customer) {
             is LoadState.Loading -> {
-                HomeHeaderSkeleton()
+                ShimmerHomeHeaderSkeleton()
             }
 
             is LoadState.Success -> {
@@ -135,7 +137,7 @@ private fun HomeContent(
         when (val foodsState = state.foods) {
             is LoadState.Loading -> {
                 item {
-                    FoodSkeletonGrid()
+                    ShimmerFoodSkeletonGrid()
                 }
             }
 
@@ -531,73 +533,6 @@ fun HomeScreenPreview() {
                 state = state,
                 event = {}
             )
-        }
-    }
-}
-
-@Composable
-fun HomeHeaderSkeleton() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Row(verticalAlignment = Alignment.CenterVertically) {
-
-            // Avatar / Icon placeholder
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray.copy(alpha = 0.4f))
-            )
-
-            Column(
-                modifier = Modifier.padding(start = 12.dp)
-            ) {
-
-                // Address skeleton
-                Box(
-                    modifier = Modifier
-                        .width(120.dp)
-                        .height(12.dp)
-                        .background(Color.LightGray.copy(alpha = 0.4f))
-                )
-
-                Spacer(Modifier.height(6.dp))
-
-                // Name skeleton
-                Box(
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(14.dp)
-                        .background(Color.LightGray.copy(alpha = 0.4f))
-                )
-            }
-        }
-
-        // Notification icon skeleton
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.LightGray.copy(alpha = 0.4f))
-        )
-    }
-}
-
-@Composable
-fun FoodSkeletonGrid() {
-    Column {
-        repeat(4) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .background(Color.LightGray.copy(alpha = 0.3f))
-            )
-            Spacer(Modifier.height(16.dp))
         }
     }
 }
