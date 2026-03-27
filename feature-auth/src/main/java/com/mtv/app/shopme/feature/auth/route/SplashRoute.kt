@@ -24,7 +24,7 @@ import com.mtv.app.shopme.nav.extensions.navigateAndPopSplash
 @Composable
 fun SplashRoute(nav: NavController) {
     BaseRoute<SplashViewModel, SplashStateListener, Unit> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SplashScreen(
                 uiState = uiState,
                 uiEvent = splashEvent(vm),
