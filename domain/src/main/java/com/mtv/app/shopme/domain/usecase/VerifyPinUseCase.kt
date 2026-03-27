@@ -8,24 +8,12 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.request.VerifyPinRequest
-import com.mtv.app.shopme.data.remote.response.VerifyPinResponse
-import com.mtv.based.core.network.di.IoDispatcher
-import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.app.shopme.domain.model.param.VerifyPinParam
+import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 
 class VerifyPinUseCase @Inject constructor(
-    private val repository: NetworkRepository,
-    @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<VerifyPinRequest, ApiResponse<VerifyPinResponse>>(dispatcher) {
-
-
-    override suspend fun execute(param: VerifyPinRequest) = repository.request<ApiResponse<VerifyPinResponse>>(
-        endpoint = ApiEndPoint.Customer.VerifyPin,
-    )
-
+    private val repository: CartRepository
+) {
+    operator fun invoke(param: VerifyPinParam) = repository.verifyPin(param)
 }

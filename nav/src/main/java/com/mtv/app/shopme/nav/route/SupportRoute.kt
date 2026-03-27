@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 22/02/26 10.39
  */
 
-package com.mtv.app.shopme.feature.customer.route
+package com.mtv.app.shopme.nav.route
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -36,7 +36,7 @@ fun SupportRoute(nav: NavController) {
             }
         }
 
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SupportScreen(
                 uiState = uiState,
                 uiData = uiData,
