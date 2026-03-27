@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.seller.ui.SellerEditStoreScreen
 @Composable
 fun SellerEditStoreRoute(nav: NavController) {
     BaseRoute<SellerEditStoreViewModel, SellerEditStoreStateListener, SellerEditStoreDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SellerEditStoreScreen(
                 uiState = uiState,
                 uiData = uiData,

@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 21/02/26 23.11
  */
 
-package com.mtv.app.shopme.feature.customer.route
+package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -23,7 +23,7 @@ import com.mtv.app.shopme.nav.auth.AuthDestinations
 @Composable
 fun SecurityRoute(nav: NavController) {
     BaseRoute<SecurityViewModel, SecurityStateListener, SecurityDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SecurityScreen(
                 uiState = uiState,
                 uiData = uiData,

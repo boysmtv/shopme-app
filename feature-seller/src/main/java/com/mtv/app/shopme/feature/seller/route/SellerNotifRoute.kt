@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.seller.ui.SellerNotificationScreen
 @Composable
 fun SellerNotifRoute(nav: NavController) {
     BaseRoute<SellerNotifViewModel, SellerNotifState, SellerNotifData> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SellerNotificationScreen(
                 uiState = uiState,
                 uiData = uiData,

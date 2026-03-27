@@ -23,7 +23,7 @@ import com.mtv.app.shopme.nav.seller.SellerDestinations
 @Composable
 fun SellerOrderRoute(nav: NavController) {
     BaseRoute<SellerOrderViewModel, SellerOrderStateListener, SellerOrderDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SellerOrderScreen(
                 uiState = uiState,
                 uiData = uiData,

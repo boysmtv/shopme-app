@@ -23,7 +23,7 @@ import com.mtv.app.shopme.nav.seller.SellerDestinations
 @Composable
 fun SellerCreateCafeRoute(nav: NavController) {
     BaseRoute<SellerCreateCafeViewModel, SellerCreateCafeStateListener, SellerCreateCafeDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SellerCreateCafeScreen(
                 uiState = uiState,
                 uiData = uiData,

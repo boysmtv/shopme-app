@@ -24,7 +24,7 @@ fun SellerChatDetailRoute(nav: NavController) {
     BaseRoute<SellerChatDetailViewModel, SellerChatDetailStateListener, SellerChatDetailDataListener> { vm, base, uiState, uiData ->
         BaseScreen(
             baseUiState = base,
-            onDismissError = vm::dismissError
+            dismissDialog = vm::dismissError
         ) {
             SellerChatScreen(
                 uiState = uiState,

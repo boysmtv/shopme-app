@@ -20,7 +20,7 @@ import com.mtv.app.shopme.nav.seller.SellerDestinations
 @Composable
 fun SellerCreateCafeTncRoute(nav: NavController) {
     BaseRoute<SellerCreateCafeTncViewModel, SellerCreateCafeTncStateListener, SellerCreateCafeTncDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             SellerCreateCafeTncScreen(
                 uiState = uiState,
                 uiData = uiData,
