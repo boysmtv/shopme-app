@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -70,6 +71,7 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.domain.model.CartItem
 import com.mtv.app.shopme.domain.model.CartVariant
@@ -78,6 +80,7 @@ import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.SessionToken
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.contract.CartUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerCartScreen
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
@@ -90,6 +93,10 @@ fun CartScreen(
     event: (CartEvent) -> Unit
 ) {
     when (val cartState = state.cartItems) {
+
+        is LoadState.Loading -> {
+            ShimmerCartScreen()
+        }
 
         is LoadState.Success -> {
             val cartItems = cartState.data

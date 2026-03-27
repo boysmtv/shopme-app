@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.auth.ui.PasswordScreen
 @Composable
 fun PasswordRoute(nav: NavController) {
     BaseRoute<PasswordViewModel, PasswordStateListener, PasswordDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, onDismissError = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
             PasswordScreen(
                 uiState = uiState,
                 uiData = uiData,
