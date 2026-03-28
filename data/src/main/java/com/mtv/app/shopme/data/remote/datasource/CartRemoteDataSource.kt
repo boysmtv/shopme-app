@@ -1,12 +1,4 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: CartRemoteDataSource.kt
- *
- * Last modified by Dedy Wijaya on 25/03/26 12.24
- */
-
-package com.mtv.app.shopme.data.remote.cart
+package com.mtv.app.shopme.data.remote.datasource
 
 import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.mapper.param.toRequest
