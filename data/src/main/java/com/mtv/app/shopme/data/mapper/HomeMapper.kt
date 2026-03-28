@@ -33,7 +33,6 @@ fun CustomerResponse.toDomain(): Customer {
         verified = verified ?: false,
         stats = stats?.toDomain(),
         menuSummary = menuSummary?.toDomain(),
-        updatedAt = updatedAt
     )
 }
 
@@ -84,7 +83,6 @@ fun FoodResponse.toDomain(): Food {
         createdAt = createdAt,
         images = images,
         variants = variants.map { it.toDomain() },
-        updatedAt = updatedAt
     )
 }
 

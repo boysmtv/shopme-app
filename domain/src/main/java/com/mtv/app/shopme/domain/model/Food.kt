@@ -25,7 +25,6 @@ data class Food(
     val estimate: String,
     val isActive: Boolean,
     val createdAt: LocalDateTime,
-    val updatedAt: Long,
     val images: List<String>,
     val variants: List<FoodVariant>
 )
