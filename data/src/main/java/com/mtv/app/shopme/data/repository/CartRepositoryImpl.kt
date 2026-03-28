@@ -10,7 +10,7 @@ package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
-import com.mtv.app.shopme.data.remote.cart.CartRemoteDataSource
+import com.mtv.app.shopme.data.remote.datasource.CartRemoteDataSource
 import com.mtv.app.shopme.domain.model.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.model.param.CartQuantityParam
 import com.mtv.app.shopme.domain.model.param.CreateOrderParam
