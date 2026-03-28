@@ -37,7 +37,6 @@ data class FoodResponse(
 
     @Serializable(with = LocalDateTimeSerializer::class)
     val createdAt: LocalDateTime,
-    val updatedAt: Long,
 
     val images: List<String>,
     val variants: List<FoodVariantResponse>

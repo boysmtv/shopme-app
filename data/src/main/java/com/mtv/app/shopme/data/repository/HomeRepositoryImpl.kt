@@ -10,7 +10,7 @@ package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
-import com.mtv.app.shopme.data.remote.home.HomeRemoteDataSource
+import com.mtv.app.shopme.data.remote.datasource.HomeRemoteDataSource
 import com.mtv.app.shopme.domain.repository.HomeRepository
 import javax.inject.Inject
 

@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 23/03/26 19.44
  */
 
-package com.mtv.app.shopme.data.remote.home
+package com.mtv.app.shopme.data.remote.datasource
 
 import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint

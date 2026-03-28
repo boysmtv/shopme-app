@@ -11,9 +11,7 @@ package com.mtv.app.shopme.data.remote.request
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class FoodAddToCartRequest(
-    val foodId: String,
-    val variants: List<FoodVariantAddToCartRequest>,
-    val quantity: Int,
-    val note: String
+data class FoodVariantAddToCartRequest(
+    val variantId: String,
+    val optionId: String
 )
