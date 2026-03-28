@@ -17,7 +17,6 @@ data class Customer(
     val verified: Boolean,
     val stats: Stats?,
     val menuSummary: MenuSummary?,
-    val updatedAt: Long
 )
 
 val EMPTY = Customer(
@@ -29,5 +28,4 @@ val EMPTY = Customer(
     verified = false,
     stats = null,
     menuSummary = null,
-    updatedAt = 0
 )

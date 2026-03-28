@@ -20,7 +20,6 @@ data class CustomerResponse(
     val verified: Boolean?,
     val stats: StatsResponse?,
     val menuSummary: MenuSummaryResponse?,
-    val updatedAt: Long
 )
 
 @Serializable

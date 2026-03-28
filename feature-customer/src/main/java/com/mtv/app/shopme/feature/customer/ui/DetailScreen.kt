@@ -12,18 +12,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -33,32 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.PriceChange
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -78,9 +44,8 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.domain.model.FoodCategory
-import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.data.remote.request.CartVariantRequest
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
@@ -89,14 +54,13 @@ import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
-import com.mtv.app.shopme.feature.customer.contract.DetailDataListener
-import com.mtv.app.shopme.feature.customer.contract.DetailEventListener
-import com.mtv.app.shopme.feature.customer.contract.DetailNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.DetailStateListener
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.feature.customer.contract.DetailEvent
+import com.mtv.app.shopme.feature.customer.contract.DetailUiState
 import com.mtv.app.shopme.feature.customer.utils.StatItem
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
-import com.mtv.app.shopme.feature.customer.utils.checkPrice
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
 import org.threeten.bp.LocalDateTime
@@ -104,136 +68,410 @@ import org.threeten.bp.LocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
-    uiState: DetailStateListener,
-    uiData: DetailDataListener,
-    uiEvent: DetailEventListener,
-    uiNavigation: DetailNavigationListener
+    state: DetailUiState,
+    event: (DetailEvent) -> Unit
 ) {
-    uiData.customerData
-    val food = uiData.foodData
-    val similarFoods = uiData.foodSimilarData.orEmpty()
-    val filteredFoods = similarFoods.filter { it.id != food?.id }
-
     var showSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+    val food = (state.food as? LoadState.Success)?.data
+    val similarFoods = ((state.similarFoods as? LoadState.Success)?.data ?: emptyList())
+        .filter { it.id != food?.id }
 
-    if (showSheet) {
+    if (showSheet && food != null) {
         ModalBottomSheet(
             onDismissRequest = { showSheet = false },
             sheetState = sheetState
         ) {
-            food?.let { food ->
-                VariantBottomSheetContent(
-                    food = food,
-                    onAddToCart = { variants, qty, note ->
-                        uiEvent.onAddToCart(
-                            food.id,
-                            variants,
-                            qty,
-                            note
-                        )
-                    },
-                    onClose = { showSheet = false }
-                )
-            }
+            VariantBottomSheetContent(
+                food = food,
+                onAddToCart = { variants, qty, note ->
+                    event(DetailEvent.AddToCart(food.id, variants, qty, note))
+                },
+                onClose = { showSheet = false }
+            )
         }
-    }
-
-    if (uiState.foodAddToCartState is Resource.Success) {
-        uiNavigation.onAddToCart()
     }
 
     Scaffold(
         bottomBar = {
             AddToCartBar(
-                onChatClick = {
-                    uiNavigation.onChatClick()
-                },
-                onCartClick = {
-                    showSheet = true
-                }
+                onChatClick = { event(DetailEvent.ChatClicked) },
+                onCartClick = { showSheet = true }
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            AppColor.GreenSoft,
-                            AppColor.WhiteSoft,
-                            AppColor.White
+
+        when (state.food) {
+
+            is LoadState.Loading -> {
+                ShimmerDetailScreen(paddingValues = paddingValues)
+            }
+
+            is LoadState.Success -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(AppColor.GreenSoft, AppColor.WhiteSoft, AppColor.White)
+                            )
                         )
-                    )
-                )
-                .padding(paddingValues)
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-        ) {
-            item { DetailHeader() }
-            item { Spacer(Modifier.height(16.dp)) }
-
-            item {
-                if (!food?.images.isNullOrEmpty()) {
-                    DetailImage(food.images)
-                }
-            }
-            item { Spacer(Modifier.height(16.dp)) }
-
-            item { DetailTitle(food) }
-            item { Spacer(Modifier.height(6.dp)) }
-
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(paddingValues)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.PriceChange,
-                        contentDescription = null,
-                        tint = AppColor.Green
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = checkPrice(food),
-                        color = Color.DarkGray,
-                        fontSize = 16.sp,
-                        fontFamily = PoppinsFont,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    item {
+                        DetailHeader(
+                            onBack = { event(DetailEvent.BackClicked) }
+                        )
+                    }
+                    item { Spacer(Modifier.height(16.dp)) }
+
+                    item {
+                        if (!food?.images.isNullOrEmpty()) {
+                            DetailImage(food!!.images)
+                        }
+                    }
+                    item { Spacer(Modifier.height(16.dp)) }
+
+                    item { DetailTitle(food) }
+                    item { Spacer(Modifier.height(6.dp)) }
+
+                    item {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.PriceChange,
+                                contentDescription = null,
+                                tint = AppColor.Green
+                            )
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = food?.price?.toRupiah() ?: EMPTY_STRING,
+                                color = Color.DarkGray,
+                                fontSize = 16.sp,
+                                fontFamily = PoppinsFont,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    item { Spacer(Modifier.height(6.dp)) }
+                    item {
+                        DetailLocation(
+                            food = food,
+                            onClickCafe = { event(DetailEvent.ClickCafe(it)) }
+                        )
+                    }
+                    item { Spacer(Modifier.height(12.dp)) }
+
+                    item { DetailDescription(food) }
+                    item { Spacer(Modifier.height(20.dp)) }
+
+                    item { DetailStatsRow(food) }
+                    item { Spacer(Modifier.height(22.dp)) }
+
+                    item { SectionTitle("Menu lainnya") }
+                    item { Spacer(Modifier.height(12.dp)) }
+
+                    // Similar foods: shimmer atau list
+                    when (state.similarFoods) {
+                        is LoadState.Loading -> {
+                            items(3) { ShimmerSimilarItemRow() }
+                        }
+                        is LoadState.Success -> {
+                            items(similarFoods) { item ->
+                                SimilarItemRow(
+                                    foodResponse = item,
+                                    onClickSimilarFood = { event(DetailEvent.ClickSimilarFood(item.id)) }
+                                )
+                                Spacer(Modifier.height(12.dp))
+                            }
+                        }
+                        else -> {}
+                    }
                 }
             }
 
-            item { Spacer(Modifier.height(6.dp)) }
-            item {
-                DetailLocation(
-                    food = food,
-                    onClickCafe = { uiNavigation.onClickCafe(it) }
+            else -> Unit
+        }
+    }
+}
+
+// ─────────────────────────────────────────────
+// SHIMMER DETAIL SCREEN
+// ─────────────────────────────────────────────
+
+@Composable
+fun ShimmerDetailScreen(paddingValues: PaddingValues) {
+    val brush = shimmerBrush()
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(AppColor.GreenSoft, AppColor.WhiteSoft, AppColor.White)
                 )
-            }
-            item { Spacer(Modifier.height(12.dp)) }
+            )
+            .padding(paddingValues)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+    ) {
 
-            item { DetailDescription(food) }
-            item { Spacer(Modifier.height(20.dp)) }
-
-            item { DetailStatsRow(food) }
-            item { Spacer(Modifier.height(22.dp)) }
-
-            item { SectionTitle("Menu lainnya") }
-            item { Spacer(Modifier.height(12.dp)) }
-
-            items(filteredFoods) { item ->
-                SimilarItemRow(
-                    foodResponse = item,
-                    onClickSimilarFood = {
-                        uiNavigation.onNavigateToDetail(item.id)
-                    }
+        // Header skeleton
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(brush)
                 )
-                Spacer(Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(18.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(brush)
+                )
             }
         }
+
+        item { Spacer(Modifier.height(16.dp)) }
+
+        // Image skeleton
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(240.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+        }
+
+        item { Spacer(Modifier.height(16.dp)) }
+
+        // Title skeleton
+        item {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        // Price skeleton
+        item {
+            Box(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(16.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+        }
+
+        item { Spacer(Modifier.height(8.dp)) }
+
+        // Location skeleton
+        item {
+            Row {
+                Box(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(14.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+                Spacer(Modifier.width(12.dp))
+                Box(
+                    modifier = Modifier
+                        .width(140.dp)
+                        .height(14.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        // Description skeleton (3 baris)
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.85f)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(brush)
+                )
+            }
+        }
+
+        item { Spacer(Modifier.height(20.dp)) }
+
+        // Stats row skeleton
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .width(90.dp)
+                            .height(32.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(brush)
+                    )
+                }
+            }
+        }
+
+        item { Spacer(Modifier.height(22.dp)) }
+
+        // Section title skeleton
+        item {
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(16.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+        }
+
+        item { Spacer(Modifier.height(12.dp)) }
+
+        // Similar items skeleton
+        items(3) { ShimmerSimilarItemRow() }
+    }
+}
+
+@Composable
+fun ShimmerSimilarItemRow() {
+    val brush = shimmerBrush()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .border(1.dp, Color.Black.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Image
+        Box(
+            modifier = Modifier
+                .size(42.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(brush)
+        )
+
+        Spacer(Modifier.width(12.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+            Spacer(Modifier.height(6.dp))
+            Box(
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .width(60.dp)
+                .height(24.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(brush)
+        )
+    }
+
+    Spacer(Modifier.height(12.dp))
+}
+
+// ─────────────────────────────────────────────
+// EXISTING COMPOSABLES (tidak berubah, hanya
+// parameter onBack ditambahkan di DetailHeader)
+// ─────────────────────────────────────────────
+
+@Composable
+fun DetailHeader(onBack: () -> Unit = {}) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = null,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .clickable { onBack() }
+                .padding(12.dp),
+            tint = Color.Black
+        )
+        Text(
+            text = "Food Detail",
+            fontFamily = PoppinsFont,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            imageVector = Icons.Filled.Favorite,
+            contentDescription = null,
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .padding(12.dp),
+            tint = Color.Red
+        )
     }
 }
 
@@ -856,14 +1094,22 @@ fun PriceRow(
 @Composable
 fun DetailScreenPreview() {
     DetailScreen(
-        uiState = DetailStateListener(),
-        uiData = DetailDataListener(
-            customerData = previewCustomer,
-            foodData = previewFood,
-            foodSimilarData = previewSimilar
+        state = DetailUiState(
+            food = LoadState.Success(previewFood),
+            similarFoods = LoadState.Success(previewSimilar)
         ),
-        uiEvent = DetailEventListener(),
-        uiNavigation = DetailNavigationListener()
+        event = {}
+    )
+}
+
+@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
+@Composable
+fun DetailScreenShimmerPreview() {
+    DetailScreen(
+        state = DetailUiState(
+            food = LoadState.Loading
+        ),
+        event = {}
     )
 }
 
