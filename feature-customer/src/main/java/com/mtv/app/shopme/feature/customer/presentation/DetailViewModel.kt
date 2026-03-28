@@ -9,22 +9,19 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.SavedStateHandle
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.common.valueFlowOf
-import com.mtv.app.shopme.data.remote.request.CartVariantRequest
+import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.app.shopme.domain.usecase.FoodAddToCartUseCase
 import com.mtv.app.shopme.domain.usecase.FoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.FoodSimilarUseCase
-import com.mtv.app.shopme.feature.customer.contract.DetailDataListener
-import com.mtv.app.shopme.feature.customer.contract.DetailStateListener
+import com.mtv.app.shopme.feature.customer.contract.DetailEffect
+import com.mtv.app.shopme.feature.customer.contract.DetailEvent
+import com.mtv.app.shopme.feature.customer.contract.DetailUiState
+import com.mtv.based.core.network.utils.LoadState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
@@ -32,82 +29,84 @@ class DetailViewModel @Inject constructor(
     private val foodDetailUseCase: FoodDetailUseCase,
     private val foodSimilarUseCase: FoodSimilarUseCase,
     private val foodAddToCartUseCase: FoodAddToCartUseCase,
-    savedStateHandle: SavedStateHandle,
-) : BaseViewModel(), UiOwner<DetailStateListener, DetailDataListener> {
+    savedStateHandle: SavedStateHandle
+) : BaseEventViewModel<DetailEvent, DetailEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(DetailStateListener())
-
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(DetailDataListener())
+    private val _state = MutableStateFlow(DetailUiState())
+    val uiState = _state.asStateFlow()
 
     private val foodId: String = checkNotNull(savedStateHandle["foodId"])
 
     init {
-        doGetFoodDetail()
+        loadDetail()
     }
 
-    fun doGetFoodDetail() {
-        launchUseCase(
-            loading = false,
-            target = uiState.valueFlowOf(
-                get = { it.foodState },
-                set = { state -> copy(foodState = state) }
-            ),
-            block = {
-                foodDetailUseCase(foodId)
-            },
-            onSuccess = { data ->
-                uiData.update {
-                    it.copy(foodData = data.data)
-                }
-
-                data.data?.let { doGetSimilarFoods(it.cafeId) }
-            }
-        )
+    override fun onEvent(event: DetailEvent) {
+        when (event) {
+            is DetailEvent.BackClicked -> emitEffect(DetailEffect.NavigateBack)
+            is DetailEvent.ChatClicked -> emitEffect(DetailEffect.NavigateToChat)
+            is DetailEvent.OpenCart -> emitEffect(DetailEffect.NavigateToCart)
+            is DetailEvent.ClickCafe -> emitEffect(DetailEffect.NavigateToCafe(event.cafeId))
+            is DetailEvent.ClickSimilarFood -> emitEffect(DetailEffect.NavigateToDetail(event.foodId))
+            is DetailEvent.AddToCart -> doAddToCart(event)
+        }
     }
 
-    fun doGetSimilarFoods(
-        cafeId: String
-    ) {
-        launchUseCase(
-            loading = false,
-            target = uiState.valueFlowOf(
-                get = { it.foodSimilarState },
-                set = { state -> copy(foodSimilarState = state) }
-            ),
-            block = {
-                foodSimilarUseCase(cafeId)
-            },
-            onSuccess = { data ->
-                uiData.update {
-                    it.copy(foodSimilarData = data.data)
+    private fun loadDetail() {
+        observeDataFlow(
+            flow = foodDetailUseCase(foodId),
+            onState = { state ->
+                when (state) {
+                    is LoadState.Loading -> _state.update { it.copy(food = LoadState.Loading) }
+                    is LoadState.Success -> {
+                        val food = state.data.data
+                        _state.update { it.copy(food = LoadState.Success(food!!)) }
+                        food?.cafeId?.let { loadSimilar(it) }
+                    }
+                    is LoadState.Error -> _state.update { it.copy(food = LoadState.Error(state.error)) }
+                    else -> Unit
                 }
             }
         )
     }
 
-    fun doAddToCart(
-        foodId: String,
-        variants: List<CartVariantRequest>,
-        quantity: Int,
-        note: String,
-    ) {
-        launchUseCase(
-            loading = false,
-            target = uiState.valueFlowOf(
-                get = { it.foodAddToCartState },
-                set = { state -> copy(foodAddToCartState = state) }
-            ),
-            block = {
-                foodAddToCartUseCase(
-                    FoodAddToCartRequest(
-                        foodId = foodId,
-                        variants = variants,
-                        quantity = quantity,
-                        note = note
-                    )
+    private fun loadSimilar(cafeId: String) {
+        observeDataFlow(
+            flow = foodSimilarUseCase(cafeId),
+            onState = { state ->
+                when (state) {
+                    is LoadState.Loading -> _state.update { it.copy(similarFoods = LoadState.Loading) }
+                    is LoadState.Success -> {
+                        val list = state.data.data.orEmpty()
+                        _state.update { it.copy(similarFoods = LoadState.Success(list)) }
+                    }
+                    is LoadState.Error -> _state.update { it.copy(similarFoods = LoadState.Error(state.error)) }
+                    else -> Unit
+                }
+            }
+        )
+    }
+
+    private fun doAddToCart(event: DetailEvent.AddToCart) {
+        observeDataFlow(
+            flow = foodAddToCartUseCase(
+                FoodAddToCartRequest(
+                    foodId = event.foodId,
+                    variants = event.variants,
+                    quantity = event.quantity,
+                    note = event.note
                 )
+            ),
+            onState = { state ->
+                when (state) {
+                    is LoadState.Loading -> _state.update { it.copy(addToCartState = LoadState.Loading) }
+                    is LoadState.Success -> {
+                        _state.update { it.copy(addToCartState = LoadState.Success(Unit)) }
+                        emitEffect(DetailEffect.NavigateToCart)
+                    }
+                    is LoadState.Error -> _state.update { it.copy(addToCartState = LoadState.Error(state.error)) }
+                    else -> Unit
+                }
             }
         )
     }

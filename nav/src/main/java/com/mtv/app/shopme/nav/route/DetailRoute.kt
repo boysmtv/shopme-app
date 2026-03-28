@@ -9,56 +9,50 @@
 package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.DetailDataListener
-import com.mtv.app.shopme.feature.customer.contract.DetailEventListener
-import com.mtv.app.shopme.feature.customer.contract.DetailNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.DetailStateListener
+import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavItem
+import com.mtv.app.shopme.feature.customer.contract.DetailEffect
+import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.presentation.DetailViewModel
 import com.mtv.app.shopme.feature.customer.ui.DetailScreen
-import com.mtv.app.shopme.nav.customer.CustomerDestinations
-import com.mtv.app.shopme.nav.customer.CustomerBottomNavItem
+import com.mtv.app.shopme.nav.customer.CustomerNavActions
 
 @Composable
 fun DetailRoute(nav: NavController) {
-    BaseRoute<DetailViewModel, DetailStateListener, DetailDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
+
+    val vm: DetailViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onEffect = { handleDetailEffect(nav, it) },
+        onEvent = vm::onEvent
+    ) {
+        BaseScreen(
+            baseUiState = baseUiState,
+            dismissDialog = { vm.onEvent(DetailEvent.BackClicked) }
+        ) {
             DetailScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = detailEvent(vm),
-                uiNavigation = detailNavigation(nav)
+                state = uiState,
+                event = vm::onEvent
             )
         }
     }
 }
 
-private fun detailEvent(vm: DetailViewModel) = DetailEventListener(
-    onAddToCart = vm::doAddToCart,
-    onDismissActiveDialog = {}
-)
-
-private fun detailNavigation(nav: NavController) = DetailNavigationListener(
-    onBack = { nav.popBackStack() },
-    onChatClick = {
-        nav.navigate(CustomerDestinations.CHAT_GRAPH)
-    },
-    onAddToCart = {
-        nav.navigate(CustomerBottomNavItem.Cart.route) {
-            launchSingleTop = true
-            restoreState = true
-
-            popUpTo(nav.graph.startDestinationId) {
-                saveState = true
-            }
-        }
-    },
-    onClickCafe = { foodId ->
-        nav.navigate(CustomerDestinations.navigateToCafe(foodId))
-    },
-    onNavigateToDetail = { foodId ->
-        nav.navigate(CustomerDestinations.navigateToDetail(foodId))
+private fun handleDetailEffect(nav: NavController, effect: DetailEffect) {
+    when (effect) {
+        is DetailEffect.NavigateBack -> nav.popBackStack()
+        is DetailEffect.NavigateToChat -> CustomerNavActions.toChat(nav)
+        is DetailEffect.NavigateToCart -> CustomerNavActions.toCart(nav)
+        is DetailEffect.NavigateToCafe -> CustomerNavActions.toCafe(nav, effect.cafeId)
+        is DetailEffect.NavigateToDetail -> CustomerNavActions.toDetail(nav, effect.foodId)
     }
-)
+}
