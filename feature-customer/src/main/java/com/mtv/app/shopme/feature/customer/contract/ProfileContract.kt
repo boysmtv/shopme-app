@@ -8,34 +8,34 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Customer
+import com.mtv.based.core.network.utils.LoadState
 
-data class ProfileStateListener(
-    val customerState: Resource<ApiResponse<CustomerResponse>> = Resource.Loading,
-    val activeDialog: ProfileDialog? = null
+data class ProfileUiState(
+    val customer: LoadState<Customer> = LoadState.Idle
 )
 
-data class ProfileDataListener(
-    val customerData: CustomerResponse? = null,
-)
+sealed class ProfileEvent {
+    object Load : ProfileEvent()
+    object DismissDialog : ProfileEvent()
 
-data class ProfileEventListener(
-    val onDismissDialog: () -> Unit = {},
-    val onCheckTncCafe: () -> Unit = {},
-)
+    object ClickEditProfile : ProfileEvent()
+    object ClickOrderHistory : ProfileEvent()
+    object ClickSettings : ProfileEvent()
+    object ClickHelpCenter : ProfileEvent()
+    object ClickOrder : ProfileEvent()
 
-data class ProfileNavigationListener(
-    val onEditProfile: () -> Unit = {},
-    val onOrderHistory: () -> Unit = {},
-    val onSettings: () -> Unit = {},
-    val onHelpCenter: () -> Unit = {},
-    val onOrder: () -> Unit = {},
-    val onNavigateToTnc: () -> Unit = {},
-    val onNavigateToSeller: () -> Unit = {}
-)
+    object ClickCheckTncCafe : ProfileEvent()
+    object ClickLogout : ProfileEvent()
+}
 
-sealed class ProfileDialog {
-    object LogoutConfirm : ProfileDialog()
+sealed class ProfileEffect {
+    object NavigateToEditProfile : ProfileEffect()
+    object NavigateToOrderHistory : ProfileEffect()
+    object NavigateToSettings : ProfileEffect()
+    object NavigateToHelpCenter : ProfileEffect()
+    object NavigateToOrder : ProfileEffect()
+    object NavigateToTnc : ProfileEffect()
+    object NavigateToSeller : ProfileEffect()
+    object NavigateToLogin : ProfileEffect()
 }
