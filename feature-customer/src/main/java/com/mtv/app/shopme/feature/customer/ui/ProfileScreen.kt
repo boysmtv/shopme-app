@@ -68,9 +68,11 @@ import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.feature.customer.contract.ProfileDataListener
+import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.ProfileEventListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileNavigationListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileStateListener
+import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
 import com.mtv.app.shopme.feature.customer.utils.checkAddress
 import com.mtv.app.shopme.feature.customer.utils.checkName
 import com.mtv.app.shopme.feature.customer.utils.checkPhone
@@ -78,10 +80,8 @@ import com.mtv.app.shopme.nav.customer.CustomerBottomNavigationBar
 
 @Composable
 fun ProfileScreen(
-    uiState: ProfileStateListener,
-    uiData: ProfileDataListener,
-    uiEvent: ProfileEventListener,
-    uiNavigation: ProfileNavigationListener
+    state: ProfileUiState,
+    event: (ProfileEvent) -> Unit
 ) {
 
     val scrollState = rememberScrollState()

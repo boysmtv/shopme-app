@@ -8,70 +8,95 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.common.valueFlowOf
+import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.CustomerUseCase
-import com.mtv.app.shopme.feature.customer.contract.ProfileDataListener
-import com.mtv.app.shopme.feature.customer.contract.ProfileDialog
-import com.mtv.app.shopme.feature.customer.contract.ProfileStateListener
+import com.mtv.app.shopme.feature.customer.contract.ProfileEffect
+import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
+import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val securePrefs: SecurePrefs,
     private val customerUseCase: CustomerUseCase,
-) : BaseViewModel(), UiOwner<ProfileStateListener, ProfileDataListener> {
+) : BaseEventViewModel<ProfileEvent, ProfileEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(ProfileStateListener())
+    private val _state = MutableStateFlow(ProfileUiState())
+    val uiState = _state.asStateFlow()
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(ProfileDataListener())
+    override fun onEvent(event: ProfileEvent) {
+        when (event) {
+            is ProfileEvent.Load -> load()
+            is ProfileEvent.DismissDialog -> dismissDialog()
 
-    init {
-        getCustomer()
+            is ProfileEvent.ClickEditProfile -> emitEffect(ProfileEffect.NavigateToEditProfile)
+            is ProfileEvent.ClickOrderHistory -> emitEffect(ProfileEffect.NavigateToOrderHistory)
+            is ProfileEvent.ClickSettings -> emitEffect(ProfileEffect.NavigateToSettings)
+            is ProfileEvent.ClickHelpCenter -> emitEffect(ProfileEffect.NavigateToHelpCenter)
+            is ProfileEvent.ClickOrder -> emitEffect(ProfileEffect.NavigateToOrder)
+
+            is ProfileEvent.ClickCheckTncCafe -> handleCheckTnc()
+            is ProfileEvent.ClickLogout -> logout()
+        }
     }
 
-    fun getCustomer() {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.customerState },
-                set = { state -> copy(customerState = state) }
-            ),
-            block = {
-                customerUseCase(Unit)
-            },
-            onSuccess = { data ->
-                securePrefs.putObject(CUSTOMER_RESPONSE, data)
+    private fun load() {
+        observeCustomer()
+    }
 
-                uiData.update {
-                    it.copy(customerData = data.data)
+    private fun observeCustomer() {
+        observeDataFlow(
+            flow = customerUseCase(),
+            onState = { state ->
+                _state.update {
+                    it.copy(customer = state)
                 }
+            },
+            onError = {
+                showError(it)
             }
         )
     }
 
-    fun doCheckTncCafe(): Boolean {
+    private fun handleCheckTnc() {
+        if (doCheckTncCafe()) {
+            emitEffect(ProfileEffect.NavigateToTnc)
+        } else {
+            emitEffect(ProfileEffect.NavigateToSeller)
+        }
+    }
+
+    private fun logout() {
+        securePrefs.clear()
+        emitEffect(ProfileEffect.NavigateToLogin)
+    }
+
+    private fun doCheckTncCafe(): Boolean {
         return false
     }
 
-    fun showLogoutDialog() {
-        uiState.update {
-            it.copy(activeDialog = ProfileDialog.LogoutConfirm)
-        }
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = {
+                    dismissDialog()
+                }
+            )
+        )
     }
-
-    fun dismissDialog() {
-        uiState.update {
-            it.copy(activeDialog = null)
-        }
-    }
-
 }
