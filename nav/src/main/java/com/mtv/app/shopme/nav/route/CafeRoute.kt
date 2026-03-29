@@ -9,46 +9,53 @@
 package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.CafeDataListener
-import com.mtv.app.shopme.feature.customer.contract.CafeEventListener
-import com.mtv.app.shopme.feature.customer.contract.CafeNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.CafeStateListener
+import com.mtv.app.shopme.feature.customer.contract.CafeEffect
+import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.presentation.CafeViewModel
 import com.mtv.app.shopme.feature.customer.ui.CafeScreen
-import com.mtv.app.shopme.nav.customer.CustomerDestinations
+import com.mtv.app.shopme.nav.customer.CustomerNavActions
 
 @Composable
 fun CafeRoute(nav: NavController) {
-    BaseRoute<CafeViewModel, CafeStateListener, CafeDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
-            CafeScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = cafeEvent(vm, nav),
-                uiNavigation = cafeNavigation(nav)
-            )
+
+    val vm: CafeViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = CafeEvent.Load,
+        onEffect = { handleCafeEffect(nav, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(CafeEvent.DismissDialog) }
+            ) {
+                CafeScreen(
+                    state = uiState,
+                    event = vm::onEvent
+                )
+            }
         }
-    }
+    )
 }
 
-private fun cafeEvent(vm: CafeViewModel, nav: NavController) = CafeEventListener(
-    onFoodClick = { food ->
-        nav.navigate("detail/${food.id}")
+private fun handleCafeEffect(
+    nav: NavController,
+    effect: CafeEffect
+) {
+    when (effect) {
+        is CafeEffect.NavigateBack -> nav.popBackStack()
+        is CafeEffect.NavigateToChat -> CustomerNavActions.toChat(nav)
+        is CafeEffect.NavigateToWhatsapp -> CustomerNavActions.toChat(nav)
+        is CafeEffect.NavigateToDetail -> CustomerNavActions.toDetail(nav, effect.id)
     }
-)
-
-private fun cafeNavigation(nav: NavController) = CafeNavigationListener(
-    onBack = { nav.popBackStack() },
-    onNavigateToChat = {
-        nav.navigate(CustomerDestinations.CHAT_GRAPH)
-    },
-    onNavigateToWhatsapp = {
-        nav.navigate(CustomerDestinations.CHAT_GRAPH)
-    },
-    onNavigateToDetail = { foodId ->
-        nav.navigate(CustomerDestinations.navigateToDetail(foodId))
-    }
-)
+}
