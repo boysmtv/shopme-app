@@ -8,18 +8,18 @@
 
 package com.mtv.app.shopme.domain.repository
 
-import com.mtv.app.shopme.domain.model.CartItem
+import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.SessionToken
-import com.mtv.app.shopme.domain.model.param.CartClearByCafeParam
-import com.mtv.app.shopme.domain.model.param.CartQuantityParam
-import com.mtv.app.shopme.domain.model.param.CreateOrderParam
-import com.mtv.app.shopme.domain.model.param.VerifyPinParam
+import com.mtv.app.shopme.domain.param.CartClearByCafeParam
+import com.mtv.app.shopme.domain.param.CartQuantityParam
+import com.mtv.app.shopme.domain.param.CreateOrderParam
+import com.mtv.app.shopme.domain.param.VerifyPinParam
 import com.mtv.based.core.network.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface CartRepository {
 
-    fun getCart(): Flow<Resource<List<CartItem>>>
+    fun getCart(): Flow<Resource<List<Cart>>>
 
     fun updateQuantity(param: CartQuantityParam): Flow<Resource<Unit>>
 

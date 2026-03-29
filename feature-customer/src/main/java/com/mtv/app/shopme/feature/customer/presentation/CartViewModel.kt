@@ -9,10 +9,10 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.domain.model.param.CartClearByCafeParam
-import com.mtv.app.shopme.domain.model.param.CartQuantityParam
-import com.mtv.app.shopme.domain.model.param.CreateOrderParam
-import com.mtv.app.shopme.domain.model.param.VerifyPinParam
+import com.mtv.app.shopme.domain.param.CartClearByCafeParam
+import com.mtv.app.shopme.domain.param.CartQuantityParam
+import com.mtv.app.shopme.domain.param.CreateOrderParam
+import com.mtv.app.shopme.domain.param.VerifyPinParam
 import com.mtv.app.shopme.domain.usecase.CartItemUseCase
 import com.mtv.app.shopme.domain.usecase.CartQuantityUseCase
 import com.mtv.app.shopme.domain.usecase.ClearCartByCafeIdUseCase

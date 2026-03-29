@@ -1,17 +1,17 @@
 package com.mtv.app.shopme.data.remote.datasource
 
 import com.mtv.app.shopme.data.base.BaseRemoteDataSource
-import com.mtv.app.shopme.data.mapper.param.toRequest
+import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.app.shopme.data.remote.response.VerifyPinResponse
 import com.mtv.app.shopme.data.utils.requireData
-import com.mtv.app.shopme.domain.model.param.CartClearByCafeParam
-import com.mtv.app.shopme.domain.model.param.CartQuantityParam
-import com.mtv.app.shopme.domain.model.param.CreateOrderParam
-import com.mtv.app.shopme.domain.model.param.VerifyPinParam
+import com.mtv.app.shopme.domain.param.CartClearByCafeParam
+import com.mtv.app.shopme.domain.param.CartQuantityParam
+import com.mtv.app.shopme.domain.param.CreateOrderParam
+import com.mtv.app.shopme.domain.param.VerifyPinParam
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 

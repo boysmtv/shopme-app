@@ -55,7 +55,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -71,10 +70,9 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.domain.model.CartItem
-import com.mtv.app.shopme.domain.model.CartVariant
+import com.mtv.app.shopme.data.mock.DataUiMock
+import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.SessionToken
@@ -118,7 +116,7 @@ fun CartScreen(
 
 @Composable
 fun CartContent(
-    cartItems: List<CartItem>,
+    cartItems: List<Cart>,
     state: CartUiState,
     event: (CartEvent) -> Unit
 ) {
@@ -342,7 +340,7 @@ private fun CartHeader() {
 
 @Composable
 fun CafeGroupCard(
-    items: List<CartItem>,
+    items: List<Cart>,
     onNavigateToDetail: (String) -> Unit,
     onDeleteFoodByCafe: (String) -> Unit,
     onMinus: (String, Int) -> Unit,
@@ -376,7 +374,7 @@ fun CafeGroupCard(
 
 @Composable
 fun CartItemRow(
-    item: CartItem,
+    item: Cart,
     onFoodClick: () -> Unit,
     onMinusClick: () -> Unit,
     onPlusClick: () -> Unit,
@@ -1099,7 +1097,7 @@ fun CartScreenPreview() {
         ) {
             CartScreen(
                 state = CartUiState(
-                    cartItems = LoadState.Success(mockCartItems),
+                    cartItems = LoadState.Success(DataUiMock.cart()),
                     sessionToken = LoadState.Success(SessionToken("")),
                 ),
                 event = {}
@@ -1127,177 +1125,10 @@ fun PremiumCheckoutSheetPreview() {
                 .background(Color.White)
         ) {
             PremiumCheckoutSheet(
-                total = mockCartItems.first().price,
+                total = DataUiMock.cart().first().price,
                 onDismiss = {},
                 onConfirm = {}
             )
         }
     }
 }
-
-//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-//@Composable
-//fun PinKeypadPreview() {
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(Color(0x66000000)),
-//        contentAlignment = Alignment.BottomCenter
-//    ) {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight(.60f)
-//                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-//                .background(Color.White)
-//        ) {
-//            PinVerificationSheet(
-//                isLoading = false,
-//                isError = false,
-//                onDismiss = {},
-//                onSuccess = {}
-//            )
-//        }
-//    }
-//}
-//
-//@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-//@Composable
-//fun OrderSuccessDialogPreview() {
-//    OrderSuccessDialog(
-//        onConfirm = {}
-//    )
-//}
-
-val mockCartItems = listOf(
-    CartItem(
-        id = "1",
-        customerId = "cust_001",
-        foodId = "food_001",
-        quantity = 2,
-        notes = "Extra cheese",
-        cafeId = "cafe_1",
-        cafeName = "Burger Queen",
-        price = 12000.toBigDecimal(),
-        image = "https://example.com/images/burger.png",
-        name = "Classic Burger",
-        variants = listOf(
-            CartVariant(
-                variantId = "v1",
-                variantName = "Size",
-                optionId = "o1",
-                optionName = "Large",
-                price = 3000.toBigDecimal()
-            ),
-            CartVariant(
-                variantId = "v2",
-                variantName = "Cheese",
-                optionId = "o2",
-                optionName = "Extra Cheese",
-                price = 2000.toBigDecimal()
-            )
-        )
-    ),
-
-    CartItem(
-        id = "2",
-        customerId = "cust_001",
-        foodId = "food_002",
-        quantity = 1,
-        notes = "Less sauce",
-        cafeId = "cafe_1",
-        cafeName = "Burger Queen",
-        price = 15000.toBigDecimal(),
-        image = "https://example.com/images/cheese_burger.png",
-        name = "Cheese Burger",
-        variants = listOf(
-            CartVariant(
-                variantId = "v1",
-                variantName = "Size",
-                optionId = "o1",
-                optionName = "Medium",
-                price = 0.toBigDecimal()
-            )
-        )
-    ),
-
-    CartItem(
-        id = "3",
-        customerId = "cust_001",
-        foodId = "food_003",
-        quantity = 1,
-        notes = "Medium spicy",
-        cafeId = "cafe_2",
-        cafeName = "Pizza Palace",
-        price = 30000.toBigDecimal(),
-        image = "https://example.com/images/pizza.png",
-        name = "Pepperoni Pizza",
-        variants = listOf(
-            CartVariant(
-                variantId = "v1",
-                variantName = "Crust",
-                optionId = "o1",
-                optionName = "Thin Crust",
-                price = 2000.toBigDecimal()
-            )
-        )
-    ),
-
-    CartItem(
-        id = "4",
-        customerId = "cust_001",
-        foodId = "food_004",
-        quantity = 2,
-        notes = "Extra chili sauce",
-        cafeId = "cafe_2",
-        cafeName = "Pizza Palace",
-        price = 28000.toBigDecimal(),
-        image = "https://example.com/images/margherita.png",
-        name = "Margherita Pizza",
-        variants = listOf(
-            CartVariant(
-                variantId = "v1",
-                variantName = "Size",
-                optionId = "o1",
-                optionName = "Large",
-                price = 5000.toBigDecimal()
-            )
-        )
-    ),
-
-    CartItem(
-        id = "5",
-        customerId = "cust_001",
-        foodId = "food_005",
-        quantity = 2,
-        notes = "No sugar",
-        cafeId = "cafe_3",
-        cafeName = "Coffee Corner",
-        price = 18000.toBigDecimal(),
-        image = "https://example.com/images/cappuccino.png",
-        name = "Cappuccino",
-        variants = listOf(
-            CartVariant(
-                variantId = "v1",
-                variantName = "Sugar",
-                optionId = "o1",
-                optionName = "No Sugar",
-                price = 0.toBigDecimal()
-            )
-        )
-    ),
-
-    CartItem(
-        id = "6",
-        customerId = "cust_001",
-        foodId = "food_006",
-        quantity = 1,
-        notes = "",
-        cafeId = "cafe_3",
-        cafeName = "Coffee Corner",
-        price = 20000.toBigDecimal(),
-        image = "https://example.com/images/latte.png",
-        name = "Latte",
-        variants = emptyList()
-    )
-)
