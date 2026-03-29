@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 25/03/26 15.34
  */
 
-package com.mtv.app.shopme.domain.model.param
+package com.mtv.app.shopme.domain.param
 
 import com.mtv.app.shopme.domain.model.PaymentMethod
 

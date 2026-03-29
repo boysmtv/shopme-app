@@ -15,7 +15,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavItem
 import com.mtv.app.shopme.feature.customer.contract.DetailEffect
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.presentation.DetailViewModel
@@ -32,6 +31,7 @@ fun DetailRoute(nav: NavController) {
 
     BaseRoute(
         viewModel = vm,
+        onLoad = DetailEvent.Load,
         onEffect = { handleDetailEffect(nav, it) },
         onEvent = vm::onEvent
     ) {

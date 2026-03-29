@@ -12,7 +12,18 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -22,9 +33,32 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PriceChange
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,18 +78,12 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.data.remote.request.CartVariantRequest
-import com.mtv.app.shopme.data.remote.response.AddressResponse
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.FoodOptionResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
-import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
-import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
-import com.mtv.app.shopme.data.remote.response.StatsResponse
-import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.data.mock.DataUiMock
+import com.mtv.app.shopme.domain.model.Food
+import com.mtv.app.shopme.domain.model.FoodOption
 import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.contract.DetailUiState
 import com.mtv.app.shopme.feature.customer.utils.StatItem
@@ -63,7 +91,6 @@ import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
-import org.threeten.bp.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,12 +98,13 @@ fun DetailScreen(
     state: DetailUiState,
     event: (DetailEvent) -> Unit
 ) {
-    var showSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
     val food = (state.food as? LoadState.Success)?.data
-    val similarFoods = ((state.similarFoods as? LoadState.Success)?.data ?: emptyList())
-        .filter { it.id != food?.id }
+    val similarFoods = (state.similarFoods as? LoadState.Success)?.data.orEmpty()
+    val filteredFoods = similarFoods.filter { it.id != food?.id }
+
+    var showSheet by remember { mutableStateOf(false) }
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     if (showSheet && food != null) {
         ModalBottomSheet(
@@ -86,7 +114,14 @@ fun DetailScreen(
             VariantBottomSheetContent(
                 food = food,
                 onAddToCart = { variants, qty, note ->
-                    event(DetailEvent.AddToCart(food.id, variants, qty, note))
+                    event(
+                        DetailEvent.AddToCart(
+                            foodId = food.id,
+                            variants = variants,
+                            quantity = qty,
+                            note = note
+                        )
+                    )
                 },
                 onClose = { showSheet = false }
             )
@@ -105,7 +140,7 @@ fun DetailScreen(
         when (state.food) {
 
             is LoadState.Loading -> {
-                ShimmerDetailScreen(paddingValues = paddingValues)
+                // pakai shimmer kamu
             }
 
             is LoadState.Success -> {
@@ -118,35 +153,35 @@ fun DetailScreen(
                             )
                         )
                         .padding(paddingValues)
-                        .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+                        .padding(16.dp)
                 ) {
+
                     item {
                         DetailHeader(
                             onBack = { event(DetailEvent.BackClicked) }
                         )
                     }
+
                     item { Spacer(Modifier.height(16.dp)) }
 
                     item {
                         if (!food?.images.isNullOrEmpty()) {
-                            DetailImage(food!!.images)
+                            DetailImage(food.images)
                         }
                     }
+
                     item { Spacer(Modifier.height(16.dp)) }
 
                     item { DetailTitle(food) }
+
                     item { Spacer(Modifier.height(6.dp)) }
 
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Default.PriceChange,
-                                contentDescription = null,
-                                tint = AppColor.Green
-                            )
+                            Icon(Icons.Default.PriceChange, null, tint = AppColor.Green)
                             Spacer(Modifier.width(4.dp))
                             Text(
-                                text = food?.price?.toRupiah() ?: EMPTY_STRING,
+                                text = food?.price?.toRupiah() ?: "",
                                 color = Color.DarkGray,
                                 fontSize = 16.sp,
                                 fontFamily = PoppinsFont,
@@ -156,322 +191,42 @@ fun DetailScreen(
                     }
 
                     item { Spacer(Modifier.height(6.dp)) }
+
                     item {
                         DetailLocation(
                             food = food,
                             onClickCafe = { event(DetailEvent.ClickCafe(it)) }
                         )
                     }
+
                     item { Spacer(Modifier.height(12.dp)) }
 
                     item { DetailDescription(food) }
+
                     item { Spacer(Modifier.height(20.dp)) }
 
                     item { DetailStatsRow(food) }
+
                     item { Spacer(Modifier.height(22.dp)) }
 
                     item { SectionTitle("Menu lainnya") }
+
                     item { Spacer(Modifier.height(12.dp)) }
 
-                    // Similar foods: shimmer atau list
-                    when (state.similarFoods) {
-                        is LoadState.Loading -> {
-                            items(3) { ShimmerSimilarItemRow() }
-                        }
-                        is LoadState.Success -> {
-                            items(similarFoods) { item ->
-                                SimilarItemRow(
-                                    foodResponse = item,
-                                    onClickSimilarFood = { event(DetailEvent.ClickSimilarFood(item.id)) }
-                                )
-                                Spacer(Modifier.height(12.dp))
+                    items(filteredFoods) { item ->
+                        SimilarItemRow(
+                            Food = item,
+                            onClickSimilarFood = {
+                                event(DetailEvent.ClickSimilarFood(item.id))
                             }
-                        }
-                        else -> {}
+                        )
+                        Spacer(Modifier.height(12.dp))
                     }
                 }
             }
 
             else -> Unit
         }
-    }
-}
-
-// ─────────────────────────────────────────────
-// SHIMMER DETAIL SCREEN
-// ─────────────────────────────────────────────
-
-@Composable
-fun ShimmerDetailScreen(paddingValues: PaddingValues) {
-    val brush = shimmerBrush()
-
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(AppColor.GreenSoft, AppColor.WhiteSoft, AppColor.White)
-                )
-            )
-            .padding(paddingValues)
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-    ) {
-
-        // Header skeleton
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(brush)
-                )
-                Box(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(18.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(brush)
-                )
-            }
-        }
-
-        item { Spacer(Modifier.height(16.dp)) }
-
-        // Image skeleton
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(240.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(brush)
-            )
-        }
-
-        item { Spacer(Modifier.height(16.dp)) }
-
-        // Title skeleton
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(24.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(brush)
-            )
-        }
-
-        item { Spacer(Modifier.height(8.dp)) }
-
-        // Price skeleton
-        item {
-            Box(
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(16.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(brush)
-            )
-        }
-
-        item { Spacer(Modifier.height(8.dp)) }
-
-        // Location skeleton
-        item {
-            Row {
-                Box(
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(14.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-                Spacer(Modifier.width(12.dp))
-                Box(
-                    modifier = Modifier
-                        .width(140.dp)
-                        .height(14.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-            }
-        }
-
-        item { Spacer(Modifier.height(12.dp)) }
-
-        // Description skeleton (3 baris)
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(12.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.85f)
-                        .height(12.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.6f)
-                        .height(12.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-            }
-        }
-
-        item { Spacer(Modifier.height(20.dp)) }
-
-        // Stats row skeleton
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                repeat(3) {
-                    Box(
-                        modifier = Modifier
-                            .width(90.dp)
-                            .height(32.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(brush)
-                    )
-                }
-            }
-        }
-
-        item { Spacer(Modifier.height(22.dp)) }
-
-        // Section title skeleton
-        item {
-            Box(
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(16.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(brush)
-            )
-        }
-
-        item { Spacer(Modifier.height(12.dp)) }
-
-        // Similar items skeleton
-        items(3) { ShimmerSimilarItemRow() }
-    }
-}
-
-@Composable
-fun ShimmerSimilarItemRow() {
-    val brush = shimmerBrush()
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .border(1.dp, Color.Black.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Image
-        Box(
-            modifier = Modifier
-                .size(42.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(brush)
-        )
-
-        Spacer(Modifier.width(12.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(14.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(brush)
-            )
-            Spacer(Modifier.height(6.dp))
-            Box(
-                modifier = Modifier
-                    .width(80.dp)
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(brush)
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .width(60.dp)
-                .height(24.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(brush)
-        )
-    }
-
-    Spacer(Modifier.height(12.dp))
-}
-
-// ─────────────────────────────────────────────
-// EXISTING COMPOSABLES (tidak berubah, hanya
-// parameter onBack ditambahkan di DetailHeader)
-// ─────────────────────────────────────────────
-
-@Composable
-fun DetailHeader(onBack: () -> Unit = {}) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.White)
-                .clickable { onBack() }
-                .padding(12.dp),
-            tint = Color.Black
-        )
-        Text(
-            text = "Food Detail",
-            fontFamily = PoppinsFont,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.weight(1f)
-        )
-        Icon(
-            imageVector = Icons.Filled.Favorite,
-            contentDescription = null,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.White)
-                .padding(12.dp),
-            tint = Color.Red
-        )
     }
 }
 
@@ -542,7 +297,9 @@ fun AddToCartBar(
 }
 
 @Composable
-fun DetailHeader() {
+fun DetailHeader(
+    onBack: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -555,7 +312,10 @@ fun DetailHeader() {
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Color.White)
-                .padding(12.dp),
+                .padding(12.dp)
+                .clickable {
+                    onBack()
+                },
             tint = Color.Black
         )
 
@@ -644,9 +404,9 @@ fun DetailImage(
 }
 
 @Composable
-fun DetailTitle(food: FoodResponse?) {
+fun DetailTitle(food: Food?) {
     Text(
-        text = food?.name ?: EMPTY_STRING,
+        text = food?.name.orEmpty(),
         fontSize = 24.sp,
         fontFamily = PoppinsFont,
         fontWeight = FontWeight.SemiBold
@@ -655,7 +415,7 @@ fun DetailTitle(food: FoodResponse?) {
 
 @Composable
 fun DetailLocation(
-    food: FoodResponse?,
+    food: Food?,
     onClickCafe: (String) -> Unit
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -697,7 +457,7 @@ fun DetailLocation(
 }
 
 @Composable
-fun DetailDescription(food: FoodResponse?) {
+fun DetailDescription(food: Food?) {
     Text(
         text = food?.description ?: EMPTY_STRING,
         color = AppColor.Gray,
@@ -707,7 +467,7 @@ fun DetailDescription(food: FoodResponse?) {
 }
 
 @Composable
-fun DetailStatsRow(food: FoodResponse?) {
+fun DetailStatsRow(food: Food?) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -740,7 +500,7 @@ fun SectionTitle(title: String) {
 
 @Composable
 fun SimilarItemRow(
-    foodResponse: FoodResponse,
+    Food: Food,
     onClickSimilarFood: () -> Unit
 ) {
     Row(
@@ -755,8 +515,8 @@ fun SimilarItemRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = foodResponse.images.first(),
-            contentDescription = foodResponse.name,
+            model = Food.images.first(),
+            contentDescription = Food.name,
             modifier = Modifier
                 .size(42.dp)
                 .clip(RoundedCornerShape(4.dp)),
@@ -769,7 +529,7 @@ fun SimilarItemRow(
                 .padding(start = 12.dp)
         ) {
             Text(
-                text = foodResponse.name,
+                text = Food.name,
                 fontWeight = FontWeight.Medium,
                 fontFamily = PoppinsFont
             )
@@ -777,7 +537,7 @@ fun SimilarItemRow(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text = foodResponse.price.toRupiah(),
+                text = Food.price.toRupiah(),
                 color = AppColor.Green,
                 fontSize = 14.sp,
                 fontFamily = PoppinsFont
@@ -789,15 +549,15 @@ fun SimilarItemRow(
             modifier = Modifier
                 .padding(end = 12.dp)
         ) {
-            StatusStatItem(foodResponse.status)
+            StatusStatItem(Food.status)
         }
     }
 }
 
 @Composable
 fun VariantBottomSheetContent(
-    food: FoodResponse,
-    onAddToCart: (List<CartVariantRequest>, Int, String) -> Unit,
+    food: Food,
+    onAddToCart: (List<CartAddVariantParam>, Int, String) -> Unit,
     onClose: () -> Unit
 ) {
 
@@ -805,7 +565,7 @@ fun VariantBottomSheetContent(
     var note by remember { mutableStateOf(EMPTY_STRING) }
 
     val selectedOptions = remember {
-        mutableStateMapOf<String, FoodOptionResponse>()
+        mutableStateMapOf<String, FoodOption>()
     }
 
     val variantPrice = selectedOptions.values.sumOf { it.price }
@@ -934,14 +694,12 @@ fun VariantBottomSheetContent(
 
         Button(
             onClick = {
-
                 val variantRequests = selectedOptions.map { (variantId, option) ->
-                    CartVariantRequest(
+                    CartAddVariantParam(
                         variantId = variantId,
                         optionId = option.id
                     )
                 }
-
                 onAddToCart(variantRequests, quantity, note)
             },
             modifier = Modifier
@@ -971,9 +729,9 @@ fun VariantBottomSheetContent(
 
 @Composable
 fun VariantSelectorDynamic(
-    options: List<FoodOptionResponse>,
-    selected: FoodOptionResponse?,
-    onSelect: (FoodOptionResponse) -> Unit
+    options: List<FoodOption>,
+    selected: FoodOption?,
+    onSelect: (FoodOption) -> Unit
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -1095,19 +853,9 @@ fun PriceRow(
 fun DetailScreenPreview() {
     DetailScreen(
         state = DetailUiState(
-            food = LoadState.Success(previewFood),
-            similarFoods = LoadState.Success(previewSimilar)
-        ),
-        event = {}
-    )
-}
-
-@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-@Composable
-fun DetailScreenShimmerPreview() {
-    DetailScreen(
-        state = DetailUiState(
-            food = LoadState.Loading
+            food = LoadState.Success(DataUiMock.foods().first()),
+            similarFoods = LoadState.Success(DataUiMock.foods()),
+            addToCartState = LoadState.Success(Unit)
         ),
         event = {}
     )
@@ -1116,7 +864,6 @@ fun DetailScreenShimmerPreview() {
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun VariantBottomSheetMockPreview() {
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -1132,7 +879,7 @@ fun VariantBottomSheetMockPreview() {
         ) {
 
             VariantBottomSheetContent(
-                food = previewFood,
+                food = DataUiMock.foods().first(),
                 onAddToCart = { _, _, _ -> },
                 onClose = {}
             )
@@ -1140,119 +887,3 @@ fun VariantBottomSheetMockPreview() {
         }
     }
 }
-
-private val previewFood by lazy {
-    FoodResponse(
-        id = "1",
-        cafeId = "1",
-        name = "Bakso Telur Joss",
-        cafeName = "Cafe Sejati",
-        cafeAddress = "Puri Lestari - Blok G06/01",
-        description = "Bakso enak dengan telur di dalamnya.",
-        price = BigDecimal("30000"),
-        category = FoodCategory.FOOD,
-        status = FoodStatus.READY,
-        quantity = 20,
-        estimate = "10-15 menit",
-        isActive = true,
-        createdAt = LocalDateTime.parse("2026-03-07T13:48:00"),
-        images = listOf("https://picsum.photos/400"),
-        variants = listOf(
-            FoodVariantResponse(
-                id = "v1",
-                name = "Ukuran",
-                options = listOf(
-                    FoodOptionResponse(
-                        id = "o1",
-                        name = "Regular",
-                        price = BigDecimal.ZERO
-                    ),
-                    FoodOptionResponse(
-                        id = "o2",
-                        name = "Large",
-                        price = BigDecimal(5000)
-                    )
-                )
-            ),
-            FoodVariantResponse(
-                id = "v1",
-                name = "Level",
-                options = listOf(
-                    FoodOptionResponse(
-                        id = "o1",
-                        name = "Tidak Pedas",
-                        price = BigDecimal.ZERO
-                    ),
-                    FoodOptionResponse(
-                        id = "o2",
-                        name = "Sedang",
-                        price = BigDecimal.ZERO
-                    ),
-                    FoodOptionResponse(
-                        id = "o2",
-                        name = "Pedas",
-                        price = BigDecimal.ZERO
-                    )
-                )
-            )
-        )
-    )
-}
-
-private val previewSimilar by lazy {
-    listOf(
-        FoodResponse(
-            id = "2",
-            cafeId = "1",
-            name = "Bakso Urat",
-            cafeName = "Cafe Sejati",
-            cafeAddress = "Puri Lestari - Blok G06/01",
-            description = "Bakso urat kenyal",
-            price = BigDecimal("25000"),
-            category = FoodCategory.FOOD,
-            status = FoodStatus.READY,
-            quantity = 30,
-            estimate = "10 menit",
-            isActive = true,
-            createdAt = LocalDateTime.parse("2026-03-07T13:48:00"),
-            images = listOf("https://picsum.photos/200"),
-            variants = emptyList()
-        ),
-        FoodResponse(
-            id = "3",
-            cafeId = "1",
-            name = "Bakso Telur Joss",
-            cafeName = "Cafe Sejati",
-            cafeAddress = "Puri Lestari - Blok G06/01",
-            description = "Bakso pedas dengan sambal mercon.",
-            price = BigDecimal(32000),
-            category = FoodCategory.FOOD,
-            status = FoodStatus.READY,
-            quantity = 15,
-            estimate = "12 menit",
-            isActive = true,
-            createdAt = LocalDateTime.parse("2026-03-07T13:48:00"),
-            images = listOf("https://picsum.photos/200"),
-            variants = emptyList()
-        )
-    )
-}
-
-val previewCustomer = CustomerResponse(
-    name = "Dedy Wijaya",
-    phone = "08123456789",
-    email = "boys.mtv@gmail.com",
-    address = AddressResponse(
-        id = "1",
-        village = "Puri Lestari",
-        block = "H2",
-        number = "21",
-        rt = "012",
-        rw = "002",
-        isDefault = true
-    ),
-    photo = EMPTY_STRING,
-    verified = true,
-    stats = StatsResponse(0, 0, EMPTY_STRING),
-    menuSummary = MenuSummaryResponse(0, 0, 0, 0, 0)
-)

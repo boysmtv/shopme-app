@@ -10,7 +10,8 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
+import com.mtv.app.shopme.domain.param.CartAddParam
+import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.app.shopme.domain.usecase.FoodAddToCartUseCase
 import com.mtv.app.shopme.domain.usecase.FoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.FoodSimilarUseCase
@@ -37,12 +38,9 @@ class DetailViewModel @Inject constructor(
 
     private val foodId: String = checkNotNull(savedStateHandle["foodId"])
 
-    init {
-        loadDetail()
-    }
-
     override fun onEvent(event: DetailEvent) {
         when (event) {
+            is DetailEvent.Load -> loadDetail()
             is DetailEvent.BackClicked -> emitEffect(DetailEffect.NavigateBack)
             is DetailEvent.ChatClicked -> emitEffect(DetailEffect.NavigateToChat)
             is DetailEvent.OpenCart -> emitEffect(DetailEffect.NavigateToCart)
@@ -56,15 +54,11 @@ class DetailViewModel @Inject constructor(
         observeDataFlow(
             flow = foodDetailUseCase(foodId),
             onState = { state ->
-                when (state) {
-                    is LoadState.Loading -> _state.update { it.copy(food = LoadState.Loading) }
-                    is LoadState.Success -> {
-                        val food = state.data.data
-                        _state.update { it.copy(food = LoadState.Success(food!!)) }
-                        food?.cafeId?.let { loadSimilar(it) }
-                    }
-                    is LoadState.Error -> _state.update { it.copy(food = LoadState.Error(state.error)) }
-                    else -> Unit
+                _state.update { it.copy(food = state) }
+
+                if (state is LoadState.Success) {
+                    val food = state.data
+                    loadSimilar(food.cafeId)
                 }
             }
         )
@@ -74,38 +68,31 @@ class DetailViewModel @Inject constructor(
         observeDataFlow(
             flow = foodSimilarUseCase(cafeId),
             onState = { state ->
-                when (state) {
-                    is LoadState.Loading -> _state.update { it.copy(similarFoods = LoadState.Loading) }
-                    is LoadState.Success -> {
-                        val list = state.data.data.orEmpty()
-                        _state.update { it.copy(similarFoods = LoadState.Success(list)) }
-                    }
-                    is LoadState.Error -> _state.update { it.copy(similarFoods = LoadState.Error(state.error)) }
-                    else -> Unit
-                }
+                _state.update { it.copy(similarFoods = state) }
             }
         )
     }
 
     private fun doAddToCart(event: DetailEvent.AddToCart) {
-        observeDataFlow(
-            flow = foodAddToCartUseCase(
-                FoodAddToCartRequest(
-                    foodId = event.foodId,
-                    variants = event.variants,
-                    quantity = event.quantity,
-                    note = event.note
+        val param = CartAddParam(
+            foodId = event.foodId,
+            quantity = event.quantity,
+            note = event.note,
+            variants = event.variants.map { cartVariant ->
+                CartAddVariantParam(
+                    variantId = cartVariant.variantId,
+                    optionId = cartVariant.optionId
                 )
-            ),
+            },
+        )
+
+        observeDataFlow(
+            flow = foodAddToCartUseCase(param),
             onState = { state ->
-                when (state) {
-                    is LoadState.Loading -> _state.update { it.copy(addToCartState = LoadState.Loading) }
-                    is LoadState.Success -> {
-                        _state.update { it.copy(addToCartState = LoadState.Success(Unit)) }
-                        emitEffect(DetailEffect.NavigateToCart)
-                    }
-                    is LoadState.Error -> _state.update { it.copy(addToCartState = LoadState.Error(state.error)) }
-                    else -> Unit
+                _state.update { it.copy(addToCartState = state) }
+
+                if (state is LoadState.Success) {
+                    emitEffect(DetailEffect.NavigateToCart)
                 }
             }
         )

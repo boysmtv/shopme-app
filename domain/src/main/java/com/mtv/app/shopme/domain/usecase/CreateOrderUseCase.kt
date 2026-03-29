@@ -8,8 +8,7 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.shopme.domain.model.param.CreateOrderParam
-import com.mtv.app.shopme.domain.model.param.VerifyPinParam
+import com.mtv.app.shopme.domain.param.CreateOrderParam
 import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
 

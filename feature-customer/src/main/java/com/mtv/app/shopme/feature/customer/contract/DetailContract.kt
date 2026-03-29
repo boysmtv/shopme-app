@@ -8,26 +8,30 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.remote.request.CartVariantRequest
-import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.domain.model.CartVariant
+import com.mtv.app.shopme.domain.model.Food
+import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.based.core.network.utils.LoadState
 
 data class DetailUiState(
-    val food: LoadState<FoodResponse> = LoadState.Loading,
-    val similarFoods: LoadState<List<FoodResponse>> = LoadState.Idle,
+    val food: LoadState<Food> = LoadState.Idle,
+    val similarFoods: LoadState<List<Food>> = LoadState.Idle,
     val addToCartState: LoadState<Unit> = LoadState.Idle
 )
 
 sealed class DetailEvent {
+    object Load : DetailEvent()
     object BackClicked : DetailEvent()
     object ChatClicked : DetailEvent()
     object OpenCart : DetailEvent()
+
     data class AddToCart(
         val foodId: String,
-        val variants: List<CartVariantRequest>,
+        val variants: List<CartAddVariantParam>,
         val quantity: Int,
         val note: String
     ) : DetailEvent()
+
     data class ClickCafe(val cafeId: String) : DetailEvent()
     data class ClickSimilarFood(val foodId: String) : DetailEvent()
 }
