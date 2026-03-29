@@ -18,14 +18,3 @@ data class Customer(
     val stats: Stats?,
     val menuSummary: MenuSummary?,
 )
-
-val EMPTY = Customer(
-    name = "",
-    phone = "",
-    email = "",
-    address = null,
-    photo = "",
-    verified = false,
-    stats = null,
-    menuSummary = null,
-)

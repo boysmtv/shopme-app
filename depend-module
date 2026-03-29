@@ -1,0 +1,34 @@
+
+        :app
+        /   \
+    :nav        :data
+    ↓           ↓
+    :feature    ↓
+    ↓           ↓
+        :domain
+        ↓
+        :core
+
+------------------------------------------
+------------------------------------------
+
+:app
+ ├── :nav
+ ├── :feature-auth
+ ├── :feature-customer
+ ├── :feature-seller
+ ├── :feature-firebase
+
+:feature-*
+ ├── :domain
+ ├── :common (optional UI shared)
+
+:domain
+ └── (NO dependency ❗ pure Kotlin)
+
+:data
+ ├── :domain
+ ├── :core
+
+:core
+ └── (NO dependency ❗ paling bawah)
