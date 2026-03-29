@@ -10,7 +10,7 @@ package com.mtv.app.shopme.domain.repository
 
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
-import com.mtv.app.shopme.domain.model.param.SearchParam
+import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.based.core.network.utils.Resource
 import kotlinx.coroutines.flow.Flow
 

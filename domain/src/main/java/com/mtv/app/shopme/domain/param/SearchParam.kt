@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 26/03/26 14.13
  */
 
-package com.mtv.app.shopme.domain.model.param
+package com.mtv.app.shopme.domain.param
 
 data class SearchParam(
     val name: String,

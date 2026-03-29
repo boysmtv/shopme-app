@@ -33,7 +33,7 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.*
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
-import com.mtv.app.shopme.data.mock.HomeUiMock
+import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.*
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
@@ -515,8 +515,8 @@ fun FoodCard(
 fun HomeScreenPreview() {
 
     val state = HomeUiState(
-        customer = LoadState.Success(HomeUiMock.customer()),
-        foods = LoadState.Success(HomeUiMock.foods()),
+        customer = LoadState.Success(DataUiMock.customer()),
+        foods = LoadState.Success(DataUiMock.foods()),
     )
 
     Scaffold(

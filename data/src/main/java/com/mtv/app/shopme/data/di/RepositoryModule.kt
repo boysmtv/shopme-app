@@ -1,17 +1,13 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: RepositoryModule.kt
- *
- * Last modified by Dedy Wijaya on 23/03/26 01.11
- */
+package com.mtv.app.shopme.data.di
 
-package com.mtv.app.shopme.di
-
+import com.mtv.app.shopme.data.repository.CafeRepositoryImpl
 import com.mtv.app.shopme.data.repository.CartRepositoryImpl
+import com.mtv.app.shopme.data.repository.FoodDetailRepositoryImpl
 import com.mtv.app.shopme.data.repository.HomeRepositoryImpl
 import com.mtv.app.shopme.data.repository.SearchRepositoryImpl
+import com.mtv.app.shopme.domain.repository.CafeRepository
 import com.mtv.app.shopme.domain.repository.CartRepository
+import com.mtv.app.shopme.domain.repository.FoodDetailRepository
 import com.mtv.app.shopme.domain.repository.HomeRepository
 import com.mtv.app.shopme.domain.repository.SearchRepository
 import dagger.Binds
@@ -37,5 +33,15 @@ abstract class RepositoryModule {
     abstract fun bindSearchRepository(
         impl: SearchRepositoryImpl
     ): SearchRepository
+
+    @Binds
+    abstract fun bindCafeRepository(
+        impl: CafeRepositoryImpl
+    ): CafeRepository
+
+    @Binds
+    abstract fun bindFoodDetailRepository(
+        impl: FoodDetailRepositoryImpl
+    ): FoodDetailRepository
 
 }
