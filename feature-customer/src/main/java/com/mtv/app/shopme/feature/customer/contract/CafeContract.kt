@@ -8,36 +8,28 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.dto.FoodItemModel
-import com.mtv.app.shopme.data.dto.OwnerCafeModel
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.CafeResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Cafe
+import com.mtv.app.shopme.domain.model.Food
+import com.mtv.based.core.network.utils.LoadState
 
-data class CafeStateListener(
-    val cafeState: Resource<ApiResponse<CafeResponse>> = Resource.Loading,
-    val foodsState: Resource<ApiResponse<List<FoodResponse>>> = Resource.Loading,
-    val activeDialog: CafeDialog? = null,
+data class CafeUiState(
+    val cafe: LoadState<Cafe> = LoadState.Idle,
+    val foods: LoadState<List<Food>> = LoadState.Idle
 )
 
-data class CafeDataListener(
-    val cafe: OwnerCafeModel? = null,
-    val foods: List<FoodItemModel> = emptyList()
-)
+sealed class CafeEvent {
+    object Load : CafeEvent()
+    object DismissDialog : CafeEvent()
 
-data class CafeEventListener(
-    val onFoodClick: (FoodItemModel) -> Unit = {},
-    val onDismissActiveDialog: () -> Unit = {}
-)
+    data class ClickFood(val id: String) : CafeEvent()
+    object ClickBack : CafeEvent()
+    object ClickChat : CafeEvent()
+    object ClickWhatsapp : CafeEvent()
+}
 
-data class CafeNavigationListener(
-    val onBack: () -> Unit = {},
-    val onNavigateToDetail: (String) -> Unit = {},
-    val onNavigateToChat: () -> Unit = {},
-    val onNavigateToWhatsapp: () -> Unit = {}
-)
-
-sealed class CafeDialog {
-    object Error : CafeDialog()
+sealed class CafeEffect {
+    object NavigateBack : CafeEffect()
+    object NavigateToChat : CafeEffect()
+    object NavigateToWhatsapp : CafeEffect()
+    data class NavigateToDetail(val id: String) : CafeEffect()
 }
