@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 27/03/26 22.42
  */
 
-package com.mtv.app.shopme.domain.model.param
+package com.mtv.app.shopme.domain.param
 
 data class CartAddVariantParam(
     val variantId: String,

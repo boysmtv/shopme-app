@@ -11,10 +11,10 @@ package com.mtv.app.shopme.data.repository
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.remote.datasource.CartRemoteDataSource
-import com.mtv.app.shopme.domain.model.param.CartClearByCafeParam
-import com.mtv.app.shopme.domain.model.param.CartQuantityParam
-import com.mtv.app.shopme.domain.model.param.CreateOrderParam
-import com.mtv.app.shopme.domain.model.param.VerifyPinParam
+import com.mtv.app.shopme.domain.param.CartClearByCafeParam
+import com.mtv.app.shopme.domain.param.CartQuantityParam
+import com.mtv.app.shopme.domain.param.CreateOrderParam
+import com.mtv.app.shopme.domain.param.VerifyPinParam
 import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
 

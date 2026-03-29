@@ -10,7 +10,7 @@ package com.mtv.app.shopme.domain.model
 
 import java.math.BigDecimal
 
-data class CartItem(
+data class Cart(
     val id: String,
     val customerId: String,
     val foodId: String,
@@ -22,12 +22,4 @@ data class CartItem(
     val quantity: Int,
     val notes: String,
     val variants: List<CartVariant>,
-)
-
-data class CartVariant(
-    val variantId: String,
-    val variantName: String,
-    val optionId: String,
-    val optionName: String,
-    val price: BigDecimal
 )
