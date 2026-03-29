@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.shopme.domain.model.param.CartAddParam
+import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.repository.FoodDetailRepository
 import javax.inject.Inject
 

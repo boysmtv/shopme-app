@@ -11,7 +11,7 @@ package com.mtv.app.shopme.data.repository
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.remote.datasource.FoodDetailRemoteDataSource
-import com.mtv.app.shopme.domain.model.param.CartAddParam
+import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.repository.FoodDetailRepository
 import javax.inject.Inject
 

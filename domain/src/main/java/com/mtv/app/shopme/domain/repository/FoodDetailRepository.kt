@@ -9,7 +9,7 @@
 package com.mtv.app.shopme.domain.repository
 
 import com.mtv.app.shopme.domain.model.Food
-import com.mtv.app.shopme.domain.model.param.CartAddParam
+import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.based.core.network.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
