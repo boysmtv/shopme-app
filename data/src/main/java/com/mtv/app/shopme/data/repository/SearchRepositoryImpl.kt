@@ -9,11 +9,11 @@
 package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
-import com.mtv.app.shopme.data.mapper.param.toSearchDomain
+import com.mtv.app.shopme.data.mapper.toSearchDomain
 import com.mtv.app.shopme.data.remote.datasource.SearchRemoteDataSource
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
-import com.mtv.app.shopme.domain.model.param.SearchParam
+import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.repository.SearchRepository
 import com.mtv.based.core.network.utils.Resource
 import javax.inject.Inject

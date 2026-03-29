@@ -10,10 +10,8 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.data.remote.request.SearchFoodRequest
-import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.SearchFood
-import com.mtv.app.shopme.domain.model.param.SearchParam
+import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.usecase.SearchFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.SearchEffect
 import com.mtv.app.shopme.feature.customer.contract.SearchEvent

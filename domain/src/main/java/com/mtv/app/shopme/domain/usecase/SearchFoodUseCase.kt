@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.shopme.domain.model.param.SearchParam
+import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.repository.SearchRepository
 import javax.inject.Inject
 
