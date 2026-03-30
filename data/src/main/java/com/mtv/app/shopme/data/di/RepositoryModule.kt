@@ -2,11 +2,13 @@ package com.mtv.app.shopme.data.di
 
 import com.mtv.app.shopme.data.repository.CafeRepositoryImpl
 import com.mtv.app.shopme.data.repository.CartRepositoryImpl
+import com.mtv.app.shopme.data.repository.ChatRepositoryImpl
 import com.mtv.app.shopme.data.repository.FoodDetailRepositoryImpl
 import com.mtv.app.shopme.data.repository.HomeRepositoryImpl
 import com.mtv.app.shopme.data.repository.SearchRepositoryImpl
 import com.mtv.app.shopme.domain.repository.CafeRepository
 import com.mtv.app.shopme.domain.repository.CartRepository
+import com.mtv.app.shopme.domain.repository.ChatRepository
 import com.mtv.app.shopme.domain.repository.FoodDetailRepository
 import com.mtv.app.shopme.domain.repository.HomeRepository
 import com.mtv.app.shopme.domain.repository.SearchRepository
@@ -43,5 +45,10 @@ abstract class RepositoryModule {
     abstract fun bindFoodDetailRepository(
         impl: FoodDetailRepositoryImpl
     ): FoodDetailRepository
+
+    @Binds
+    abstract fun bindChatRepository(
+        impl: ChatRepositoryImpl
+    ): ChatRepository
 
 }
