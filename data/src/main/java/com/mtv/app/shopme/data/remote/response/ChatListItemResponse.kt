@@ -1,9 +1,9 @@
-package com.mtv.app.shopme.data.local
+package com.mtv.app.shopme.data.remote.response
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ChatListItem(
+data class ChatListItemResponse(
     val id: String,
     val name: String,
     val lastMessage: String,

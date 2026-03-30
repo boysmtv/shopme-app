@@ -8,22 +8,11 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.ChatListResponse
-import com.mtv.based.core.network.di.IoDispatcher
-import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.app.shopme.domain.repository.ChatRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 
 class ChatListUseCase @Inject constructor(
-    private val repository: NetworkRepository,
-    @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<Unit, ApiResponse<ChatListResponse>>(dispatcher) {
-
-    override suspend fun execute(param: Unit) = repository.request<ApiResponse<ChatListResponse>>(
-        endpoint = ApiEndPoint.Chat.GetList,
-    )
-
+    private val repository: ChatRepository
+) {
+    operator fun invoke() = repository.getChatList()
 }

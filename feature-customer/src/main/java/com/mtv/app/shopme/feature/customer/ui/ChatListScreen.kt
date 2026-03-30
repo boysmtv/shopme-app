@@ -56,22 +56,18 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base64ToBitmap
-import com.mtv.app.shopme.data.local.ChatListItem
-import com.mtv.app.shopme.feature.customer.contract.ChatListDataListener
-import com.mtv.app.shopme.feature.customer.contract.ChatListEventListener
-import com.mtv.app.shopme.feature.customer.contract.ChatListNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
+import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
+import com.mtv.app.shopme.domain.model.ChatList
+import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
+import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
 import com.mtv.app.shopme.feature.customer.presentation.mockChatList
-import com.mtv.app.shopme.feature.customer.presentation.mockChatListState
-import com.mtv.app.shopme.nav.customer.CustomerBottomNavigationBar
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.network.utils.LoadState
 
 @Composable
 fun ChatListScreen(
-    uiState: ChatListStateListener,
-    uiData: ChatListDataListener,
-    uiEvent: ChatListEventListener,
-    uiNavigation: ChatListNavigationListener
+    state: ChatListUiState,
+    event: (ChatListEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -91,7 +87,7 @@ fun ChatListScreen(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                IconButton(onClick = uiNavigation.onBack) {
+                IconButton(onClick = { event(ChatListEvent.ClickBack) }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
@@ -107,7 +103,7 @@ fun ChatListScreen(
                 )
             }
 
-            IconButton(onClick = uiNavigation.onBack) {
+            IconButton(onClick = { event(ChatListEvent.ClickBack) }) {
                 Icon(
                     imageVector = Icons.Default.DeleteOutline,
                     contentDescription = null,
@@ -120,8 +116,8 @@ fun ChatListScreen(
         HorizontalDivider()
         Spacer(modifier = Modifier.height(16.dp))
 
-        val chats = when (val state = uiState.chatListState) {
-            is Resource.Success -> state.data.data?.chatList ?: emptyList()
+        val chats = when (val state = state.chatListState) {
+            is LoadState.Success -> state.data.chatList
             else -> mockChatList()
         }
 
@@ -132,7 +128,7 @@ fun ChatListScreen(
             items(chats) { item ->
                 ListChatItem(
                     data = item,
-                    onClick = { uiNavigation.navigateToChat(item.id) }
+                    onClick = { event(ChatListEvent.ClickItem(item.id)) }
                 )
             }
         }
@@ -275,12 +271,14 @@ fun ChatListScreenPreview() {
                 .background(Color.White)
         ) {
             ChatListScreen(
-                uiState = ChatListStateListener(
-                    chatListState = mockChatListState()
+                state = ChatListUiState(
+                    chatListState = LoadState.Success(
+                        ChatList(
+                            emptyList()
+                        )
+                    )
                 ),
-                uiData = ChatListDataListener(),
-                uiEvent = ChatListEventListener(),
-                uiNavigation = ChatListNavigationListener()
+                event = { }
             )
         }
     }
