@@ -8,10 +8,12 @@
 
 package com.mtv.app.shopme.data.mapper
 
+import com.mtv.app.shopme.data.remote.response.ChatListItemResponse
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CafeAddressResponse
 import com.mtv.app.shopme.data.remote.response.CafeResponse
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
+import com.mtv.app.shopme.data.remote.response.ChatListResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.FoodOptionResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
@@ -24,6 +26,8 @@ import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
 import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.CartVariant
+import com.mtv.app.shopme.domain.model.ChatList
+import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodOption
@@ -158,3 +162,20 @@ fun FoodResponse.toSearchDomain(): SearchFood = SearchFood(
     image = images.firstOrNull().orEmpty(),
     cafeName = cafeName
 )
+
+fun ChatListResponse.toDomain(): ChatList {
+    return ChatList(
+        chatList = chatList.map { it.toDomain() }
+    )
+}
+
+fun ChatListItemResponse.toDomain(): ChatListItem {
+    return ChatListItem(
+        id = id,
+        name = name,
+        lastMessage = lastMessage,
+        time = time,
+        unreadCount = unreadCount,
+        avatarBase64 = avatarBase64
+    )
+}
