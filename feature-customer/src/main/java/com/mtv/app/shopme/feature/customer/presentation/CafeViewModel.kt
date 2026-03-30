@@ -42,7 +42,6 @@ class CafeViewModel @Inject constructor(
         when (event) {
             is CafeEvent.Load -> load()
             is CafeEvent.DismissDialog -> dismissDialog()
-
             is CafeEvent.ClickFood -> emitEffect(CafeEffect.NavigateToDetail(event.id))
             is CafeEvent.ClickBack -> emitEffect(CafeEffect.NavigateBack)
             is CafeEvent.ClickChat -> emitEffect(CafeEffect.NavigateToChat)

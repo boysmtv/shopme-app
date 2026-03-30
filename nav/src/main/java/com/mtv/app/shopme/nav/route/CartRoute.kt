@@ -15,7 +15,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.*
+import com.mtv.app.shopme.feature.customer.contract.CartEffect
+import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.presentation.CartViewModel
 import com.mtv.app.shopme.feature.customer.ui.CartScreen
 import com.mtv.app.shopme.nav.customer.CustomerNavActions
@@ -51,12 +52,7 @@ private fun handleCartEffect(
     effect: CartEffect
 ) {
     when (effect) {
-        CartEffect.OpenPinSheet -> {
-            // trigger bottom sheet di UI
-        }
-
-        CartEffect.NavigateToOrder -> {
-            CustomerNavActions.toOrder(nav)
-        }
+        CartEffect.OpenPinSheet -> { }
+        CartEffect.NavigateToOrder -> CustomerNavActions.toOrder(nav)
     }
 }

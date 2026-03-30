@@ -8,66 +8,67 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.common.valueFlowOf
-import com.mtv.app.shopme.data.local.ChatListItem
+import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.data.local.NotificationItem
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
-import com.mtv.app.shopme.data.remote.response.ChatListResponse
+import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.usecase.ChatListUseCase
-import com.mtv.app.shopme.feature.customer.contract.ChatListDataListener
-import com.mtv.app.shopme.feature.customer.contract.ChatListStateListener
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.feature.customer.contract.ChatListEffect
+import com.mtv.app.shopme.feature.customer.contract.ChatListEffect.*
+import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
+import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
     private val chatListUseCase: ChatListUseCase
-) : BaseViewModel(), UiOwner<ChatListStateListener, ChatListDataListener> {
+) : BaseEventViewModel<ChatListEvent, ChatListEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(
-        ChatListStateListener(
-            chatListState = mockChatListState()
-        )
-    )
+    private val _state = MutableStateFlow(ChatListUiState())
+    val uiState = _state.asStateFlow()
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(ChatListDataListener())
+    override fun onEvent(event: ChatListEvent) {
+        when (event) {
+            is ChatListEvent.Load -> observeChatList()
+            is ChatListEvent.DismissDialog -> dismissDialog()
+            is ChatListEvent.ClickItem -> emitEffect(NavigateToChat(event.id))
+            is ChatListEvent.ClickBack -> TODO()
+        }
+    }
 
-    fun goFetchChatList() {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.chatListState },
-                set = { state -> copy(chatListState = state) }
-            ),
-            block = {
-                chatListUseCase(Unit)
-            }
+    private fun observeChatList() {
+        observeDataFlow(
+            flow = chatListUseCase(),
+            onLoad = ::showLoading,
+            onState = { state ->
+                _state.update {
+                    it.copy(chatListState = state)
+                }
+            },
+            onError = ::showError
         )
     }
 
-}
-
-fun mockChatListState(): Resource<ApiResponse<ChatListResponse>> {
-    return Resource.Success(
-        ApiResponse(
-            timestamp = "2026-02-13T10:00:00",
-            status = 200,
-            code = "SUCCESS",
-            message = "Success",
-            traceId = "mock-trace-id",
-            data = ChatListResponse(
-                chatList = mockChatList()
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
             )
         )
-    )
+    }
 }
 
 fun mockChatList() = listOf(
@@ -76,70 +77,80 @@ fun mockChatList() = listOf(
         name = "Cafe Kopi Kita",
         lastMessage = "Pesanan latte sedang diproses ☕",
         time = "12:30",
-        unreadCount = 2
+        unreadCount = 2,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "2",
         name = "Bakery Mantap",
         lastMessage = "Kue brownies baru keluar oven!",
         time = "10:15",
-        unreadCount = 0
+        unreadCount = 0,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "3",
         name = "Warung Sederhana",
         lastMessage = "Ayam geprek siap dikirim.",
         time = "Kemarin",
-        unreadCount = 1
+        unreadCount = 1,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "4",
         name = "Sushi House",
         lastMessage = "Salmon sushi extra fresh hari ini 🍣",
         time = "09:20",
-        unreadCount = 12
+        unreadCount = 12,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "5",
         name = "Burger Boss",
         lastMessage = "Cheese burger pesanan Anda sedang dibuat.",
         time = "08:45",
-        unreadCount = 0
+        unreadCount = 0,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "6",
         name = "Noodle Station",
         lastMessage = "Mie pedas level 3 siap disantap! 🔥",
         time = "Kemarin",
-        unreadCount = 4
+        unreadCount = 4,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "7",
         name = "Pizza Corner",
         lastMessage = "Promo beli 1 gratis 1 masih tersedia! 🍕",
         time = "2 hari lalu",
-        unreadCount = 0
+        unreadCount = 0,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "8",
         name = "Kedai Teh Manis",
         lastMessage = "Thai tea ukuran large siap diambil.",
         time = "11:05",
-        unreadCount = 1
+        unreadCount = 1,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "9",
         name = "Steak Master",
         lastMessage = "Steak medium rare sedang dipanggang 🥩",
         time = "Hari ini",
-        unreadCount = 2
+        unreadCount = 2,
+        avatarBase64 = ""
     ),
     ChatListItem(
         id = "10",
         name = "Dimsum Queen",
         lastMessage = "Paket dimsum sudah dikemas.",
         time = "07:50",
-        unreadCount = 0
+        unreadCount = 0,
+        avatarBase64 = ""
     )
 )
 

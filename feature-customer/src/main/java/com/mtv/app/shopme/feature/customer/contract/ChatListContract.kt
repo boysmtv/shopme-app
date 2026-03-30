@@ -8,23 +8,21 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.ChatListResponse
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.ChatList
+import com.mtv.based.core.network.utils.LoadState
 
-data class ChatListStateListener(
-    val chatListState: Resource<ApiResponse<ChatListResponse>> = Resource.Loading,
+data class ChatListUiState(
+    val chatListState: LoadState<ChatList> = LoadState.Idle,
 )
 
-data class ChatListDataListener(
-    val emptyData: String? = null
-)
+sealed class ChatListEvent {
+    object Load : ChatListEvent()
+    object DismissDialog : ChatListEvent()
+    object ClickBack : ChatListEvent()
+    data class ClickItem(val id: String) : ChatListEvent()
+}
 
-data class ChatListEventListener(
-    val onClickItem: (String) -> Unit = {}
-)
-
-data class ChatListNavigationListener(
-    val onBack: () -> Unit = {},
-    val navigateToChat: (String) -> Unit = {}
-)
+sealed class ChatListEffect {
+    object NavigateBack : CafeEffect()
+    data class NavigateToChat(val id: String) : ChatListEffect()
+}

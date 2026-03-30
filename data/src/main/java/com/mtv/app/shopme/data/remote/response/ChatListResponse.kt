@@ -8,10 +8,9 @@
 
 package com.mtv.app.shopme.data.remote.response
 
-import com.mtv.app.shopme.data.local.ChatListItem
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChatListResponse(
-    var chatList: List<ChatListItem>,
+    var chatList: List<ChatListItemResponse>,
 )
