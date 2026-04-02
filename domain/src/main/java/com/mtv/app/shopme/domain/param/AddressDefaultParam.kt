@@ -1,0 +1,13 @@
+/*
+ * Project: Shopme App
+ * Author: Boys.mtv@gmail.com
+ * File: AddressDefaultParam.kt
+ *
+ * Last modified by Dedy Wijaya on 01/04/26 09.44
+ */
+
+package com.mtv.app.shopme.domain.param
+
+data class AddressDefaultParam(
+    val id: String,
+)
