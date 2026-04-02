@@ -10,6 +10,7 @@ package com.mtv.app.shopme.domain.repository
 
 import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.SessionToken
+import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
@@ -21,6 +22,8 @@ interface CartRepository {
 
     fun getCart(): Flow<Resource<List<Cart>>>
 
+    fun addCart(param: CartAddParam): Flow<Resource<Unit>>
+    
     fun updateQuantity(param: CartQuantityParam): Flow<Resource<Unit>>
 
     fun clearCart(): Flow<Resource<Unit>>

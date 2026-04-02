@@ -14,6 +14,7 @@ import com.mtv.based.core.network.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface CafeRepository {
+
     fun getCafe(id: String): Flow<Resource<Cafe>>
-    fun getFoodsByCafe(id: String): Flow<Resource<List<Food>>>
+
 }
