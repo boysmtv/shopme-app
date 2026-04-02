@@ -21,6 +21,7 @@ import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
+import com.mtv.app.shopme.data.remote.response.VillageResponse
 import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
@@ -36,6 +37,7 @@ import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.model.SessionToken
 import com.mtv.app.shopme.domain.model.Stats
+import com.mtv.app.shopme.domain.model.Village
 
 /* =========================================================
  * RESPONSE → DOMAIN
@@ -177,5 +179,12 @@ fun ChatListItemResponse.toDomain(): ChatListItem {
         time = time,
         unreadCount = unreadCount,
         avatarBase64 = avatarBase64
+    )
+}
+
+fun VillageResponse.toDomain(): Village {
+    return Village(
+        id = id,
+        name = name,
     )
 }

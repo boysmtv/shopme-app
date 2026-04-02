@@ -12,9 +12,9 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
-import com.mtv.app.shopme.domain.usecase.FoodAddToCartUseCase
-import com.mtv.app.shopme.domain.usecase.FoodDetailUseCase
-import com.mtv.app.shopme.domain.usecase.FoodSimilarUseCase
+import com.mtv.app.shopme.domain.usecase.CreateFoodToCartUseCase
+import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
+import com.mtv.app.shopme.domain.usecase.GetFoodSimilarUseCase
 import com.mtv.app.shopme.feature.customer.contract.DetailEffect
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.contract.DetailUiState
@@ -27,9 +27,9 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val foodDetailUseCase: FoodDetailUseCase,
-    private val foodSimilarUseCase: FoodSimilarUseCase,
-    private val foodAddToCartUseCase: FoodAddToCartUseCase,
+    private val foodDetailUseCase: GetFoodDetailUseCase,
+    private val foodSimilarUseCase: GetFoodSimilarUseCase,
+    private val foodAddToCartUseCase: CreateFoodToCartUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseEventViewModel<DetailEvent, DetailEffect>() {
 
