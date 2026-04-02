@@ -11,6 +11,7 @@ package com.mtv.app.shopme.data.repository
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.remote.datasource.CartRemoteDataSource
+import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
@@ -26,6 +27,12 @@ class CartRepositoryImpl @Inject constructor(
     override fun getCart() =
         resultFlow.create {
             remote.getCart().map { it.toDomain() }
+        }
+
+
+    override fun addCart(param: CartAddParam) =
+        resultFlow.createUnit {
+            remote.addCart(param)
         }
 
     override fun updateQuantity(param: CartQuantityParam) =

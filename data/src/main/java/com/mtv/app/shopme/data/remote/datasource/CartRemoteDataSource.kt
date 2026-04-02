@@ -8,6 +8,7 @@ import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.app.shopme.data.remote.response.VerifyPinResponse
 import com.mtv.app.shopme.data.utils.requireData
+import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
@@ -22,6 +23,13 @@ class CartRemoteDataSource @Inject constructor(
     suspend fun getCart() =
         request<ApiResponse<List<CartItemResponse>>>(
             endpoint = ApiEndPoint.Cart.Get
+        ).requireData()
+
+
+    suspend fun addCart(param: CartAddParam) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Cart.Add,
+            body = param.toRequest()
         ).requireData()
 
     suspend fun updateQuantity(param: CartQuantityParam) =

@@ -25,8 +25,4 @@ class CafeRemoteDataSource @Inject constructor(
         endpoint = ApiEndPoint.Cafe.Detail(id)
     ).requireData()
 
-    suspend fun getFoodsByCafe(id: String) = request<ApiResponse<List<FoodResponse>>>(
-        endpoint = ApiEndPoint.Foods.GetByCafeId(id)
-    ).requireData()
-
 }

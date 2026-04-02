@@ -13,13 +13,13 @@ import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
 import com.mtv.app.shopme.domain.param.VerifyPinParam
-import com.mtv.app.shopme.domain.usecase.CartItemUseCase
-import com.mtv.app.shopme.domain.usecase.CartQuantityUseCase
-import com.mtv.app.shopme.domain.usecase.ClearCartByCafeIdUseCase
-import com.mtv.app.shopme.domain.usecase.ClearCartUseCase
+import com.mtv.app.shopme.domain.usecase.GetCartUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateCartQuantityUseCase
+import com.mtv.app.shopme.domain.usecase.DeleteCartByCafeIdUseCase
+import com.mtv.app.shopme.domain.usecase.DeleteCartUseCase
 import com.mtv.app.shopme.domain.usecase.CreateOrderUseCase
 import com.mtv.app.shopme.domain.usecase.GetSessionTokenUseCase
-import com.mtv.app.shopme.domain.usecase.VerifyPinUseCase
+import com.mtv.app.shopme.domain.usecase.GetVerifyPinUseCase
 import com.mtv.app.shopme.feature.customer.contract.CartEffect
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.contract.CartUiState
@@ -37,13 +37,13 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val cartItemUseCase: CartItemUseCase,
+    private val cartItemUseCase: GetCartUseCase,
     private val getSessionTokenUseCase: GetSessionTokenUseCase,
-    private val verifyPinUseCase: VerifyPinUseCase,
+    private val verifyPinUseCase: GetVerifyPinUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
-    private val cartQuantityUseCase: CartQuantityUseCase,
-    private val clearCartByCafeIdUseCase: ClearCartByCafeIdUseCase,
-    private val clearCartUseCase: ClearCartUseCase,
+    private val cartQuantityUseCase: UpdateCartQuantityUseCase,
+    private val clearCartByCafeIdUseCase: DeleteCartByCafeIdUseCase,
+    private val clearCartUseCase: DeleteCartUseCase,
 ) : BaseEventViewModel<CartEvent, CartEffect>() {
 
     private val _state = MutableStateFlow(CartUiState())

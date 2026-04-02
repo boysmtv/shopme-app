@@ -24,8 +24,4 @@ class CafeRepositoryImpl @Inject constructor(
             remote.getCafe(id).toDomain()
         }
 
-    override fun getFoodsByCafe(id: String) =
-        resultFlow.create {
-            remote.getFoodsByCafe(id).map { it.toDomain() }
-        }
 }
