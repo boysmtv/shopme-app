@@ -15,10 +15,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface FoodDetailRepository {
 
-    fun getFoodDetail(id: String): Flow<Resource<Food>>
-
-    fun getSimilarFoods(cafeId: String): Flow<Resource<List<Food>>>
-
-    fun addToCart(param: CartAddParam): Flow<Resource<Unit>>
 
 }

@@ -8,216 +8,177 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.app.shopme.common.ConstantPreferences.CUSTOMER_RESPONSE
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.common.valueFlowOf
-import com.mtv.app.shopme.data.remote.request.AddressAddRequest
-import com.mtv.app.shopme.data.remote.request.AddressDefaultRequest
-import com.mtv.app.shopme.data.remote.request.AddressDeleteRequest
-import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
-import com.mtv.app.shopme.domain.usecase.AddressAddUseCase
-import com.mtv.app.shopme.domain.usecase.AddressDefaultUseCase
-import com.mtv.app.shopme.domain.usecase.AddressDeleteUseCase
-import com.mtv.app.shopme.domain.usecase.AddressUseCase
-import com.mtv.app.shopme.domain.usecase.CustomerUpdateUseCase
-import com.mtv.app.shopme.domain.usecase.CustomerUseCase
-import com.mtv.app.shopme.domain.usecase.VillageUseCase
-import com.mtv.app.shopme.feature.customer.contract.EditProfileDataListener
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.param.AddressAddParam
+import com.mtv.app.shopme.domain.param.AddressDefaultParam
+import com.mtv.app.shopme.domain.param.AddressDeleteParam
+import com.mtv.app.shopme.domain.param.CustomerUpdateParam
+import com.mtv.app.shopme.domain.usecase.CreateAddressUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateAddressDefaultUseCase
+import com.mtv.app.shopme.domain.usecase.DeleteAddressUseCase
+import com.mtv.app.shopme.domain.usecase.GetAddressUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateCustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetVillageUseCase
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDialog
-import com.mtv.app.shopme.feature.customer.contract.EditProfileStateListener
+import com.mtv.app.shopme.feature.customer.contract.EditProfileEffect
+import com.mtv.app.shopme.feature.customer.contract.EditProfileEvent
+import com.mtv.app.shopme.feature.customer.contract.EditProfileUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
-    private val securePrefs: SecurePrefs,
-    private val customerUseCase: CustomerUseCase,
-    private val customerUpdateUseCase: CustomerUpdateUseCase,
-    private val addressUseCase: AddressUseCase,
-    private val villageUseCase: VillageUseCase,
-    private val addressAddUseCase: AddressAddUseCase,
-    private val addressDeleteUseCase: AddressDeleteUseCase,
-    private val addressDefaultUseCase: AddressDefaultUseCase,
-) : BaseViewModel(), UiOwner<EditProfileStateListener, EditProfileDataListener> {
+    private val customerUseCase: GetCustomerUseCase,
+    private val customerUpdateUseCase: UpdateCustomerUseCase,
+    private val addressUseCase: GetAddressUseCase,
+    private val addressAddUseCase: CreateAddressUseCase,
+    private val addressDeleteUseCase: DeleteAddressUseCase,
+    private val addressDefaultUseCase: UpdateAddressDefaultUseCase,
+    private val villageUseCase: GetVillageUseCase,
+) : BaseEventViewModel<EditProfileEvent, EditProfileEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(EditProfileStateListener())
+    private val _state = MutableStateFlow(EditProfileUiState())
+    val uiState = _state.asStateFlow()
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(EditProfileDataListener())
-
-    init {
-        doFetchProfile()
-        doFetchAddress()
-        doFetchVillage()
-    }
-
-    fun doFetchProfile() {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.customerState },
-                set = { state -> copy(customerState = state) }
-            ),
-            block = {
-                customerUseCase(Unit)
-            },
-            onSuccess = { data ->
-                securePrefs.putObject(CUSTOMER_RESPONSE, data)
-
-                uiData.update {
-                    it.copy(customerData = data.data)
-                }
-            }
-        )
-    }
-
-    fun doFetchAddress() {
-        launchUseCase(
-            loading = false,
-            target = uiState.valueFlowOf(
-                get = { it.addressState },
-                set = { state -> copy(addressState = state) }
-            ),
-            block = {
-                addressUseCase(Unit)
-            },
-            onSuccess = { data ->
-                uiData.update {
-                    it.copy(addressData = data.data)
-                }
-            }
-        )
-    }
-
-    fun doFetchVillage() {
-        launchUseCase(
-            loading = false,
-            target = uiState.valueFlowOf(
-                get = { it.villageState },
-                set = { state -> copy(villageState = state) }
-            ),
-            block = {
-                villageUseCase(Unit)
-            },
-            onSuccess = { data ->
-                uiData.update {
-                    it.copy(villageData = data.data)
-                }
-            }
-        )
-    }
-
-    fun doUpdateProfile(
-        name: String,
-        phone: String,
-        photo: String,
-    ) {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.customerUpdateState },
-                set = { state -> copy(customerUpdateState = state) }
-            ),
-            block = {
-                customerUpdateUseCase(
-                    CustomerUpdateRequest(
-                        name = name,
-                        phone = phone,
-                        photo = photo
-                    )
-                )
-            },
-            onSuccess = {
-                uiState.update {
-                    it.copy(
-                        activeDialog = EditProfileDialog.SuccessUpdateProfile
-                    )
-                }
-            }
-        )
-    }
-
-    fun doAddAddress(
-        villageId: String,
-        block: String,
-        number: String,
-        rt: String,
-        rw: String,
-        isDefault: Boolean
-    ) {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.addressAddState },
-                set = { state -> copy(addressAddState = state) }
-            ),
-            block = {
-                addressAddUseCase(
-                    AddressAddRequest(
-                        villageId = villageId,
-                        block = block,
-                        number = number,
-                        rt = rt,
-                        rw = rw,
-                        isDefault = isDefault
-                    )
-                )
-            },
-            onSuccess = {
-                doFetchAddress()
-            }
-        )
-    }
-
-    fun doDeleteAddress(
-        id: String,
-    ) {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.addressDeleteState },
-                set = { state -> copy(addressDeleteState = state) }
-            ),
-            block = {
-                addressDeleteUseCase(
-                    AddressDeleteRequest(
-                        id = id,
-                    )
-                )
-            },
-            onSuccess = {
-                doFetchAddress()
-            }
-        )
-    }
-
-    fun doDefaultAddress(
-        id: String,
-    ) {
-        launchUseCase(
-            target = uiState.valueFlowOf(
-                get = { it.addressDefaultState },
-                set = { state -> copy(addressDefaultState = state) }
-            ),
-            block = {
-                addressDefaultUseCase(
-                    AddressDefaultRequest(
-                        id = id,
-                    )
-                )
-            },
-            onSuccess = {
-                doFetchAddress()
-            }
-        )
-    }
-
-    fun doDismissActiveDialog() {
-        uiState.update {
-            it.copy(
-                activeDialog = null,
-            )
+    override fun onEvent(event: EditProfileEvent) {
+        when (event) {
+            is EditProfileEvent.Load -> load()
+            is EditProfileEvent.DismissDialog -> dismissDialog()
+            is EditProfileEvent.DismissActiveDialog -> dismissActiveDialog()
+            is EditProfileEvent.UpdateProfile -> updateProfile(event)
+            is EditProfileEvent.AddAddress -> addAddress(event)
+            is EditProfileEvent.DeleteAddress -> deleteAddress(event)
+            is EditProfileEvent.SetDefaultAddress -> setDefault(event)
+            is EditProfileEvent.ClickBack -> emitEffect(EditProfileEffect.NavigateBack)
         }
+    }
+
+    private fun load() {
+        observeCustomer()
+        observeAddress()
+        observeVillage()
+    }
+
+    private fun observeCustomer() {
+        observeDataFlow(
+            flow = customerUseCase(),
+            onState = { state ->
+                _state.update { it.copy(customer = state) }
+            },
+            onError = { showError(it) }
+        )
+    }
+
+    private fun observeAddress() {
+        observeDataFlow(
+            flow = addressUseCase(),
+            onState = { state ->
+                _state.update { it.copy(addresses = state) }
+            },
+            onError = { showError(it) }
+        )
+    }
+
+    private fun observeVillage() {
+        observeDataFlow(
+            flow = villageUseCase(),
+            onState = { state ->
+                _state.update { it.copy(villages = state) }
+            },
+            onError = { showError(it) }
+        )
+    }
+
+    private fun updateProfile(event: EditProfileEvent.UpdateProfile) {
+        observeDataFlow(
+            flow = customerUpdateUseCase(
+                CustomerUpdateParam(
+                    name = event.name,
+                    phone = event.phone,
+                    photo = event.photo
+                )
+            ),
+            onState = { state ->
+                _state.update { it.copy(updateProfile = state) }
+            },
+            onError = { showError(it) },
+            onSuccess = {
+                _state.update {
+                    it.copy(activeDialog = EditProfileDialog.SuccessUpdateProfile)
+                }
+            }
+        )
+    }
+
+    private fun addAddress(event: EditProfileEvent.AddAddress) {
+        observeDataFlow(
+            flow = addressAddUseCase(
+                AddressAddParam(
+                    villageId = event.villageId,
+                    block = event.block,
+                    number = event.number,
+                    rt = event.rt,
+                    rw = event.rw,
+                    isDefault = event.isDefault
+                )
+            ),
+            onState = { state ->
+                _state.update { it.copy(addAddress = state) }
+            },
+            onError = { showError(it) },
+            onSuccess = { observeAddress() }
+        )
+    }
+
+    private fun deleteAddress(event: EditProfileEvent.DeleteAddress) {
+        observeDataFlow(
+            flow = addressDeleteUseCase(
+                AddressDeleteParam(event.id)
+            ),
+            onState = { state ->
+                _state.update { it.copy(deleteAddress = state) }
+            },
+            onError = { showError(it) },
+            onSuccess = { observeAddress() }
+        )
+    }
+
+    private fun setDefault(event: EditProfileEvent.SetDefaultAddress) {
+        observeDataFlow(
+            flow = addressDefaultUseCase(
+                AddressDefaultParam(event.id)
+            ),
+            onState = { state ->
+                _state.update { it.copy(setDefaultAddress = state) }
+            },
+            onError = { showError(it) },
+            onSuccess = { observeAddress() }
+        )
+    }
+
+    private fun dismissActiveDialog() {
+        _state.update { it.copy(activeDialog = null) }
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
     }
 }
