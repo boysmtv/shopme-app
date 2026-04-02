@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.repository.FoodDetailRepository
 import javax.inject.Inject
 
-class FoodAddToCartUseCase @Inject constructor(
+class CreateFoodToCartUseCase @Inject constructor(
     private val repository: FoodDetailRepository
 ) {
     operator fun invoke(request: CartAddParam) = repository.addToCart(request)

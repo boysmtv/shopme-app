@@ -8,11 +8,12 @@
 
 package com.mtv.app.shopme.domain.usecase
 
+import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
 
-class ClearCartUseCase @Inject constructor(
+class DeleteCartByCafeIdUseCase @Inject constructor(
     private val repository: CartRepository
 ) {
-    operator fun invoke() = repository.clearCart()
+    operator fun invoke(param: CartClearByCafeParam) = repository.clearCartByCafe(param)
 }

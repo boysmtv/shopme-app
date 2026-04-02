@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 
-class NotificationUseCase @Inject constructor(
+class CreateNotificationUseCase @Inject constructor(
     private val dataSource: FirebaseDataSource,
     @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseFirebaseUseCase<NotificationData, String>(dispatcher) {

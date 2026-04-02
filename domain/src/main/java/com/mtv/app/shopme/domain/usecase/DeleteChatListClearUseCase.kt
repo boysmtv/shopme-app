@@ -1,7 +1,7 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: ChatClearUseCase.kt
+ * File: DeleteChatListClearUseCase.kt
  *
  * Last modified by Dedy Wijaya on 03/03/26 13.42
  */
@@ -15,7 +15,7 @@ import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 
-class ChatListClearUseCase @Inject constructor(
+class DeleteChatListClearUseCase @Inject constructor(
     private val repository: NetworkRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<Unit, String>(dispatcher) {
