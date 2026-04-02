@@ -8,42 +8,54 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.AddressResponse
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.VillageResponse
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Address
+import com.mtv.app.shopme.domain.model.Customer
+import com.mtv.app.shopme.domain.model.Village
+import com.mtv.based.core.network.utils.LoadState
 
-data class EditProfileStateListener(
-    val customerState: Resource<ApiResponse<CustomerResponse>> = Resource.Loading,
-    val customerUpdateState: Resource<ApiResponse<Unit>> = Resource.Loading,
-    val addressState: Resource<ApiResponse<List<AddressResponse>>> = Resource.Loading,
-    val villageState: Resource<ApiResponse<List<VillageResponse>>> = Resource.Loading,
-    val addressAddState: Resource<ApiResponse<Unit>> = Resource.Loading,
-    val addressDeleteState: Resource<ApiResponse<Unit>> = Resource.Loading,
-    val addressDefaultState: Resource<ApiResponse<Unit>> = Resource.Loading,
+data class EditProfileUiState(
+    val customer: LoadState<Customer> = LoadState.Idle,
+    val addresses: LoadState<List<Address>> = LoadState.Idle,
+    val villages: LoadState<List<Village>> = LoadState.Idle,
+
+    val updateProfile: LoadState<Unit> = LoadState.Idle,
+    val addAddress: LoadState<Unit> = LoadState.Idle,
+    val deleteAddress: LoadState<Unit> = LoadState.Idle,
+    val setDefaultAddress: LoadState<Unit> = LoadState.Idle,
+
     val activeDialog: EditProfileDialog? = null
 )
 
-data class EditProfileDataListener(
-    val customerData: CustomerResponse? = null,
-    val addressData: List<AddressResponse>? = null,
-    val villageData: List<VillageResponse>? = null
-)
+sealed class EditProfileEvent {
+    object Load : EditProfileEvent()
+    object DismissDialog : EditProfileEvent()
+    object DismissActiveDialog : EditProfileEvent()
 
-class EditProfileEventListener(
-    val onUpdateProfile: (String, String, String) -> Unit = { _, _, _ -> },
-    val onAddAddress: (String, String, String, String, String, Boolean) -> Unit = { _, _, _, _, _, _ -> },
-    val onDeleteAddress: (String) -> Unit = {},
-    val onDefaultAddress: (String) -> Unit = {},
-    val onDismissActiveDialog: () -> Unit = {}
-)
+    data class UpdateProfile(
+        val name: String,
+        val phone: String,
+        val photo: String
+    ) : EditProfileEvent()
 
-class EditProfileNavigationListener(
-    val onBack: () -> Unit = {}
-)
+    data class AddAddress(
+        val villageId: String,
+        val block: String,
+        val number: String,
+        val rt: String,
+        val rw: String,
+        val isDefault: Boolean
+    ) : EditProfileEvent()
+
+    data class DeleteAddress(val id: String) : EditProfileEvent()
+    data class SetDefaultAddress(val id: String) : EditProfileEvent()
+
+    object ClickBack : EditProfileEvent()
+}
+
+sealed class EditProfileEffect {
+    object NavigateBack : EditProfileEffect()
+}
 
 sealed class EditProfileDialog {
     object SuccessUpdateProfile : EditProfileDialog()
-
 }

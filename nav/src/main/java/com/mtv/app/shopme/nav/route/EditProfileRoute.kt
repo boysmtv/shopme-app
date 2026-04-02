@@ -9,40 +9,49 @@
 package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.EditProfileDataListener
-import com.mtv.app.shopme.feature.customer.contract.EditProfileEventListener
-import com.mtv.app.shopme.feature.customer.contract.EditProfileNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.EditProfileStateListener
+import com.mtv.app.shopme.feature.customer.contract.EditProfileEffect
+import com.mtv.app.shopme.feature.customer.contract.EditProfileEvent
 import com.mtv.app.shopme.feature.customer.presentation.EditProfileViewModel
 import com.mtv.app.shopme.feature.customer.ui.EditProfileScreen
 
 @Composable
 fun EditProfileRoute(nav: NavController) {
-    BaseRoute<EditProfileViewModel, EditProfileStateListener, EditProfileDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
-            EditProfileScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = editProfileEvent(vm),
-                uiNavigation = editProfileNavigation(nav)
-            )
+
+    val vm: EditProfileViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = EditProfileEvent.Load,
+        onEffect = { handleEffect(nav, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(EditProfileEvent.DismissDialog) }
+            ) {
+                EditProfileScreen(
+                    state = uiState,
+                    event = vm::onEvent
+                )
+            }
         }
-    }
+    )
 }
 
-private fun editProfileEvent(vm: EditProfileViewModel) = EditProfileEventListener(
-    onUpdateProfile = vm::doUpdateProfile,
-    onAddAddress = vm::doAddAddress,
-    onDeleteAddress = vm::doDeleteAddress,
-    onDefaultAddress = vm::doDefaultAddress,
-    onDismissActiveDialog = vm::doDismissActiveDialog
-)
-
-private fun editProfileNavigation(nav: NavController) = EditProfileNavigationListener(
-    onBack = {
-        nav.popBackStack()
+private fun handleEffect(
+    nav: NavController,
+    effect: EditProfileEffect
+) {
+    when (effect) {
+        EditProfileEffect.NavigateBack -> nav.popBackStack()
     }
-)
+}
