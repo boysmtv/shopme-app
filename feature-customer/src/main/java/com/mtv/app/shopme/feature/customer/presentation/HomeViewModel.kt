@@ -9,8 +9,8 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.domain.usecase.CustomerUseCase
-import com.mtv.app.shopme.domain.usecase.HomeFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
@@ -27,8 +27,8 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val customerUseCase: CustomerUseCase,
-    private val homeFoodUseCase: HomeFoodUseCase,
+    private val customerUseCase: GetCustomerUseCase,
+    private val homeFoodUseCase: GetFoodUseCase,
 ) : BaseEventViewModel<HomeEvent, HomeEffect>() {
 
     private val _state = MutableStateFlow(HomeUiState())

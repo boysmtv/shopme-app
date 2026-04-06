@@ -5,8 +5,8 @@ import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
-import com.mtv.app.shopme.domain.usecase.CustomerUseCase
-import com.mtv.app.shopme.domain.usecase.HomeFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.presentation.HomeViewModel
@@ -32,8 +32,8 @@ class HomeViewModelTest {
     val dispatcherRule = MainDispatcherRule()
 
     private val securePref: SecurePrefs = mockk(relaxed = true)
-    private val customerUseCase: CustomerUseCase = mockk()
-    private val homeFoodUseCase: HomeFoodUseCase = mockk()
+    private val customerUseCase: GetCustomerUseCase = mockk()
+    private val homeFoodUseCase: GetFoodUseCase = mockk()
 
     private lateinit var viewModel: HomeViewModel
 

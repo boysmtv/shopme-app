@@ -1,8 +1,6 @@
 package com.mtv.app.shopme.data
 
 import com.mtv.app.shopme.data.fake.fakeCustomerResponse
-import com.mtv.app.shopme.data.remote.datasource.HomeRemoteDataSource
-import com.mtv.app.shopme.data.repository.HomeRepositoryImpl
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
