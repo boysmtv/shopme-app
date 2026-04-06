@@ -18,7 +18,7 @@ import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 
-class SplashUseCase @Inject constructor(
+class GetSplashUseCase @Inject constructor(
     private val repository: NetworkRepository,
     @IoDispatcher dispatcher: CoroutineDispatcher
 ) : BaseUseCase<SplashRequest, ApiResponse<SplashResponse>>(dispatcher) {
