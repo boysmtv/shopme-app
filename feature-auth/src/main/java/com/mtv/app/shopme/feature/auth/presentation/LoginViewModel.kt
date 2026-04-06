@@ -8,33 +8,23 @@
 
 package com.mtv.app.shopme.feature.auth.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.based.core.provider.based.BaseViewModel
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
-import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.valueFlowOf
 import com.mtv.app.shopme.data.remote.request.LoginRequest
-import com.mtv.app.shopme.data.remote.request.RegisterRequest
-import com.mtv.app.shopme.domain.usecase.LoginUseCase
+import com.mtv.app.shopme.domain.usecase.GetLoginUseCase
 import com.mtv.app.shopme.feature.auth.contract.LoginDataListener
 import com.mtv.app.shopme.feature.auth.contract.LoginStateListener
-import com.mtv.app.shopme.feature.auth.contract.RegisterDialog
-import com.mtv.based.core.network.utils.ErrorMessages
-import com.mtv.based.core.network.utils.ResourceFirebase
-import com.mtv.based.core.network.utils.UiErrorFirebase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val securePrefs: SecurePrefs,
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: GetLoginUseCase
 ) : BaseViewModel(), UiOwner<LoginStateListener, LoginDataListener> {
 
     override val uiState = MutableStateFlow(LoginStateListener())
