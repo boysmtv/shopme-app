@@ -9,11 +9,11 @@
 package com.mtv.app.shopme.domain.usecase
 
 import com.mtv.app.shopme.domain.param.SearchParam
-import com.mtv.app.shopme.domain.repository.SearchRepository
+import com.mtv.app.shopme.domain.repository.FoodRepository
 import javax.inject.Inject
 
-class SearchFoodUseCase @Inject constructor(
-    private val repository: SearchRepository
+class GetSearchFoodUseCase @Inject constructor(
+    private val repository: FoodRepository
 ) {
     operator fun invoke(request: SearchParam) = repository.searchFoods(request)
 }

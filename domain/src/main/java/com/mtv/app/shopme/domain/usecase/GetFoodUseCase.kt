@@ -8,10 +8,9 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.shopme.domain.repository.HomeRepository
 import javax.inject.Inject
 
-class HomeFoodUseCase @Inject constructor(
+class GetFoodUseCase @Inject constructor(
     private val repository: HomeRepository
 ) {
     operator fun invoke() = repository.getFoods()

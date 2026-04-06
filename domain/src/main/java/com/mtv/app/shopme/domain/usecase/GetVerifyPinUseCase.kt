@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.param.VerifyPinParam
 import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
 
-class VerifyPinUseCase @Inject constructor(
+class GetVerifyPinUseCase @Inject constructor(
     private val repository: CartRepository
 ) {
     operator fun invoke(param: VerifyPinParam) = repository.verifyPin(param)
