@@ -12,7 +12,7 @@ import com.mtv.based.core.provider.based.BaseViewModel
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.domain.usecase.NotificationUseCase
+import com.mtv.app.shopme.domain.usecase.CreateNotificationUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotifDataListener
 import com.mtv.app.shopme.feature.customer.contract.NotifStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NotifViewModel @Inject constructor(
-    private val notificationUseCase: NotificationUseCase,
+    private val notificationUseCase: CreateNotificationUseCase,
     private val sessionManager: SessionManager,
     private val securePrefs: SecurePrefs,
 ) : BaseViewModel(), UiOwner<NotifStateListener, NotifDataListener> {
