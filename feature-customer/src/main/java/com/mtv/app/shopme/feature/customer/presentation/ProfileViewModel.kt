@@ -9,7 +9,7 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.domain.usecase.CustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
 import com.mtv.app.shopme.feature.customer.contract.ProfileEffect
 import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val securePrefs: SecurePrefs,
-    private val customerUseCase: CustomerUseCase,
+    private val customerUseCase: GetCustomerUseCase,
 ) : BaseEventViewModel<ProfileEvent, ProfileEffect>() {
 
     private val _state = MutableStateFlow(ProfileUiState())
