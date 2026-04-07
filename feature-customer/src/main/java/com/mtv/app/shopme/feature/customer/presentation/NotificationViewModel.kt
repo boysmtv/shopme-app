@@ -8,39 +8,73 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.customer.contract.NotificationDataListener
-import com.mtv.app.shopme.feature.customer.contract.NotificationStateListener
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.customer.contract.NotificationEffect
+import com.mtv.app.shopme.feature.customer.contract.NotificationEvent
+import com.mtv.app.shopme.feature.customer.contract.NotificationUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class NotificationViewModel @Inject constructor() :
-    BaseViewModel(),
-    UiOwner<NotificationStateListener, NotificationDataListener> {
+    BaseEventViewModel<NotificationEvent, NotificationEffect>() {
 
-    override val uiState = MutableStateFlow(NotificationStateListener())
-    override val uiData = MutableStateFlow(NotificationDataListener())
+    private val _state = MutableStateFlow(NotificationUiState())
+    val uiState = _state.asStateFlow()
 
-    fun toggleOrder(value: Boolean) {
-        uiData.value = uiData.value.copy(orderNotification = value)
+    override fun onEvent(event: NotificationEvent) {
+        when (event) {
+            is NotificationEvent.Load -> {}
+            is NotificationEvent.DismissDialog -> dismissDialog()
+
+            is NotificationEvent.ToggleOrder -> toggleOrder(event.value)
+            is NotificationEvent.TogglePromo -> togglePromo(event.value)
+            is NotificationEvent.ToggleChat -> toggleChat(event.value)
+            is NotificationEvent.TogglePush -> togglePush(event.value)
+            is NotificationEvent.ToggleEmail -> toggleEmail(event.value)
+
+            is NotificationEvent.ClickBack -> emitEffect(NotificationEffect.NavigateBack)
+        }
     }
 
-    fun togglePromo(value: Boolean) {
-        uiData.value = uiData.value.copy(promoNotification = value)
+    private fun toggleOrder(value: Boolean) {
+        _state.update { it.copy(orderNotification = value) }
     }
 
-    fun toggleChat(value: Boolean) {
-        uiData.value = uiData.value.copy(chatNotification = value)
+    private fun togglePromo(value: Boolean) {
+        _state.update { it.copy(promoNotification = value) }
     }
 
-    fun togglePush(value: Boolean) {
-        uiData.value = uiData.value.copy(pushEnabled = value)
+    private fun toggleChat(value: Boolean) {
+        _state.update { it.copy(chatNotification = value) }
     }
 
-    fun toggleEmail(value: Boolean) {
-        uiData.value = uiData.value.copy(emailEnabled = value)
+    private fun togglePush(value: Boolean) {
+        _state.update { it.copy(pushEnabled = value) }
+    }
+
+    private fun toggleEmail(value: Boolean) {
+        _state.update { it.copy(emailEnabled = value) }
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
     }
 }
