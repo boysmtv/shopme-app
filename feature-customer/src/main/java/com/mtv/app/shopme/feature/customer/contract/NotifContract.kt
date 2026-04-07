@@ -5,36 +5,37 @@
  *
  * Last modified by Dedy Wijaya on 20/02/26 14.56
  */
-
 package com.mtv.app.shopme.feature.customer.contract
 
 import com.mtv.app.shopme.data.local.NotificationItem
 import com.mtv.based.core.network.utils.ResourceFirebase
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING
 
-data class NotifStateListener(
+data class NotifUiState(
+    val localNotification: List<NotificationItem> = emptyList(),
+
     val notificationState: ResourceFirebase<String> = ResourceFirebase.Loading,
     val activeDialog: NotifDialog? = null
 )
 
-data class NotifDataListener(
-    val localNotification: List<NotificationItem> = emptyList(),
-)
+sealed class NotifEvent {
+    object Load : NotifEvent()
+    object DismissDialog : NotifEvent()
 
-data class NotifEventListener(
-    val onNotificationClicked: (item: NotificationItem) -> Unit,
-    val onGetNotification: () -> Unit,
-    val onClearNotification: () -> Unit,
-    val onDismissActiveDialog: () -> Unit,
-)
+    object GetNotification : NotifEvent()
+    object ClearNotification : NotifEvent()
 
-data class NotifNavigationListener(
-    val onBack: () -> Unit,
-)
+    data class ClickNotification(val item: NotificationItem) : NotifEvent()
+
+    object ClickBack : NotifEvent()
+}
+
+sealed class NotifEffect {
+    object NavigateBack : NotifEffect()
+}
 
 sealed class NotifDialog {
     data class Error(
-        val message: String = ERROR_STRING
+        val message: String
     ) : NotifDialog()
 
     object Success : NotifDialog()

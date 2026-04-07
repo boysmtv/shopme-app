@@ -9,39 +9,49 @@
 package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.NotificationDataListener
-import com.mtv.app.shopme.feature.customer.contract.NotificationEventListener
-import com.mtv.app.shopme.feature.customer.contract.NotificationNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.NotificationStateListener
+import com.mtv.app.shopme.feature.customer.contract.NotificationEffect
+import com.mtv.app.shopme.feature.customer.contract.NotificationEvent
 import com.mtv.app.shopme.feature.customer.presentation.NotificationViewModel
 import com.mtv.app.shopme.feature.customer.ui.NotificationScreen
 
 @Composable
 fun NotificationRoute(nav: NavController) {
-    BaseRoute<NotificationViewModel, NotificationStateListener, NotificationDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
-            NotificationScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = notificationEvent(vm),
-                uiNavigation = notificationNavigation(nav)
-            )
+
+    val vm: NotificationViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = NotificationEvent.Load,
+        onEffect = { handleNotificationEffect(nav, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(NotificationEvent.DismissDialog) }
+            ) {
+                NotificationScreen(
+                    state = uiState,
+                    event = vm::onEvent
+                )
+            }
         }
-    }
+    )
 }
 
-private fun notificationEvent(vm: NotificationViewModel) = NotificationEventListener(
-    onToggleOrder = vm::toggleOrder,
-    onTogglePromo = vm::togglePromo,
-    onToggleChat = vm::toggleChat,
-    onTogglePush = vm::togglePush,
-    onToggleEmail = vm::toggleEmail
-)
-
-private fun notificationNavigation(nav: NavController) =
-    NotificationNavigationListener(
-        onBack = { nav.popBackStack() }
-    )
+private fun handleNotificationEffect(
+    nav: NavController,
+    effect: NotificationEffect
+) {
+    when (effect) {
+        NotificationEffect.NavigateBack -> nav.popBackStack()
+    }
+}

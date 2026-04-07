@@ -66,7 +66,7 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.WARNING_STRING
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun NotificationScreen(
+fun NotifScreen(
     uiState: NotifStateListener,
     uiData: NotifDataListener,
     uiEvent: NotifEventListener,

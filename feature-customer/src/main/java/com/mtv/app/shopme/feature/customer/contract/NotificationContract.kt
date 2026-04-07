@@ -8,11 +8,9 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-data class NotificationStateListener(
-    val loading: Boolean = false
-)
+data class NotificationUiState(
+    val loading: Boolean = false,
 
-data class NotificationDataListener(
     val orderNotification: Boolean = true,
     val promoNotification: Boolean = true,
     val chatNotification: Boolean = true,
@@ -20,14 +18,18 @@ data class NotificationDataListener(
     val emailEnabled: Boolean = false
 )
 
-data class NotificationEventListener(
-    val onToggleOrder: (Boolean) -> Unit = {},
-    val onTogglePromo: (Boolean) -> Unit = {},
-    val onToggleChat: (Boolean) -> Unit = {},
-    val onTogglePush: (Boolean) -> Unit = {},
-    val onToggleEmail: (Boolean) -> Unit = {}
-)
+sealed class NotificationEvent {
+    object Load : NotificationEvent()
+    object DismissDialog : NotificationEvent()
+    data class ToggleOrder(val value: Boolean) : NotificationEvent()
+    data class TogglePromo(val value: Boolean) : NotificationEvent()
+    data class ToggleChat(val value: Boolean) : NotificationEvent()
+    data class TogglePush(val value: Boolean) : NotificationEvent()
+    data class ToggleEmail(val value: Boolean) : NotificationEvent()
 
-data class NotificationNavigationListener(
-    val onBack: () -> Unit = {}
-)
+    object ClickBack : NotificationEvent()
+}
+
+sealed class NotificationEffect {
+    object NavigateBack : NotificationEffect()
+}

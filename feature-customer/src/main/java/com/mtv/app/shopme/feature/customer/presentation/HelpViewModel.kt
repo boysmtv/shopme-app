@@ -8,24 +8,28 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.customer.contract.HelpDataListener
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.customer.contract.HelpEffect
+import com.mtv.app.shopme.feature.customer.contract.HelpEvent
 import com.mtv.app.shopme.feature.customer.contract.HelpFaq
-import com.mtv.app.shopme.feature.customer.contract.HelpStateListener
+import com.mtv.app.shopme.feature.customer.contract.HelpUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class HelpViewModel @Inject constructor() :
-    BaseViewModel(),
-    UiOwner<HelpStateListener, HelpDataListener> {
+    BaseEventViewModel<HelpEvent, HelpEffect>() {
 
-    override val uiState = MutableStateFlow(HelpStateListener())
-
-    override val uiData = MutableStateFlow(
-        HelpDataListener(
+    private val _state = MutableStateFlow(
+        HelpUiState(
             faq = listOf(
                 HelpFaq(
                     "Bagaimana cara melacak pesanan?",
@@ -42,17 +46,46 @@ class HelpViewModel @Inject constructor() :
             )
         )
     )
+    val uiState = _state.asStateFlow()
 
-    fun onToggleFaq(target: HelpFaq) {
-        val current = uiData.value
+    override fun onEvent(event: HelpEvent) {
+        when (event) {
+            is HelpEvent.Load -> {}
+            is HelpEvent.DismissDialog -> dismissDialog()
+            is HelpEvent.Refresh -> {}
+            is HelpEvent.ToggleFaq -> toggleFaq(event.faq)
+            is HelpEvent.ClickBack -> emitEffect(HelpEffect.NavigateBack)
+            is HelpEvent.ClickAbout -> emitEffect(HelpEffect.NavigateAbout)
+            is HelpEvent.ClickPrivacy -> emitEffect(HelpEffect.NavigatePrivacy)
+            is HelpEvent.ClickShipping -> emitEffect(HelpEffect.NavigateShipping)
+            is HelpEvent.ClickPayment -> emitEffect(HelpEffect.NavigatePayment)
+            is HelpEvent.ClickContact -> emitEffect(HelpEffect.NavigateContact)
+        }
+    }
 
-        uiData.value = current.copy(
-            faq = current.faq.map {
-                when {
-                    it == target -> it.copy(expanded = !it.expanded)
-                    else -> it.copy(expanded = false)
+    private fun toggleFaq(target: HelpFaq) {
+        _state.update { current ->
+            current.copy(
+                faq = current.faq.map {
+                    when {
+                        it == target -> it.copy(expanded = !it.expanded)
+                        else -> it.copy(expanded = false)
+                    }
                 }
-            }
+            )
+        }
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
+            )
         )
     }
 }

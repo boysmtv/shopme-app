@@ -8,27 +8,34 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-data class HelpStateListener(
+data class HelpUiState(
+    val faq: List<HelpFaq> = emptyList(),
     val isLoading: Boolean = false
 )
 
-data class HelpDataListener(
-    val faq: List<HelpFaq> = emptyList()
-)
+sealed class HelpEvent {
+    object Load : HelpEvent()
+    object DismissDialog : HelpEvent()
 
-data class HelpEventListener(
-    val onRefresh: () -> Unit = {},
-    val onToggleFaq: (faq: HelpFaq) -> Unit = {},
-)
+    object Refresh : HelpEvent()
+    data class ToggleFaq(val faq: HelpFaq) : HelpEvent()
 
-data class HelpNavigationListener(
-    val onBack: () -> Unit = {},
-    val onAbout: () -> Unit = {},
-    val onPrivacy: () -> Unit = {},
-    val onShipping: () -> Unit = {},
-    val onPayment: () -> Unit = {},
-    val onContact: () -> Unit = {}
-)
+    object ClickBack : HelpEvent()
+    object ClickAbout : HelpEvent()
+    object ClickPrivacy : HelpEvent()
+    object ClickShipping : HelpEvent()
+    object ClickPayment : HelpEvent()
+    object ClickContact : HelpEvent()
+}
+
+sealed class HelpEffect {
+    object NavigateBack : HelpEffect()
+    object NavigateAbout : HelpEffect()
+    object NavigatePrivacy : HelpEffect()
+    object NavigateShipping : HelpEffect()
+    object NavigatePayment : HelpEffect()
+    object NavigateContact : HelpEffect()
+}
 
 data class HelpFaq(
     val question: String,
