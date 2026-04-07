@@ -7,35 +7,39 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-data class CafeCreateStateListener(
-    var isLoading: Boolean = false
+data class CafeCreateUiState(
+    val isLoading: Boolean = false,
+
+    val name: String = "",
+    val phone: String = "",
+    val description: String = "",
+    val minimalOrder: String = "",
+    val openTime: String = "",
+    val closeTime: String = "",
+    val image: String? = null,
+    val isActive: Boolean = true
 )
 
-data class CafeCreateDataListener(
+sealed class CafeCreateEvent {
+    object Load : CafeCreateEvent()
+    object DismissDialog : CafeCreateEvent()
 
-    var name: String = "",
-    var phone: String = "",
-    var description: String = "",
-    var minimalOrder: String = "",
-    var openTime: String = "",
-    var closeTime: String = "",
-    var image: String? = null,
-    var isActive: Boolean = true
-)
+    data class ChangeName(val value: String) : CafeCreateEvent()
+    data class ChangePhone(val value: String) : CafeCreateEvent()
+    data class ChangeDescription(val value: String) : CafeCreateEvent()
+    data class ChangeMinimalOrder(val value: String) : CafeCreateEvent()
+    data class ChangeOpenTime(val value: String) : CafeCreateEvent()
+    data class ChangeCloseTime(val value: String) : CafeCreateEvent()
 
-data class CafeCreateEventListener(
+    object UploadImage : CafeCreateEvent()
+    object Submit : CafeCreateEvent()
 
-    val onNameChange: (String) -> Unit,
-    val onPhoneChange: (String) -> Unit,
-    val onDescriptionChange: (String) -> Unit,
-    val onMinimalOrderChange: (String) -> Unit,
-    val onOpenTimeChange: (String) -> Unit,
-    val onCloseTimeChange: (String) -> Unit,
+    object ClickBack : CafeCreateEvent()
+}
 
-    val onUploadImage: () -> Unit,
-    val onCreateCafe: () -> Unit
-)
+sealed class CafeCreateEffect {
+    object NavigateBack : CafeCreateEffect()
+    object OpenImagePicker : CafeCreateEffect()
 
-data class CafeCreateNavigationListener(
-    val navigateBack: () -> Unit = {}
-)
+    object CreateSuccess : CafeCreateEffect()
+}

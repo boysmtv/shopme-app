@@ -10,29 +10,33 @@ package com.mtv.app.shopme.feature.customer.contract
 
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
-data class ChatSupportStateListener(
-    val isLoading: Boolean = false,
-    val isSending: Boolean = false
+import com.mtv.based.core.network.utils.LoadState
+
+data class ChatSupportUiState(
+    val messages: List<SupportMessage> = emptyList(),
+    val currentMessage: String = "",
+    val isAgentTyping: Boolean = false,
+
+    val sendMessage: LoadState<Unit> = LoadState.Idle
 )
 
-data class ChatSupportDataListener(
-    val messages: List<SupportMessage> = emptyList(),
-    val currentMessage: String = EMPTY_STRING,
-    val isAgentTyping: Boolean = false
-)
+sealed class ChatSupportEvent {
+    object Load : ChatSupportEvent()
+    object DismissDialog : ChatSupportEvent()
+
+    data class OnMessageChange(val value: String) : ChatSupportEvent()
+    object SendMessage : ChatSupportEvent()
+
+    object ClickBack : ChatSupportEvent()
+}
+
+sealed class ChatSupportEffect {
+    object NavigateBack : ChatSupportEffect()
+}
 
 data class SupportMessage(
     val id: String,
     val message: String,
     val isFromUser: Boolean,
     val timestamp: String
-)
-
-data class ChatSupportEventListener(
-    val onMessageChange: (String) -> Unit = {},
-    val onSendMessage: () -> Unit = {}
-)
-
-data class ChatSupportNavigationListener(
-    val onBack: () -> Unit = {}
 )
