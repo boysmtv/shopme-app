@@ -10,25 +10,28 @@ package com.mtv.app.shopme.feature.customer.contract
 
 import com.mtv.app.shopme.data.dto.OrderModel
 
-data class OrderStateListener(
+data class OrderUiState(
     val isLoading: Boolean = false,
-    val activeDialog: com.mtv.app.shopme.feature.customer.contract.OrderDialog? = null
+    val orders: List<OrderModel> = emptyList(),
+    val activeDialog: OrderDialog? = null
 )
 
-data class OrderDataListener(
-    val orders: List<OrderModel> = emptyList()
-)
+sealed class OrderEvent {
+    object Load : OrderEvent()
+    object DismissDialog : OrderEvent()
 
-data class OrderEventListener(
-    val onReload: () -> Unit = {},
-    val onOrderClick: (String) -> Unit = {}
-)
+    object Reload : OrderEvent()
+    data class ClickOrder(val orderId: String) : OrderEvent()
 
-data class OrderNavigationListener(
-    val onDetail: (String) -> Unit = {},
-    val onChatClick: () -> Unit = {},
-    val onBack: () -> Unit = {},
-)
+    object ClickBack : OrderEvent()
+    object ClickChat : OrderEvent()
+}
+
+sealed class OrderEffect {
+    object NavigateBack : OrderEffect()
+    object NavigateToChat : OrderEffect()
+    data class NavigateToDetail(val orderId: String) : OrderEffect()
+}
 
 sealed class OrderDialog {
     object None : OrderDialog()

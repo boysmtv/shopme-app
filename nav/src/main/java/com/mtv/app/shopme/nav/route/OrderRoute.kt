@@ -9,53 +9,68 @@
 package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.OrderDataListener
-import com.mtv.app.shopme.feature.customer.contract.OrderEventListener
-import com.mtv.app.shopme.feature.customer.contract.OrderNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.OrderStateListener
+import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavItem
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
+import com.mtv.app.shopme.feature.customer.contract.OrderEffect
+import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
 import com.mtv.app.shopme.feature.customer.ui.OrderScreen
-import com.mtv.app.shopme.nav.customer.CustomerDestinations
-import com.mtv.app.shopme.nav.customer.CustomerBottomNavItem
 
 @Composable
 fun OrderRoute(nav: NavController) {
-    BaseRoute<OrderViewModel, OrderStateListener, OrderDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(
-            baseUiState = base,
-            dismissDialog = vm::dismissError
-        ) {
-            OrderScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = orderEvent(vm),
-                uiNavigation = orderNavigation(nav)
-            )
+
+    val vm: OrderViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = OrderEvent.Load,
+        onEffect = { handleOrderEffect(nav, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(OrderEvent.DismissDialog) }
+            ) {
+                OrderScreen(
+                    state = uiState,
+                    event = vm::onEvent
+                )
+            }
+        }
+    )
+}
+
+private fun handleOrderEffect(
+    nav: NavController,
+    effect: OrderEffect
+) {
+    when (effect) {
+        OrderEffect.NavigateBack -> nav.popBackStack()
+
+        OrderEffect.NavigateToChat -> {
+            nav.navigate(CustomerBottomNavItem.Chat.route) {
+                launchSingleTop = true
+                restoreState = true
+
+                popUpTo(nav.graph.startDestinationId) {
+                    saveState = true
+                }
+            }
+        }
+
+        is OrderEffect.NavigateToDetail -> {
+            nav.navigate(CustomerDestinations.ORDER_DETAIL_GRAPH)
+            // next improvement:
+            // nav.navigate("order_detail/${effect.orderId}")
         }
     }
 }
-
-private fun orderEvent(vm: OrderViewModel) = OrderEventListener(
-    onReload = vm::loadOrders,
-    onOrderClick = vm::selectOrder
-)
-
-private fun orderNavigation(nav: NavController) = OrderNavigationListener(
-    onDetail = { _ ->
-        nav.navigate(CustomerDestinations.ORDER_DETAIL_GRAPH)
-    },
-    onChatClick = {
-        nav.navigate(CustomerBottomNavItem.Chat.route) {
-            launchSingleTop = true
-            restoreState = true
-
-            popUpTo(nav.graph.startDestinationId) {
-                saveState = true
-            }
-        }
-    },
-    onBack = { nav.popBackStack() },
-)
