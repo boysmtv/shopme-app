@@ -8,31 +8,32 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
-
 enum class OrderStatusFilter {
     SEMUA, SELESAI, DIPROSES, BATAL
 }
 
-data class OrderHistoryStateListener(
-    val loading: Boolean = false
-)
+data class OrderHistoryUiState(
+    val loading: Boolean = false,
 
-data class OrderHistoryDataListener(
     val selectedFilter: OrderStatusFilter = OrderStatusFilter.SEMUA,
     val orders: List<OrderHistoryItem> = emptyList()
 )
 
-data class OrderHistoryEventListener(
-    val onRefresh: () -> Unit = {},
-    val onFilterChange: (OrderStatusFilter) -> Unit = {},
-    val onClickOrder: (OrderHistoryItem) -> Unit = {}
-)
+sealed class OrderHistoryEvent {
+    object Load : OrderHistoryEvent()
+    object DismissDialog : OrderHistoryEvent()
 
-data class OrderHistoryNavigationListener(
-    val onBack: () -> Unit = {},
-    val onDetail: (OrderHistoryItem) -> Unit = {}
-)
+    object Refresh : OrderHistoryEvent()
+    data class ChangeFilter(val filter: OrderStatusFilter) : OrderHistoryEvent()
+    data class ClickOrder(val item: OrderHistoryItem) : OrderHistoryEvent()
+
+    object ClickBack : OrderHistoryEvent()
+}
+
+sealed class OrderHistoryEffect {
+    object NavigateBack : OrderHistoryEffect()
+    data class NavigateToDetail(val item: OrderHistoryItem) : OrderHistoryEffect()
+}
 
 data class OrderHistoryItem(
     val id: String,
