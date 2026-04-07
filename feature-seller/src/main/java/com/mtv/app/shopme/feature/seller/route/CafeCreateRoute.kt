@@ -8,47 +8,57 @@
 package com.mtv.app.shopme.feature.seller.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateDataListener
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateEventListener
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateStateListener
+import com.mtv.app.shopme.feature.seller.contract.CafeCreateEffect
+import com.mtv.app.shopme.feature.seller.contract.CafeCreateEvent
 import com.mtv.app.shopme.feature.seller.presentation.CafeCreateViewModel
 import com.mtv.app.shopme.feature.seller.ui.CafeCreateScreen
 
 @Composable
 fun CafeCreateRoute(nav: NavController) {
-    BaseRoute<CafeCreateViewModel, CafeCreateStateListener, CafeCreateDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(
-            baseUiState = base,
-            dismissDialog = vm::dismissError
-        ) {
 
-            CafeCreateScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = cafeCreateEvent(vm),
-                uiNavigation = cafeCreateNavigation(nav)
-            )
+    val vm: CafeCreateViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = CafeCreateEvent.Load,
+        onEffect = { handleCafeCreateEffect(nav, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(CafeCreateEvent.DismissDialog) }
+            ) {
+                CafeCreateScreen(
+                    state = uiState,
+                    event = vm::onEvent
+                )
+            }
+        }
+    )
+}
+
+private fun handleCafeCreateEffect(
+    nav: NavController,
+    effect: CafeCreateEffect
+) {
+    when (effect) {
+        CafeCreateEffect.NavigateBack -> nav.popBackStack()
+
+        CafeCreateEffect.OpenImagePicker -> {
+            // trigger launcher (ActivityResult)
+        }
+
+        CafeCreateEffect.CreateSuccess -> {
+            nav.popBackStack()
         }
     }
 }
-
-private fun cafeCreateEvent(vm: CafeCreateViewModel) =
-    CafeCreateEventListener(
-        onNameChange = vm::onNameChange,
-        onPhoneChange = vm::onPhoneChange,
-        onDescriptionChange = vm::onDescriptionChange,
-        onMinimalOrderChange = vm::onMinimalOrderChange,
-        onOpenTimeChange = vm::onOpenTimeChange,
-        onCloseTimeChange = vm::onCloseTimeChange,
-        onUploadImage = vm::onUploadImage,
-        onCreateCafe = vm::createCafe
-    )
-
-private fun cafeCreateNavigation(nav: NavController) =
-    CafeCreateNavigationListener(
-        navigateBack = { nav.popBackStack() }
-    )
