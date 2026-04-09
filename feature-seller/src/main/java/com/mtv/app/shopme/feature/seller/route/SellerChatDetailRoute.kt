@@ -9,39 +9,49 @@
 package com.mtv.app.shopme.feature.seller.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEffect
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerChatDetailViewModel
 import com.mtv.app.shopme.feature.seller.ui.SellerChatScreen
 
 @Composable
 fun SellerChatDetailRoute(nav: NavController) {
-    BaseRoute<SellerChatDetailViewModel, SellerChatDetailStateListener, SellerChatDetailDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(
-            baseUiState = base,
-            dismissDialog = vm::dismissError
-        ) {
-            SellerChatScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = sellerChatEvent(vm),
-                uiNavigation = sellerChatNavigation(nav)
-            )
+
+    val vm: SellerChatDetailViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = SellerChatDetailEvent.Load,
+        onEffect = { handleSellerChatEffect(nav, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(SellerChatDetailEvent.DismissDialog) }
+            ) {
+                SellerChatScreen(
+                    state = uiState,
+                    event = vm::onEvent
+                )
+            }
         }
-    }
+    )
 }
 
-private fun sellerChatEvent(vm: SellerChatDetailViewModel) = SellerChatDetailEventListener(
-    onSendMessage = { message ->
-        vm.sendMessage(message)
+private fun handleSellerChatEffect(
+    nav: NavController,
+    effect: SellerChatDetailEffect
+) {
+    when (effect) {
+        SellerChatDetailEffect.NavigateBack -> nav.popBackStack()
     }
-)
-
-private fun sellerChatNavigation(nav: NavController) = SellerChatDetailNavigationListener(
-    onBack = { nav.popBackStack() }
-)
+}

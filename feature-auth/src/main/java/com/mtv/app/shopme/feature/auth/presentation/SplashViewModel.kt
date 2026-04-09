@@ -15,13 +15,11 @@ import com.mtv.app.shopme.data.remote.request.SplashRequest
 import com.mtv.app.shopme.data.remote.response.AppConfig
 import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.app.shopme.data.remote.response.User
-import com.mtv.app.shopme.domain.usecase.SplashUseCase
+import com.mtv.app.shopme.domain.usecase.GetSplashUseCase
 import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
-import com.mtv.based.core.network.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
@@ -29,7 +27,7 @@ class SplashViewModel @Inject constructor(
     private val installationIdProvider: InstallationIdProvider,
     private val deviceInfoProvider: DeviceInfoProvider,
     private val appInfoProvider: AppInfoProvider,
-    private val splashUseCase: SplashUseCase
+    private val splashUseCase: GetSplashUseCase
 ) : BaseViewModel(), UiOwner<SplashStateListener, Unit> {
 
     /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */

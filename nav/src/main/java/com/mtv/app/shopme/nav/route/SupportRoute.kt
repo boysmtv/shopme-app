@@ -9,65 +9,65 @@
 package com.mtv.app.shopme.nav.route
 
 import android.content.Context
-import android.content.pm.PackageManager
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.SupportDataListener
-import com.mtv.app.shopme.feature.customer.contract.SupportEventListener
-import com.mtv.app.shopme.feature.customer.contract.SupportNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.SupportStateListener
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
+import com.mtv.app.shopme.feature.customer.contract.SupportEffect
+import com.mtv.app.shopme.feature.customer.contract.SupportEvent
 import com.mtv.app.shopme.feature.customer.presentation.SupportViewModel
 import com.mtv.app.shopme.feature.customer.ui.SupportScreen
-import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun SupportRoute(nav: NavController) {
-    BaseRoute<SupportViewModel, SupportStateListener, SupportDataListener> { vm, base, uiState, uiData ->
-        val context = LocalContext.current
-        val pm = context.packageManager
 
-        LaunchedEffect(Unit) {
-            vm.intentFlow.collect { intent ->
-                context.startActivity(intent)
+    val vm: SupportViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    val pm = context.packageManager
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = SupportEvent.Load,
+        onEffect = { handleSupportEffect(nav, context, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(SupportEvent.DismissDialog) }
+            ) {
+                SupportScreen(
+                    state = uiState,
+                    event = { event ->
+                        when (event) {
+                            SupportEvent.OpenWhatsapp -> vm.onEvent(pm)
+                            SupportEvent.OpenEmail -> vm.onEvent(context, pm)
+                            SupportEvent.OpenDial -> vm.onEvent()
+                            else -> vm.onEvent(event)
+                        }
+                    }
+                )
             }
         }
-
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
-            SupportScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = contactEvent(vm, context, pm),
-                uiNavigation = contactNavigation(nav)
-            )
-        }
-    }
+    )
 }
 
-private fun contactEvent(
-    vm: SupportViewModel,
+private fun handleSupportEffect(
+    nav: NavController,
     context: Context,
-    pm: PackageManager
-) = SupportEventListener(
-
-    onOpenWhatsapp = {
-        vm.openWhatsapp(vm.uiData.value.whatsapp, pm)
-    },
-
-    onOpenEmail = {
-        vm.openEmailWithAttachment(context, pm)
-    },
-
-    onOpenDial = {
-        vm.openDial(vm.uiData.value.phone, pm)
+    effect: SupportEffect
+) {
+    when (effect) {
+        SupportEffect.NavigateBack -> nav.popBackStack()
+        SupportEffect.NavigateLiveChat -> nav.navigate(CustomerDestinations.CHAT_SUPPORT_GRAPH)
+        is SupportEffect.OpenIntent -> context.startActivity(effect.intent)
     }
-)
-
-private fun contactNavigation(nav: NavController) =
-    SupportNavigationListener(
-        onBack = { nav.popBackStack() },
-        onLiveChat = { nav.navigate(CustomerDestinations.CHAT_SUPPORT_GRAPH) }
-    )
+}

@@ -9,42 +9,64 @@
 package com.mtv.app.shopme.nav.route
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.SettingsDataListener
-import com.mtv.app.shopme.feature.customer.contract.SettingsEventListener
-import com.mtv.app.shopme.feature.customer.contract.SettingsNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.SettingsStateListener
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
+import com.mtv.app.shopme.feature.customer.contract.SettingsEffect
+import com.mtv.app.shopme.feature.customer.contract.SettingsEvent
 import com.mtv.app.shopme.feature.customer.presentation.SettingsViewModel
 import com.mtv.app.shopme.feature.customer.ui.SettingsScreen
-import com.mtv.app.shopme.nav.customer.CustomerDestinations
 
 @Composable
 fun SettingsRoute(nav: NavController) {
-    BaseRoute<SettingsViewModel, SettingsStateListener, SettingsDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
-            SettingsScreen(
-                uiState = uiState,
-                uiData = uiData,
-                uiEvent = settingsEvent(vm),
-                uiNavigation = settingsNavigation(nav)
-            )
+
+    val vm: SettingsViewModel = hiltViewModel()
+
+    val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    BaseRoute(
+        viewModel = vm,
+        onLoad = SettingsEvent.Load,
+        onEffect = { handleSettingsEffect(nav, it) },
+        onEvent = vm::onEvent,
+        content = {
+            BaseScreen(
+                baseUiState = baseUiState,
+                dismissDialog = { vm.onEvent(SettingsEvent.DismissDialog) }
+            ) {
+                SettingsScreen(
+                    state = uiState,
+                    event = vm::onEvent
+                )
+            }
+        }
+    )
+}
+
+private fun handleSettingsEffect(
+    nav: NavController,
+    effect: SettingsEffect
+) {
+    when (effect) {
+        SettingsEffect.NavigateBack -> nav.popBackStack()
+
+        SettingsEffect.NavigateSecurity ->
+            nav.navigate(CustomerDestinations.SECURITY_GRAPH)
+
+        SettingsEffect.NavigateHelp ->
+            nav.navigate(CustomerDestinations.SUPPORT_GRAPH)
+
+        SettingsEffect.NavigateNotification ->
+            nav.navigate(CustomerDestinations.NOTIFICATION_GRAPH)
+
+        SettingsEffect.LogoutSuccess -> {
+            // contoh:
+            // nav.navigate("login") { popUpTo(0) }
         }
     }
 }
-
-private fun settingsEvent(vm: SettingsViewModel) =
-    SettingsEventListener(
-        onToggleNotification = vm::toggleNotification,
-        onToggleDarkMode = vm::toggleDarkMode,
-        onLogout = vm::logout
-    )
-
-private fun settingsNavigation(nav: NavController) =
-    SettingsNavigationListener(
-        onBack = { nav.popBackStack() },
-        onSecurity = { nav.navigate(CustomerDestinations.SECURITY_GRAPH) },
-        onHelp = { nav.navigate(CustomerDestinations.SUPPORT_GRAPH) },
-        onNotification = { nav.navigate(CustomerDestinations.NOTIFICATION_GRAPH)}
-    )
