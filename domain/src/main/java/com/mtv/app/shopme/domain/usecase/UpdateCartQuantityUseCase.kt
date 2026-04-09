@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.repository.CartRepository
 import javax.inject.Inject
 
-class CartQuantityUseCase @Inject constructor(
+class UpdateCartQuantityUseCase @Inject constructor(
     private val repository: CartRepository
 ) {
     operator fun invoke(param: CartQuantityParam) = repository.updateQuantity(param)

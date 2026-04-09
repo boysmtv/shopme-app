@@ -8,23 +8,32 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-data class SupportStateListener(
-    val isLoading: Boolean = false
-)
+import android.content.Intent
+import android.content.pm.PackageManager
 
-data class SupportDataListener(
+data class SupportUiState(
+    val isLoading: Boolean = false,
+
     val phone: String = "081234567890",
     val email: String = "support@shopme.com",
     val whatsapp: String = "6281234567890"
 )
 
-data class SupportEventListener(
-    val onOpenWhatsapp: (String) -> Unit = {},
-    val onOpenEmail: (String) -> Unit = {},
-    val onOpenDial: (String) -> Unit = {}
-)
+sealed class SupportEvent {
+    object Load : SupportEvent()
+    object DismissDialog : SupportEvent()
 
-data class SupportNavigationListener(
-    val onBack: () -> Unit = {},
-    val onLiveChat: () -> Unit = {}
-)
+    data class OpenWhatsapp(val pm: PackageManager) : SupportEvent()
+    object OpenEmail : SupportEvent()
+    object OpenDial : SupportEvent()
+
+    object ClickBack : SupportEvent()
+    object ClickLiveChat : SupportEvent()
+}
+
+sealed class SupportEffect {
+    object NavigateBack : SupportEffect()
+    object NavigateLiveChat : SupportEffect()
+
+    data class OpenIntent(val intent: Intent) : SupportEffect()
+}

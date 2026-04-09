@@ -5,6 +5,7 @@
  *
  * Last modified by Dedy Wijaya on 22/02/26 10.38
  */
+
 package com.mtv.app.shopme.feature.customer.presentation
 
 import android.content.Context
@@ -13,68 +14,79 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
-import androidx.lifecycle.viewModelScope
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.customer.contract.SupportDataListener
-import com.mtv.app.shopme.feature.customer.contract.SupportStateListener
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.customer.contract.SupportEffect
+import com.mtv.app.shopme.feature.customer.contract.SupportEvent
+import com.mtv.app.shopme.feature.customer.contract.SupportUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import java.util.Calendar
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel
 class SupportViewModel @Inject constructor() :
-    BaseViewModel(),
-    UiOwner<SupportStateListener, SupportDataListener> {
+    BaseEventViewModel<SupportEvent, SupportEffect>() {
 
-    override val uiState = MutableStateFlow(SupportStateListener())
+    private val _state = MutableStateFlow(SupportUiState())
+    val uiState = _state.asStateFlow()
 
-    override val uiData = MutableStateFlow(SupportDataListener())
+    override fun onEvent(event: SupportEvent) {
+        when (event) {
+            is SupportEvent.Load -> {}
+            is SupportEvent.DismissDialog -> dismissDialog()
 
-    private val _intentFlow = MutableSharedFlow<Intent>()
-    val intentFlow = _intentFlow.asSharedFlow()
+            is SupportEvent.OpenWhatsapp -> openWhatsapp(event.pm)
+            is SupportEvent.OpenEmail -> {}
+            is SupportEvent.OpenDial -> openDial()
 
-    private fun sendIntent(intent: Intent) {
-        viewModelScope.launch { _intentFlow.emit(intent) }
-    }
-
-    fun openSafeIntent(
-        intent: Intent,
-        packageManager: PackageManager,
-        fallbackUrl: String? = null
-    ) {
-        val canOpen = intent.resolveActivity(packageManager) != null
-
-        if (canOpen || intent.action == Intent.ACTION_CHOOSER) {
-            sendIntent(intent)
-        } else if (fallbackUrl != null) {
-            sendIntent(Intent(Intent.ACTION_VIEW, fallbackUrl.toUri()))
+            is SupportEvent.ClickBack -> emitEffect(SupportEffect.NavigateBack)
+            is SupportEvent.ClickLiveChat -> emitEffect(SupportEffect.NavigateLiveChat)
         }
     }
 
-    fun openWhatsapp(number: String, pm: PackageManager) {
+    private fun emitSafeIntent(
+        intent: Intent,
+        pm: PackageManager,
+        fallbackUrl: String? = null
+    ) {
+        val canOpen = intent.resolveActivity(pm) != null
+
+        val finalIntent = when {
+            canOpen || intent.action == Intent.ACTION_CHOOSER -> intent
+            fallbackUrl != null -> Intent(Intent.ACTION_VIEW, fallbackUrl.toUri())
+            else -> null
+        }
+
+        finalIntent?.let {
+            emitEffect(SupportEffect.OpenIntent(it))
+        }
+    }
+
+    private fun openWhatsapp(pm: PackageManager) {
+        val number = _state.value.whatsapp
         val uri = "https://wa.me/$number".toUri()
+
         val intent = Intent(Intent.ACTION_VIEW, uri).apply {
             setPackage("com.whatsapp")
         }
-        openSafeIntent(intent, pm, fallbackUrl = uri.toString())
+
+        emitSafeIntent(intent, pm, uri.toString())
     }
 
-    fun openDial(phone: String, pm: PackageManager) {
+    private fun openDial() {
+        val phone = _state.value.phone
         val intent = Intent(Intent.ACTION_DIAL, "tel:$phone".toUri())
-        openSafeIntent(intent, pm)
+
+        emitEffect(SupportEffect.OpenIntent(intent))
     }
 
-    fun openEmailWithAttachment(
+    private fun openEmailWithAttachment(
         context: Context,
         pm: PackageManager
     ) {
-        val email = uiData.value.email
+        val email = _state.value.email
         val authority = context.packageName + ".provider"
 
         val screenshotFile = File(context.cacheDir, "support.png")
@@ -108,31 +120,11 @@ class SupportViewModel @Inject constructor() :
         }
 
         val chooser = Intent.createChooser(intent, "Kirim Email")
-        openSafeIntent(chooser, pm)
+        emitSafeIntent(chooser, pm)
     }
 
-    fun isSupportOpen(): Boolean {
+    private fun isSupportOpen(): Boolean {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         return hour in 8..21
-    }
-
-    fun buildTicketBody(
-        userId: String,
-        appVersion: String,
-        device: String,
-        message: String
-    ): String {
-        return """
-            Support Ticket
-            
-            User ID : $userId
-            Device  : $device
-            App Ver : $appVersion
-            
-            Message :
-            $message
-            
-            ---- Auto Generated ----
-        """.trimIndent()
     }
 }

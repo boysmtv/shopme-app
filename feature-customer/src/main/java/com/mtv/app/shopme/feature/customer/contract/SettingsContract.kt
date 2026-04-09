@@ -8,24 +8,33 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-data class SettingsStateListener(
-    val isLoading: Boolean = false
-)
+data class SettingsUiState(
+    val isLoading: Boolean = false,
 
-data class SettingsDataListener(
     val notificationEnabled: Boolean = true,
     val darkMode: Boolean = false
 )
 
-data class SettingsEventListener(
-    val onToggleNotification: (Boolean) -> Unit = {},
-    val onToggleDarkMode: (Boolean) -> Unit = {},
-    val onLogout: () -> Unit = {}
-)
+sealed class SettingsEvent {
+    object Load : SettingsEvent()
+    object DismissDialog : SettingsEvent()
 
-data class SettingsNavigationListener(
-    val onBack: () -> Unit = {},
-    val onSecurity: () -> Unit = {},
-    val onHelp: () -> Unit = {},
-    val onNotification: () -> Unit = {},
-)
+    data class ToggleNotification(val enabled: Boolean) : SettingsEvent()
+    data class ToggleDarkMode(val enabled: Boolean) : SettingsEvent()
+
+    object Logout : SettingsEvent()
+
+    object ClickBack : SettingsEvent()
+    object ClickSecurity : SettingsEvent()
+    object ClickHelp : SettingsEvent()
+    object ClickNotification : SettingsEvent()
+}
+
+sealed class SettingsEffect {
+    object NavigateBack : SettingsEffect()
+    object NavigateSecurity : SettingsEffect()
+    object NavigateHelp : SettingsEffect()
+    object NavigateNotification : SettingsEffect()
+
+    object LogoutSuccess : SettingsEffect()
+}
