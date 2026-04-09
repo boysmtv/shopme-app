@@ -12,7 +12,7 @@ import com.mtv.based.core.provider.based.BaseViewModel
 import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.valueFlowOf
 import com.mtv.app.shopme.data.remote.request.RegisterRequest
-import com.mtv.app.shopme.domain.usecase.RegisterUseCase
+import com.mtv.app.shopme.domain.usecase.GetRegisterUseCase
 import com.mtv.app.shopme.feature.auth.contract.RegisterDataListener
 import com.mtv.app.shopme.feature.auth.contract.RegisterDialog
 import com.mtv.app.shopme.feature.auth.contract.RegisterStateListener
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: GetRegisterUseCase
 ) : BaseViewModel(), UiOwner<RegisterStateListener, RegisterDataListener> {
 
     override val uiState = MutableStateFlow(RegisterStateListener())

@@ -8,14 +8,18 @@
 
 package com.mtv.app.shopme.data.mapper
 
+import com.mtv.app.shopme.data.remote.request.AddressAddRequest
 import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
 import com.mtv.app.shopme.data.remote.request.CreateOrderRequest
+import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
 import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.app.shopme.data.remote.request.FoodVariantAddToCartRequest
 import com.mtv.app.shopme.data.remote.request.VerifyPinRequest
+import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
+import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.VerifyPinParam
 
 /* =========================================================
@@ -47,4 +51,19 @@ fun CartAddParam.toRequest() = FoodAddToCartRequest(
     },
     quantity = quantity,
     note = note
+)
+
+fun CustomerUpdateParam.toRequest() = CustomerUpdateRequest(
+    name = name,
+    phone = phone,
+    photo = photo
+)
+
+fun AddressAddParam.toRequest() = AddressAddRequest(
+    villageId = villageId,
+    block = block,
+    number = number,
+    rt = rt,
+    rw = rw,
+    isDefault = isDefault
 )
