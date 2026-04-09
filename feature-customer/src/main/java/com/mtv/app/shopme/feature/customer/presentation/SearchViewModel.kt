@@ -12,7 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.param.SearchParam
-import com.mtv.app.shopme.domain.usecase.SearchFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetSearchFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.SearchEffect
 import com.mtv.app.shopme.feature.customer.contract.SearchEvent
 import com.mtv.app.shopme.feature.customer.contract.SearchUiState
@@ -34,7 +34,7 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchFoodUseCase: SearchFoodUseCase
+    private val searchFoodUseCase: GetSearchFoodUseCase
 ) : BaseEventViewModel<SearchEvent, SearchEffect>() {
 
     private val _state = MutableStateFlow(SearchUiState())
