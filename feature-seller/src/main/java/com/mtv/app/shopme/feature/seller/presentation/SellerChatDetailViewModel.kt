@@ -8,32 +8,98 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailDataListener
+import androidx.lifecycle.viewModelScope
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEffect
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerChatDetailViewModel @Inject constructor(
-    private val sessionManager: SessionManager
-) : BaseViewModel(),
-    UiOwner<SellerChatDetailStateListener, SellerChatDetailDataListener> {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(SellerChatDetailStateListener(messages = mockSellerChatMessages()))
+) : BaseEventViewModel<SellerChatDetailEvent, SellerChatDetailEffect>() {
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(SellerChatDetailDataListener())
+    private val _state = MutableStateFlow(
+        SellerChatDetailUiState(
+            messages = mockSellerChatMessages()
+        )
+    )
+    val uiState = _state.asStateFlow()
 
-    fun sendMessage(message: String) {
-        val newMessage = SellerChatDetailMessage(message, isFromSeller = true)
-        val updatedMessages = uiState.value.messages + newMessage
-        uiState.value = uiState.value.copy(messages = updatedMessages)
+    override fun onEvent(event: SellerChatDetailEvent) {
+        when (event) {
+            is SellerChatDetailEvent.Load -> {}
+            is SellerChatDetailEvent.DismissDialog -> dismissDialog()
+
+            is SellerChatDetailEvent.ChangeMessage -> {
+                _state.update { it.copy(currentMessage = event.value) }
+            }
+
+            is SellerChatDetailEvent.SendMessage -> sendMessage()
+
+            is SellerChatDetailEvent.ClickBack ->
+                emitEffect(SellerChatDetailEffect.NavigateBack)
+        }
+    }
+
+    private fun sendMessage() {
+        val message = _state.value.currentMessage
+        if (message.isBlank()) return
+
+        val newMessage = SellerChatDetailMessage(
+            message = message,
+            isFromSeller = true
+        )
+
+        _state.update {
+            it.copy(
+                messages = it.messages + newMessage,
+                currentMessage = ""
+            )
+        }
+
+        simulateCustomerReply()
+    }
+
+    private fun simulateCustomerReply() {
+        viewModelScope.launch {
+            delay(1000)
+
+            _state.update {
+                it.copy(
+                    messages = it.messages + SellerChatDetailMessage(
+                        message = "Baik kak, terima kasih 🙏",
+                        isFromSeller = false
+                    )
+                )
+            }
+        }
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
     }
 }
 
