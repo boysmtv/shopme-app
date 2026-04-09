@@ -8,24 +8,25 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
-
-data class SellerChatListStateListener(
+data class SellerChatListUiState(
+    val isLoading: Boolean = false,
     val chatList: List<SellerChatListItem> = emptyList()
 )
 
-data class SellerChatListDataListener(
-    val unused: String = EMPTY_STRING
-)
+sealed class SellerChatListEvent {
+    object Load : SellerChatListEvent()
+    object DismissDialog : SellerChatListEvent()
 
-class SellerChatListEventListener(
-    val onDeleteChat: () -> Unit
-)
+    data class ClickChat(val item: SellerChatListItem) : SellerChatListEvent()
+    data class DeleteChat(val item: SellerChatListItem) : SellerChatListEvent()
 
-class SellerChatListNavigationListener(
-    val onBack: () -> Unit = {},
-    val navigateToChat: () -> Unit = {}
-)
+    object ClickBack : SellerChatListEvent()
+}
+
+sealed class SellerChatListEffect {
+    object NavigateBack : SellerChatListEffect()
+    data class NavigateToChat(val chatId: String) : SellerChatListEffect()
+}
 
 data class SellerChatListItem(
     val id: String,
@@ -35,4 +36,3 @@ data class SellerChatListItem(
     val unreadCount: Int,
     val avatarBase64: String? = null
 )
-
