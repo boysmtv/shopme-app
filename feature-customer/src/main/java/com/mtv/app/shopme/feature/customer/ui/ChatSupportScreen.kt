@@ -26,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,18 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.customer.contract.ChatSupportDataListener
-import com.mtv.app.shopme.feature.customer.contract.ChatSupportEventListener
-import com.mtv.app.shopme.feature.customer.contract.ChatSupportNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.ChatSupportStateListener
+import com.mtv.app.shopme.feature.customer.contract.ChatSupportEvent
+import com.mtv.app.shopme.feature.customer.contract.ChatSupportUiState
 import com.mtv.app.shopme.feature.customer.contract.SupportMessage
 
 @Composable
 fun ChatSupportScreen(
-    uiState: ChatSupportStateListener,
-    uiData: ChatSupportDataListener,
-    uiEvent: ChatSupportEventListener,
-    uiNavigation: ChatSupportNavigationListener
+    state: ChatSupportUiState,
+    event: (ChatSupportEvent) -> Unit
 ) {
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -67,7 +62,7 @@ fun ChatSupportScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            IconButton(onClick = uiNavigation.onBack) {
+            IconButton(onClick = { event(ChatSupportEvent.ClickBack) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
             }
 
@@ -89,7 +84,7 @@ fun ChatSupportScreen(
                     fontSize = 14.sp
                 )
                 Text(
-                    if (uiData.isAgentTyping) "Mengetik..."
+                    if (state.isAgentTyping) "Mengetik..."
                     else "Online • Respon cepat",
                     fontSize = 11.sp,
                     color = Color(0xFF4CAF50),
@@ -109,11 +104,11 @@ fun ChatSupportScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
 
-            items(uiData.messages) { message ->
+            items(state.messages) { message ->
                 ChatBubbleSuper(message)
             }
 
-            if (uiData.isAgentTyping) {
+            if (state.isAgentTyping) {
                 item {
                     TypingIndicatorDots()
                 }
@@ -130,8 +125,8 @@ fun ChatSupportScreen(
         ) {
 
             OutlinedTextField(
-                value = uiData.currentMessage,
-                onValueChange = uiEvent.onMessageChange,
+                value = state.currentMessage,
+                onValueChange = { event(ChatSupportEvent.OnMessageChange(it)) },
                 modifier = Modifier.weight(1f),
                 shape = RoundedCornerShape(22.dp),
                 placeholder = {
@@ -151,7 +146,7 @@ fun ChatSupportScreen(
                     .padding(10.dp)
                     .size(38.dp)
             ) {
-                IconButton(onClick = uiEvent.onSendMessage) {
+                IconButton(onClick = { event(ChatSupportEvent.SendMessage) }) {
                     Icon(
                         Icons.AutoMirrored.Filled.Send,
                         null,
@@ -236,36 +231,14 @@ private fun TypingIndicatorDots() {
 @Composable
 fun ChatSupportPreview() {
     ChatSupportScreen(
-        uiState = ChatSupportStateListener(),
-        uiData = ChatSupportDataListener(
+        state = ChatSupportUiState(
             messages = listOf(
                 SupportMessage("1", "Halo 👋 Selamat datang di Shopme Support.", false, "09:58"),
-                SupportMessage("2", "Ada yang bisa kami bantu hari ini?", false, "09:58"),
-                SupportMessage("3", "Halo kak, saya mau tanya pesanan saya belum sampai.", true, "09:59"),
-                SupportMessage("4", "Baik kak 😊 Boleh diinformasikan nomor pesanan nya?", false, "09:59"),
-                SupportMessage("5", "ORD-20260222-8891", true, "10:00"),
-                SupportMessage("6", "Terima kasih, kami cek dulu ya kak ⏳", false, "10:00"),
-                SupportMessage("7", "Baik kak, ditunggu 🙏", true, "10:01"),
-                SupportMessage("8", "Pesanan kakak saat ini sedang dalam perjalanan 🚚", false, "10:02"),
-                SupportMessage("9", "Estimasi tiba sekitar 20-30 menit lagi.", false, "10:02"),
-                SupportMessage("10", "Oh baik, berarti masih normal ya?", true, "10:03"),
-                SupportMessage("11", "Betul kak 👍 Tidak ada kendala di pengiriman.", false, "10:03"),
-                SupportMessage("12", "Kalau nanti ada masalah saya hubungi lagi ya.", true, "10:04"),
-                SupportMessage("13", "Siap kak, kami siap membantu kapan saja 😊", false, "10:04"),
-                SupportMessage("14", "Terima kasih supportnya 🙌", true, "10:05"),
-                SupportMessage("15", "Sama-sama kak 💚 Semoga harinya menyenangkan.", false, "10:05"),
-                SupportMessage("16", "Oh iya kak, apakah ada promo hari ini?", true, "10:06"),
-                SupportMessage("17", "Ada kak 🎉 Promo Diskon 20% untuk pembelian di atas 50rb.", false, "10:06"),
-                SupportMessage("18", "Wah menarik, berlaku sampai kapan?", true, "10:07"),
-                SupportMessage("19", "Promo berlaku sampai malam ini pukul 23:59 ya kak.", false, "10:07"),
-                SupportMessage("20", "Siap kak, nanti saya coba order lagi.", true, "10:08"),
-                SupportMessage("21", "Baik kak, terima kasih sudah menggunakan Shopme 💚", false, "10:08"),
-                SupportMessage("22", "Jika ada kendala, silakan hubungi kami kembali.", false, "10:09"),
-                SupportMessage("23", "Oke siap 👍", true, "10:09"),
-                SupportMessage("24", "Have a great day kak 🌟", false, "10:09")
-            )
+                SupportMessage("2", "Ada yang bisa kami bantu?", false, "09:58"),
+                SupportMessage("3", "Saya mau tanya pesanan", true, "09:59")
+            ),
+            currentMessage = "",
+            isAgentTyping = true
         ),
-        uiEvent = ChatSupportEventListener(),
-        uiNavigation = ChatSupportNavigationListener()
-    )
-}
+        event = {}
+    )}
