@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 13/02/26 13.34
  */
 
-package com.mtv.app.shopme.nav.route
+package com.mtv.app.shopme.nav.route.customer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,5 +55,6 @@ private fun handleEffect(
         is ChatListEffect.NavigateToChat -> {
             nav.navigate(CustomerDestinations.CHAT_GRAPH)
         }
+        ChatListEffect.NavigateBack -> nav.popBackStack()
     }
 }
