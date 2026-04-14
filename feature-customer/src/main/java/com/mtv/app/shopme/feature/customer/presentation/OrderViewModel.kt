@@ -38,19 +38,10 @@ class OrderViewModel @Inject constructor() :
         when (event) {
             is OrderEvent.Load -> loadOrders()
             is OrderEvent.DismissDialog -> dismissDialog()
-
             is OrderEvent.Reload -> loadOrders()
-            is OrderEvent.ClickOrder -> {
-                emitEffect(OrderEffect.NavigateToDetail(event.orderId))
-            }
-
-            is OrderEvent.ClickChat -> {
-                emitEffect(OrderEffect.NavigateToChat)
-            }
-
-            is OrderEvent.ClickBack -> {
-                emitEffect(OrderEffect.NavigateBack)
-            }
+            is OrderEvent.ClickOrder -> emitEffect(OrderEffect.NavigateToDetail(event.orderId))
+            is OrderEvent.ClickChat -> emitEffect(OrderEffect.NavigateToChat)
+            is OrderEvent.ClickBack -> emitEffect(OrderEffect.NavigateBack)
         }
     }
 

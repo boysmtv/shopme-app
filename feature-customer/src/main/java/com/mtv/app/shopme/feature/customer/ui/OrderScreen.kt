@@ -29,13 +29,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -69,11 +67,9 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.data.dto.OrderItemModel
 import com.mtv.app.shopme.data.dto.OrderModel
 import com.mtv.app.shopme.data.dto.OrderStatus
-import com.mtv.app.shopme.data.dto.PaymentMethod
-import com.mtv.app.shopme.feature.customer.contract.OrderDataListener
-import com.mtv.app.shopme.feature.customer.contract.OrderEventListener
-import com.mtv.app.shopme.feature.customer.contract.OrderNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.OrderStateListener
+import com.mtv.app.shopme.domain.model.PaymentMethod
+import com.mtv.app.shopme.feature.customer.contract.OrderEvent
+import com.mtv.app.shopme.feature.customer.contract.OrderUiState
 
 enum class OrderFilter {
     SEMUA,
@@ -85,17 +81,15 @@ enum class OrderFilter {
 
 @Composable
 fun OrderScreen(
-    uiState: OrderStateListener,
-    uiData: OrderDataListener,
-    uiEvent: OrderEventListener,
-    uiNavigation: OrderNavigationListener
+    state: OrderUiState,
+    event: (OrderEvent) -> Unit
 ) {
     var selectedFilter by remember { mutableStateOf(OrderFilter.SEMUA) }
     var showUploadSheet by remember { mutableStateOf(false) }
     var proofUri by remember { mutableStateOf<Uri?>(null) }
     var selectedOrderId by remember { mutableStateOf<String?>(null) }
 
-    val filteredOrders = uiData.orders.filter {
+    val filteredOrders = state.orders.filter {
         when (selectedFilter) {
             OrderFilter.SEMUA -> true
             OrderFilter.ORDERED -> it.status == OrderStatus.ORDERED
@@ -129,8 +123,10 @@ fun OrderScreen(
             .statusBarsPadding()
     ) {
 
-        ModernOrderTopBar(uiNavigation)
-
+        ModernOrderTopBar(
+            onBack = { event(OrderEvent.ClickBack) },
+            onChat = { event(OrderEvent.ClickChat) }
+        )
         Card(
             modifier = Modifier.fillMaxSize(),
             shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
@@ -154,8 +150,7 @@ fun OrderScreen(
                             ModernOrderCard(
                                 order = order,
                                 onClick = {
-                                    uiEvent.onOrderClick(order.id)
-                                    uiNavigation.onDetail(order.id)
+                                    event(OrderEvent.ClickOrder(order.id))
                                 },
                                 onUploadProofClick = { orderId ->
                                     selectedOrderId = orderId
@@ -208,7 +203,10 @@ fun ModernOrderFilter(
 }
 
 @Composable
-private fun ModernOrderTopBar(nav: OrderNavigationListener) {
+private fun ModernOrderTopBar(
+    onBack: () -> Unit,
+    onChat: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -220,10 +218,15 @@ private fun ModernOrderTopBar(nav: OrderNavigationListener) {
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .clickable { nav.onBack() },
+                .clickable { onBack() },
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+            Icon(
+                Icons.AutoMirrored.Filled.Chat,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.clickable { onChat() }
+            )
         }
 
         Spacer(Modifier.width(14.dp))
@@ -256,7 +259,7 @@ fun ModernOrderCard(
     order: OrderModel,
     onClick: () -> Unit,
     onUploadProofClick: (String) -> Unit
-){
+) {
 
     val statusColor = when (order.status) {
         OrderStatus.ORDERED -> Color(0xFFF59E0B)
@@ -653,10 +656,11 @@ fun OrderScreenPreview() {
     )
 
     OrderScreen(
-        uiState = OrderStateListener(isLoading = false),
-        uiData = OrderDataListener(orders = dummyOrders),
-        uiEvent = OrderEventListener(),
-        uiNavigation = OrderNavigationListener()
+        state = OrderUiState(
+            isLoading = false,
+            orders = dummyOrders
+        ),
+        event = {}
     )
 }
 
