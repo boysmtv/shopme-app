@@ -23,6 +23,6 @@ sealed class ChatListEvent {
 }
 
 sealed class ChatListEffect {
-    object NavigateBack : CafeEffect()
+    object NavigateBack : ChatListEffect()
     data class NavigateToChat(val id: String) : ChatListEffect()
 }

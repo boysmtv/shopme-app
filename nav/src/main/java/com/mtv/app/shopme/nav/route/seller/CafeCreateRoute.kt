@@ -5,7 +5,7 @@
  * Last modified by Dedy Wijaya on 13/03/2026 13.42
  */
 
-package com.mtv.app.shopme.feature.seller.route
+package com.mtv.app.shopme.nav.route.seller
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,13 +52,7 @@ private fun handleCafeCreateEffect(
 ) {
     when (effect) {
         CafeCreateEffect.NavigateBack -> nav.popBackStack()
-
-        CafeCreateEffect.OpenImagePicker -> {
-            // trigger launcher (ActivityResult)
-        }
-
-        CafeCreateEffect.CreateSuccess -> {
-            nav.popBackStack()
-        }
+        CafeCreateEffect.OpenImagePicker -> nav.popBackStack()
+        CafeCreateEffect.CreateSuccess -> nav.popBackStack()
     }
 }
