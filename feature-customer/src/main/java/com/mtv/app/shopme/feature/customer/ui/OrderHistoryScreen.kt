@@ -38,7 +38,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,24 +55,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.customer.contract.OrderHistoryDataListener
-import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEventListener
+import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem
-import com.mtv.app.shopme.feature.customer.contract.OrderHistoryNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.OrderHistoryStateListener
+import com.mtv.app.shopme.feature.customer.contract.OrderHistoryUiState
 import com.mtv.app.shopme.feature.customer.contract.OrderStatusFilter
 
 @Composable
 fun OrderHistoryScreen(
-    uiState: OrderHistoryStateListener,
-    uiData: OrderHistoryDataListener,
-    uiEvent: OrderHistoryEventListener,
-    uiNavigation: OrderHistoryNavigationListener
+    state: OrderHistoryUiState,
+    event: (OrderHistoryEvent) -> Unit
 ) {
 
-    val filteredOrders = uiData.orders.filter {
-        uiData.selectedFilter == OrderStatusFilter.SEMUA ||
-                it.status == uiData.selectedFilter.name
+    val filteredOrders = state.orders.filter {
+        state.selectedFilter == OrderStatusFilter.SEMUA ||
+                it.status == state.selectedFilter.name
     }
 
     Column(
@@ -86,8 +81,9 @@ fun OrderHistoryScreen(
             )
             .statusBarsPadding()
     ) {
-
-        ModernTopBar(uiNavigation)
+        ModernTopBar(
+            onBack = { event(OrderHistoryEvent.ClickBack) }
+        )
 
         Card(
             modifier = Modifier.fillMaxSize(),
@@ -96,8 +92,11 @@ fun OrderHistoryScreen(
         ) {
 
             Column(Modifier.fillMaxSize()) {
-                ModernFilter(uiData.selectedFilter, uiEvent)
-                if (uiState.loading) {
+                ModernFilter(
+                    selected = state.selectedFilter,
+                    onSelect = { event(OrderHistoryEvent.ChangeFilter(it)) }
+                )
+                if (state.loading) {
                     ModernSkeleton()
                 } else if (filteredOrders.isEmpty()) {
                     ModernEmpty()
@@ -107,7 +106,7 @@ fun OrderHistoryScreen(
                     ) {
                         items(filteredOrders) { order ->
                             ModernOrderCard(order) {
-                                uiNavigation.onDetail(order)
+                                event(OrderHistoryEvent.ClickOrder(order))
                             }
                         }
                     }
@@ -119,7 +118,7 @@ fun OrderHistoryScreen(
 
 
 @Composable
-private fun ModernTopBar(nav: OrderHistoryNavigationListener) {
+private fun ModernTopBar(onBack: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -131,7 +130,7 @@ private fun ModernTopBar(nav: OrderHistoryNavigationListener) {
             modifier = Modifier
                 .size(40.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .clickable { nav.onBack() },
+                .clickable { onBack() },
             contentAlignment = Alignment.Center
         ) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
@@ -159,7 +158,7 @@ private fun ModernTopBar(nav: OrderHistoryNavigationListener) {
 @Composable
 private fun ModernFilter(
     selected: OrderStatusFilter,
-    event: OrderHistoryEventListener
+    onSelect: (OrderStatusFilter) -> Unit
 ) {
 
     Row(
@@ -185,7 +184,7 @@ private fun ModernFilter(
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     ) {
-                        event.onFilterChange(filter)
+                        onSelect(filter)
                     }
                     .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
@@ -465,8 +464,8 @@ fun ModernSkeleton() {
 @Composable
 fun OrderHistoryPreview() {
     OrderHistoryScreen(
-        uiState = OrderHistoryStateListener(loading = false),
-        uiData = OrderHistoryDataListener(
+        state = OrderHistoryUiState(
+            loading = false,
             selectedFilter = OrderStatusFilter.SEMUA,
             orders = listOf(
                 OrderHistoryItem(
@@ -479,54 +478,9 @@ fun OrderHistoryPreview() {
                     3,
                     "E-Wallet",
                     "Diantar"
-                ),
-                OrderHistoryItem(
-                    "2",
-                    "Kopi Nusantara",
-                    "Caramel Latte",
-                    "11 Feb 2026",
-                    "Rp 32.000",
-                    "DIPROSES",
-                    2,
-                    "QRIS",
-                    "Pickup"
-                ),
-                OrderHistoryItem(
-                    "3",
-                    "Burger Town",
-                    "Cheese Burger Combo",
-                    "10 Feb 2026",
-                    "Rp 48.000",
-                    "DIKIRIM",
-                    4,
-                    "Cash",
-                    "Diantar"
-                ),
-                OrderHistoryItem(
-                    "4",
-                    "Coffee Corner",
-                    "Americano",
-                    "08 Feb 2026",
-                    "Rp 22.000",
-                    "SELESAI",
-                    1,
-                    "E-Wallet",
-                    "Pickup"
-                ),
-                OrderHistoryItem(
-                    "5",
-                    "Cafe Kopi Boy",
-                    "Matcha Latte",
-                    "05 Feb 2026",
-                    "Rp 30.000",
-                    "BATAL",
-                    2,
-                    "QRIS",
-                    "Diantar"
                 )
             )
         ),
-        uiEvent = OrderHistoryEventListener(),
-        uiNavigation = OrderHistoryNavigationListener()
+        event = {}
     )
 }
