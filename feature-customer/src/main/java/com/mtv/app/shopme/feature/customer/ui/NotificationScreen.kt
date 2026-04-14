@@ -26,7 +26,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Campaign
-import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.PhoneIphone
@@ -48,17 +47,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.customer.contract.NotificationDataListener
-import com.mtv.app.shopme.feature.customer.contract.NotificationEventListener
-import com.mtv.app.shopme.feature.customer.contract.NotificationNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.NotificationStateListener
+import com.mtv.app.shopme.feature.customer.contract.NotificationEvent
+import com.mtv.app.shopme.feature.customer.contract.NotificationUiState
 
 @Composable
 fun NotificationScreen(
-    uiState: NotificationStateListener,
-    uiData: NotificationDataListener,
-    uiEvent: NotificationEventListener,
-    uiNavigation: NotificationNavigationListener
+    state: NotificationUiState,
+    event: (NotificationEvent) -> Unit
 ) {
 
     Column(
@@ -78,7 +73,7 @@ fun NotificationScreen(
                 .padding(18.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = uiNavigation.onBack) {
+            IconButton(onClick = { event(NotificationEvent.ClickBack) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
             }
 
@@ -110,24 +105,24 @@ fun NotificationScreen(
                         icon = Icons.Default.LocalShipping,
                         title = "Status Pesanan",
                         subtitle = "Update pengiriman & perubahan status",
-                        checked = uiData.orderNotification,
-                        onToggle = uiEvent.onToggleOrder
+                        checked = state.orderNotification,
+                        onToggle = { event(NotificationEvent.ToggleOrder(it)) }
                     )
 
                     SwitchSettingItem(
                         icon = Icons.Default.Campaign,
                         title = "Promo & Diskon",
                         subtitle = "Voucher, promo & flash sale",
-                        checked = uiData.promoNotification,
-                        onToggle = uiEvent.onTogglePromo
+                        checked = state.promoNotification,
+                        onToggle = { event(NotificationEvent.TogglePromo(it)) }
                     )
 
                     SwitchSettingItem(
                         icon = Icons.AutoMirrored.Filled.Chat,
                         title = "Chat & Pesan",
                         subtitle = "Pesan dari penjual & sistem",
-                        checked = uiData.chatNotification,
-                        onToggle = uiEvent.onToggleChat
+                        checked = state.chatNotification,
+                        onToggle = { event(NotificationEvent.ToggleChat(it)) }
                     )
                 }
 
@@ -142,16 +137,16 @@ fun NotificationScreen(
                         icon = Icons.Default.PhoneIphone,
                         title = "Push Notification",
                         subtitle = "Notifikasi langsung ke perangkat",
-                        checked = uiData.pushEnabled,
-                        onToggle = uiEvent.onTogglePush
+                        checked = state.pushEnabled,
+                        onToggle = { event(NotificationEvent.TogglePush(it)) }
                     )
 
                     SwitchSettingItem(
                         icon = Icons.Default.Email,
                         title = "Email Notification",
                         subtitle = "Dikirim ke email terdaftar",
-                        checked = uiData.emailEnabled,
-                        onToggle = uiEvent.onToggleEmail
+                        checked = state.emailEnabled,
+                        onToggle = { event(NotificationEvent.ToggleEmail(it)) }
                     )
                 }
 
@@ -235,9 +230,13 @@ fun SwitchSettingItem(
 @Composable
 fun NotificationPreview() {
     NotificationScreen(
-        uiState = NotificationStateListener(),
-        uiData = NotificationDataListener(),
-        uiEvent = NotificationEventListener(),
-        uiNavigation = NotificationNavigationListener()
+        state = NotificationUiState(
+            orderNotification = true,
+            promoNotification = false,
+            chatNotification = true,
+            pushEnabled = true,
+            emailEnabled = false
+        ),
+        event = {}
     )
 }

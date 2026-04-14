@@ -1,12 +1,12 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: NotifRoute.kt
+ * File: NotificationRoute.kt
  *
- * Last modified by Dedy Wijaya on 20/02/26 14.59
+ * Last modified by Dedy Wijaya on 21/02/26 23.26
  */
 
-package com.mtv.app.shopme.nav.route
+package com.mtv.app.shopme.nav.route.customer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,30 +15,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.NotifEffect
-import com.mtv.app.shopme.feature.customer.contract.NotifEvent
-import com.mtv.app.shopme.feature.customer.presentation.NotifViewModel
-import com.mtv.app.shopme.feature.customer.ui.NotifScreen
+import com.mtv.app.shopme.feature.customer.contract.NotificationEffect
+import com.mtv.app.shopme.feature.customer.contract.NotificationEvent
+import com.mtv.app.shopme.feature.customer.presentation.NotificationViewModel
+import com.mtv.app.shopme.feature.customer.ui.NotificationScreen
 
 @Composable
-fun NotifRoute(nav: NavController) {
+fun NotificationRoute(nav: NavController) {
 
-    val vm: NotifViewModel = hiltViewModel()
+    val vm: NotificationViewModel = hiltViewModel()
 
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
 
     BaseRoute(
         viewModel = vm,
-        onLoad = NotifEvent.Load,
-        onEffect = { handleNotifEffect(nav, it) },
+        onLoad = NotificationEvent.Load,
+        onEffect = { handleNotificationEffect(nav, it) },
         onEvent = vm::onEvent,
         content = {
             BaseScreen(
                 baseUiState = baseUiState,
-                dismissDialog = { vm.onEvent(NotifEvent.DismissDialog) }
+                dismissDialog = { vm.onEvent(NotificationEvent.DismissDialog) }
             ) {
-                NotifScreen(
+                NotificationScreen(
                     state = uiState,
                     event = vm::onEvent
                 )
@@ -47,11 +47,11 @@ fun NotifRoute(nav: NavController) {
     )
 }
 
-private fun handleNotifEffect(
+private fun handleNotificationEffect(
     nav: NavController,
-    effect: NotifEffect
+    effect: NotificationEffect
 ) {
     when (effect) {
-        NotifEffect.NavigateBack -> nav.popBackStack()
+        NotificationEffect.NavigateBack -> nav.popBackStack()
     }
 }
