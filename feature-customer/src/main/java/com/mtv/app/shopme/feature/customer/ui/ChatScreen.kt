@@ -59,10 +59,10 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.customer.contract.ChatDataListener
-import com.mtv.app.shopme.feature.customer.contract.ChatEventListener
-import com.mtv.app.shopme.feature.customer.contract.ChatNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.ChatStateListener
+import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.feature.customer.contract.ChatEvent
+import com.mtv.app.shopme.feature.customer.contract.ChatUiState
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class ChatMessage(
@@ -72,22 +72,17 @@ data class ChatMessage(
 
 @Composable
 fun ChatScreen(
-    uiState: ChatStateListener,
-    uiData: ChatDataListener,
-    uiEvent: ChatEventListener,
-    uiNavigation: ChatNavigationListener,
+    state: ChatUiState,
+    event: (ChatEvent) -> Unit
 ) {
     var userMessage by remember { mutableStateOf(EMPTY_STRING) }
 
-    val messages = remember {
-        mutableStateListOf(
-            ChatMessage("Halo 👋 Selamat datang di Coffee Corner. Ada yang bisa kami bantu?", true),
-            ChatMessage("Halo kak, saya mau pesan kopi latte.", false),
-            ChatMessage("Siap ☕ Mau yang panas atau dingin ya kak?", true),
-            ChatMessage("Yang dingin ya, ukuran regular.", false),
-            ChatMessage("Bisa banget 😊 Tambah 1 shot espresso ya. Ada request lain?", true),
-            ChatMessage("Tidak ada, itu saja. Terima kasih 🙏", false),
-            ChatMessage("Siap kak! Pesanan sedang kami siapkan. Mohon ditunggu ya ⏳", true)
+    val messages = (state.chats as? LoadState.Success)?.data.orEmpty()
+
+    val uiMessages = messages.mapIndexed { index, item ->
+        ChatMessage(
+            message = item.lastMessage,
+            isFromUser = index % 2 == 0 // fake alternating biar preview hidup
         )
     }
 
@@ -105,7 +100,7 @@ fun ChatScreen(
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { uiNavigation.onBack() }) {
+            IconButton(onClick = { event(ChatEvent.ClickBack) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
 
@@ -138,7 +133,7 @@ fun ChatScreen(
 
             Spacer(Modifier.weight(1f))
 
-            IconButton(onClick = { uiNavigation.onBack() }) {
+            IconButton(onClick = { event(ChatEvent.ClickBack) }) {
                 Icon(Icons.Default.Call, contentDescription = "Call")
             }
 
@@ -157,7 +152,7 @@ fun ChatScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(messages) { msg ->
-                ChatBubble(message = msg)
+                ChatBubble(message = ChatMessage(msg.lastMessage, true))
             }
         }
 
@@ -191,7 +186,12 @@ fun ChatScreen(
             IconButton(
                 onClick = {
                     if (userMessage.isNotEmpty()) {
-                        messages.add(ChatMessage(userMessage, true))
+                        event(
+                            ChatEvent.SendMessage(
+                                id = "cafeId", // nanti ambil dari state / args
+                                message = userMessage
+                            )
+                        )
                         userMessage = EMPTY_STRING
                     }
                 },
@@ -240,10 +240,30 @@ fun ChatBubble(message: ChatMessage) {
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun ChatScreenPreview() {
+
+    val fakeChats = listOf(
+        ChatListItem(
+            id = "1",
+            name = "Cafe Kopi Kita",
+            lastMessage = "Halo kak 👋",
+            time = "10:00",
+            unreadCount = 0,
+            avatarBase64 = null
+        ),
+        ChatListItem(
+            id = "2",
+            name = "Cafe Kopi Kita",
+            lastMessage = "Pesanan sedang diproses",
+            time = "10:01",
+            unreadCount = 0,
+            avatarBase64 = null
+        )
+    )
+
     ChatScreen(
-        uiState = ChatStateListener(),
-        uiData = ChatDataListener(),
-        uiEvent = ChatEventListener(),
-        uiNavigation = ChatNavigationListener()
+        state = ChatUiState(
+            chats = LoadState.Success(fakeChats)
+        ),
+        event = {}
     )
 }

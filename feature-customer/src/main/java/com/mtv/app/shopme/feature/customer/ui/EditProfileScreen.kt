@@ -87,11 +87,13 @@ import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.VillageResponse
-import com.mtv.app.shopme.feature.customer.contract.EditProfileDataListener
+import com.mtv.app.shopme.domain.model.Address
+import com.mtv.app.shopme.domain.model.Customer
+import com.mtv.app.shopme.domain.model.Village
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDialog
-import com.mtv.app.shopme.feature.customer.contract.EditProfileEventListener
-import com.mtv.app.shopme.feature.customer.contract.EditProfileNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.EditProfileStateListener
+import com.mtv.app.shopme.feature.customer.contract.EditProfileEvent
+import com.mtv.app.shopme.feature.customer.contract.EditProfileUiState
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -102,35 +104,35 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EditProfileScreen(
-    uiState: EditProfileStateListener,
-    uiData: EditProfileDataListener,
-    uiEvent: EditProfileEventListener,
-    uiNavigation: EditProfileNavigationListener
+    state: EditProfileUiState,
+    event: (EditProfileEvent) -> Unit
 ) {
 
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAddAddress by remember { mutableStateOf(false) }
     val sheetController = rememberSheetController()
 
-    val customer = uiData.customerData
+    val customer = (state.customer as? LoadState.Success)?.data
+    val addresses = (state.addresses as? LoadState.Success)?.data.orEmpty()
+    val villages = (state.villages as? LoadState.Success)?.data.orEmpty()
 
     var name by remember { mutableStateOf(EMPTY_STRING) }
     var phone by remember { mutableStateOf(EMPTY_STRING) }
     var email by remember { mutableStateOf(EMPTY_STRING) }
     var photo by remember { mutableStateOf("https://i.pinimg.com/736x/b8/8d/d8/b88dd895727e06f977a7443a8f6d13c0.jpg") }
 
-    val addresses = uiData.addressData.orEmpty()
-    val villages = uiData.villageData.orEmpty()
 
-    val isValid = name.isNotBlank() && phone.length >= 10 && email.contains("@")
+    val isValid = name.isNotBlank() && phone.length >= 10
 
     LaunchedEffect(customer) {
-        name = customer?.name.orEmpty()
-        phone = customer?.phone.orEmpty()
-        email = customer?.email.orEmpty()
+        if (name.isBlank()) {
+            name = customer?.name.orEmpty()
+            phone = customer?.phone.orEmpty()
+            email = customer?.email.orEmpty()
+        }
     }
 
-    if (uiState.activeDialog is EditProfileDialog.SuccessUpdateProfile) {
+    if (state.activeDialog is EditProfileDialog.SuccessUpdateProfile) {
         DialogCenterV1(
             state = DialogStateV1(
                 type = DialogType.SUCCESS,
@@ -138,7 +140,7 @@ fun EditProfileScreen(
                 message = stringResource(R.string.successfully_update_profile),
                 primaryButtonText = OK_STRING
             ),
-            onDismiss = { uiEvent.onDismissActiveDialog() }
+            onDismiss = { event(EditProfileEvent.DismissActiveDialog) }
         )
     }
 
@@ -153,7 +155,9 @@ fun EditProfileScreen(
             .statusBarsPadding()
     ) {
 
-        PremiumHeader(uiNavigation)
+        PremiumHeader(
+            onBack = { event(EditProfileEvent.ClickBack) }
+        )
 
         Card(
             modifier = Modifier.fillMaxSize(),
@@ -189,10 +193,10 @@ fun EditProfileScreen(
                             addresses = addresses,
                             onAdd = { showAddAddress = true },
                             onDelete = { id ->
-                                uiEvent.onDeleteAddress(id)
+                                event(EditProfileEvent.DeleteAddress(id))
                             },
                             onSetDefault = { id ->
-                                uiEvent.onDefaultAddress(id)
+                                event(EditProfileEvent.SetDefaultAddress(id))
                             }
                         )
                     }
@@ -202,8 +206,12 @@ fun EditProfileScreen(
                     Spacer(Modifier.height(20.dp))
                     Button(
                         onClick = {
-                            uiEvent.onUpdateProfile(
-                                name, phone, photo
+                            event(
+                                EditProfileEvent.UpdateProfile(
+                                    name = name,
+                                    phone = phone,
+                                    photo = photo
+                                )
                             )
                         },
                         enabled = isValid,
@@ -227,13 +235,15 @@ fun EditProfileScreen(
                 villages = villages,
                 onDismiss = { showAddAddress = false },
                 onSave = { villageId, block, number, rt, rw, isDefault ->
-                    uiEvent.onAddAddress(
-                        villageId,
-                        block,
-                        number,
-                        rt,
-                        rw,
-                        isDefault
+                    event(
+                        EditProfileEvent.AddAddress(
+                            villageId,
+                            block,
+                            number,
+                            rt,
+                            rw,
+                            isDefault
+                        )
                     )
                     showAddAddress = false
                 }
@@ -243,7 +253,7 @@ fun EditProfileScreen(
 }
 
 @Composable
-fun PremiumHeader(nav: EditProfileNavigationListener) {
+fun PremiumHeader(onBack: () -> Unit) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -253,7 +263,7 @@ fun PremiumHeader(nav: EditProfileNavigationListener) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { nav.onBack() }) {
+            IconButton(onClick = { onBack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
             }
 
@@ -284,7 +294,7 @@ fun PremiumHeader(nav: EditProfileNavigationListener) {
 
 @Composable
 fun AddressSection(
-    addresses: List<AddressResponse>,
+    addresses: List<Address>,
     onAdd: () -> Unit,
     onDelete: (String) -> Unit,
     onSetDefault: (String) -> Unit
@@ -460,7 +470,7 @@ fun AnimatedTab(selected: Int, onChange: (Int) -> Unit) {
 @Composable
 fun AddAddressSheet(
     controller: SheetController,
-    villages: List<VillageResponse>,
+    villages: List<Village>,
     onDismiss: () -> Unit,
     onSave: (String, String, String, String, String, Boolean) -> Unit
 ) {
@@ -476,7 +486,8 @@ fun AddAddressSheet(
             controller.expand()
         }
 
-        var selectedVillage by rememberSaveable { mutableStateOf<VillageResponse?>(null) }
+        var selectedVillage by rememberSaveable { mutableStateOf<Village?>(null) }
+
         var block by rememberSaveable { mutableStateOf(EMPTY_STRING) }
         var number by rememberSaveable { mutableStateOf(EMPTY_STRING) }
         var rt by rememberSaveable { mutableStateOf(EMPTY_STRING) }
@@ -606,9 +617,9 @@ fun AddAddressSheet(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VillageDropdown(
-    villages: List<VillageResponse>,
-    selectedVillage: VillageResponse?,
-    onSelected: (VillageResponse) -> Unit
+    villages: List<Village>,
+    selectedVillage: Village?,
+    onSelected: (Village) -> Unit
 ) {
 
     var expanded by remember { mutableStateOf(false) }
@@ -764,13 +775,39 @@ fun EditProfileScreenPreview() {
     )
 
     EditProfileScreen(
-        uiState = EditProfileStateListener(),
-        uiData = EditProfileDataListener(
-            addressData = addresses,
-            villageData = villages
+        state = EditProfileUiState(
+            customer = LoadState.Success(
+                Customer(
+                    name = "Dedy Wijaya",
+                    phone = "08123456789",
+                    email = "dedy@mail.com",
+                    address = null,
+                    photo = "",
+                    verified = true,
+                    stats = null,
+                    menuSummary = null
+                )
+            ),
+            addresses = LoadState.Success(
+                listOf(
+                    Address(
+                        id = "1",
+                        village = "Puri Lestari",
+                        block = "A",
+                        number = "10",
+                        rt = "01",
+                        rw = "02",
+                        isDefault = true
+                    )
+                )
+            ),
+            villages = LoadState.Success(
+                listOf(
+                    Village("1", "Puri Lestari")
+                )
+            )
         ),
-        uiEvent = EditProfileEventListener(),
-        uiNavigation = EditProfileNavigationListener()
+        event = {}
     )
 }
 
@@ -781,7 +818,7 @@ fun EditProfileAddressTabPreview() {
     var selectedTab by remember { mutableIntStateOf(1) }
 
     val dummyAddresses = listOf(
-        AddressResponse(
+        Address(
             id = "1",
             village = "Griya Asri",
             block = "A",
@@ -790,7 +827,7 @@ fun EditProfileAddressTabPreview() {
             rw = "02",
             isDefault = true
         ),
-        AddressResponse(
+        Address(
             id = "2",
             village = "Permata Indah",
             block = "B",
@@ -811,7 +848,7 @@ fun EditProfileAddressTabPreview() {
             )
     ) {
 
-        PremiumHeader(EditProfileNavigationListener())
+        PremiumHeader({})
 
         Card(
             modifier = Modifier.fillMaxSize(),
@@ -843,9 +880,9 @@ fun AddAddressSheetPreview() {
     val controller = rememberSheetController()
 
     val villages = listOf(
-        VillageResponse("1", "Puri Lestari"),
-        VillageResponse("2", "Grama Puri Persada"),
-        VillageResponse("3", "Kirana Cikarang")
+        Village("1", "Puri Lestari"),
+        Village("2", "Grama Puri Persada"),
+        Village("3", "Kirana Cikarang")
     )
 
     Box(
