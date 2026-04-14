@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.ui
 
-import androidx.compose.animation.AnimatedVisibility
+import  androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -56,19 +56,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.customer.contract.HelpDataListener
-import com.mtv.app.shopme.feature.customer.contract.HelpEventListener
+import com.mtv.app.shopme.feature.customer.contract.HelpEvent
 import com.mtv.app.shopme.feature.customer.contract.HelpFaq
-import com.mtv.app.shopme.feature.customer.contract.HelpNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.HelpStateListener
+import com.mtv.app.shopme.feature.customer.contract.HelpUiState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
 fun HelpScreen(
-    uiState: HelpStateListener,
-    uiData: HelpDataListener,
-    uiEvent: HelpEventListener,
-    uiNavigation: HelpNavigationListener
+    state: HelpUiState,
+    event: (HelpEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -86,7 +82,7 @@ fun HelpScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = uiNavigation.onBack) {
+            IconButton(onClick = { event(HelpEvent.ClickBack) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
@@ -122,10 +118,10 @@ fun HelpScreen(
                     )
                 }
 
-                items(uiData.faq) { faq ->
+                items(state.faq) { faq ->
                     HelpFaqItem(
                         faq = faq,
-                        onToggle = { uiEvent.onToggleFaq(faq) }
+                        onToggle = { event(HelpEvent.ToggleFaq(faq)) }
                     )
                 }
 
@@ -133,7 +129,7 @@ fun HelpScreen(
                     Spacer(Modifier.height(16.dp))
 
                     Button(
-                        onClick = uiNavigation.onContact,
+                        onClick = { event(HelpEvent.ClickContact) },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(16.dp)
                     ) {
@@ -229,29 +225,21 @@ fun HelpFaqItem(
 @Composable
 fun HelpScreenExpandedPreview() {
     HelpScreen(
-        uiState = HelpStateListener(
-            isLoading = false
-        ),
-        uiData = HelpDataListener(
+        state = HelpUiState(
             faq = listOf(
                 HelpFaq(
                     question = "Bagaimana cara melacak pesanan?",
-                    answer = "Masuk ke menu Pesanan Saya → pilih pesanan → lihat status pengiriman secara realtime hingga pesanan diterima.",
+                    answer = "Masuk ke menu Pesanan Saya...",
                     expanded = true
                 ),
                 HelpFaq(
                     question = "Metode pembayaran apa saja tersedia?",
-                    answer = "Kami mendukung transfer bank, e-wallet, virtual account, dan Cash On Delivery (COD) untuk area tertentu.",
-                    expanded = true
-                ),
-                HelpFaq(
-                    question = "Bagaimana cara menghubungi support?",
-                    answer = "Gunakan tombol Hubungi Support di bagian bawah halaman ini. Tim kami tersedia 24/7 untuk membantu Anda.",
-                    expanded = true
+                    answer = "Kami mendukung transfer bank...",
+                    expanded = false
                 )
-            )
+            ),
+            isLoading = false
         ),
-        uiEvent = HelpEventListener(),
-        uiNavigation = HelpNavigationListener()
+        event = {}
     )
 }

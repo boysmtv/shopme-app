@@ -49,12 +49,11 @@ import androidx.compose.ui.unit.dp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.data.local.NotificationItem
-import com.mtv.app.shopme.feature.customer.contract.NotifDataListener
 import com.mtv.app.shopme.feature.customer.contract.NotifDialog
-import com.mtv.app.shopme.feature.customer.contract.NotifEventListener
-import com.mtv.app.shopme.feature.customer.contract.NotifNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.NotifStateListener
+import com.mtv.app.shopme.feature.customer.contract.NotifEvent
+import com.mtv.app.shopme.feature.customer.contract.NotifUiState
 import com.mtv.app.shopme.feature.customer.presentation.previewNotification
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
@@ -67,18 +66,16 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.WARNING_STRING
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun NotifScreen(
-    uiState: NotifStateListener,
-    uiData: NotifDataListener,
-    uiEvent: NotifEventListener,
-    uiNavigation: NotifNavigationListener
+    state: NotifUiState,
+    event: (NotifEvent) -> Unit
 ) {
-    ShowNotificationDialog(uiState, uiEvent)
+    ShowNotificationDialog(state, event)
 
-    val isRefreshing = uiState.notificationState is ResourceFirebase.Loading
+    val isRefreshing = state.notificationState is LoadState.Loading
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
-        onRefresh = { uiEvent.onGetNotification() }
+        onRefresh = { event(NotifEvent.GetNotification) }
     )
 
     Box(
@@ -94,8 +91,8 @@ fun NotifScreen(
                 title = "Notification",
                 showRightIcon = true,
                 rightIcon = Icons.Default.DeleteSweep,
-                onLeftClick = { uiNavigation.onBack() },
-                onRightClick = { uiEvent.onClearNotification() }
+                onLeftClick = { event(NotifEvent.ClickBack) },
+                onRightClick = { event(NotifEvent.ClearNotification) }
             )
 
             Text(
@@ -110,15 +107,15 @@ fun NotifScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (uiData.localNotification.isEmpty()) {
+                if (state.localNotification.isEmpty()) {
                     item {
                         EmptyNotificationState()
                     }
                 } else {
-                    items(uiData.localNotification) { item ->
+                    items(state.localNotification) { item ->
                         NotificationItemCard(
                             item = item,
-                            onClick = { uiEvent.onNotificationClicked(item) }
+                            onClick = { event(NotifEvent.ClickNotification(item)) }
                         )
                     }
                 }
@@ -207,11 +204,11 @@ private fun EmptyNotificationState() {
 
 
 @Composable
-private fun ShowNotificationDialog(
-    uiState: NotifStateListener,
-    uiEvent: NotifEventListener
+fun ShowNotificationDialog(
+    state: NotifUiState,
+    event: (NotifEvent) -> Unit
 ) {
-    uiState.activeDialog?.let { dialog ->
+    state.activeDialog?.let { dialog ->
         when (dialog) {
             is NotifDialog.Success -> {
                 DialogCenterV1(
@@ -221,7 +218,7 @@ private fun ShowNotificationDialog(
                         message = stringResource(R.string.success_clear_notif),
                         primaryButtonText = OK_STRING
                     ),
-                    onDismiss = { uiEvent.onDismissActiveDialog() }
+                    onDismiss = { event(NotifEvent.DismissDialog) }
                 )
             }
 
@@ -233,7 +230,7 @@ private fun ShowNotificationDialog(
                         message = dialog.message,
                         primaryButtonText = OK_STRING
                     ),
-                    onDismiss = { uiEvent.onDismissActiveDialog() }
+                    onDismiss = { event(NotifEvent.DismissDialog) }
                 )
             }
         }
@@ -286,12 +283,12 @@ fun NotificationItemPreview() {
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun NotificationScreenPreview() {
-    NotificationScreen(
-        uiState = NotifStateListener(),
-        uiData = NotifDataListener(
-            localNotification = List(9) { previewNotification }
+    NotifScreen(
+        state = NotifUiState(
+            localNotification = List(5) { previewNotification },
+            notificationState = LoadState.Success(""),
+            activeDialog = null
         ),
-        uiEvent = NotifEventListener({}, {}, {}, {}),
-        uiNavigation = NotifNavigationListener {}
+        event = {}
     )
 }

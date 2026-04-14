@@ -25,7 +25,7 @@ import com.mtv.app.shopme.nav.extensions.navigateAndPopLogin
 @Composable
 fun LoginRoute(nav: NavController) {
     BaseRoute<LoginViewModel, LoginStateListener, LoginDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissDialog) {
             LoginScreen(
                 uiState = uiState,
                 uiData = uiData,

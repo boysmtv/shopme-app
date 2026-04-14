@@ -5,15 +5,15 @@
  *
  * Last modified by Dedy Wijaya on 20/02/26 14.56
  */
+
 package com.mtv.app.shopme.feature.customer.contract
 
 import com.mtv.app.shopme.data.local.NotificationItem
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.based.core.network.utils.LoadState
 
 data class NotifUiState(
     val localNotification: List<NotificationItem> = emptyList(),
-
-    val notificationState: ResourceFirebase<String> = ResourceFirebase.Loading,
+    val notificationState: LoadState<String> = LoadState.Loading,
     val activeDialog: NotifDialog? = null
 )
 
