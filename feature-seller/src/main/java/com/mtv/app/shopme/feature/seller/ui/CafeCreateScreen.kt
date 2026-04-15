@@ -44,17 +44,13 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateDataListener
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateEventListener
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.CafeCreateStateListener
+import com.mtv.app.shopme.feature.seller.contract.CafeCreateEvent
+import com.mtv.app.shopme.feature.seller.contract.CafeCreateUiState
 
 @Composable
 fun CafeCreateScreen(
-    uiState: CafeCreateStateListener,
-    uiData: CafeCreateDataListener,
-    uiEvent: CafeCreateEventListener,
-    uiNavigation: CafeCreateNavigationListener
+    state: CafeCreateUiState,
+    event: (CafeCreateEvent) -> Unit
 ) {
 
     Column(
@@ -74,7 +70,7 @@ fun CafeCreateScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            IconButton(onClick = uiNavigation.navigateBack) {
+            IconButton(onClick = { event(CafeCreateEvent.ClickBack) }) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
@@ -92,8 +88,8 @@ fun CafeCreateScreen(
 
 
         StorePhotoSection(
-            imageUrl = uiData.image,
-            onUpload = uiEvent.onUploadImage
+            imageUrl = state.image,
+            onUpload = { event(CafeCreateEvent.UploadImage) }
         )
 
         Spacer(Modifier.height(32.dp))
@@ -111,36 +107,36 @@ fun CafeCreateScreen(
 
                 BaseSimpleFormField(
                     label = "Cafe Name",
-                    value = uiData.name
+                    value = state.name
                 ) {
-                    uiEvent.onNameChange(it)
+                    event(CafeCreateEvent.ChangeName(it))
                 }
 
                 Spacer(Modifier.height(16.dp))
 
                 BaseSimpleFormField(
                     label = "Phone",
-                    value = uiData.phone
+                    value = state.phone
                 ) {
-                    uiEvent.onPhoneChange(it)
+                    event(CafeCreateEvent.ChangePhone(it))
                 }
 
                 Spacer(Modifier.height(16.dp))
 
                 BaseSimpleFormField(
                     label = "Description",
-                    value = uiData.description
+                    value = state.description
                 ) {
-                    uiEvent.onDescriptionChange(it)
+                    event(CafeCreateEvent.ChangeDescription(it))
                 }
 
                 Spacer(Modifier.height(16.dp))
 
                 BaseSimpleFormField(
                     label = "Minimal Order",
-                    value = uiData.minimalOrder
+                    value = state.minimalOrder
                 ) {
-                    uiEvent.onMinimalOrderChange(it)
+                    event(CafeCreateEvent.ChangeMinimalOrder(it))
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -148,27 +144,27 @@ fun CafeCreateScreen(
                 Row {
                     BaseSimpleFormField(
                         label = "Open Time (HH:mm)",
-                        value = uiData.openTime,
+                        value = state.openTime,
                         modifier = Modifier.weight(1f)
                     ) {
-                        uiEvent.onOpenTimeChange(it)
+                        event(CafeCreateEvent.ChangeOpenTime(it))
                     }
 
                     Spacer(Modifier.width(16.dp))
 
                     BaseSimpleFormField(
                         label = "Close Time (HH:mm)",
-                        value = uiData.closeTime,
+                        value = state.closeTime,
                         modifier = Modifier.weight(1f)
                     ) {
-                        uiEvent.onCloseTimeChange(it)
+                        event(CafeCreateEvent.ChangeCloseTime(it))
                     }
                 }
 
                 Spacer(Modifier.height(32.dp))
 
                 Button(
-                    onClick = uiEvent.onCreateCafe,
+                    onClick = { event(CafeCreateEvent.Submit) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
@@ -231,34 +227,15 @@ private fun StorePhotoSection(
 )
 @Composable
 fun CafeCreateScreenPreview() {
-
     CafeCreateScreen(
-        uiState = CafeCreateStateListener(),
-
-        uiData = CafeCreateDataListener(
+        state = CafeCreateUiState(
             name = "Shopme Cafe",
             phone = "08123456789",
             description = "Best coffee in town",
             minimalOrder = "10000",
             openTime = "09:00",
-            closeTime = "22:00",
-            image = null,
-            isActive = true
+            closeTime = "22:00"
         ),
-
-        uiEvent = CafeCreateEventListener(
-            onNameChange = {},
-            onPhoneChange = {},
-            onDescriptionChange = {},
-            onMinimalOrderChange = {},
-            onOpenTimeChange = {},
-            onCloseTimeChange = {},
-            onUploadImage = {},
-            onCreateCafe = {}
-        ),
-
-        uiNavigation = CafeCreateNavigationListener(
-            navigateBack = {}
-        )
+        event = {}
     )
 }
