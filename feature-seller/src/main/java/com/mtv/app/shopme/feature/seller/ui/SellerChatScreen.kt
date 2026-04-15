@@ -34,11 +34,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,24 +44,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEventListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailUiState
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
-
 
 @Composable
 fun SellerChatScreen(
-    uiState: SellerChatDetailStateListener,
-    uiData: SellerChatDetailDataListener,
-    uiEvent: SellerChatDetailEventListener,
-    uiNavigation: SellerChatDetailNavigationListener,
+    state: SellerChatDetailUiState,
+    event: (SellerChatDetailEvent) -> Unit
 ) {
-    var messageInput by remember { mutableStateOf(EMPTY_STRING) }
-    val messages = remember { mutableStateListOf<SellerChatDetailMessage>().apply { addAll(uiState.messages) } }
+    val messages = state.messages
+    val messageInput = state.currentMessage
 
     Column(
         modifier = Modifier
@@ -82,7 +71,7 @@ fun SellerChatScreen(
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { uiNavigation.onBack() }) {
+            IconButton(onClick = { event(SellerChatDetailEvent.ClickBack) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
 
@@ -114,7 +103,7 @@ fun SellerChatScreen(
         ) {
             OutlinedTextField(
                 value = messageInput,
-                onValueChange = { messageInput = it },
+                onValueChange = { event(SellerChatDetailEvent.ChangeMessage(it)) },
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp, max = 150.dp),
                 placeholder = { Text("Tulis pesan...", fontFamily = PoppinsFont, fontSize = 14.sp) },
                 shape = RoundedCornerShape(16.dp),
@@ -126,9 +115,7 @@ fun SellerChatScreen(
             IconButton(
                 onClick = {
                     if (messageInput.isNotBlank()) {
-                        messages.add(SellerChatDetailMessage(messageInput, true))
-                        uiEvent.onSendMessage?.invoke(messageInput)
-                        messageInput = EMPTY_STRING
+                        event(SellerChatDetailEvent.SendMessage)
                     }
                 },
                 modifier = Modifier
@@ -164,10 +151,10 @@ fun SellerChatBubble(msg: SellerChatDetailMessage) {
 @Composable
 fun SellerChatDetailPreview() {
     SellerChatScreen(
-        uiState = SellerChatDetailStateListener(messages = mockSellerChatMessages()),
-        uiData = SellerChatDetailDataListener(),
-        uiEvent = SellerChatDetailEventListener(),
-        uiNavigation = SellerChatDetailNavigationListener()
+        state = SellerChatDetailUiState(
+            messages = mockSellerChatMessages()
+        ),
+        event = {}
     )
 }
 

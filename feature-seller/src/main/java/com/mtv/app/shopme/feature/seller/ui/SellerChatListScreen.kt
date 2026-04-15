@@ -55,19 +55,15 @@ import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.base64ToBitmap
-import com.mtv.app.shopme.feature.seller.contract.SellerChatListDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerChatListEventListener
+import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.feature.seller.contract.SellerChatListEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
-import com.mtv.app.shopme.feature.seller.contract.SellerChatListNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerChatListStateListener
-import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.feature.seller.contract.SellerChatListUiState
 
 @Composable
 fun SellerChatListScreen(
-    uiState: SellerChatListStateListener,
-    uiData: SellerChatListDataListener,
-    uiEvent: SellerChatListEventListener,
-    uiNavigation: SellerChatListNavigationListener
+    state: SellerChatListUiState,
+    event: (SellerChatListEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -85,7 +81,7 @@ fun SellerChatListScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = uiNavigation.onBack) {
+                IconButton(onClick = { event(SellerChatListEvent.ClickBack) }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
                 Text("Chats", fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
@@ -104,10 +100,10 @@ fun SellerChatListScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(horizontal = 20.dp)
         ) {
-            items(uiState.chatList) { item ->
+            items(state.chatList) { item ->
                 SellerListChatItem(
                     data = item,
-                    onClick = { uiNavigation.navigateToChat() }
+                    onClick = { event(SellerChatListEvent.ClickChat(item)) }
                 )
             }
         }
@@ -128,9 +124,9 @@ fun SellerListChatItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ChatAvatar(
+            modifier = Modifier.size(48.dp),
             base64Image = data.avatarBase64,
             placeholderRes = data.id.toIntOrNull() ?: 0,
-            modifier = Modifier.size(48.dp)
         )
         Spacer(Modifier.width(12.dp))
 
@@ -180,9 +176,9 @@ fun SellerListChatItem(
 
 @Composable
 fun ChatAvatar(
+    modifier: Modifier = Modifier,
     base64Image: String?,
-    placeholderRes: Int = 0,
-    modifier: Modifier = Modifier
+    placeholderRes: Int = 0
 ) {
     Box(
         modifier = modifier
@@ -235,10 +231,10 @@ fun SellerChatListPreview() {
                 .padding(bottom = padding.calculateBottomPadding())
         ) {
             SellerChatListScreen(
-                uiState = SellerChatListStateListener(chatList = mockSellerChatList()),
-                uiData = SellerChatListDataListener(),
-                uiEvent = SellerChatListEventListener({}),
-                uiNavigation = SellerChatListNavigationListener()
+                state = SellerChatListUiState(
+                    chatList = mockSellerChatList()
+                ),
+                event = {}
             )
         }
     }

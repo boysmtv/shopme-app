@@ -8,99 +8,117 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeStateListener
+import androidx.lifecycle.viewModelScope
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEffect
+import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeUiState
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerCreateCafeViewModel @Inject constructor(
+) : BaseEventViewModel<SellerCreateCafeEvent, SellerCreateCafeEffect>() {
 
-) : BaseViewModel(),
-    UiOwner<SellerCreateCafeStateListener, SellerCreateCafeDataListener> {
+    private val _state = MutableStateFlow(SellerCreateCafeUiState())
+    val uiState = _state.asStateFlow()
 
-    override val uiState = MutableStateFlow(
-        SellerCreateCafeStateListener()
-    )
+    override fun onEvent(event: SellerCreateCafeEvent) {
+        when (event) {
 
-    override val uiData = MutableStateFlow(
-        SellerCreateCafeDataListener()
-    )
+            is SellerCreateCafeEvent.Load -> {}
+            is SellerCreateCafeEvent.DismissDialog -> dismissDialog()
 
-    fun onCafeNameChange(value: String) {
-        uiData.update { it.copy(cafeName = value) }
-    }
+            is SellerCreateCafeEvent.ChangeCafeName -> update { copy(cafeName = event.value) }
+            is SellerCreateCafeEvent.ChangePhone -> update { copy(phone = event.value) }
+            is SellerCreateCafeEvent.ChangeMinOrder -> update { copy(minOrder = event.value) }
+            is SellerCreateCafeEvent.ChangeOpenHours -> update { copy(openHours = event.value) }
+            is SellerCreateCafeEvent.ChangeDescription -> update { copy(description = event.value) }
 
-    fun onPhoneChange(value: String) {
-        uiData.update { it.copy(phone = value) }
-    }
+            is SellerCreateCafeEvent.ChangeVillage -> update { copy(village = event.value) }
+            is SellerCreateCafeEvent.ChangeBlock -> update { copy(block = event.value) }
+            is SellerCreateCafeEvent.ChangeNumber -> update { copy(number = event.value) }
+            is SellerCreateCafeEvent.ChangeRt -> update { copy(rt = event.value) }
+            is SellerCreateCafeEvent.ChangeRw -> update { copy(rw = event.value) }
 
-    fun onMinOrderChange(value: String) {
-        uiData.update { it.copy(minOrder = value) }
-    }
+            SellerCreateCafeEvent.UploadPhoto -> emitEffect(SellerCreateCafeEffect.OpenImagePicker)
+            SellerCreateCafeEvent.PickLocation -> emitEffect(SellerCreateCafeEffect.OpenLocationPicker)
 
-    fun onOpenHoursChange(value: String) {
-        uiData.update { it.copy(openHours = value) }
-    }
+            SellerCreateCafeEvent.NextStep -> nextStep()
+            SellerCreateCafeEvent.CreateCafe -> createCafe()
 
-    fun onDescriptionChange(value: String) {
-        uiData.update { it.copy(description = value) }
-    }
+            SellerCreateCafeEvent.ClickBack -> emitEffect(SellerCreateCafeEffect.NavigateBack)
+            SellerCreateCafeEvent.PrevStep -> {
+                _state.update { it.copy(step = (it.step - 1).coerceAtLeast(1)) }
+            }
+            is SellerCreateCafeEvent.ChangeCloseHours ->
+                update { copy(closeHours = event.value) }
+            is SellerCreateCafeEvent.ImageSelected ->
+                update { copy(cafePhoto = event.uri) }
 
-    fun onVillageChange(value: String) {
-        uiData.update { it.copy(village = value) }
-    }
-
-    fun onBlockChange(value: String) {
-        uiData.update { it.copy(block = value) }
-    }
-
-    fun onNumberChange(value: String) {
-        uiData.update { it.copy(number = value) }
-    }
-
-    fun onRtChange(value: String) {
-        uiData.update { it.copy(rt = value) }
-    }
-
-    fun onRwChange(value: String) {
-        uiData.update { it.copy(rw = value) }
-    }
-
-    fun onUploadPhoto() {
-        // open image picker
-    }
-
-    fun onPickLocation() {
-        // open google maps picker
-    }
-
-    fun onNextStep() {
-
-        if (!validateStep()) return
-
-        uiState.update {
-            it.copy(step = it.step + 1)
+            SellerCreateCafeEvent.RemovePhoto ->
+                update { copy(cafePhoto = null) }
         }
     }
 
-    private fun validateStep(): Boolean {
-
-        val data = uiData.value
-
-        if (data.cafeName.isBlank()) {
-            uiState.update { it.copy(errorMessage = "Cafe name is required") }
-            return false
-        }
-
-        return true
+    private fun update(block: SellerCreateCafeUiState.() -> SellerCreateCafeUiState) {
+        _state.update { it.block() }
     }
 
-    fun createCafe() {
-        // API create cafe
+    private fun nextStep() {
+        val state = _state.value
+
+        when (state.step) {
+            1 -> {
+                if (state.cafeName.isBlank() || state.phone.isBlank()) {
+                    showError("Nama & Phone wajib diisi")
+                    return
+                }
+            }
+
+            2 -> {
+                if (state.village.isBlank()) {
+                    showError("Alamat belum lengkap")
+                    return
+                }
+            }
+        }
+
+        _state.update {
+            it.copy(step = (it.step + 1).coerceAtMost(4))
+        }
+    }
+
+    private fun createCafe() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
+            delay(1000)
+
+            _state.update { it.copy(isLoading = false) }
+
+            emitEffect(SellerCreateCafeEffect.NavigateSuccess)
+        }
+    }
+
+    private fun showError(message: String) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = "Error",
+                    message = message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
     }
 }
