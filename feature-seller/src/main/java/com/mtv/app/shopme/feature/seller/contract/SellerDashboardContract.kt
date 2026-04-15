@@ -8,23 +8,38 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 
-data class SellerDashboardStateListener(
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading
+data class SellerDashboardUiState(
+    val isLoading: Boolean = false,
+    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
+
+    val orders: List<SellerOrderItem> = emptyList(),
+
+    val isOnline: Boolean = true,
+    val selectedFilter: String = "All",
+    val selectedSort: String = "Asc"
 )
 
-data class SellerDashboardDataListener(
-    val emptyData: String? = null
-)
+sealed class SellerDashboardEvent {
+    object Load : SellerDashboardEvent()
+    object DismissDialog : SellerDashboardEvent()
 
-data class SellerDashboardEventListener(
-    val onRefresh: () -> Unit = {}
-)
+    object Refresh : SellerDashboardEvent()
 
-data class SellerDashboardNavigationListener(
-    val onNavigateToProduct: () -> Unit = {},
-    val onNavigateToOrder: () -> Unit = {},
-    val onNavigateToOrderDetail: (String) -> Unit = {},
-    val onNavigateToNotif: () -> Unit = {}
-)
+    object ClickProduct : SellerDashboardEvent()
+    object ClickOrder : SellerDashboardEvent()
+    data class ClickOrderDetail(val orderId: String) : SellerDashboardEvent()
+    object ClickNotif : SellerDashboardEvent()
+    object ToggleOnline : SellerDashboardEvent()
+    data class ChangeFilter(val value: String) : SellerDashboardEvent()
+    data class ChangeSort(val value: String) : SellerDashboardEvent()
+}
+
+sealed class SellerDashboardEffect {
+    object NavigateToProduct : SellerDashboardEffect()
+    object NavigateToOrder : SellerDashboardEffect()
+    data class NavigateToOrderDetail(val orderId: String) : SellerDashboardEffect()
+    object NavigateToNotif : SellerDashboardEffect()
+}
