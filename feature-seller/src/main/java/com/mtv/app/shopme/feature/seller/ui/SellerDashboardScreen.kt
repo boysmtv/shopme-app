@@ -40,10 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,70 +57,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.feature.seller.contract.SellerDashboardDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerDashboardNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerDashboardStateListener
-import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.domain.model.SellerOrderItem
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardUiState
 import kotlin.math.max
 
 @Composable
 fun SellerDashboardScreen(
-    uiState: SellerDashboardStateListener,
-    uiData: SellerDashboardDataListener,
-    uiEvent: SellerDashboardEventListener,
-    uiNavigation: SellerDashboardNavigationListener
+    state: SellerDashboardUiState,
+    event: (SellerDashboardEvent) -> Unit
 ) {
-    var isOnline by remember { mutableStateOf(true) }
-    var selectedFilter by remember { mutableStateOf("All") }
-    var selectedSort by remember { mutableStateOf("Asc") }
+    val isOnline = state.isOnline
+    val selectedFilter = state.selectedFilter
+    val selectedSort = state.selectedSort
 
-    val orders = listOf(
-        mapOf(
-            "invoice" to "INV-2026-001",
-            "customer" to "John Doe",
-            "total" to "Rp 120.000",
-            "date" to "18 Feb 2026",
-            "time" to "09:45",
-            "payment" to "Transfer Bank",
-            "status" to "Pending",
-            "location" to "Puri Lestari - Blok H12/12"
-        ),
-        mapOf(
-            "invoice" to "INV-2026-002",
-            "customer" to "Jane Smith",
-            "total" to "Rp 250.000",
-            "date" to "17 Feb 2026",
-            "time" to "14:30",
-            "payment" to "E-Wallet",
-            "status" to "Completed",
-            "location" to "Puri Lestari - Blok H11/10"
-        ),
-        mapOf(
-            "invoice" to "INV-2026-003",
-            "customer" to "Michael Johnson",
-            "total" to "Rp 180.000",
-            "date" to "16 Feb 2026",
-            "time" to "11:15",
-            "payment" to "Cash",
-            "status" to "Cooking",
-            "location" to "Puri Indah - Blok A5/3"
-        ),
-        mapOf(
-            "invoice" to "INV-2026-004",
-            "customer" to "Emily Davis",
-            "total" to "Rp 300.000",
-            "date" to "15 Feb 2026",
-            "time" to "16:50",
-            "payment" to "Transfer Bank",
-            "status" to "Cancelled",
-            "location" to "Puri Lestari - Blok H13/5"
-        ),
-    )
+    val orders = state.orders
 
     val sortedOrders = remember(orders, selectedSort) {
-        if (selectedSort == "Asc") orders.sortedBy { it["location"] }
-        else orders.sortedByDescending { it["location"] }
+        if (selectedSort == "Asc") orders.sortedBy { it.location }
+        else orders.sortedByDescending { it.location }
     }
 
     Column(
@@ -145,8 +98,8 @@ fun SellerDashboardScreen(
             item {
                 DashboardHeader(
                     isOnline = isOnline,
-                    onToggle = { isOnline = !isOnline },
-                    onNotifClick = { uiNavigation.onNavigateToNotif() }
+                    onToggle = { event(SellerDashboardEvent.ToggleOnline) },
+                    onNotifClick = { event(SellerDashboardEvent.ClickNotif) }
                 )
             }
 
@@ -168,7 +121,9 @@ fun SellerDashboardScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OrderFilterChips(selected = selectedFilter, onSelected = { selectedFilter = it })
+                    OrderFilterChips(
+                        selected = selectedFilter,
+                        onSelected = { event(SellerDashboardEvent.ChangeFilter(it)) })
 
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf("Asc", "Desc").forEach { sortOption ->
@@ -180,7 +135,7 @@ fun SellerDashboardScreen(
                                         if (isSelected) AppColor.Blue
                                         else Color.LightGray.copy(alpha = 0.3f)
                                     )
-                                    .clickable { selectedSort = sortOption }
+                                    .clickable { event(SellerDashboardEvent.ChangeSort(sortOption)) }
                                     .padding(horizontal = 12.dp, vertical = 6.dp)
                             ) {
                                 Text(
@@ -197,16 +152,16 @@ fun SellerDashboardScreen(
 
             items(sortedOrders.size) { index ->
                 val order = sortedOrders[index]
-                if (selectedFilter == "All" || order["status"] == selectedFilter) {
+                if (selectedFilter == "All" || order.status == selectedFilter) {
                     ModernOrderItemCompact(
-                        invoice = order["invoice"]!!,
-                        customer = order["customer"]!!,
-                        total = order["total"]!!,
-                        date = order["date"]!!,
-                        time = order["time"]!!,
-                        paymentMethod = order["payment"]!!,
-                        status = order["status"]!!,
-                        location = order["location"]!!
+                        invoice = order.invoice,
+                        customer = order.customer,
+                        total = order.total,
+                        date = order.date,
+                        time = order.time,
+                        paymentMethod = order.paymentMethod,
+                        status = order.status,
+                        location = order.location,
                     )
                     Spacer(Modifier.height(8.dp))
                 }
@@ -557,6 +512,32 @@ private fun OrderFilterChips(
 @Composable
 fun SellerDashboardPreview() {
     val navController = rememberNavController()
+
+    val mockOrders = listOf(
+        SellerOrderItem(
+            id = "1",
+            invoice = "INV-001",
+            customer = "John Doe",
+            total = "Rp 120.000",
+            date = "18 Feb 2026",
+            time = "09:45",
+            paymentMethod = "Transfer",
+            status = "Pending",
+            location = "Puri Lestari"
+        ),
+        SellerOrderItem(
+            id = "2",
+            invoice = "INV-002",
+            customer = "Jane Smith",
+            total = "Rp 250.000",
+            date = "17 Feb 2026",
+            time = "14:30",
+            paymentMethod = "E-Wallet",
+            status = "Completed",
+            location = "Puri Indah"
+        )
+    )
+
     Scaffold(
         bottomBar = {
             SellerBottomNavigationBar(navController)
@@ -568,11 +549,16 @@ fun SellerDashboardPreview() {
                 .fillMaxSize()
                 .background(AppColor.White)
         ) {
+
             SellerDashboardScreen(
-                uiState = SellerDashboardStateListener(),
-                uiData = SellerDashboardDataListener(),
-                uiEvent = SellerDashboardEventListener(),
-                uiNavigation = SellerDashboardNavigationListener()
+                state = SellerDashboardUiState(
+                    isLoading = false,
+                    orders = mockOrders,
+                    isOnline = true,
+                    selectedFilter = "All",
+                    selectedSort = "Asc"
+                ),
+                event = {}
             )
         }
     }
