@@ -64,8 +64,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.data.dto.OrderItemModel
-import com.mtv.app.shopme.data.dto.OrderModel
+import com.mtv.app.shopme.data.dto.OrderItem
+import com.mtv.app.shopme.data.dto.Order
 import com.mtv.app.shopme.data.dto.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
@@ -256,7 +256,7 @@ private fun ModernOrderTopBar(
 
 @Composable
 fun ModernOrderCard(
-    order: OrderModel,
+    order: Order,
     onClick: () -> Unit,
     onUploadProofClick: (String) -> Unit
 ) {
@@ -618,36 +618,36 @@ fun UploadProofSheet(
 @Composable
 fun OrderScreenPreview() {
     val dummyOrders = listOf(
-        OrderModel(
+        Order(
             id = "A001",
             customerId = "C001",
             cafeId = "Mamah Al Cafe",
             items = listOf(
-                OrderItemModel(foodId = 0, quantity = 2, price = 15000.0),
-                OrderItemModel(foodId = 3, quantity = 1, price = 15000.0)
+                OrderItem(foodId = 0, quantity = 2, price = 15000.0),
+                OrderItem(foodId = 3, quantity = 1, price = 15000.0)
             ),
             totalPrice = 45000.0,
             status = OrderStatus.ORDERED,
             paymentMethod = PaymentMethod.TRANSFER
         ),
-        OrderModel(
+        Order(
             id = "A002",
             customerId = "C001",
             cafeId = "Mamah Al Cafe",
             items = listOf(
-                OrderItemModel(foodId = 1, quantity = 1, price = 30000.0)
+                OrderItem(foodId = 1, quantity = 1, price = 30000.0)
             ),
             totalPrice = 30000.0,
             status = OrderStatus.DELIVERING,
             paymentMethod = PaymentMethod.TRANSFER
         ),
-        OrderModel(
+        Order(
             id = "A003",
             customerId = "C001",
             cafeId = "Mamah Al Cafe",
             items = listOf(
-                OrderItemModel(foodId = 2, quantity = 1, price = 20000.0),
-                OrderItemModel(foodId = 5, quantity = 2, price = 16000.0)
+                OrderItem(foodId = 2, quantity = 1, price = 20000.0),
+                OrderItem(foodId = 5, quantity = 2, price = 16000.0)
             ),
             totalPrice = 52000.0,
             status = OrderStatus.COMPLETED,
