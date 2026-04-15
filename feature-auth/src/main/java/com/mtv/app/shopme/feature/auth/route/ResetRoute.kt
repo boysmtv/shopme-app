@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.auth.ui.ResetScreen
 @Composable
 fun ResetRoute(nav: NavController) {
     BaseRoute<ResetViewModel, ResetStateListener, ResetDataListener> { vm, base, uiState, uiData ->
-        BaseScreen(baseUiState = base, dismissDialog = vm::dismissError) {
+        BaseScreen(baseUiState = base, dismissDialog = vm::dismissDialog) {
             ResetScreen(
                 uiState = uiState,
                 uiData = uiData,
