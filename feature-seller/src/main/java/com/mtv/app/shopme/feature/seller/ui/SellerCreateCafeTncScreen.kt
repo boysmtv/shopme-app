@@ -37,23 +37,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncUiState
 
 @Composable
 fun SellerCreateCafeTncScreen(
-    uiState: SellerCreateCafeTncStateListener,
-    uiData: SellerCreateCafeTncDataListener,
-    uiEvent: SellerCreateCafeTncEventListener,
-    uiNavigation: SellerCreateCafeTncNavigationListener
+    state: SellerCreateCafeTncUiState,
+    event: (SellerCreateCafeTncEvent) -> Unit
 ) {
 
     val isValid =
-        uiData.agreeTerms &&
-                uiData.agreeFoodSafety &&
-                uiData.agreeLocation
+        state.agreeTerms &&
+                state.agreeFoodSafety &&
+                state.agreeLocation
 
     Column(
         modifier = Modifier
@@ -87,28 +83,30 @@ fun SellerCreateCafeTncScreen(
             Spacer(Modifier.height(24.dp))
 
             SellerTncCard(
-                checked = uiData.agreeTerms,
+                checked = state.agreeTerms,
                 title = "Accurate Cafe Information",
                 description = "I confirm that all information provided about my cafe including the cafe name, contact number, description, menu offerings, and other related details are accurate and truthful. I understand that providing misleading or incorrect information may lead to the suspension or removal of my cafe listing from the platform.",
-                onCheckedChange = uiEvent.onAgreeTerms
+                onCheckedChange = {
+                    event(SellerCreateCafeTncEvent.AgreeTerms(it))
+                }
             )
 
             Spacer(Modifier.height(16.dp))
 
             SellerTncCard(
-                checked = uiData.agreeFoodSafety,
+                checked = state.agreeFoodSafety,
                 title = "Food Safety and Quality Compliance",
                 description = "I agree that all food and beverages sold through my cafe comply with local food safety regulations and hygiene standards. I will ensure that the preparation, storage, and serving of food maintain proper cleanliness and safety practices to protect the health and well-being of customers.",
-                onCheckedChange = uiEvent.onAgreeFoodSafety
+                onCheckedChange = { event(SellerCreateCafeTncEvent.AgreeFoodSafety(it)) }
             )
 
             Spacer(Modifier.height(16.dp))
 
             SellerTncCard(
-                checked = uiData.agreeLocation,
+                checked = state.agreeLocation,
                 title = "Valid and Accessible Cafe Location",
                 description = "I confirm that the cafe address and location provided are correct and accessible for customers and delivery partners. I understand that inaccurate location information may cause order delivery issues and negatively affect customer experience.",
-                onCheckedChange = uiEvent.onAgreeLocation
+                onCheckedChange = { event(SellerCreateCafeTncEvent.AgreeLocation(it)) }
             )
 
             Spacer(Modifier.height(24.dp))
@@ -122,7 +120,7 @@ fun SellerCreateCafeTncScreen(
         }
 
         Button(
-            onClick = uiEvent.onNext,
+            onClick = { event(SellerCreateCafeTncEvent.Next) },
             enabled = isValid,
             modifier = Modifier
                 .fillMaxWidth()
@@ -197,23 +195,12 @@ fun SellerTncCard(
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerCreateCafeTncScreenPreview() {
-
     SellerCreateCafeTncScreen(
-        uiState = SellerCreateCafeTncStateListener(),
-        uiData = SellerCreateCafeTncDataListener(
+        state = SellerCreateCafeTncUiState(
             agreeTerms = true,
             agreeFoodSafety = false,
             agreeLocation = false
         ),
-        uiEvent = SellerCreateCafeTncEventListener(
-            onAgreeTerms = {},
-            onAgreeFoodSafety = {},
-            onAgreeLocation = {},
-            onNext = {}
-        ),
-        uiNavigation = SellerCreateCafeTncNavigationListener(
-            navigateBack = {},
-            navigateNext = {}
-        )
+        event = {}
     )
 }

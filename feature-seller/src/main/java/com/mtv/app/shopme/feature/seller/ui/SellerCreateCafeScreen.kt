@@ -5,6 +5,7 @@
  *
  * Last modified by Dedy Wijaya on 14/03/26 14.12
  */
+
 package com.mtv.app.shopme.feature.seller.ui
 
 import android.net.Uri
@@ -32,7 +33,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Phone
@@ -49,10 +49,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,36 +63,20 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeUiState
+import androidx.core.net.toUri
 
 enum class CafeStep { BASIC, ADDRESS, PHOTO, REVIEW }
 
 @Composable
 fun SellerCreateCafeScreen(
-    uiState: SellerCreateCafeStateListener,
-    uiData: SellerCreateCafeDataListener,
-    uiEvent: SellerCreateCafeEventListener,
-    uiNavigation: SellerCreateCafeNavigationListener,
-    initialStep: CafeStep = CafeStep.BASIC
+    state: SellerCreateCafeUiState,
+    event: (SellerCreateCafeEvent) -> Unit
 ) {
 
-    var step by remember { mutableStateOf(initialStep) }
-
-    var cafePhotoUri by remember {
-        mutableStateOf<Uri?>(null)
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-
-        uri ?: return@rememberLauncherForActivityResult
-
-        cafePhotoUri = uri
-    }
+    val currentStep = CafeStep.entries.getOrElse(state.step - 1) { CafeStep.BASIC }
+    val photo = state.cafePhoto
 
     Column(
         modifier = Modifier
@@ -106,9 +86,7 @@ fun SellerCreateCafeScreen(
 
         Surface(shadowElevation = 4.dp) {
             Column(Modifier.padding(16.dp)) {
-
-                CafeStepper(step)
-
+                CafeStepper(currentStep)
             }
         }
 
@@ -118,7 +96,7 @@ fun SellerCreateCafeScreen(
             contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)
         ) {
 
-            when (step) {
+            when (currentStep) {
 
                 CafeStep.BASIC -> {
 
@@ -131,16 +109,16 @@ fun SellerCreateCafeScreen(
                         ModernCard {
 
                             ModernOutlinedField(
-                                value = uiData.cafeName,
-                                onValueChange = uiEvent.onCafeNameChange,
+                                value = state.cafeName.ifEmpty { "-" },
+                                onValueChange = { event(SellerCreateCafeEvent.ChangeCafeName(it)) },
                                 label = "Cafe Name",
                                 icon = Icons.Default.Store,
                                 modifier = Modifier.fillMaxWidth()
                             )
 
                             ModernOutlinedField(
-                                value = uiData.phone,
-                                onValueChange = uiEvent.onPhoneChange,
+                                value = state.phone,
+                                onValueChange = { event(SellerCreateCafeEvent.ChangePhone(it)) },
                                 label = "Phone Number",
                                 icon = Icons.Default.Phone,
                                 modifier = Modifier.fillMaxWidth()
@@ -148,9 +126,9 @@ fun SellerCreateCafeScreen(
 
                             Row {
                                 ModernOutlinedField(
-                                    value = uiData.openHours,
+                                    value = state.openHours,
+                                    onValueChange = { event(SellerCreateCafeEvent.ChangeOpenHours(it)) },
                                     icon = Icons.Default.WatchLater,
-                                    onValueChange = uiEvent.onOpenHoursChange,
                                     label = "Opening Hours",
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -160,10 +138,10 @@ fun SellerCreateCafeScreen(
                                 Spacer(Modifier.width(16.dp))
 
                                 ModernOutlinedField(
-                                    value = uiData.closeHours,
+                                    value = state.closeHours,
+                                    onValueChange = { event(SellerCreateCafeEvent.ChangeCloseHours(it)) },
                                     icon = Icons.Default.WatchLater,
-                                    onValueChange = uiEvent.onOpenHoursChange,
-                                    label = "Opening Hours",
+                                    label = "Closing Hours",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(1f)
@@ -171,8 +149,8 @@ fun SellerCreateCafeScreen(
                             }
 
                             ModernOutlinedField(
-                                value = uiData.minOrder,
-                                onValueChange = uiEvent.onDescriptionChange,
+                                value = state.minOrder,
+                                onValueChange = { event(SellerCreateCafeEvent.ChangeMinOrder(it)) },
                                 label = "Minimum Order",
                                 icon = Icons.Default.PriceChange,
                                 modifier = Modifier
@@ -181,8 +159,8 @@ fun SellerCreateCafeScreen(
                             )
 
                             ModernOutlinedField(
-                                value = uiData.description,
-                                onValueChange = uiEvent.onDescriptionChange,
+                                value = state.description,
+                                onValueChange = { event(SellerCreateCafeEvent.ChangeDescription(it)) },
                                 label = "Description",
                                 icon = Icons.Default.Description,
                                 modifier = Modifier
@@ -204,8 +182,8 @@ fun SellerCreateCafeScreen(
                         ModernCard {
 
                             ModernOutlinedField(
-                                value = uiData.village,
-                                onValueChange = uiEvent.onVillageChange,
+                                value = state.village,
+                                onValueChange = { event(SellerCreateCafeEvent.ChangeVillage(it)) },
                                 label = "Village",
                                 icon = Icons.Default.LocationOn,
                                 modifier = Modifier.fillMaxWidth()
@@ -216,15 +194,15 @@ fun SellerCreateCafeScreen(
                             ) {
 
                                 ModernOutlinedField(
-                                    value = uiData.block,
-                                    onValueChange = uiEvent.onBlockChange,
+                                    value = state.block,
+                                    onValueChange = { event(SellerCreateCafeEvent.ChangeBlock(it)) },
                                     label = "Block",
                                     modifier = Modifier.weight(1f)
                                 )
 
                                 ModernOutlinedField(
-                                    value = uiData.number,
-                                    onValueChange = uiEvent.onNumberChange,
+                                    value = state.number,
+                                    onValueChange = { event(SellerCreateCafeEvent.ChangeNumber(it)) },
                                     label = "Number",
                                     modifier = Modifier.weight(1f)
                                 )
@@ -235,15 +213,15 @@ fun SellerCreateCafeScreen(
                             ) {
 
                                 ModernOutlinedField(
-                                    value = uiData.rt,
-                                    onValueChange = uiEvent.onRtChange,
+                                    value = state.rt,
+                                    onValueChange = { event(SellerCreateCafeEvent.ChangeRt(it)) },
                                     label = "RT",
                                     modifier = Modifier.weight(1f)
                                 )
 
                                 ModernOutlinedField(
-                                    value = uiData.rw,
-                                    onValueChange = uiEvent.onRwChange,
+                                    value = state.rw,
+                                    onValueChange = { event(SellerCreateCafeEvent.ChangeRw(it)) },
                                     label = "RW",
                                     modifier = Modifier.weight(1f)
                                 )
@@ -262,12 +240,12 @@ fun SellerCreateCafeScreen(
                         ModernCard {
 
                             CafeProfilePhotoUpload(
-                                photoUri = cafePhotoUri,
+                                photoUri = photo?.toUri(),
                                 onUploadClick = {
-                                    launcher.launch("image/*")
+                                    event(SellerCreateCafeEvent.UploadPhoto)
                                 },
                                 onRemoveClick = {
-                                    cafePhotoUri = null
+                                    event(SellerCreateCafeEvent.RemovePhoto)
                                 }
                             )
                         }
@@ -277,7 +255,6 @@ fun SellerCreateCafeScreen(
                 CafeStep.REVIEW -> {
 
                     item {
-
                         SectionTitle("Review Cafe")
 
                         Spacer(modifier = Modifier.height(20.dp))
@@ -285,12 +262,9 @@ fun SellerCreateCafeScreen(
                         Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
 
                             // PHOTO
-                            cafePhotoUri?.let {
-
+                            photo?.let {
                                 ModernCard {
-
                                     Column {
-
                                         Text(
                                             text = "Cafe Photo",
                                             fontFamily = PoppinsFont,
@@ -322,25 +296,25 @@ fun SellerCreateCafeScreen(
                                     ReviewItem(
                                         icon = Icons.Default.Store,
                                         label = "Cafe Name",
-                                        value = uiData.cafeName
+                                        value = state.cafeName.ifEmpty { "-" }
                                     )
 
                                     ReviewItem(
                                         icon = Icons.Default.Phone,
                                         label = "Phone",
-                                        value = uiData.phone
+                                        value = state.phone
                                     )
 
                                     ReviewItem(
                                         icon = Icons.Default.Schedule,
                                         label = "Opening Hours",
-                                        value = "${uiData.openHours} - ${uiData.closeHours}"
+                                        value = "${state.openHours} - ${state.closeHours}"
                                     )
 
                                     ReviewItem(
                                         icon = Icons.Default.ShoppingCart,
                                         label = "Minimum Order",
-                                        value = uiData.minOrder
+                                        value = state.minOrder
                                     )
                                 }
                             }
@@ -355,7 +329,7 @@ fun SellerCreateCafeScreen(
                                     Spacer(Modifier.height(8.dp))
 
                                     Text(
-                                        text = uiData.description,
+                                        text = state.description,
                                         fontFamily = PoppinsFont,
                                         fontSize = 14.sp,
                                         lineHeight = 20.sp,
@@ -373,19 +347,19 @@ fun SellerCreateCafeScreen(
                                     ReviewItem(
                                         icon = Icons.Default.LocationOn,
                                         label = "Village",
-                                        value = uiData.village
+                                        value = state.village
                                     )
 
                                     ReviewItem(
                                         icon = Icons.Default.Home,
                                         label = "Block / Number",
-                                        value = "${uiData.block}/${uiData.number}"
+                                        value = "${state.block}/${state.number}"
                                     )
 
                                     ReviewItem(
                                         icon = Icons.Default.Map,
                                         label = "RT / RW",
-                                        value = "${uiData.rt}/${uiData.rw}"
+                                        value = "${state.rt}/${state.rw}"
                                     )
                                 }
                             }
@@ -404,11 +378,10 @@ fun SellerCreateCafeScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                if (step != CafeStep.BASIC) {
-
+                if (currentStep != CafeStep.BASIC) {
                     Button(
                         onClick = {
-                            step = CafeStep.entries[step.ordinal - 1]
+                            event(SellerCreateCafeEvent.PrevStep)
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.LightGray
@@ -420,10 +393,10 @@ fun SellerCreateCafeScreen(
 
                 Button(
                     onClick = {
-                        if (step == CafeStep.REVIEW) {
-                            uiEvent.onCreateCafe()
+                        if (currentStep == CafeStep.REVIEW) {
+                            event(SellerCreateCafeEvent.CreateCafe)
                         } else {
-                            step = CafeStep.entries[step.ordinal + 1]
+                            event(SellerCreateCafeEvent.NextStep)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -432,7 +405,7 @@ fun SellerCreateCafeScreen(
                     shape = RoundedCornerShape(24.dp)
                 ) {
                     Text(
-                        text = if (step == CafeStep.REVIEW) "Create Cafe" else "Next",
+                        text = if (currentStep == CafeStep.REVIEW) "Create Cafe" else "Next",
                         fontFamily = PoppinsFont
                     )
                 }
@@ -467,7 +440,12 @@ fun CafeStepper(step: CafeStep) {
         Spacer(Modifier.height(6.dp))
 
         Text(
-            text = step.name,
+            text = when (step) {
+                CafeStep.BASIC -> "Basic Info"
+                CafeStep.ADDRESS -> "Address"
+                CafeStep.PHOTO -> "Photo"
+                CafeStep.REVIEW -> "Review"
+            },
             fontFamily = PoppinsFont,
             fontSize = 18.sp
         )
@@ -549,9 +527,7 @@ fun CafeProfilePhotoUpload(
                 .clickable { onUploadClick() },
             contentAlignment = Alignment.Center
         ) {
-
             if (photoUri != null) {
-
                 AsyncImage(
                     model = photoUri,
                     contentDescription = null,
@@ -618,22 +594,10 @@ fun CafeProfilePhotoUpload(
 )
 @Composable
 fun PreviewCreateCafeBasic() {
-
     MaterialTheme {
-
         SellerCreateCafeScreen(
-            uiState = SellerCreateCafeStateListener(),
-            uiData = SellerCreateCafeDataListener(
-                cafeName = "Shopme Coffee",
-                phone = "08123456789",
-                openHours = "09:00",
-                closeHours = "22:00",
-                minOrder = "Rp 10.000",
-                description = "Specialty coffee & fresh bakery"
-            ),
-            uiEvent = SellerCreateCafeEventListener(),
-            uiNavigation = SellerCreateCafeNavigationListener(),
-            initialStep = CafeStep.BASIC
+            state = SellerCreateCafeUiState(),
+            event = {}
         )
     }
 }
@@ -645,24 +609,11 @@ fun PreviewCreateCafeBasic() {
 )
 @Composable
 fun PreviewCreateCafeAddress() {
-
     MaterialTheme {
-
         SellerCreateCafeScreen(
-            uiState = SellerCreateCafeStateListener(),
-            uiData = SellerCreateCafeDataListener(
-                cafeName = "Shopme Coffee",
-                village = "Griya Asri",
-                block = "A",
-                number = "12",
-                rt = "01",
-                rw = "02"
-            ),
-            uiEvent = SellerCreateCafeEventListener(),
-            uiNavigation = SellerCreateCafeNavigationListener(),
-            initialStep = CafeStep.ADDRESS
+            state = SellerCreateCafeUiState(),
+            event = {}
         )
-
     }
 }
 
@@ -673,24 +624,11 @@ fun PreviewCreateCafeAddress() {
 )
 @Composable
 fun PreviewCreateCafePhotoStep() {
-
     MaterialTheme {
-
         SellerCreateCafeScreen(
-            uiState = SellerCreateCafeStateListener(),
-            uiData = SellerCreateCafeDataListener(
-                cafeName = "Shopme Coffee",
-                village = "Griya Asri",
-                block = "A",
-                number = "12",
-                rt = "01",
-                rw = "02"
-            ),
-            uiEvent = SellerCreateCafeEventListener(),
-            uiNavigation = SellerCreateCafeNavigationListener(),
-            initialStep = CafeStep.PHOTO
+            state = SellerCreateCafeUiState(),
+            event = {}
         )
-
     }
 }
 
@@ -703,24 +641,8 @@ fun PreviewCreateCafePhotoStep() {
 fun PreviewCreateCafeReview() {
     MaterialTheme {
         SellerCreateCafeScreen(
-            uiState = SellerCreateCafeStateListener(),
-            uiData = SellerCreateCafeDataListener(
-                cafeName = "Shopme Coffee",
-                phone = "08123456789",
-                openHours = "09:00",
-                closeHours = "22:00",
-                minOrder = "Rp 10.000",
-                description = "Specialty coffee & fresh bakery",
-                village = "Griya Asri",
-                block = "A",
-                number = "12",
-                rt = "01",
-                rw = "02"
-            ),
-            uiEvent = SellerCreateCafeEventListener(),
-            uiNavigation = SellerCreateCafeNavigationListener(),
-            initialStep = CafeStep.REVIEW
+            state = SellerCreateCafeUiState(),
+            event = {}
         )
-
     }
 }

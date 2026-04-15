@@ -8,55 +8,61 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
-
-data class SellerCreateCafeStateListener(
+data class SellerCreateCafeUiState(
     val isLoading: Boolean = false,
     val step: Int = 1,
-    val errorMessage: String? = null
-)
 
-data class SellerCreateCafeDataListener(
-    val cafeName: String = EMPTY_STRING,
-    val phone: String = EMPTY_STRING,
-    val minOrder: String = EMPTY_STRING,
-    val openHours: String = EMPTY_STRING,
-    val closeHours: String = EMPTY_STRING,
-    val description: String = EMPTY_STRING,
+    val cafeName: String = "",
+    val phone: String = "",
+    val minOrder: String = "",
+    val openHours: String = "",
+    val closeHours: String = "",
+    val description: String = "",
     val cafePhoto: String? = null,
 
     val latitude: Double? = null,
     val longitude: Double? = null,
 
-    val village: String = EMPTY_STRING,
-    val block: String = EMPTY_STRING,
-    val number: String = EMPTY_STRING,
-    val rt: String = EMPTY_STRING,
-    val rw: String = EMPTY_STRING
+    val village: String = "",
+    val block: String = "",
+    val number: String = "",
+    val rt: String = "",
+    val rw: String = ""
 )
 
-data class SellerCreateCafeEventListener(
+sealed class SellerCreateCafeEvent {
 
-    val onCafeNameChange: (String) -> Unit = {},
-    val onPhoneChange: (String) -> Unit = {},
-    val onMinOrderChange: (String) -> Unit = {},
-    val onOpenHoursChange: (String) -> Unit = {},
-    val onDescriptionChange: (String) -> Unit = {},
+    object Load : SellerCreateCafeEvent()
+    object DismissDialog : SellerCreateCafeEvent()
 
-    val onVillageChange: (String) -> Unit = {},
-    val onBlockChange: (String) -> Unit = {},
-    val onNumberChange: (String) -> Unit = {},
-    val onRtChange: (String) -> Unit = {},
-    val onRwChange: (String) -> Unit = {},
+    data class ChangeCafeName(val value: String) : SellerCreateCafeEvent()
+    data class ChangePhone(val value: String) : SellerCreateCafeEvent()
+    data class ChangeMinOrder(val value: String) : SellerCreateCafeEvent()
+    data class ChangeOpenHours(val value: String) : SellerCreateCafeEvent()
+    data class ChangeCloseHours(val value: String) : SellerCreateCafeEvent()
+    data class ChangeDescription(val value: String) : SellerCreateCafeEvent()
 
-    val onUploadPhoto: () -> Unit = {},
-    val onPickLocation: () -> Unit = {},
+    data class ChangeVillage(val value: String) : SellerCreateCafeEvent()
+    data class ChangeBlock(val value: String) : SellerCreateCafeEvent()
+    data class ChangeNumber(val value: String) : SellerCreateCafeEvent()
+    data class ChangeRt(val value: String) : SellerCreateCafeEvent()
+    data class ChangeRw(val value: String) : SellerCreateCafeEvent()
 
-    val onNextStep: () -> Unit = {},
-    val onCreateCafe: () -> Unit = {}
-)
+    object UploadPhoto : SellerCreateCafeEvent()
+    object PickLocation : SellerCreateCafeEvent()
+    object PrevStep : SellerCreateCafeEvent()
+    object NextStep : SellerCreateCafeEvent()
+    object CreateCafe : SellerCreateCafeEvent()
 
-data class SellerCreateCafeNavigationListener(
-    val navigateBack: () -> Unit = {},
-    val navigateSuccess: () -> Unit = {}
-)
+    object ClickBack : SellerCreateCafeEvent()
+    data class ImageSelected(val uri: String) : SellerCreateCafeEvent()
+    object RemovePhoto : SellerCreateCafeEvent()
+}
+
+sealed class SellerCreateCafeEffect {
+    object NavigateBack : SellerCreateCafeEffect()
+    object NavigateSuccess : SellerCreateCafeEffect()
+
+    object OpenImagePicker : SellerCreateCafeEffect()
+    object OpenLocationPicker : SellerCreateCafeEffect()
+}

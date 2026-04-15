@@ -8,29 +8,27 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import androidx.navigation.NavController
+data class SellerCreateCafeTncUiState(
+    val isLoading: Boolean = false,
 
-data class SellerCreateCafeTncStateListener(
-    val isLoading: Boolean = false
-)
-
-data class SellerCreateCafeTncDataListener(
     val agreeTerms: Boolean = false,
     val agreeFoodSafety: Boolean = false,
     val agreeLocation: Boolean = false
 )
 
-data class SellerCreateCafeTncEventListener(
+sealed class SellerCreateCafeTncEvent {
+    object Load : SellerCreateCafeTncEvent()
+    object DismissDialog : SellerCreateCafeTncEvent()
 
-    val onAgreeTerms: (Boolean) -> Unit,
-    val onAgreeFoodSafety: (Boolean) -> Unit,
-    val onAgreeLocation: (Boolean) -> Unit,
+    data class AgreeTerms(val value: Boolean) : SellerCreateCafeTncEvent()
+    data class AgreeFoodSafety(val value: Boolean) : SellerCreateCafeTncEvent()
+    data class AgreeLocation(val value: Boolean) : SellerCreateCafeTncEvent()
 
-    val onNext: () -> Unit
-)
+    object Next : SellerCreateCafeTncEvent()
+    object ClickBack : SellerCreateCafeTncEvent()
+}
 
-data class SellerCreateCafeTncNavigationListener(
-    val navigateBack: () -> Unit = {},
-    val navigateNext: (navController: NavController) -> Unit = {}
-
-)
+sealed class SellerCreateCafeTncEffect {
+    object NavigateBack : SellerCreateCafeTncEffect()
+    object NavigateNext : SellerCreateCafeTncEffect()
+}
