@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 11/02/26 13.42
  */
 
-package com.mtv.app.shopme.nav.route
+package com.mtv.app.shopme.nav.route.customer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

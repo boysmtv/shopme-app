@@ -50,17 +50,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.customer.contract.SecurityDataListener
-import com.mtv.app.shopme.feature.customer.contract.SecurityEventListener
-import com.mtv.app.shopme.feature.customer.contract.SecurityNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.SecurityStateListener
+import com.mtv.app.shopme.feature.customer.contract.SecurityEvent
+import com.mtv.app.shopme.feature.customer.contract.SecurityUiState
 
 @Composable
 fun SecurityScreen(
-    uiState: SecurityStateListener,
-    uiData: SecurityDataListener,
-    uiEvent: SecurityEventListener,
-    uiNavigation: SecurityNavigationListener
+    state: SecurityUiState,
+    event: (SecurityEvent) -> Unit
 ) {
 
     Column(
@@ -79,7 +75,7 @@ fun SecurityScreen(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = uiNavigation.onBack) {
+            IconButton(onClick = { event(SecurityEvent.ClickBack) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
             }
 
@@ -107,22 +103,22 @@ fun SecurityScreen(
                     "Ubah Password",
                     "Perbarui password akun",
                     Icons.Default.Lock,
-                    uiNavigation.onChangePassword
+                    onClick = { event(SecurityEvent.ClickChangePassword) }
                 )
 
                 ModernSettingItem(
                     title = "Ubah PIN",
                     subtitle = "PIN keamanan transaksi",
                     icon = Icons.Default.Password,
-                    onClick = uiNavigation.onChangePin
+                    onClick = { event(SecurityEvent.ClickChangePin) }
                 )
 
                 ModernSwitchItem(
                     title = "Biometric / Fingerprint",
                     subtitle = "Login lebih cepat & aman",
                     icon = Icons.Default.Fingerprint,
-                    checked = uiData.biometricEnabled,
-                    onCheckedChange = uiEvent.onToggleBiometric
+                    checked = state.biometricEnabled,
+                    onCheckedChange = { event(SecurityEvent.ToggleBiometric(it)) }
                 )
 
                 Spacer(Modifier.height(20.dp))
@@ -132,14 +128,14 @@ fun SecurityScreen(
                 Spacer(Modifier.height(10.dp))
 
                 OutlinedButton(
-                    onClick = uiEvent.onLogoutAllDevice,
+                    onClick = { event(SecurityEvent.LogoutAllDevice) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Logout semua perangkat")
                 }
 
                 Button(
-                    onClick = uiEvent.onDeleteAccount,
+                    onClick = { event(SecurityEvent.DeleteAccount) },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(Color.Red)
                 ) {
@@ -247,9 +243,7 @@ fun ModernSwitchItem(
 @Composable
 fun SecurityPreview() {
     SecurityScreen(
-        uiState = SecurityStateListener(),
-        uiData = SecurityDataListener(biometricEnabled = true),
-        uiEvent = SecurityEventListener(),
-        uiNavigation = SecurityNavigationListener()
+        state = SecurityUiState(biometricEnabled = true),
+        event = {}
     )
 }
