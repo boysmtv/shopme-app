@@ -8,11 +8,11 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.dto.OrderModel
+import com.mtv.app.shopme.data.dto.Order
 
 data class OrderUiState(
     val isLoading: Boolean = false,
-    val orders: List<OrderModel> = emptyList(),
+    val orders: List<Order> = emptyList(),
     val activeDialog: OrderDialog? = null
 )
 

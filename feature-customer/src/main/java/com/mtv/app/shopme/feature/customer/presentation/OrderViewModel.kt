@@ -8,8 +8,8 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.data.dto.OrderItemModel
-import com.mtv.app.shopme.data.dto.OrderModel
+import com.mtv.app.shopme.data.dto.OrderItem
+import com.mtv.app.shopme.data.dto.Order
 import com.mtv.app.shopme.data.dto.OrderStatus
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
@@ -52,46 +52,46 @@ class OrderViewModel @Inject constructor() :
             delay(800)
 
             val dummy = listOf(
-                OrderModel(
+                Order(
                     id = "A001",
                     customerId = "C001",
                     cafeId = "Mamah Al Cafe",
                     items = listOf(
-                        OrderItemModel(foodId = 0, quantity = 2, price = 15000.0),
-                        OrderItemModel(foodId = 3, quantity = 1, price = 18000.0)
+                        OrderItem(foodId = 0, quantity = 2, price = 15000.0),
+                        OrderItem(foodId = 3, quantity = 1, price = 18000.0)
                     ),
                     totalPrice = 48000.0,
                     status = OrderStatus.COOKING
                 ),
-                OrderModel(
+                Order(
                     id = "A002",
                     customerId = "C001",
                     cafeId = "Mamah Al Cafe",
                     items = listOf(
-                        OrderItemModel(foodId = 1, quantity = 1, price = 30000.0),
-                        OrderItemModel(foodId = 4, quantity = 2, price = 20000.0)
+                        OrderItem(foodId = 1, quantity = 1, price = 30000.0),
+                        OrderItem(foodId = 4, quantity = 2, price = 20000.0)
                     ),
                     totalPrice = 70000.0,
                     status = OrderStatus.DELIVERING
                 ),
-                OrderModel(
+                Order(
                     id = "A003",
                     customerId = "C001",
                     cafeId = "Mamah Al Cafe",
                     items = listOf(
-                        OrderItemModel(foodId = 2, quantity = 3, price = 12000.0),
-                        OrderItemModel(foodId = 5, quantity = 1, price = 16000.0)
+                        OrderItem(foodId = 2, quantity = 3, price = 12000.0),
+                        OrderItem(foodId = 5, quantity = 1, price = 16000.0)
                     ),
                     totalPrice = 52000.0,
                     status = OrderStatus.COMPLETED
                 ),
-                OrderModel(
+                Order(
                     id = "A004",
                     customerId = "C001",
                     cafeId = "Mamah Al Cafe",
                     items = listOf(
-                        OrderItemModel(foodId = 6, quantity = 1, price = 25000.0),
-                        OrderItemModel(foodId = 7, quantity = 2, price = 22000.0)
+                        OrderItem(foodId = 6, quantity = 1, price = 25000.0),
+                        OrderItem(foodId = 7, quantity = 2, price = 22000.0)
                     ),
                     totalPrice = 69000.0,
                     status = OrderStatus.ORDERED
