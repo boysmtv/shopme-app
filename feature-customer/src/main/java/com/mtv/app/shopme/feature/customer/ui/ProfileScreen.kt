@@ -63,34 +63,32 @@ import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
-import com.mtv.app.shopme.feature.customer.contract.ProfileDataListener
+import com.mtv.app.shopme.domain.model.Address
+import com.mtv.app.shopme.domain.model.Customer
+import com.mtv.app.shopme.domain.model.MenuSummary
+import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
-import com.mtv.app.shopme.feature.customer.contract.ProfileEventListener
-import com.mtv.app.shopme.feature.customer.contract.ProfileNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.ProfileStateListener
 import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
-import com.mtv.app.shopme.feature.customer.utils.checkAddress
-import com.mtv.app.shopme.feature.customer.utils.checkName
-import com.mtv.app.shopme.feature.customer.utils.checkPhone
-import com.mtv.app.shopme.nav.customer.CustomerBottomNavigationBar
+import com.mtv.based.core.network.utils.LoadState
 
 @Composable
 fun ProfileScreen(
     state: ProfileUiState,
     event: (ProfileEvent) -> Unit
 ) {
-
+    val customer = (state.customer as? LoadState.Success)?.data
     val scrollState = rememberScrollState()
 
     val orderMenus = listOf(
-        OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet, uiData.customerData?.menuSummary?.ordered ?: 0),
-        OrderMenu("Dimasak", Icons.Filled.Inventory, uiData.customerData?.menuSummary?.cooking ?: 0),
-        OrderMenu("Dikirim", Icons.Filled.LocalShipping, uiData.customerData?.menuSummary?.shipping ?: 0),
-        OrderMenu("Selesai", Icons.Filled.CheckCircle, uiData.customerData?.menuSummary?.completed ?: 0)
+        OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet, customer?.menuSummary?.ordered ?: 0),
+        OrderMenu("Dimasak", Icons.Filled.Inventory, customer?.menuSummary?.cooking ?: 0),
+        OrderMenu("Dikirim", Icons.Filled.LocalShipping, customer?.menuSummary?.shipping ?: 0),
+        OrderMenu("Selesai", Icons.Filled.CheckCircle, customer?.menuSummary?.completed ?: 0)
     )
 
     Column(
@@ -107,9 +105,7 @@ fun ProfileScreen(
             .statusBarsPadding()
             .padding(top = 24.dp)
     ) {
-        HeaderProfile(
-            uiData.customerData
-        )
+        HeaderProfile(customer)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -155,7 +151,7 @@ fun ProfileScreen(
                         Column(
                             modifier = Modifier
                                 .weight(1f)
-                                .clickable { uiNavigation.onOrder() },
+                                .clickable { event(ProfileEvent.ClickOrder) },
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
 
@@ -212,35 +208,33 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         title = "Edit Account",
                         icon = Icons.Default.Person,
-                        onClickMenu = { uiNavigation.onEditProfile() }
+                        onClickMenu = { event(ProfileEvent.ClickEditProfile) }
                     )
                     ProfileMenuItem(
                         title = "Riwayat Belanja",
                         icon = Icons.Default.History,
-                        onClickMenu = { uiNavigation.onOrderHistory() }
+                        onClickMenu = { event(ProfileEvent.ClickOrderHistory) }
                     )
                     ProfileMenuItem(
                         title = "Pengaturan Akun",
                         icon = Icons.Default.Settings,
-                        onClickMenu = { uiNavigation.onSettings() }
+                        onClickMenu = { event(ProfileEvent.ClickSettings) }
                     )
                     ProfileMenuItem(
                         title = "Menjadi Penjual",
                         icon = Icons.Default.CardTravel,
-                        onClickMenu = {
-                            uiEvent.onCheckTncCafe()
-                        }
+                        onClickMenu = { event(ProfileEvent.ClickCheckTncCafe) }
                     )
                     ProfileMenuItem(
                         title = "Bantuan",
                         icon = Icons.AutoMirrored.Filled.Help,
-                        onClickMenu = { uiNavigation.onHelpCenter() }
+                        onClickMenu = { event(ProfileEvent.ClickHelpCenter) }
                     )
                     ProfileMenuItem(
                         title = "Keluar",
                         icon = Icons.Default.Map,
                         isLogout = true,
-                        onClickMenu = { /* logout */ }
+                        onClickMenu = { event(ProfileEvent.ClickLogout) }
                     )
                 }
             }
@@ -250,7 +244,7 @@ fun ProfileScreen(
 
 @Composable
 fun HeaderProfile(
-    customerData: CustomerResponse?
+    customer: Customer?
 ) {
     Column(
         modifier = Modifier
@@ -289,20 +283,20 @@ fun HeaderProfile(
 
             Column {
                 Text(
-                    text = "Hi, " + checkName(customerData),
+                    text = "Hi, " + customer?.name.orEmpty(),
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     fontFamily = PoppinsFont
                 )
                 Text(
-                    text = checkPhone(customerData),
+                    text = customer?.phone.orEmpty(),
                     color = Color.White.copy(.9f),
                     fontSize = 14.sp,
                     fontFamily = PoppinsFont
                 )
                 Text(
-                    text = checkAddress(customerData),
+                    text = customer?.address?.village.orEmpty(),
                     color = Color.White.copy(.7f),
                     fontSize = 12.sp,
                     fontFamily = PoppinsFont
@@ -325,9 +319,9 @@ fun HeaderProfile(
                     .padding(vertical = 14.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                ProfileStat(customerData?.stats?.totalOrders.toString(), "Pesanan")
-                ProfileStat(customerData?.stats?.activeOrders.toString(), "Aktif")
-                ProfileStat(customerData?.stats?.membership.toString(), "Member")
+                ProfileStat(customer?.stats?.totalOrders.toString(), "Pesanan")
+                ProfileStat(customer?.stats?.activeOrders.toString(), "Aktif")
+                ProfileStat(customer?.stats?.membership.toString(), "Member")
             }
         }
     }
@@ -412,35 +406,6 @@ data class OrderMenu(
 @Composable
 fun ProfileScreenPreview() {
 
-    val previewCustomer = CustomerResponse(
-        name = "Dedy Wijaya",
-        phone = "08158844424",
-        email = "boys.mtv@gmail.com",
-        address = AddressResponse(
-            id = "89a3c44a-b9c7-412f-83fd-f4f1ed66c6da",
-            village = "Puri Lestari",
-            block = "H2",
-            number = "21",
-            rt = "012",
-            rw = "002",
-            isDefault = true
-        ),
-        photo = "https://rakyatsulsel.fajar.co.id/wp-content/uploads/2025/03/g_p_o_potret_davina_karamoy_berhijab_saat_umrah_dipuji_makin_cantik_saat_tidak_pakai_makeup_p_davina_karamoy-20240925-007-non_fotografer_kly.jpg",
-        verified = true,
-        stats = StatsResponse(
-            totalOrders = 24,
-            activeOrders = 2,
-            membership = "GOLD"
-        ),
-        menuSummary = MenuSummaryResponse(
-            ordered = 12,
-            cooking = 2,
-            shipping = 1,
-            completed = 9,
-            cancelled = 2
-        )
-    )
-
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
@@ -454,12 +419,39 @@ fun ProfileScreenPreview() {
                 .background(Color.White)
         ) {
             ProfileScreen(
-                uiState = ProfileStateListener(),
-                uiData = ProfileDataListener(
-                    customerData = previewCustomer
+                state = ProfileUiState(
+                    customer = LoadState.Success(
+                        Customer(
+                            name = "Dedy Wijaya",
+                            phone = "08158844424",
+                            email = "boys.mtv@gmail.com",
+                            address = Address(
+                                id = "89a3c44a-b9c7-412f-83fd-f4f1ed66c6da",
+                                village = "Puri Lestari",
+                                block = "H2",
+                                number = "21",
+                                rt = "012",
+                                rw = "002",
+                                isDefault = true
+                            ),
+                            photo = "https://rakyatsulsel.fajar.co.id/wp-content/uploads/2025/03/g_p_o_potret_davina_karamoy_berhijab_saat_umrah_dipuji_makin_cantik_saat_tidak_pakai_makeup_p_davina_karamoy-20240925-007-non_fotografer_kly.jpg",
+                            verified = true,
+                            stats = Stats(
+                                totalOrders = 24,
+                                activeOrders = 2,
+                                membership = "GOLD"
+                            ),
+                            menuSummary = MenuSummary(
+                                ordered = 12,
+                                cooking = 2,
+                                shipping = 1,
+                                completed = 9,
+                                cancelled = 2
+                            )
+                        )
+                    )
                 ),
-                uiEvent = ProfileEventListener(),
-                uiNavigation = ProfileNavigationListener()
+                event = {}
             )
         }
     }

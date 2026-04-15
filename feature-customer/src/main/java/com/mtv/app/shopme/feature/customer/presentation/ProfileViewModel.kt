@@ -38,13 +38,11 @@ class ProfileViewModel @Inject constructor(
         when (event) {
             is ProfileEvent.Load -> load()
             is ProfileEvent.DismissDialog -> dismissDialog()
-
             is ProfileEvent.ClickEditProfile -> emitEffect(ProfileEffect.NavigateToEditProfile)
             is ProfileEvent.ClickOrderHistory -> emitEffect(ProfileEffect.NavigateToOrderHistory)
             is ProfileEvent.ClickSettings -> emitEffect(ProfileEffect.NavigateToSettings)
             is ProfileEvent.ClickHelpCenter -> emitEffect(ProfileEffect.NavigateToHelpCenter)
             is ProfileEvent.ClickOrder -> emitEffect(ProfileEffect.NavigateToOrder)
-
             is ProfileEvent.ClickCheckTncCafe -> handleCheckTnc()
             is ProfileEvent.ClickLogout -> logout()
         }
