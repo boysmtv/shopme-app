@@ -173,9 +173,7 @@ fun CartContent(
 
     // 🔥 REPLACEMENT LaunchedEffect lama
     LaunchedEffect(state.sessionToken) {
-        if (state.sessionToken != null) {
-            showPinSheet = true
-        }
+        showPinSheet = true
     }
 
     Box(
