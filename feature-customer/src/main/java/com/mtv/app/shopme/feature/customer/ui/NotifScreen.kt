@@ -48,13 +48,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.data.local.NotificationItem
+import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.feature.customer.contract.NotifDialog
 import com.mtv.app.shopme.feature.customer.contract.NotifEvent
 import com.mtv.app.shopme.feature.customer.contract.NotifUiState
 import com.mtv.app.shopme.feature.customer.presentation.previewNotification
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType

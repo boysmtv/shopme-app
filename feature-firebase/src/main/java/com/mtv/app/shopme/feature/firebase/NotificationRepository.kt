@@ -12,7 +12,7 @@ import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_CUSTOMER_NOTIFICATION
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_STATUS
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_TOKEN
-import com.mtv.app.shopme.data.local.NotificationItem
+import com.mtv.app.shopme.domain.model.NotificationItem
 
 class NotificationRepository(private val securePrefs: SecurePrefs) {
 
