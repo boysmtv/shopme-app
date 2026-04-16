@@ -1,14 +1,14 @@
 /*
  * Project: Shopme App
  * Author: Boys.mtv@gmail.com
- * File: CafeAddRequest.kt
+ * File: CafeAddParam.kt
  *
  * Last modified by Dedy Wijaya on 16/04/26 13.41
  */
 
-package com.mtv.app.shopme.data.remote.request
+package com.mtv.app.shopme.domain.param
 
-data class CafeAddRequest(
+data class CafeAddParam(
     val name: String,
     val phone: String = "",
     val description: String = "",

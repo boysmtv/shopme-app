@@ -13,10 +13,9 @@ import com.mtv.based.core.network.endpoint.IApiEndPoint
 import com.mtv.based.core.network.model.NetworkResponse
 import com.mtv.based.core.network.model.RequestOptions
 import com.mtv.based.core.network.repository.NetworkRepository
-import javax.inject.Inject
 
-abstract class BaseRemoteDataSource @Inject constructor(
-    val network: NetworkRepository
+abstract class BaseRemoteDataSource(
+    protected val network: NetworkRepository
 ) {
 
     protected suspend inline fun <reified R : Any> request(
