@@ -9,7 +9,7 @@ package com.mtv.app.shopme.feature.seller.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.data.remote.request.CafeAddRequest
+import com.mtv.app.shopme.domain.param.CafeAddParam
 import com.mtv.app.shopme.feature.seller.contract.CafeCreateEffect
 import com.mtv.app.shopme.feature.seller.contract.CafeCreateEvent
 import com.mtv.app.shopme.feature.seller.contract.CafeCreateUiState
@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class CafeCreateViewModel @Inject constructor(
-
 ) : BaseEventViewModel<CafeCreateEvent, CafeCreateEffect>() {
 
     private val _state = MutableStateFlow(CafeCreateUiState())
@@ -62,11 +61,11 @@ class CafeCreateViewModel @Inject constructor(
         val state = _state.value
 
         if (state.name.isBlank() || state.phone.isBlank()) {
-            showError(UiError(message = "Nama & Phone wajib diisi"))
+            showError(UiError.Validation(message = "Nama & Phone wajib diisi"))
             return
         }
 
-        val request = CafeAddRequest(
+        val request = CafeAddParam(
             name = state.name,
             phone = state.phone,
             description = state.description,
