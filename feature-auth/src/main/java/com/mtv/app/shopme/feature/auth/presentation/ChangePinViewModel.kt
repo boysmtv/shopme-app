@@ -8,42 +8,77 @@
 
 package com.mtv.app.shopme.feature.auth.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.auth.contract.ChangePinDataListener
-import com.mtv.app.shopme.feature.auth.contract.ChangePinStateListener
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.auth.contract.*
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class ChangePinViewModel @Inject constructor() :
-    BaseViewModel(),
-    UiOwner<ChangePinStateListener, ChangePinDataListener> {
+    BaseEventViewModel<ChangePinEvent, ChangePinEffect>() {
 
-    override val uiState = MutableStateFlow(ChangePinStateListener())
-    override val uiData = MutableStateFlow(ChangePinDataListener())
+    private val _state = MutableStateFlow(ChangePinUiState())
+    val uiState = _state.asStateFlow()
 
-    fun updateOldPin(value: String) {
-        uiData.value = uiData.value.copy(oldPin = value.take(6))
+    override fun onEvent(event: ChangePinEvent) {
+        when (event) {
+            is ChangePinEvent.OnOldPinChange -> {
+                _state.update { it.copy(oldPin = event.value.take(6)) }
+            }
+
+            is ChangePinEvent.OnNewPinChange -> {
+                _state.update { it.copy(newPin = event.value.take(6)) }
+            }
+
+            is ChangePinEvent.OnConfirmPinChange -> {
+                _state.update { it.copy(confirmPin = event.value.take(6)) }
+            }
+
+            ChangePinEvent.OnSubmit -> submit()
+
+            ChangePinEvent.DismissDialog -> dismissDialog()
+        }
     }
 
-    fun updateNewPin(value: String) {
-        uiData.value = uiData.value.copy(newPin = value.take(6))
-    }
+    private fun submit() {
+        val state = _state.value
 
-    fun updateConfirmPin(value: String) {
-        uiData.value = uiData.value.copy(confirmPin = value.take(6))
-    }
-
-    fun submit() {
-        val data = uiData.value
-
-        if (data.newPin != data.confirmPin) {
-            uiState.value = uiState.value.copy(error = "PIN tidak sama")
+        if (state.newPin != state.confirmPin) {
+            showError("PIN tidak sama")
             return
         }
 
-        // TODO API Change PIN
+        if (state.newPin.length < 6) {
+            showError("PIN harus 6 digit")
+            return
+        }
+
+        // sementara mock success (nanti connect API)
+        _state.update {
+            it.copy(changePin = LoadState.Success(Unit))
+        }
+
+        emitEffect(ChangePinEffect.NavigateBack)
+    }
+
+    private fun showError(message: String) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
     }
 }

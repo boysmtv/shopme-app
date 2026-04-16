@@ -45,7 +45,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -65,30 +64,30 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.auth.contract.ChangePinDataListener
-import com.mtv.app.shopme.feature.auth.contract.ChangePinEventListener
-import com.mtv.app.shopme.feature.auth.contract.ChangePinNavigationListener
-import com.mtv.app.shopme.feature.auth.contract.ChangePinStateListener
+import com.mtv.app.shopme.feature.auth.contract.ChangePinEvent
+import com.mtv.app.shopme.feature.auth.contract.ChangePinUiState
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
 fun ChangePinScreen(
-    uiState: ChangePinStateListener,
-    uiData: ChangePinDataListener,
-    uiEvent: ChangePinEventListener,
-    uiNavigation: ChangePinNavigationListener
+    state: ChangePinUiState,
+    event: (ChangePinEvent) -> Unit
 ) {
 
     val haptic = LocalHapticFeedback.current
     var errorTrigger by remember { mutableIntStateOf(0) }
 
     val isValid =
-        uiData.oldPin.length == 6 &&
-                uiData.newPin.length == 6 &&
-                uiData.confirmPin.length == 6
+        state.oldPin.length == 6 &&
+                state.newPin.length == 6 &&
+                state.confirmPin.length == 6
 
-    LaunchedEffect(uiState.error) {
-        if (uiState.error != null) {
+    val isLoading = state.changePin is LoadState.Loading
+    val isSuccess = state.changePin is LoadState.Success
+
+    LaunchedEffect(state.changePin) {
+        if (state.changePin is LoadState.Error) {
             errorTrigger++
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
@@ -104,7 +103,7 @@ fun ChangePinScreen(
             )
     ) {
 
-        TopBar(uiNavigation)
+        TopBar { event(ChangePinEvent.DismissDialog) }
 
         Card(
             modifier = Modifier.fillMaxSize(),
@@ -131,32 +130,35 @@ fun ChangePinScreen(
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                        PinSection("PIN Lama", uiData.oldPin, uiEvent.onOldPinChange)
+                        PinSection(
+                            "PIN Lama",
+                            state.oldPin
+                        ) { event(ChangePinEvent.OnOldPinChange(it)) }
+
                         Spacer(Modifier.height(18.dp))
 
-                        PinSection("PIN Baru", uiData.newPin, uiEvent.onNewPinChange)
+                        PinSection(
+                            "PIN Baru",
+                            state.newPin
+                        ) { event(ChangePinEvent.OnNewPinChange(it)) }
 
                         Spacer(Modifier.height(6.dp))
-                        PinStrengthMeter(uiData.newPin)
+                        PinStrengthMeter(state.newPin)
 
                         Spacer(Modifier.height(18.dp))
-                        PinSection("Konfirmasi PIN Baru", uiData.confirmPin, uiEvent.onConfirmPinChange)
-                    }
-                }
 
-                AnimatedVisibility(uiState.error != null) {
-                    Text(
-                        uiState.error ?: EMPTY_STRING,
-                        color = Color.Red,
-                        fontSize = 12.sp
-                    )
+                        PinSection(
+                            "Konfirmasi PIN Baru",
+                            state.confirmPin
+                        ) { event(ChangePinEvent.OnConfirmPinChange(it)) }
+                    }
                 }
 
                 Spacer(Modifier.height(24.dp))
 
                 Button(
-                    onClick = uiEvent.onSubmit,
-                    enabled = isValid && !uiState.loading,
+                    onClick = { event(ChangePinEvent.OnSubmit) },
+                    enabled = isValid && !isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
@@ -166,7 +168,7 @@ fun ChangePinScreen(
                     )
                 ) {
 
-                    if (uiState.loading) {
+                    if (isLoading) {
                         CircularProgressIndicator(
                             color = Color.White,
                             strokeWidth = 2.dp,
@@ -177,7 +179,7 @@ fun ChangePinScreen(
                     }
                 }
 
-                SuccessCheck(uiState.loading)
+                SuccessCheck(isSuccess)
             }
         }
     }
@@ -253,14 +255,14 @@ fun PinSection(
 }
 
 @Composable
-private fun TopBar(nav: ChangePinNavigationListener) {
+private fun TopBar(onBack: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = nav.onBack) {
+        IconButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
         }
         Text("Ubah PIN", color = Color.White, fontFamily = PoppinsFont)
@@ -366,9 +368,35 @@ fun SuccessCheck(show: Boolean) {
 @Composable
 fun ChangePinPreview() {
     ChangePinScreen(
-        uiState = ChangePinStateListener(),
-        uiData = ChangePinDataListener(),
-        uiEvent = ChangePinEventListener(),
-        uiNavigation = ChangePinNavigationListener()
+        state = ChangePinUiState(
+            oldPin = "123456",
+            newPin = "654321",
+            confirmPin = "654321",
+            changePin = LoadState.Idle
+        ),
+        event = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ChangePinSuccessPreview() {
+    ChangePinScreen(
+        state = ChangePinUiState(
+            oldPin = "123456",
+            newPin = "654321",
+            confirmPin = "654321",
+            changePin = LoadState.Success(Unit)
+        ),
+        event = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ChangePinEmptyPreview() {
+    ChangePinScreen(
+        state = ChangePinUiState(),
+        event = {}
     )
 }
