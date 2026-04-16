@@ -8,24 +8,12 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.request.SplashRequest
-import com.mtv.app.shopme.data.remote.response.SplashResponse
-import com.mtv.based.core.network.di.IoDispatcher
-import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.app.shopme.domain.param.SplashParam
+import com.mtv.app.shopme.domain.repository.AppRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 
 class GetSplashUseCase @Inject constructor(
-    private val repository: NetworkRepository,
-    @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<SplashRequest, ApiResponse<SplashResponse>>(dispatcher) {
-
-    override suspend fun execute(param: SplashRequest) = repository.request<ApiResponse<SplashResponse>>(
-        endpoint = ApiEndPoint.Misc.Splash,
-        body = param
-    )
-
+    private val repository: AppRepository
+) {
+    operator fun invoke(param: SplashParam) = repository.getSplash(param)
 }
