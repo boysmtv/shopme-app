@@ -18,11 +18,14 @@ import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.FoodOptionResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
+import com.mtv.app.shopme.data.remote.response.LoginResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
+import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.data.remote.response.VillageResponse
 import com.mtv.app.shopme.domain.model.Address
+import com.mtv.app.shopme.domain.model.AppConfig
 import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
 import com.mtv.app.shopme.domain.model.Cart
@@ -33,10 +36,14 @@ import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodOption
 import com.mtv.app.shopme.domain.model.FoodVariant
+import com.mtv.app.shopme.domain.model.Login
 import com.mtv.app.shopme.domain.model.MenuSummary
+import com.mtv.app.shopme.domain.model.Register
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.model.SessionToken
+import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.app.shopme.domain.model.Stats
+import com.mtv.app.shopme.domain.model.User
 import com.mtv.app.shopme.domain.model.Village
 
 /* =========================================================
@@ -188,3 +195,30 @@ fun VillageResponse.toDomain(): Village {
         name = name,
     )
 }
+
+fun SplashResponse.toDomain() = Splash(
+    isAuthenticated = isAuthenticated,
+    versionStatus = versionStatus,
+    user = user?.let {
+        User(
+            id = it.id,
+            name = it.name,
+            email = it.email,
+            phone = it.phone,
+            photo = it.photo
+        )
+    },
+    config = AppConfig(
+        minVersion = config.minVersion,
+        latestVersion = config.latestVersion,
+        forceUpdate = config.forceUpdate,
+        maintenanceMode = config.maintenanceMode,
+        maintenanceMessage = config.maintenanceMessage
+    )
+)
+
+fun LoginResponse.toDomain() = Login(
+    accessToken = accessToken
+)
+
+fun Unit.toDomain() = Register(success = true)

@@ -9,11 +9,12 @@
 package com.mtv.app.shopme.domain.usecase
 
 import com.mtv.app.shopme.domain.param.CartAddParam
-import com.mtv.app.shopme.domain.repository.FoodDetailRepository
+import com.mtv.app.shopme.domain.repository.CartRepository
+import com.mtv.app.shopme.domain.repository.FoodRepository
 import javax.inject.Inject
 
 class CreateFoodToCartUseCase @Inject constructor(
-    private val repository: FoodDetailRepository
+    private val repository: CartRepository
 ) {
-    operator fun invoke(request: CartAddParam) = repository.addToCart(request)
+    operator fun invoke(request: CartAddParam) = repository.addCart(request)
 }
