@@ -1,4 +1,4 @@
-package com.mtv.app.shopme.data.local
+package com.mtv.app.shopme.domain.model
 
 import java.util.Date
 

@@ -8,15 +8,16 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
+import com.mtv.app.shopme.common.ConstantPreferences.FCM_CUSTOMER_NOTIFICATION
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.data.local.NotificationItem
+import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.usecase.CreateNotificationUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotifDialog
 import com.mtv.app.shopme.feature.customer.contract.NotifEffect
 import com.mtv.app.shopme.feature.customer.contract.NotifEvent
 import com.mtv.app.shopme.feature.customer.contract.NotifUiState
 import com.mtv.based.core.network.utils.ErrorMessages
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
@@ -55,14 +56,14 @@ class NotifViewModel @Inject constructor(
     private fun getLocalNotification() {
         try {
             val localNotification = securePrefs.getObject(
-                FCM_NOTIFICATION,
+                FCM_CUSTOMER_NOTIFICATION,
                 Array<NotificationItem>::class.java
             )?.toList() ?: emptyList()
 
             _state.update {
                 it.copy(
                     localNotification = localNotification,
-                    notificationState = ResourceFirebase.Success(EMPTY_STRING)
+                    notificationState = LoadState.Success(EMPTY_STRING)
                 )
             }
         } catch (e: Exception) {
@@ -78,7 +79,7 @@ class NotifViewModel @Inject constructor(
 
     private fun clearNotification() {
         try {
-            securePrefs.remove(FCM_NOTIFICATION)
+            securePrefs.remove(FCM_CUSTOMER_NOTIFICATION)
 
             _state.update {
                 it.copy(

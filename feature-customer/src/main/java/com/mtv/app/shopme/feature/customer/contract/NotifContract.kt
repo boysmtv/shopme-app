@@ -8,7 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.local.NotificationItem
+import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.based.core.network.utils.LoadState
 
 data class NotifUiState(
