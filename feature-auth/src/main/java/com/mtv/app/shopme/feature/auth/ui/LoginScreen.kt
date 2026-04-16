@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,25 +63,18 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.auth.contract.LoginDataListener
-import com.mtv.app.shopme.feature.auth.contract.LoginEventListener
-import com.mtv.app.shopme.feature.auth.contract.LoginNavigationListener
-import com.mtv.app.shopme.feature.auth.contract.LoginStateListener
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.feature.auth.contract.LoginEvent
+import com.mtv.app.shopme.feature.auth.contract.LoginUiState
+import com.mtv.based.core.network.utils.LoadState
 
 @Composable
 fun LoginScreen(
-    uiState: LoginStateListener,
-    uiData: LoginDataListener,
-    uiEvent: LoginEventListener,
-    uiNavigation: LoginNavigationListener
+    state: LoginUiState,
+    event: (LoginEvent) -> Unit
 ) {
 
     var remember by remember { mutableStateOf(false) }
-
-    if (uiState.loginState is Resource.Success){
-        uiNavigation.onNavigateToHome()
-    }
+    val isLoading = state.login is LoadState.Loading
 
     Box(
         modifier = Modifier
@@ -143,8 +135,8 @@ fun LoginScreen(
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
-                        value = uiData.email,
-                        onValueChange = uiEvent.onEmailChange,
+                        value = state.email,
+                        onValueChange = { event(LoginEvent.OnEmailChange(it)) },
                         placeholder = {
                             Text(
                                 "Enter your email",
@@ -178,8 +170,10 @@ fun LoginScreen(
                     var passwordVisible by remember { mutableStateOf(false) }
 
                     OutlinedTextField(
-                        value = uiData.password,
-                        onValueChange = uiEvent.onPasswordChange,
+                        value = state.password,
+                        onValueChange = {
+                            event(LoginEvent.OnPasswordChange(it))
+                        },
                         placeholder = {
                             Text(
                                 "Enter your password",
@@ -248,7 +242,7 @@ fun LoginScreen(
                             fontFamily = PoppinsFont,
                             fontSize = 13.sp,
                             modifier = Modifier.clickable {
-                                uiNavigation.onNavigateToForgotPassword()
+                                event(LoginEvent.NavigateToForgotPassword)
                             }
                         )
                     }
@@ -257,11 +251,9 @@ fun LoginScreen(
 
                     Button(
                         onClick = {
-                            uiEvent.onLoginClick(
-                                uiData.email,
-                                uiData.password
-                            )
+                            event(LoginEvent.OnLoginClick)
                         },
+                        enabled = !isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
@@ -328,7 +320,7 @@ fun LoginScreen(
                             fontFamily = PoppinsFont,
                             fontSize = 13.sp,
                             modifier = Modifier.clickable {
-                                uiNavigation.onNavigateToRegister()
+                                event(LoginEvent.NavigateToRegister)
                             }
                         )
                     }
@@ -359,11 +351,9 @@ private fun SocialButton(icon: Int) {
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
-fun LoginScreenPreview() {
+fun LoginPreview() {
     LoginScreen(
-        uiState = LoginStateListener(),
-        uiData = LoginDataListener(),
-        uiEvent = LoginEventListener(),
-        uiNavigation = LoginNavigationListener()
+        state = LoginUiState(),
+        event = {}
     )
 }

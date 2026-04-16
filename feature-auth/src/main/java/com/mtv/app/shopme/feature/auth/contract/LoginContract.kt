@@ -8,32 +8,27 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.LoginResponse
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Login
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
-data class LoginStateListener(
-    val loginState: Resource<ApiResponse<LoginResponse>> = Resource.Loading
+data class LoginUiState(
+    val email: String = EMPTY_STRING,
+    val password: String = EMPTY_STRING,
+    val login: LoadState<Login> = LoadState.Idle
 )
 
-data class LoginDataListener(
-    val email: String = "Boys.mtv@gmail.com",
-    val password: String = "Mbi123456.",
-)
+sealed class LoginEvent {
+    data class OnEmailChange(val value: String) : LoginEvent()
+    data class OnPasswordChange(val value: String) : LoginEvent()
+    data object OnLoginClick : LoginEvent()
+    data object DismissDialog : LoginEvent()
+    data object NavigateToRegister : LoginEvent()
+    data object NavigateToForgotPassword : LoginEvent()
+}
 
-//data class LoginDataListener(
-//    val email: String = EMPTY_STRING,
-//    val password: String = EMPTY_STRING
-//)
-
-data class LoginEventListener(
-    val onEmailChange: (String) -> Unit = {},
-    val onPasswordChange: (String) -> Unit = {},
-    val onLoginClick: (String, String) -> Unit = { _, _ -> }
-)
-
-data class LoginNavigationListener(
-    val onNavigateToHome: () -> Unit = {},
-    val onNavigateToRegister: () -> Unit = {},
-    val onNavigateToForgotPassword: () -> Unit = {},
-)
+sealed class LoginEffect {
+    data object NavigateToHome : LoginEffect()
+    data object NavigateToRegister : LoginEffect()
+    data object NavigateToForgotPassword : LoginEffect()
+}
