@@ -13,6 +13,7 @@ import com.mtv.app.shopme.common.navbar.auth.AuthDestinations
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavItem
 import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
 import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
+import com.mtv.app.shopme.nav.extensions.navigateAndPopSplash
 
 object CustomerNavActions {
 
@@ -20,6 +21,20 @@ object CustomerNavActions {
         nav.navigate(AuthDestinations.LOGIN_GRAPH) {
             popUpTo(0) { inclusive = true }
         }
+    }
+
+    fun toHome(nav: NavController) {
+        nav.navigate(CustomerDestinations.HOME_GRAPH) {
+            popUpTo(0) { inclusive = true }
+        }
+    }
+
+    fun toRegister(nav: NavController) {
+        nav.navigate(AuthDestinations.REGISTER_GRAPH)
+    }
+
+    fun toForgetPassword(nav: NavController) {
+        nav.navigate(AuthDestinations.RESET_GRAPH)
     }
 
     fun toSearch(nav: NavController) {

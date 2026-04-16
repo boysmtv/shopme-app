@@ -9,7 +9,7 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.data.local.NotificationItem
+import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatListEffect
