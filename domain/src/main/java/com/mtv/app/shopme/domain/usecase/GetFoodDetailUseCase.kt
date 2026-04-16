@@ -8,11 +8,11 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.app.shopme.domain.repository.FoodDetailRepository
+import com.mtv.app.shopme.domain.repository.FoodRepository
 import javax.inject.Inject
 
 class GetFoodDetailUseCase @Inject constructor(
-    private val repository: FoodDetailRepository
+    private val repository: FoodRepository
 ) {
     operator fun invoke(id: String) = repository.getFoodDetail(id)
 }

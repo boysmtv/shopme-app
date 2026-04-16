@@ -8,23 +8,12 @@
 
 package com.mtv.app.shopme.domain.usecase
 
-import com.mtv.based.core.provider.based.BaseUseCase
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.api.ApiEndPoint
-import com.mtv.app.shopme.data.remote.request.RegisterRequest
-import com.mtv.based.core.network.di.IoDispatcher
-import com.mtv.based.core.network.repository.NetworkRepository
+import com.mtv.app.shopme.domain.param.RegisterParam
+import com.mtv.app.shopme.domain.repository.AuthRepository
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineDispatcher
 
 class GetRegisterUseCase @Inject constructor(
-    private val repository: NetworkRepository,
-    @IoDispatcher dispatcher: CoroutineDispatcher
-) : BaseUseCase<RegisterRequest, ApiResponse<Unit>>(dispatcher) {
-
-    override suspend fun execute(param: RegisterRequest) = repository.request<ApiResponse<Unit>>(
-        endpoint = ApiEndPoint.Auth.Register,
-        body = param
-    )
-
+    private val repository: AuthRepository
+) {
+    operator fun invoke(param: RegisterParam) = repository.register(param)
 }
