@@ -46,11 +46,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.feature.seller.contract.SellerNotifData
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifDialog
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifEvent
-import com.mtv.app.shopme.feature.seller.contract.SellerNotifNavigation
-import com.mtv.app.shopme.feature.seller.contract.SellerNotifState
+import com.mtv.app.shopme.feature.seller.contract.SellerNotifUiState
 import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
@@ -64,19 +62,17 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.WARNING_STRING
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SellerNotificationScreen(
-    uiState: SellerNotifState,
-    uiData: SellerNotifData,
-    uiEvent: SellerNotifEvent,
-    uiNavigation: SellerNotifNavigation
+    state: SellerNotifUiState,
+    event: (SellerNotifEvent) -> Unit
 ) {
 
-    ShowSellerDialog(uiState, uiEvent)
+    ShowSellerDialog(state, event)
 
-    val isRefreshing = uiState.notificationState is ResourceFirebase.Loading
+    val isRefreshing = state.notificationState is ResourceFirebase.Loading
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
-        onRefresh = { uiEvent.onGetNotification() }
+        onRefresh = { event(SellerNotifEvent.GetNotification) }
     )
 
     Box(
@@ -92,8 +88,12 @@ fun SellerNotificationScreen(
                 title = "Seller Notification",
                 showRightIcon = true,
                 rightIcon = Icons.Default.DeleteSweep,
-                onLeftClick = { uiNavigation.onBack() },
-                onRightClick = { uiEvent.onClearNotification() }
+                onLeftClick = {
+                    event(SellerNotifEvent.ClickBack)
+                },
+                onRightClick = {
+                    event(SellerNotifEvent.ClearNotification)
+                }
             )
 
             Text(
@@ -108,13 +108,16 @@ fun SellerNotificationScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if (uiData.localNotification.isEmpty()) {
+
+                if (state.notifications.isEmpty()) {
                     item { EmptySellerState() }
                 } else {
-                    items(uiData.localNotification) { item ->
+                    items(state.notifications) { item ->
                         SellerNotificationItemCard(
                             item = item,
-                            onClick = { uiEvent.onNotificationClicked(item) }
+                            onClick = {
+                                event(SellerNotifEvent.ClickNotification(item))
+                            }
                         )
                     }
                 }
@@ -131,12 +134,13 @@ fun SellerNotificationScreen(
 
 @Composable
 private fun ShowSellerDialog(
-    uiState: SellerNotifState,
-    uiEvent: SellerNotifEvent
+    state: SellerNotifUiState,
+    event: (SellerNotifEvent) -> Unit
 ) {
-    uiState.activeDialog?.let { dialog ->
+    state.activeDialog?.let { dialog ->
         when (dialog) {
-            is SellerNotifDialog.Success -> {
+
+            SellerNotifDialog.Success -> {
                 DialogCenterV1(
                     state = DialogStateV1(
                         type = DialogType.SUCCESS,
@@ -144,7 +148,9 @@ private fun ShowSellerDialog(
                         message = "Seller notifications cleared",
                         primaryButtonText = OK_STRING
                     ),
-                    onDismiss = { uiEvent.onDismissActiveDialog() }
+                    onDismiss = {
+                        event(SellerNotifEvent.DismissDialog)
+                    }
                 )
             }
 
@@ -156,7 +162,9 @@ private fun ShowSellerDialog(
                         message = dialog.message,
                         primaryButtonText = OK_STRING
                     ),
-                    onDismiss = { uiEvent.onDismissActiveDialog() }
+                    onDismiss = {
+                        event(SellerNotifEvent.DismissDialog)
+                    }
                 )
             }
         }
@@ -286,6 +294,7 @@ fun SellerNotificationItemCard(
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerNotificationScreenPreview() {
+
     val dummyList = List(5) {
         SellerNotifItem(
             title = "New Order Received",
@@ -299,18 +308,10 @@ fun SellerNotificationScreenPreview() {
     }
 
     SellerNotificationScreen(
-        uiState = SellerNotifState(),
-        uiData = SellerNotifData(
-            localNotification = dummyList
+        state = SellerNotifUiState(
+            notifications = dummyList,
+            notificationState = ResourceFirebase.Success("")
         ),
-        uiEvent = SellerNotifEvent(
-            onNotificationClicked = {},
-            onGetNotification = {},
-            onClearNotification = {},
-            onDismissActiveDialog = {}
-        ),
-        uiNavigation = SellerNotifNavigation(
-            onBack = {}
-        )
+        event = {}
     )
 }
