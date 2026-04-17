@@ -43,18 +43,17 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.auth.contract.ResetDataListener
-import com.mtv.app.shopme.feature.auth.contract.ResetEventListener
-import com.mtv.app.shopme.feature.auth.contract.ResetNavigationListener
-import com.mtv.app.shopme.feature.auth.contract.ResetStateListener
+import com.mtv.app.shopme.feature.auth.contract.ResetEvent
+import com.mtv.app.shopme.feature.auth.contract.ResetUiState
+import com.mtv.based.core.network.utils.LoadState
 
 @Composable
 fun ResetScreen(
-    uiState: ResetStateListener,
-    uiData: ResetDataListener,
-    uiEvent: ResetEventListener,
-    uiNavigation: ResetNavigationListener
+    state: ResetUiState,
+    event: (ResetEvent) -> Unit
 ) {
+
+    val isLoading = state.reset is LoadState.Loading
 
     Box(
         modifier = Modifier
@@ -123,8 +122,8 @@ fun ResetScreen(
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
-                        value = uiData.email,
-                        onValueChange = uiEvent.onEmailChange,
+                        value = state.email,
+                        onValueChange = { event(ResetEvent.OnEmailChange(it)) },
                         leadingIcon = {
                             Icon(Icons.Outlined.Email, contentDescription = null)
                         },
@@ -142,7 +141,8 @@ fun ResetScreen(
                     Spacer(Modifier.height(24.dp))
 
                     Button(
-                        onClick = uiEvent.onResetClick,
+                        onClick = { event(ResetEvent.OnResetClick) },
+                        enabled = !isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
@@ -161,7 +161,7 @@ fun ResetScreen(
                     Spacer(Modifier.height(16.dp))
 
                     TextButton(
-                        onClick = uiNavigation.onNavigateToLogin,
+                        onClick = { event(ResetEvent.OnBackClick) },
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
                         Text(
@@ -180,17 +180,9 @@ fun ResetScreen(
 @Composable
 fun ResetScreenPreview() {
     ResetScreen(
-        uiState = ResetStateListener(),
-        uiData = ResetDataListener(
-            email = "Boys.mtv@gmail.com"
+        state = ResetUiState(
+            email = "test@mail.com"
         ),
-        uiEvent = ResetEventListener(
-            onEmailChange = {},
-            onResetClick = {}
-        ),
-        uiNavigation = ResetNavigationListener(
-            onNavigateToLogin = {},
-            onBack = {}
-        )
+        event = {}
     )
 }
