@@ -106,9 +106,14 @@ class CartViewModel @Inject constructor(
                     pin = event.pin
                 )
             ),
-            onLoad = { showLoading() },
-            onSuccess = { hideLoading() },
+            onLoad = {
+                _state.update { it.copy(verifyPin = LoadState.Loading) }
+            },
+            onSuccess = {
+                _state.update { it.copy(verifyPin = LoadState.Success(Unit)) }
+            },
             onError = {
+                _state.update { error -> error.copy(verifyPin = LoadState.Error(it)) }
                 showError(it)
             }
         )
@@ -123,9 +128,15 @@ class CartViewModel @Inject constructor(
                     token = event.token
                 )
             ),
-            onLoad = { showLoading() },
-            onSuccess = { hideLoading() },
+            onLoad = {
+                _state.update { it.copy(createOrder = LoadState.Loading) }
+            },
+            onSuccess = {
+                _state.update { it.copy(createOrder = LoadState.Success(Unit)) }
+                emitEffect(CartEffect.NavigateToOrder)
+            },
             onError = {
+                _state.update { error -> error.copy(createOrder = LoadState.Error(it)) }
                 showError(it)
             }
         )

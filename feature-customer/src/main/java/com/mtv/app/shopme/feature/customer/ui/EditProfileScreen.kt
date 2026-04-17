@@ -85,10 +85,11 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
-import com.mtv.app.shopme.data.remote.response.AddressResponse
-import com.mtv.app.shopme.data.remote.response.VillageResponse
+import com.mtv.app.shopme.data.mock.DataUiMock
+import com.mtv.app.shopme.data.mock.DataUiMock.addresses
+import com.mtv.app.shopme.data.mock.DataUiMock.customer
+import com.mtv.app.shopme.data.mock.DataUiMock.villages
 import com.mtv.app.shopme.domain.model.Address
-import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Village
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDialog
 import com.mtv.app.shopme.feature.customer.contract.EditProfileEvent
@@ -380,7 +381,6 @@ fun AddressSection(
                     ) {
 
                         if (!address.isDefault) {
-
                             TextButton(
                                 onClick = { onSetDefault(address.id) }
                             ) {
@@ -755,57 +755,11 @@ fun rememberSheetController(): SheetController {
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun EditProfileScreenPreview() {
-
-    val villages = listOf(
-        VillageResponse("1", "Puri Lestari"),
-        VillageResponse("2", "Grama Puri Persada"),
-        VillageResponse("3", "Kirana Cikarang")
-    )
-
-    val addresses = listOf(
-        AddressResponse(
-            id = "1",
-            village = "Puri Lestari",
-            block = "A",
-            number = "10",
-            rt = "01",
-            rw = "02",
-            isDefault = true
-        )
-    )
-
     EditProfileScreen(
         state = EditProfileUiState(
-            customer = LoadState.Success(
-                Customer(
-                    name = "Dedy Wijaya",
-                    phone = "08123456789",
-                    email = "dedy@mail.com",
-                    address = null,
-                    photo = "",
-                    verified = true,
-                    stats = null,
-                    menuSummary = null
-                )
-            ),
-            addresses = LoadState.Success(
-                listOf(
-                    Address(
-                        id = "1",
-                        village = "Puri Lestari",
-                        block = "A",
-                        number = "10",
-                        rt = "01",
-                        rw = "02",
-                        isDefault = true
-                    )
-                )
-            ),
-            villages = LoadState.Success(
-                listOf(
-                    Village("1", "Puri Lestari")
-                )
-            )
+            customer = LoadState.Success(customer()),
+            addresses = LoadState.Success(addresses()),
+            villages = LoadState.Success(villages())
         ),
         event = {}
     )
@@ -817,27 +771,6 @@ fun EditProfileAddressTabPreview() {
 
     var selectedTab by remember { mutableIntStateOf(1) }
 
-    val dummyAddresses = listOf(
-        Address(
-            id = "1",
-            village = "Griya Asri",
-            block = "A",
-            number = "12",
-            rt = "01",
-            rw = "02",
-            isDefault = true
-        ),
-        Address(
-            id = "2",
-            village = "Permata Indah",
-            block = "B",
-            number = "8",
-            rt = "03",
-            rw = "05",
-            isDefault = false
-        )
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -848,7 +781,7 @@ fun EditProfileAddressTabPreview() {
             )
     ) {
 
-        PremiumHeader({})
+        PremiumHeader {}
 
         Card(
             modifier = Modifier.fillMaxSize(),
@@ -863,7 +796,7 @@ fun EditProfileAddressTabPreview() {
                 Spacer(Modifier.height(16.dp))
 
                 AddressSection(
-                    addresses = dummyAddresses,
+                    addresses = addresses(),
                     onAdd = {},
                     onDelete = {},
                     onSetDefault = {}
@@ -879,12 +812,6 @@ fun AddAddressSheetPreview() {
 
     val controller = rememberSheetController()
 
-    val villages = listOf(
-        Village("1", "Puri Lestari"),
-        Village("2", "Grama Puri Persada"),
-        Village("3", "Kirana Cikarang")
-    )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -894,7 +821,7 @@ fun AddAddressSheetPreview() {
 
         AddAddressSheet(
             controller = controller,
-            villages = villages,
+            villages = villages(),
             onDismiss = {},
             onSave = { _, _, _, _, _, _ -> }
         )

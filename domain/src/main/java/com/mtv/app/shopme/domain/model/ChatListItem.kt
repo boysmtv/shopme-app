@@ -14,5 +14,6 @@ data class ChatListItem(
     val lastMessage: String,
     val time: String,
     val unreadCount: Int,
-    val avatarBase64: String?
+    val avatarBase64: String?,
+    val isFromUser: Boolean = false,
 )

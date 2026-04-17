@@ -13,6 +13,8 @@ import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
 import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.CartVariant
+import com.mtv.app.shopme.domain.model.ChatList
+import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
@@ -21,6 +23,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.FoodVariant
 import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.Stats
+import com.mtv.app.shopme.domain.model.Village
 import java.math.BigDecimal
 import org.threeten.bp.LocalDateTime
 
@@ -68,7 +71,7 @@ object DataUiMock {
             quantity = 10,
             estimate = "15-20 menit",
             isActive = index % 2 == 0,
-            createdAt = LocalDateTime.now(),
+            createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
             images = listOf("https://picsum.photos/200?random=$index"),
 
             variants = listOf(
@@ -265,6 +268,164 @@ object DataUiMock {
             image = "https://example.com/images/latte.png",
             name = "Latte",
             variants = emptyList()
+        )
+    )
+
+    fun chatList(): ChatList {
+        return ChatList(
+            chatList = listOf(
+                ChatListItem(
+                    id = "0",
+                    name = "Cafe Santuy",
+                    lastMessage = "Pesanan kamu sedang diproses ya 🍔",
+                    time = "10:30",
+                    unreadCount = 2,
+                    avatarBase64 = null
+                ),
+                ChatListItem(
+                    id = "1",
+                    name = "Burger Queen",
+                    lastMessage = "Siap dikirim 🚀",
+                    time = "09:15",
+                    unreadCount = 0,
+                    avatarBase64 = null
+                ),
+                ChatListItem(
+                    id = "2",
+                    name = "Pizza Palace",
+                    lastMessage = "Tambah topping lagi kak?",
+                    time = "Kemarin",
+                    unreadCount = 1,
+                    avatarBase64 = null
+                ),
+                ChatListItem(
+                    id = "3",
+                    name = "Coffee Corner",
+                    lastMessage = "Promo hari ini buy 1 get 1 ☕",
+                    time = "08:45",
+                    unreadCount = 0,
+                    avatarBase64 = null
+                ),
+                ChatListItem(
+                    id = "4",
+                    name = "Warung Nusantara",
+                    lastMessage = "Pesanan sudah selesai 🙌",
+                    time = "Kemarin",
+                    unreadCount = 3,
+                    avatarBase64 = null
+                ),
+                ChatListItem(
+                    id = "5",
+                    name = "Sate Madura Pak Haji",
+                    lastMessage = "Siap diambil ya 🔥",
+                    time = "07:20",
+                    unreadCount = 0,
+                    avatarBase64 = null
+                ),
+                ChatListItem(
+                    id = "6",
+                    name = "Bakso Mantap",
+                    lastMessage = "Extra sambal ya?",
+                    time = "Senin",
+                    unreadCount = 5,
+                    avatarBase64 = null
+                )
+            )
+        )
+    }
+
+    fun chatDetail(): List<ChatListItem> {
+        return listOf(
+            ChatListItem(
+                id = "1",
+                name = "Cafe Kopi Kita",
+                lastMessage = "Halo kak 👋",
+                time = "10:00",
+                unreadCount = 0,
+                avatarBase64 = null,
+                isFromUser = false
+            ),
+            ChatListItem(
+                id = "2",
+                name = "Cafe Kopi Kita",
+                lastMessage = "Pesanan kamu sedang diproses ya 🍔",
+                time = "10:01",
+                unreadCount = 0,
+                avatarBase64 = null,
+                isFromUser = false
+            ),
+            ChatListItem(
+                id = "3",
+                name = "User",
+                lastMessage = "Oke kak, ditunggu ya 🙌",
+                time = "10:02",
+                unreadCount = 0,
+                avatarBase64 = null,
+                isFromUser = true
+            ),
+            ChatListItem(
+                id = "4",
+                name = "Cafe Kopi Kita",
+                lastMessage = "Siap kak 👍",
+                time = "10:03",
+                unreadCount = 0,
+                avatarBase64 = null,
+                isFromUser = false
+            ),
+            ChatListItem(
+                id = "5",
+                name = "User",
+                lastMessage = "Pesanan sudah selesai kak?",
+                time = "10:04",
+                unreadCount = 0,
+                avatarBase64 = null,
+                isFromUser = true
+            ),
+            ChatListItem(
+                id = "6",
+                name = "Cafe Kopi Kita",
+                lastMessage = "Sudah siap diambil ya 🎉",
+                time = "10:05",
+                unreadCount = 0,
+                avatarBase64 = null,
+                isFromUser = false
+            ),
+            ChatListItem(
+                id = "7",
+                name = "User",
+                lastMessage = "Otw 🚀",
+                time = "10:06",
+                unreadCount = 0,
+                avatarBase64 = null,
+                isFromUser = true
+            )
+        )
+    }
+
+    fun villages(): List<Village> = listOf(
+        Village("1", "Puri Lestari"),
+        Village("2", "Grama Puri Persada"),
+        Village("3", "Kirana Cikarang")
+    )
+
+    fun addresses(): List<Address> = listOf(
+        Address(
+            id = "1",
+            village = "Puri Lestari",
+            block = "A",
+            number = "10",
+            rt = "01",
+            rw = "02",
+            isDefault = true
+        ),
+        Address(
+            id = "2",
+            village = "Grama Puri Persada",
+            block = "B",
+            number = "8",
+            rt = "03",
+            rw = "05",
+            isDefault = false
         )
     )
 
