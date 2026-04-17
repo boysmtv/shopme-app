@@ -12,25 +12,30 @@ import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING
 
-data class SellerNotifState(
+data class SellerNotifUiState(
+    val isLoading: Boolean = false,
+
+    val notifications: List<SellerNotifItem> = emptyList(),
+
     val notificationState: ResourceFirebase<String> = ResourceFirebase.Loading,
     val activeDialog: SellerNotifDialog? = null
 )
 
-data class SellerNotifData(
-    val localNotification: List<SellerNotifItem> = emptyList(),
-)
+sealed class SellerNotifEvent {
+    object Load : SellerNotifEvent()
+    object DismissDialog : SellerNotifEvent()
 
-data class SellerNotifEvent(
-    val onNotificationClicked: (item: SellerNotifItem) -> Unit,
-    val onGetNotification: () -> Unit,
-    val onClearNotification: () -> Unit,
-    val onDismissActiveDialog: () -> Unit,
-)
+    object GetNotification : SellerNotifEvent()
+    object ClearNotification : SellerNotifEvent()
 
-data class SellerNotifNavigation(
-    val onBack: () -> Unit,
-)
+    data class ClickNotification(val item: SellerNotifItem) : SellerNotifEvent()
+
+    object ClickBack : SellerNotifEvent()
+}
+
+sealed class SellerNotifEffect {
+    object NavigateBack : SellerNotifEffect()
+}
 
 sealed class SellerNotifDialog {
     data class Error(
