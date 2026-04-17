@@ -8,42 +8,58 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+data class SellerEditStoreUiState(
+    val isLoading: Boolean = false,
 
-data class SellerEditStoreStateListener(
-    var isLoading: Boolean = false
+    val selectedTab: Int = 0,
+
+    val storeName: String = "",
+    val phone: String = "",
+    val minOrder: String = "",
+    val storeOpen: String = "",
+    val description: String = "",
+    val storePhoto: String? = null,
+
+    val village: String = "",
+    val block: String = "",
+    val number: String = "",
+    val rt: String = "",
+    val rw: String = ""
 )
 
+sealed class SellerEditStoreEvent {
 
-data class SellerEditStoreDataListener(
-    var storeName: String = EMPTY_STRING,
-    var phone: String = EMPTY_STRING,
-    var minOrder: String = EMPTY_STRING,
-    var storeOpen: String = EMPTY_STRING,
-    var description: String = EMPTY_STRING,
-    var storePhoto: String? = null,
-    var village: String = EMPTY_STRING,
-    var block: String = EMPTY_STRING,
-    var number: String = EMPTY_STRING,
-    var rt: String = EMPTY_STRING,
-    var rw: String = EMPTY_STRING
-)
+    object Load : SellerEditStoreEvent()
+    object DismissDialog : SellerEditStoreEvent()
 
-data class SellerEditStoreEventListener(
-    val onStoreNameChange: (String) -> Unit,
-    val onPhoneChange: (String) -> Unit,
-    val onDescriptionChange: (String) -> Unit,
+    // BASIC
+    data class ChangeStoreName(val value: String) : SellerEditStoreEvent()
+    data class ChangePhone(val value: String) : SellerEditStoreEvent()
+    data class ChangeMinOrder(val value: String) : SellerEditStoreEvent()
+    data class ChangeStoreOpen(val value: String) : SellerEditStoreEvent()
+    data class ChangeDescription(val value: String) : SellerEditStoreEvent()
 
-    val onVillageChange: (String) -> Unit,
-    val onBlockChange: (String) -> Unit,
-    val onNumberChange: (String) -> Unit,
-    val onRtChange: (String) -> Unit,
-    val onRwChange: (String) -> Unit,
+    // ADDRESS
+    data class ChangeVillage(val value: String) : SellerEditStoreEvent()
+    data class ChangeBlock(val value: String) : SellerEditStoreEvent()
+    data class ChangeNumber(val value: String) : SellerEditStoreEvent()
+    data class ChangeRt(val value: String) : SellerEditStoreEvent()
+    data class ChangeRw(val value: String) : SellerEditStoreEvent()
 
-    val onUploadPhoto: () -> Unit,
-    val onSave: () -> Unit
-)
+    // UI STATE
+    data class ChangeTab(val index: Int) : SellerEditStoreEvent()
 
-data class SellerEditStoreNavigationListener(
-    val navigateBack: () -> Unit = {}
-)
+    // ACTION
+    object UploadPhoto : SellerEditStoreEvent()
+    object RemovePhoto : SellerEditStoreEvent()
+    data class PhotoSelected(val uri: String) : SellerEditStoreEvent()
+
+    object Save : SellerEditStoreEvent()
+    object ClickBack : SellerEditStoreEvent()
+}
+
+sealed class SellerEditStoreEffect {
+    object NavigateBack : SellerEditStoreEffect()
+    object OpenImagePicker : SellerEditStoreEffect()
+    object SaveSuccess : SellerEditStoreEffect()
+}

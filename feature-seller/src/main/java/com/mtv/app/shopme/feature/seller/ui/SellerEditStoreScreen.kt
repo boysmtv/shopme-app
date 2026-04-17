@@ -34,10 +34,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,18 +48,16 @@ import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
-import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreUiState
 
 @Composable
 fun SellerEditStoreScreen(
-    uiState: SellerEditStoreStateListener,
-    uiData: SellerEditStoreDataListener,
-    uiEvent: SellerEditStoreEventListener,
-    uiNavigation: SellerEditStoreNavigationListener
-) {
+    state: SellerEditStoreUiState,
+    event: (SellerEditStoreEvent) -> Unit
+){
+
+    val selectedTab = state.selectedTab
 
     Column(
         modifier = Modifier
@@ -75,13 +69,15 @@ fun SellerEditStoreScreen(
             )
     ) {
 
-        SellerHeader(uiNavigation)
+        SellerHeader { event(SellerEditStoreEvent.ClickBack) }
 
         Spacer(Modifier.height(16.dp))
 
         StorePhotoSection(
-            imageUrl = uiData.storePhoto,
-            onUpload = uiEvent.onUploadPhoto
+            imageUrl = state.storePhoto,
+            onUpload = {
+                event(SellerEditStoreEvent.UploadPhoto)
+            }
         )
 
         Spacer(Modifier.height(32.dp))
@@ -92,8 +88,6 @@ fun SellerEditStoreScreen(
             colors = CardDefaults.cardColors(containerColor = Color.White)
         ) {
 
-            var selectedTab by remember { mutableIntStateOf(0) }
-
             Column(
                 modifier = Modifier
                     .verticalScroll(rememberScrollState())
@@ -101,7 +95,7 @@ fun SellerEditStoreScreen(
             ) {
 
                 SellerTab(selectedTab) {
-                    selectedTab = it
+                    event(SellerEditStoreEvent.ChangeTab(it))
                 }
 
                 Spacer(Modifier.height(24.dp))
@@ -109,18 +103,21 @@ fun SellerEditStoreScreen(
                 when (selectedTab) {
 
                     0 -> {
-                        StoreInformationSection(uiData, uiEvent)
+                        StoreInformationSection(state, event)
+
                     }
 
                     1 -> {
-                        StoreAddressSection(uiData, uiEvent)
+                        StoreAddressSection(state, event)
                     }
                 }
 
                 Spacer(Modifier.height(28.dp))
 
                 Button(
-                    onClick = uiEvent.onSave,
+                    onClick = {
+                        event(SellerEditStoreEvent.Save)
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -217,61 +214,61 @@ private fun StorePhotoSection(
 
 @Composable
 fun StoreInformationSection(
-    uiData: SellerEditStoreDataListener,
-    uiEvent: SellerEditStoreEventListener
+    state: SellerEditStoreUiState,
+    event: (SellerEditStoreEvent) -> Unit
 ) {
 
     Column {
 
         BaseSimpleFormField(
             label = "Store Name",
-            value = uiData.storeName
+            value = state.storeName
         ) {
-            uiEvent.onStoreNameChange(it)
+            event(SellerEditStoreEvent.ChangeStoreName(it))
         }
 
         Spacer(Modifier.height(16.dp))
 
         BaseSimpleFormField(
             label = "Phone Number",
-            value = uiData.phone
+            value = state.phone
         ) {
-            uiEvent.onPhoneChange(it)
+            event(SellerEditStoreEvent.ChangePhone(it))
         }
 
         Spacer(Modifier.height(16.dp))
 
         BaseSimpleFormField(
             label = "Minimal Order",
-            value = uiData.minOrder
+            value = state.minOrder
         ) {
-            uiEvent.onPhoneChange(it)
+            event(SellerEditStoreEvent.ChangeMinOrder(it))
         }
 
         Spacer(Modifier.height(16.dp))
 
         BaseSimpleFormField(
             label = "Jam Buka",
-            value = uiData.storeOpen
+            value = state.storeOpen
         ) {
-            uiEvent.onPhoneChange(it)
+            event(SellerEditStoreEvent.ChangeStoreOpen(it))
         }
 
         Spacer(Modifier.height(16.dp))
 
         BaseSimpleFormField(
             label = "Description",
-            value = uiData.description,
+            value = state.description,
         ) {
-            uiEvent.onDescriptionChange(it)
+            event(SellerEditStoreEvent.ChangeDescription(it))
         }
     }
 }
 
 @Composable
 fun StoreAddressSection(
-    uiData: SellerEditStoreDataListener,
-    uiEvent: SellerEditStoreEventListener
+    state: SellerEditStoreUiState,
+    event: (SellerEditStoreEvent) -> Unit
 ) {
 
     Column {
@@ -286,9 +283,9 @@ fun StoreAddressSection(
 
         BaseSimpleFormField(
             label = "Village / Area",
-            value = uiData.village
+            value = state.village
         ) {
-            uiEvent.onVillageChange(it)
+            event(SellerEditStoreEvent.ChangeVillage(it))
         }
 
         Spacer(Modifier.height(12.dp))
@@ -297,20 +294,20 @@ fun StoreAddressSection(
 
             BaseSimpleFormField(
                 label = "Block",
-                value = uiData.block,
+                value = state.block,
                 modifier = Modifier.weight(1f)
             ) {
-                uiEvent.onBlockChange(it)
+                event(SellerEditStoreEvent.ChangeBlock(it))
             }
 
             Spacer(Modifier.width(10.dp))
 
             BaseSimpleFormField(
                 label = "Number",
-                value = uiData.number,
+                value = state.number,
                 modifier = Modifier.weight(1f)
             ) {
-                uiEvent.onNumberChange(it)
+                event(SellerEditStoreEvent.ChangeNumber(it))
             }
         }
 
@@ -320,27 +317,27 @@ fun StoreAddressSection(
 
             BaseSimpleFormField(
                 label = "RT",
-                value = uiData.rt,
+                value = state.rt,
                 modifier = Modifier.weight(1f)
             ) {
-                uiEvent.onRtChange(it)
+                event(SellerEditStoreEvent.ChangeRt(it))
             }
 
             Spacer(Modifier.width(10.dp))
 
             BaseSimpleFormField(
                 label = "RW",
-                value = uiData.rw,
+                value = state.rw,
                 modifier = Modifier.weight(1f)
             ) {
-                uiEvent.onRwChange(it)
+                event(SellerEditStoreEvent.ChangeRw(it))
             }
         }
     }
 }
 
 @Composable
-fun SellerHeader(nav: SellerEditStoreNavigationListener) {
+fun SellerHeader(onBack: () -> Unit) {
 
     Column {
 
@@ -352,7 +349,7 @@ fun SellerHeader(nav: SellerEditStoreNavigationListener) {
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            IconButton(onClick = nav.navigateBack) {
+            IconButton(onClick = onBack) {
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = null,
@@ -374,8 +371,7 @@ fun SellerHeader(nav: SellerEditStoreNavigationListener) {
 @Composable
 fun SellerEditStoreScreenPreview() {
     SellerEditStoreScreen(
-        uiState = SellerEditStoreStateListener(),
-        uiData = SellerEditStoreDataListener(
+        state = SellerEditStoreUiState(
             storeName = "Shopme Store",
             phone = "08123456789",
             description = "Best shop for everything",
@@ -388,30 +384,13 @@ fun SellerEditStoreScreenPreview() {
             rt = "01",
             rw = "02"
         ),
-        uiEvent = SellerEditStoreEventListener(
-            onStoreNameChange = {},
-            onPhoneChange = {},
-            onDescriptionChange = {},
-
-            onVillageChange = {},
-            onBlockChange = {},
-            onNumberChange = {},
-            onRtChange = {},
-            onRwChange = {},
-
-            onUploadPhoto = {},
-            onSave = {}
-        ),
-        uiNavigation = SellerEditStoreNavigationListener(
-            navigateBack = {}
-        )
+        event = {}
     )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun StoreAddressPreview() {
-
     Column(
         modifier = Modifier
             .background(Color.White)
@@ -419,25 +398,14 @@ fun StoreAddressPreview() {
     ) {
 
         StoreAddressSection(
-            uiData = SellerEditStoreDataListener(
+            state = SellerEditStoreUiState(
                 village = "Griya Asri",
                 block = "A",
                 number = "12",
                 rt = "01",
                 rw = "02"
             ),
-            uiEvent = SellerEditStoreEventListener(
-                onStoreNameChange = {},
-                onPhoneChange = {},
-                onDescriptionChange = {},
-                onVillageChange = {},
-                onBlockChange = {},
-                onNumberChange = {},
-                onRtChange = {},
-                onRwChange = {},
-                onUploadPhoto = {},
-                onSave = {}
-            )
+            event = {}
         )
     }
 }

@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect.*
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardUiState
 import com.mtv.based.core.provider.utils.SessionManager
@@ -43,10 +44,14 @@ class SellerDashboardViewModel @Inject constructor(
                 emitEffect(SellerDashboardEffect.NavigateToOrder)
 
             is SellerDashboardEvent.ClickOrderDetail ->
-                emitEffect(SellerDashboardEffect.NavigateToOrderDetail(event.orderId))
+                emitEffect(NavigateToOrderDetail(event.orderId))
 
             SellerDashboardEvent.ClickNotif ->
                 emitEffect(SellerDashboardEffect.NavigateToNotif)
+
+            is SellerDashboardEvent.ChangeFilter -> TODO()
+            is SellerDashboardEvent.ChangeSort -> TODO()
+            SellerDashboardEvent.ToggleOnline -> TODO()
         }
     }
 
