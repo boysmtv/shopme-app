@@ -57,6 +57,7 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base64ToBitmap
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
+import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
@@ -273,9 +274,7 @@ fun ChatListScreenPreview() {
             ChatListScreen(
                 state = ChatListUiState(
                     chatListState = LoadState.Success(
-                        ChatList(
-                            emptyList()
-                        )
+                        DataUiMock.chatList()
                     )
                 ),
                 event = { }

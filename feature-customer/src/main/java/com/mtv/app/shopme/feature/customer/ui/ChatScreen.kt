@@ -40,7 +40,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,6 +58,7 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatUiState
@@ -78,13 +78,6 @@ fun ChatScreen(
     var userMessage by remember { mutableStateOf(EMPTY_STRING) }
 
     val messages = (state.chats as? LoadState.Success)?.data.orEmpty()
-
-    val uiMessages = messages.mapIndexed { index, item ->
-        ChatMessage(
-            message = item.lastMessage,
-            isFromUser = index % 2 == 0 // fake alternating biar preview hidup
-        )
-    }
 
     Column(
         modifier = Modifier
@@ -152,7 +145,7 @@ fun ChatScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(messages) { msg ->
-                ChatBubble(message = ChatMessage(msg.lastMessage, true))
+                ChatBubble(msg)
             }
         }
 
@@ -212,10 +205,10 @@ fun ChatScreen(
 }
 
 @Composable
-fun ChatBubble(message: ChatMessage) {
-    val bubbleColor = if (message.isFromUser) AppColor.Green else AppColor.GreenSoft
-    val alignment = if (message.isFromUser) Arrangement.End else Arrangement.Start
-    val textColor = if (message.isFromUser) AppColor.White else Color.Black
+fun ChatBubble(chatListItem: ChatListItem) {
+    val bubbleColor = if (chatListItem.isFromUser) AppColor.Green else AppColor.GreenSoft
+    val alignment = if (chatListItem.isFromUser) Arrangement.End else Arrangement.Start
+    val textColor = if (chatListItem.isFromUser) AppColor.White else Color.Black
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -228,7 +221,7 @@ fun ChatBubble(message: ChatMessage) {
                 .widthIn(max = 250.dp)
         ) {
             Text(
-                text = message.message,
+                text = chatListItem.lastMessage,
                 color = textColor,
                 fontFamily = PoppinsFont,
                 fontSize = 14.sp
@@ -240,29 +233,9 @@ fun ChatBubble(message: ChatMessage) {
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun ChatScreenPreview() {
-
-    val fakeChats = listOf(
-        ChatListItem(
-            id = "1",
-            name = "Cafe Kopi Kita",
-            lastMessage = "Halo kak 👋",
-            time = "10:00",
-            unreadCount = 0,
-            avatarBase64 = null
-        ),
-        ChatListItem(
-            id = "2",
-            name = "Cafe Kopi Kita",
-            lastMessage = "Pesanan sedang diproses",
-            time = "10:01",
-            unreadCount = 0,
-            avatarBase64 = null
-        )
-    )
-
     ChatScreen(
         state = ChatUiState(
-            chats = LoadState.Success(fakeChats)
+            chats = LoadState.Success(DataUiMock.chatDetail())
         ),
         event = {}
     )

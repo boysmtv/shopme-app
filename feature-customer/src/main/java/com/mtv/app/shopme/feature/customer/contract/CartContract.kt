@@ -15,7 +15,9 @@ import com.mtv.based.core.network.utils.LoadState
 
 data class CartUiState(
     val cartItems: LoadState<List<Cart>> = LoadState.Idle,
-    val sessionToken: LoadState<SessionToken> = LoadState.Idle
+    val sessionToken: LoadState<SessionToken> = LoadState.Idle,
+    val verifyPin: LoadState<Unit> = LoadState.Idle,
+    val createOrder: LoadState<Unit> = LoadState.Idle
 )
 
 sealed class CartEvent {
@@ -42,6 +44,7 @@ sealed class CartEvent {
 
     data class ClearCartByCafe(val cafeId: String) : CartEvent()
     object ClearCart : CartEvent()
+    object ShowSuccessDialog : CartEffect()
 }
 
 sealed class CartEffect {
