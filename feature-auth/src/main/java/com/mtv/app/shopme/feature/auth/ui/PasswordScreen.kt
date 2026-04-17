@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Lock
@@ -53,23 +52,20 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.auth.contract.PasswordDataListener
-import com.mtv.app.shopme.feature.auth.contract.PasswordEventListener
-import com.mtv.app.shopme.feature.auth.contract.PasswordNavigationListener
-import com.mtv.app.shopme.feature.auth.contract.PasswordStateListener
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import com.mtv.app.shopme.feature.auth.contract.PasswordEvent
+import com.mtv.app.shopme.feature.auth.contract.PasswordUiState
+import com.mtv.based.core.network.utils.LoadState
 
 @Composable
 fun PasswordScreen(
-    uiState: PasswordStateListener,
-    uiData: PasswordDataListener,
-    uiEvent: PasswordEventListener,
-    uiNavigation: PasswordNavigationListener
+    state: PasswordUiState,
+    event: (PasswordEvent) -> Unit
 ) {
 
     var currentVisible by remember { mutableStateOf(false) }
     var newVisible by remember { mutableStateOf(false) }
     var confirmVisible by remember { mutableStateOf(false) }
+    val isLoading = state.changePassword is LoadState.Loading
 
     Box(
         modifier = Modifier
@@ -125,36 +121,37 @@ fun PasswordScreen(
 
                     PasswordField(
                         title = "Current Password",
-                        value = uiData.currentPassword,
+                        value = state.currentPassword,
                         visible = currentVisible,
                         onToggle = { currentVisible = !currentVisible },
-                        onChange = uiEvent.onCurrentPasswordChange
+                        onChange = { event(PasswordEvent.OnCurrentPasswordChange(it)) }
                     )
 
                     Spacer(Modifier.height(16.dp))
 
                     PasswordField(
                         title = "New Password",
-                        value = uiData.newPassword,
+                        value = state.newPassword,
                         visible = newVisible,
                         onToggle = { newVisible = !newVisible },
-                        onChange = uiEvent.onNewPasswordChange
+                        onChange = { event(PasswordEvent.OnNewPasswordChange(it)) }
                     )
 
                     Spacer(Modifier.height(16.dp))
 
                     PasswordField(
                         title = "Confirm Password",
-                        value = uiData.confirmPassword,
+                        value = state.confirmPassword,
                         visible = confirmVisible,
                         onToggle = { confirmVisible = !confirmVisible },
-                        onChange = uiEvent.onConfirmPasswordChange
+                        onChange = { event(PasswordEvent.OnConfirmPasswordChange(it)) }
                     )
 
                     Spacer(Modifier.height(24.dp))
 
                     Button(
-                        onClick = uiEvent.onSubmitClick,
+                        onClick = { event(PasswordEvent.OnSubmitClick) },
+                        enabled = !isLoading,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
@@ -178,7 +175,7 @@ fun PasswordScreen(
                         color = AppColor.Green,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .clickable { uiNavigation.onBack() }
+                            .clickable { event(PasswordEvent.DismissDialog) }
                     )
                 }
             }
@@ -237,20 +234,7 @@ private fun PasswordField(
 @Composable
 fun PasswordScreenPreview() {
     PasswordScreen(
-        uiState = PasswordStateListener(),
-        uiData = PasswordDataListener(
-            currentPassword = EMPTY_STRING,
-            newPassword = EMPTY_STRING,
-            confirmPassword = EMPTY_STRING
-        ),
-        uiEvent = PasswordEventListener(
-            onCurrentPasswordChange = {},
-            onNewPasswordChange = {},
-            onConfirmPasswordChange = {},
-            onSubmitClick = {}
-        ),
-        uiNavigation = PasswordNavigationListener(
-            onBack = {}
-        )
+        state = PasswordUiState(),
+        event = {}
     )
 }

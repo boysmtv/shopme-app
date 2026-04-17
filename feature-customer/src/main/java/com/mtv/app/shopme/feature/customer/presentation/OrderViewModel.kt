@@ -8,9 +8,9 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.data.dto.OrderItem
-import com.mtv.app.shopme.data.dto.Order
-import com.mtv.app.shopme.data.dto.OrderStatus
+import com.mtv.app.shopme.domain.model.Order
+import com.mtv.app.shopme.domain.model.OrderItem
+import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderUiState
