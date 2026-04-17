@@ -54,5 +54,6 @@ private fun handleCartEffect(
     when (effect) {
         CartEffect.OpenPinSheet -> { }
         CartEffect.NavigateToOrder -> CustomerNavActions.toOrder(nav)
+        CartEvent.ShowSuccessDialog -> TODO()
     }
 }

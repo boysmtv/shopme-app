@@ -35,7 +35,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,11 +55,9 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.auth.contract.RegisterDataListener
-import com.mtv.app.shopme.feature.auth.contract.RegisterEventListener
-import com.mtv.app.shopme.feature.auth.contract.RegisterNavigationListener
-import com.mtv.app.shopme.feature.auth.contract.RegisterStateListener
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.feature.auth.contract.RegisterDialog
+import com.mtv.app.shopme.feature.auth.contract.RegisterEvent
+import com.mtv.app.shopme.feature.auth.contract.RegisterUiState
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -68,15 +65,13 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.OK_STRING
 
 @Composable
 fun RegisterScreen(
-    uiState: RegisterStateListener,
-    uiData: RegisterDataListener,
-    uiEvent: RegisterEventListener,
-    uiNavigation: RegisterNavigationListener
+    state: RegisterUiState,
+    event: (RegisterEvent) -> Unit
 ) {
 
     var passwordVisible by remember { mutableStateOf(false) }
 
-    if (uiState.registerState is Resource.Success) {
+    if (state.activeDialog is RegisterDialog.Success) {
         DialogCenterV1(
             state = DialogStateV1(
                 type = DialogType.SUCCESS,
@@ -85,8 +80,7 @@ fun RegisterScreen(
                 primaryButtonText = OK_STRING
             ),
             onDismiss = {
-                uiEvent.onDismissActiveDialog()
-                uiNavigation.onNavigateToLogin()
+                event(RegisterEvent.DismissDialog)
             }
         )
     }
@@ -145,8 +139,8 @@ fun RegisterScreen(
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
-                        value = uiData.name,
-                        onValueChange = uiEvent.onNameChange,
+                        value = state.name,
+                        onValueChange = { event(RegisterEvent.OnNameChange(it)) },
                         leadingIcon = {
                             Icon(Icons.Outlined.People, contentDescription = null)
                         },
@@ -167,8 +161,8 @@ fun RegisterScreen(
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
-                        value = uiData.email,
-                        onValueChange = uiEvent.onEmailChange,
+                        value = state.email,
+                        onValueChange = { event(RegisterEvent.OnEmailChange(state.email)) },
                         leadingIcon = {
                             Icon(Icons.Outlined.Email, contentDescription = null)
                         },
@@ -189,8 +183,8 @@ fun RegisterScreen(
                     Spacer(Modifier.height(8.dp))
 
                     OutlinedTextField(
-                        value = uiData.password,
-                        onValueChange = uiEvent.onPasswordChange,
+                        value = state.password,
+                        onValueChange = { event(RegisterEvent.OnPasswordChange(state.password)) },
                         leadingIcon = {
                             Icon(Icons.Outlined.Lock, contentDescription = null)
                         },
@@ -226,10 +220,12 @@ fun RegisterScreen(
 
                     Button(
                         onClick = {
-                            uiEvent.onRegisterClick(
-                                uiData.name,
-                                uiData.email,
-                                uiData.password
+                            event(
+                                RegisterEvent.OnRegisterClick(
+                                    state.name,
+                                    state.email,
+                                    state.password
+                                )
                             )
                         },
                         modifier = Modifier
@@ -256,7 +252,7 @@ fun RegisterScreen(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .clickable {
-                                uiNavigation.onNavigateToLogin()
+                                event(RegisterEvent.OnLoginClick)
                             }
                     )
                 }
@@ -269,9 +265,7 @@ fun RegisterScreen(
 @Composable
 fun RegisterScreenPreview() {
     RegisterScreen(
-        uiState = RegisterStateListener(),
-        uiData = RegisterDataListener(),
-        uiEvent = RegisterEventListener(),
-        uiNavigation = RegisterNavigationListener()
+        state = RegisterUiState(),
+        event = {}
     )
 }
