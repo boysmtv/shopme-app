@@ -8,25 +8,28 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreStateListener
+import androidx.lifecycle.viewModelScope
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEffect
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreUiState
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerEditStoreViewModel @Inject constructor(
+) : BaseEventViewModel<SellerEditStoreEvent, SellerEditStoreEffect>() {
 
-) : BaseViewModel(), UiOwner<SellerEditStoreStateListener, SellerEditStoreDataListener> {
-
-    override val uiState = MutableStateFlow(
-        SellerEditStoreStateListener()
-    )
-
-    override val uiData = MutableStateFlow(
-        SellerEditStoreDataListener(
+    private val _state = MutableStateFlow(
+        SellerEditStoreUiState(
             storeName = "Shopme Store",
             phone = "08123456789",
             description = "Best shop for everything",
@@ -37,45 +40,101 @@ class SellerEditStoreViewModel @Inject constructor(
             rw = "02"
         )
     )
+    val uiState = _state.asStateFlow()
 
-    fun onStoreNameChange(value: String) {
-        uiData.value = uiData.value.copy(storeName = value)
+    override fun onEvent(event: SellerEditStoreEvent) {
+        when (event) {
+
+            SellerEditStoreEvent.Load -> {}
+            SellerEditStoreEvent.DismissDialog -> dismissDialog()
+
+            // BASIC
+            is SellerEditStoreEvent.ChangeStoreName ->
+                update { copy(storeName = event.value) }
+
+            is SellerEditStoreEvent.ChangePhone ->
+                update { copy(phone = event.value) }
+
+            is SellerEditStoreEvent.ChangeMinOrder ->
+                update { copy(minOrder = event.value) }
+
+            is SellerEditStoreEvent.ChangeStoreOpen ->
+                update { copy(storeOpen = event.value) }
+
+            is SellerEditStoreEvent.ChangeDescription ->
+                update { copy(description = event.value) }
+
+            // ADDRESS
+            is SellerEditStoreEvent.ChangeVillage ->
+                update { copy(village = event.value) }
+
+            is SellerEditStoreEvent.ChangeBlock ->
+                update { copy(block = event.value) }
+
+            is SellerEditStoreEvent.ChangeNumber ->
+                update { copy(number = event.value) }
+
+            is SellerEditStoreEvent.ChangeRt ->
+                update { copy(rt = event.value) }
+
+            is SellerEditStoreEvent.ChangeRw ->
+                update { copy(rw = event.value) }
+
+            // TAB
+            is SellerEditStoreEvent.ChangeTab ->
+                update { copy(selectedTab = event.index) }
+
+            // IMAGE
+            SellerEditStoreEvent.UploadPhoto ->
+                emitEffect(SellerEditStoreEffect.OpenImagePicker)
+
+            is SellerEditStoreEvent.PhotoSelected ->
+                update { copy(storePhoto = event.uri) }
+
+            SellerEditStoreEvent.RemovePhoto ->
+                update { copy(storePhoto = null) }
+
+            // ACTION
+            SellerEditStoreEvent.Save -> save()
+
+            SellerEditStoreEvent.ClickBack ->
+                emitEffect(SellerEditStoreEffect.NavigateBack)
+        }
     }
 
-
-    fun onPhoneChange(value: String) {
-        uiData.value = uiData.value.copy(phone = value)
+    private fun update(block: SellerEditStoreUiState.() -> SellerEditStoreUiState) {
+        _state.update { it.block() }
     }
 
-    fun onDescriptionChange(value: String) {
-        uiData.value = uiData.value.copy(description = value)
+    private fun save() {
+        val state = _state.value
+
+        if (state.storeName.isBlank() || state.phone.isBlank()) {
+            showError("Store name & phone wajib diisi")
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+
+            delay(1000) // simulate API
+
+            _state.update { it.copy(isLoading = false) }
+
+            emitEffect(SellerEditStoreEffect.SaveSuccess)
+        }
     }
 
-    fun onVillageChange(value: String) {
-        uiData.value = uiData.value.copy(village = value)
-    }
-
-    fun onBlockChange(value: String) {
-        uiData.value = uiData.value.copy(block = value)
-    }
-
-    fun onNumberChange(value: String) {
-        uiData.value = uiData.value.copy(number = value)
-    }
-
-    fun onRtChange(value: String) {
-        uiData.value = uiData.value.copy(rt = value)
-    }
-
-    fun onRwChange(value: String) {
-        uiData.value = uiData.value.copy(rw = value)
-    }
-
-    fun onUploadPhoto() {
-        // open gallery / camera
-    }
-
-    fun saveStore() {
-
+    private fun showError(message: String) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = "Error",
+                    message = message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
     }
 }
