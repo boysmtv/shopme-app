@@ -8,25 +8,30 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.app.shopme.data.dto.OrderStatus
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import com.mtv.app.shopme.domain.model.OrderStatus
 
-data class SellerOrderDetailStateListener(
-    val orderId: String = EMPTY_STRING,
-    val currentStatus: OrderStatus = OrderStatus.ORDERED
+
+data class SellerOrderDetailUiState(
+    val isLoading: Boolean = false,
+
+    val orderId: String = "",
+    val currentStatus: OrderStatus = OrderStatus.ORDERED,
+
+    val customerName: String = "",
+    val total: String = ""
 )
 
-data class SellerOrderDetailDataListener(
-    val customerName: String = EMPTY_STRING,
-    val total: String = EMPTY_STRING
-)
+sealed class SellerOrderDetailEvent {
+    object Load : SellerOrderDetailEvent()
+    object DismissDialog : SellerOrderDetailEvent()
 
-data class SellerOrderDetailEventListener(
-    val onChangeStatus: (OrderStatus) -> Unit = {},
-    val onSaveStatus: () -> Unit = {},
-    val onDismissActiveDialog: () -> Unit = {}
-)
+    data class ChangeStatus(val status: OrderStatus) : SellerOrderDetailEvent()
+    object SaveStatus : SellerOrderDetailEvent()
 
-data class SellerOrderDetailNavigationListener(
-    val onBack: () -> Unit = {}
-)
+    object ClickBack : SellerOrderDetailEvent()
+}
+
+sealed class SellerOrderDetailEffect {
+    object NavigateBack : SellerOrderDetailEffect()
+    object UpdateSuccess : SellerOrderDetailEffect()
+}

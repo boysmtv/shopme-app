@@ -8,13 +8,13 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-class SellerOrderStateListener(
-    var selectedFilter: String = "All",
-    var isOnline: Boolean = true
-)
+data class SellerOrderUiState(
+    val isLoading: Boolean = false,
 
-class SellerOrderDataListener(
-    var orders: List<OrderSummary> = emptyList()
+    val selectedFilter: String = "All",
+    val isOnline: Boolean = true,
+
+    val orders: List<OrderSummary> = emptyList()
 )
 
 data class OrderSummary(
@@ -28,11 +28,14 @@ data class OrderSummary(
     val location: String
 )
 
-class SellerOrderEventListener(
-    val onToggleOnline: () -> Unit,
-    val onSelectFilter: (String) -> Unit
-)
+sealed class SellerOrderEvent {
+    object Load : SellerOrderEvent()
+    object DismissDialog : SellerOrderEvent()
+    data class SelectFilter(val value: String) : SellerOrderEvent()
+    object ToggleOnline : SellerOrderEvent()
+    data class ClickOrder(val orderId: String) : SellerOrderEvent()
+}
 
-class SellerOrderNavigationListener(
-    val onNavigateToOrderDetail: () -> Unit
-)
+sealed class SellerOrderEffect {
+    data class NavigateToOrderDetail(val orderId: String) : SellerOrderEffect()
+}

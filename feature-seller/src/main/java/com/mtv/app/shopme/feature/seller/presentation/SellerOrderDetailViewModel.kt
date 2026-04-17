@@ -8,25 +8,69 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerOrderDetailViewModel @Inject constructor(
-    private val sessionManager: SessionManager
-) : BaseViewModel(),
-    UiOwner<SellerOrderDetailStateListener, SellerOrderDetailDataListener> {
+    private val sessionManager: SessionManager,
+    savedStateHandle: SavedStateHandle
+) : BaseEventViewModel<SellerOrderDetailEvent, SellerOrderDetailEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(SellerOrderDetailStateListener())
+    private val orderId: String = checkNotNull(savedStateHandle["orderId"])
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(SellerOrderDetailDataListener())
+    private val _state = MutableStateFlow(
+        SellerOrderDetailUiState(orderId = orderId)
+    )
+    val uiState = _state.asStateFlow()
 
+    override fun onEvent(event: SellerOrderDetailEvent) {
+        when (event) {
+
+            SellerOrderDetailEvent.Load -> load()
+
+            SellerOrderDetailEvent.DismissDialog -> dismissDialog()
+
+            is SellerOrderDetailEvent.ChangeStatus ->
+                update { copy(currentStatus = event.status) }
+
+            SellerOrderDetailEvent.SaveStatus -> saveStatus()
+
+            SellerOrderDetailEvent.ClickBack ->
+                emitEffect(SellerOrderDetailEffect.NavigateBack)
+        }
+    }
+
+    private fun update(block: SellerOrderDetailUiState.() -> SellerOrderDetailUiState) {
+        _state.update { it.block() }
+    }
+
+    private fun load() {
+        // TODO: get order detail API
+        _state.update {
+            it.copy(
+                customerName = "John Doe",
+                total = "50000"
+            )
+        }
+    }
+
+    private fun saveStatus() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            delay(1000)
+            _state.update { it.copy(isLoading = false) }
+            emitEffect(SellerOrderDetailEffect.UpdateSuccess)
+        }
+    }
 }
