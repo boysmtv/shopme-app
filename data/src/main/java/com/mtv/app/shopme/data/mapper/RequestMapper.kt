@@ -14,12 +14,16 @@ import com.mtv.app.shopme.data.remote.request.CreateOrderRequest
 import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
 import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.app.shopme.data.remote.request.FoodVariantAddToCartRequest
+import com.mtv.app.shopme.data.remote.request.LoginRequest
+import com.mtv.app.shopme.data.remote.request.RegisterRequest
 import com.mtv.app.shopme.data.remote.request.VerifyPinRequest
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
+import com.mtv.app.shopme.domain.param.LoginParam
+import com.mtv.app.shopme.domain.param.RegisterParam
 import com.mtv.app.shopme.domain.param.VerifyPinParam
 
 /* =========================================================
@@ -66,4 +70,15 @@ fun AddressAddParam.toRequest() = AddressAddRequest(
     rt = rt,
     rw = rw,
     isDefault = isDefault
+)
+
+fun LoginParam.toRequest() = LoginRequest(
+    email = email,
+    password = password
+)
+
+fun RegisterParam.toRequest() = RegisterRequest(
+    name = name,
+    email = email,
+    password = password
 )
