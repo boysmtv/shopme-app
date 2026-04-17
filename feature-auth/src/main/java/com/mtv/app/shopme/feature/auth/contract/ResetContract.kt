@@ -8,22 +8,21 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
-data class ResetStateListener(
-    val resetState: ResourceFirebase<String> = ResourceFirebase.Loading
+data class ResetUiState(
+    val email: String = EMPTY_STRING,
+    val reset: LoadState<String> = LoadState.Idle
 )
 
-data class ResetDataListener(
-    val email: String = "Boys.mtv@gmail.com"
-)
+sealed class ResetEvent {
+    data class OnEmailChange(val value: String) : ResetEvent()
+    data object OnResetClick : ResetEvent()
+    data object OnBackClick : ResetEvent()
+    data object DismissDialog : ResetEvent()
+}
 
-data class ResetEventListener(
-    val onEmailChange: (String) -> Unit,
-    val onResetClick: () -> Unit
-)
-
-data class ResetNavigationListener(
-    val onNavigateToLogin: () -> Unit,
-    val onBack: () -> Unit
-)
+sealed class ResetEffect {
+    data object NavigateBack : ResetEffect()
+}
