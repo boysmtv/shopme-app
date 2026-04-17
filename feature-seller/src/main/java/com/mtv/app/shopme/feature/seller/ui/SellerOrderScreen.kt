@@ -37,13 +37,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,23 +50,16 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderStateListener
-import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.feature.seller.contract.OrderSummary
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderUiState
 
 @Composable
 fun SellerOrderScreen(
-    uiState: SellerOrderStateListener,
-    uiData: SellerOrderDataListener,
-    uiEvent: SellerOrderEventListener,
-    uiNavigation: SellerOrderNavigationListener
+    state: SellerOrderUiState,
+    event: (SellerOrderEvent) -> Unit
 ) {
-    var selectedFilter by remember { mutableStateOf("All") }
-    var isOnline by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -78,16 +67,36 @@ fun SellerOrderScreen(
             .background(AppColor.Blue)
             .statusBarsPadding()
     ) {
-        SellerOrderHeader(isOnline, orders)
+
+        SellerOrderHeader(
+            isOnline = state.isOnline,
+            totalOrders = state.orders.size,
+            onToggle = {
+                event(SellerOrderEvent.ToggleOnline)
+            }
+        )
 
         Column(
-            modifier = Modifier
-                .background(AppColor.WhiteSoft)
+            modifier = Modifier.background(AppColor.WhiteSoft)
         ) {
+
             Spacer(Modifier.height(16.dp))
-            OrderFilterChips(selectedFilter) { selectedFilter = it }
+
+            OrderFilterChips(
+                selected = state.selectedFilter,
+                onSelected = {
+                    event(SellerOrderEvent.SelectFilter(it))
+                }
+            )
 
             Spacer(Modifier.height(12.dp))
+
+            if (state.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -95,17 +104,24 @@ fun SellerOrderScreen(
                     .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(orders.filter { selectedFilter == "All" || it["status"] == selectedFilter }) { order ->
+
+                val filtered = state.orders.filter {
+                    state.selectedFilter == "All" || it.status.equals(state.selectedFilter, true)
+                }
+
+                items(filtered) { order ->
                     ModernOrderCard(
-                        invoice = order["invoice"]!!,
-                        customer = order["customer"]!!,
-                        location = order["location"]!!,
-                        total = order["total"]!!,
-                        date = order["date"]!!,
-                        time = order["time"]!!,
-                        paymentMethod = order["payment"]!!,
-                        status = order["status"]!!,
-                        onClick = { uiNavigation.onNavigateToOrderDetail() }
+                        invoice = order.orderId,
+                        customer = order.customerName,
+                        location = order.location,
+                        total = order.total,
+                        date = order.date,
+                        time = order.time,
+                        paymentMethod = order.paymentMethod,
+                        status = order.status,
+                        onClick = {
+                            event(SellerOrderEvent.ClickOrder(order.orderId))
+                        }
                     )
                 }
             }
@@ -115,8 +131,11 @@ fun SellerOrderScreen(
 
 @Composable
 fun SellerOrderHeader(
-    isOnline: Boolean, orders: List<Map<String, String>>
+    isOnline: Boolean,
+    totalOrders: Int,
+    onToggle: () -> Unit
 ) {
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -127,29 +146,53 @@ fun SellerOrderHeader(
             )
             .padding(20.dp)
     ) {
+
         Column {
+
             Row(verticalAlignment = Alignment.CenterVertically) {
+
                 Icon(
                     imageVector = Icons.Default.Receipt,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
+
                 Spacer(Modifier.width(12.dp))
-                Text("Orders", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+
+                Text(
+                    "Orders",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
                 Spacer(Modifier.weight(1f))
+
                 Box(
                     modifier = Modifier
                         .size(12.dp)
                         .clip(CircleShape)
                         .background(if (isOnline) Color.Green else Color.Red)
+                        .clickable { onToggle() }
                 )
+
                 Spacer(Modifier.width(6.dp))
-                Text(if (isOnline) "Online" else "Offline", color = Color.White, fontSize = 14.sp)
+
+                Text(
+                    if (isOnline) "Online" else "Offline",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
             }
 
             Spacer(Modifier.height(8.dp))
-            Text("${orders.size} total orders", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+
+            Text(
+                "$totalOrders total orders",
+                color = Color.White.copy(alpha = 0.8f),
+                fontSize = 14.sp
+            )
         }
     }
 }
@@ -350,21 +393,36 @@ val orders = listOf(
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerOrderScreenPreview() {
-    val navController = rememberNavController()
-    Scaffold(
-        bottomBar = { SellerBottomNavigationBar(navController) }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = padding.calculateBottomPadding())
-        ) {
-            SellerOrderScreen(
-                uiState = SellerOrderStateListener(),
-                uiData = SellerOrderDataListener(),
-                uiEvent = SellerOrderEventListener({}, {}),
-                uiNavigation = SellerOrderNavigationListener({})
-            )
-        }
-    }
+
+    val dummy = listOf(
+        OrderSummary(
+            orderId = "INV-001",
+            customerName = "John Doe",
+            total = "Rp 120.000",
+            date = "18 Feb 2026",
+            time = "09:45",
+            paymentMethod = "Transfer",
+            status = "Pending",
+            location = "Jakarta"
+        ),
+        OrderSummary(
+            orderId = "INV-002",
+            customerName = "Jane Smith",
+            total = "Rp 250.000",
+            date = "17 Feb 2026",
+            time = "14:30",
+            paymentMethod = "QRIS",
+            status = "Completed",
+            location = "Bandung"
+        )
+    )
+
+    SellerOrderScreen(
+        state = SellerOrderUiState(
+            orders = dummy,
+            selectedFilter = "All",
+            isOnline = true
+        ),
+        event = {}
+    )
 }

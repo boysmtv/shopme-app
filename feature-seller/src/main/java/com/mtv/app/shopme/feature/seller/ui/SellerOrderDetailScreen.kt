@@ -1,3 +1,11 @@
+/*
+ * Project: Shopme App
+ * Author: Boys.mtv@gmail.com
+ * File: SellerOrderDetailScreen.kt
+ *
+ * Last modified by Dedy Wijaya on 18/02/26 13.04
+ */
+
 package com.mtv.app.shopme.feature.seller.ui
 
 import androidx.compose.animation.animateColorAsState
@@ -24,6 +32,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,56 +50,75 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.data.dto.OrderStatus
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailStateListener
+import com.mtv.app.shopme.domain.model.OrderStatus
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SellerOrderDetailScreen(
-    uiState: SellerOrderDetailStateListener,
-    uiData: SellerOrderDetailDataListener,
-    uiEvent: SellerOrderDetailEventListener,
-    uiNavigation: SellerOrderDetailNavigationListener
+    state: SellerOrderDetailUiState,
+    event: (SellerOrderDetailEvent) -> Unit
 ) {
+
     Scaffold(
         containerColor = AppColor.White,
         bottomBar = {
             UpdateStatusBottomBar(
-                currentStatus = uiState.currentStatus,
-                onUpdate = { uiEvent.onChangeStatus(it) }
+                currentStatus = state.currentStatus,
+                onUpdate = {
+                    event(SellerOrderDetailEvent.ChangeStatus(it))
+                    event(SellerOrderDetailEvent.SaveStatus)
+                }
             )
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+
             SellerOrderDetailHeader(
-                orderId = uiState.orderId,
-                status = uiState.currentStatus,
-                onBack = uiNavigation.onBack
+                orderId = state.orderId,
+                status = state.currentStatus,
+                onBack = {
+                    event(SellerOrderDetailEvent.ClickBack)
+                }
             )
+
+            // 🔥 Loading (optional tapi bagus)
+            if (state.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f) // 🔥 penting
+                    .weight(1f)
                     .background(AppColor.WhiteSoft)
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
 
-                item { OrderTimeline(uiState.currentStatus) }
+                item { OrderTimeline(state.currentStatus) }
 
                 item { OrderItemSection() }
 
-                item { CustomerSection(customerName = uiData.customerName) }
+                item {
+                    CustomerSection(
+                        customerName = state.customerName
+                    )
+                }
 
-                item { PaymentSection(total = uiData.total) }
+                item {
+                    PaymentSection(
+                        total = state.total
+                    )
+                }
             }
         }
     }
@@ -350,15 +378,12 @@ fun OrderStatus.statusColor(): Color {
 @Composable
 fun SellerOrderDetailPreview() {
     SellerOrderDetailScreen(
-        uiState = SellerOrderDetailStateListener(
+        state = SellerOrderDetailUiState(
             orderId = "INV-001",
-            currentStatus = OrderStatus.COOKING
-        ),
-        uiData = SellerOrderDetailDataListener(
+            currentStatus = OrderStatus.COOKING,
             customerName = "Dedy Wijaya",
             total = "Rp 120.000"
         ),
-        uiEvent = SellerOrderDetailEventListener(),
-        uiNavigation = SellerOrderDetailNavigationListener()
+        event = {}
     )
 }
