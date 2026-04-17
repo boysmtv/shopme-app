@@ -8,26 +8,24 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
-import com.mtv.based.core.network.utils.ResourceFirebase
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
-data class PasswordStateListener(
-    val changePasswordState: ResourceFirebase<String> = ResourceFirebase.Loading
-)
-
-data class PasswordDataListener(
+data class PasswordUiState(
     val currentPassword: String = EMPTY_STRING,
     val newPassword: String = EMPTY_STRING,
-    val confirmPassword: String = EMPTY_STRING
+    val confirmPassword: String = EMPTY_STRING,
+    val changePassword: LoadState<String> = LoadState.Idle
 )
 
-data class PasswordEventListener(
-    val onCurrentPasswordChange: (String) -> Unit,
-    val onNewPasswordChange: (String) -> Unit,
-    val onConfirmPasswordChange: (String) -> Unit,
-    val onSubmitClick: () -> Unit
-)
+sealed class PasswordEvent {
+    data class OnCurrentPasswordChange(val value: String) : PasswordEvent()
+    data class OnNewPasswordChange(val value: String) : PasswordEvent()
+    data class OnConfirmPasswordChange(val value: String) : PasswordEvent()
+    data object OnSubmitClick : PasswordEvent()
+    data object DismissDialog : PasswordEvent()
+}
 
-data class PasswordNavigationListener(
-    val onBack: () -> Unit
-)
+sealed class PasswordEffect {
+    data object NavigateBack : PasswordEffect()
+}

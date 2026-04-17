@@ -8,63 +8,77 @@
 
 package com.mtv.app.shopme.feature.auth.presentation
 
-import androidx.lifecycle.viewModelScope
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.auth.contract.PasswordDataListener
-import com.mtv.app.shopme.feature.auth.contract.PasswordStateListener
-import com.mtv.based.core.network.utils.ResourceFirebase
-import com.mtv.based.core.network.utils.UiErrorFirebase
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.auth.contract.*
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class PasswordViewModel @Inject constructor() :
-    BaseViewModel(),
-    UiOwner<PasswordStateListener, PasswordDataListener> {
+    BaseEventViewModel<PasswordEvent, PasswordEffect>() {
 
-    override val uiState = MutableStateFlow(PasswordStateListener())
-    override val uiData = MutableStateFlow(PasswordDataListener())
+    private val _state = MutableStateFlow(PasswordUiState())
+    val uiState = _state.asStateFlow()
 
-    fun updateCurrentPassword(value: String) {
-        uiData.value = uiData.value.copy(currentPassword = value)
-    }
-
-    fun updateNewPassword(value: String) {
-        uiData.value = uiData.value.copy(newPassword = value)
-    }
-
-    fun updateConfirmPassword(value: String) {
-        uiData.value = uiData.value.copy(confirmPassword = value)
-    }
-
-    fun changePassword(onSuccess: () -> Unit) {
-        viewModelScope.launch {
-
-            uiState.value =
-                uiState.value.copy(changePasswordState = ResourceFirebase.Loading)
-
-            delay(700)
-
-            val data = uiData.value
-
-            if (data.newPassword == data.confirmPassword &&
-                data.currentPassword.isNotEmpty()
-            ) {
-                uiState.value =
-                    uiState.value.copy(changePasswordState = ResourceFirebase.Success("Password Updated"))
-                onSuccess()
-            } else {
-                uiState.value =
-                    uiState.value.copy(
-                        changePasswordState = ResourceFirebase.Error(
-                            UiErrorFirebase.Unknown("Password not match")
-                        )
-                    )
+    override fun onEvent(event: PasswordEvent) {
+        when (event) {
+            is PasswordEvent.OnCurrentPasswordChange -> {
+                _state.update { it.copy(currentPassword = event.value) }
             }
+
+            is PasswordEvent.OnNewPasswordChange -> {
+                _state.update { it.copy(newPassword = event.value) }
+            }
+
+            is PasswordEvent.OnConfirmPasswordChange -> {
+                _state.update { it.copy(confirmPassword = event.value) }
+            }
+
+            PasswordEvent.OnSubmitClick -> changePassword()
+
+            PasswordEvent.DismissDialog -> dismissDialog()
         }
+    }
+
+    private fun changePassword() {
+        val state = _state.value
+
+        if (state.newPassword != state.confirmPassword) {
+            showError("Password tidak sama")
+            return
+        }
+
+        if (state.currentPassword.isEmpty()) {
+            showError("Password lama kosong")
+            return
+        }
+
+        // sementara mock success (nanti tinggal connect ke API)
+        _state.update {
+            it.copy(changePassword = LoadState.Success("Password Updated"))
+        }
+
+        emitEffect(PasswordEffect.NavigateBack)
+    }
+
+    private fun showError(message: String) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
     }
 }
