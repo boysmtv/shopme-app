@@ -8,36 +8,48 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+data class SellerPaymentMethodUiState(
+    val isLoading: Boolean = false,
 
-data class SellerPaymentMethodStateListener(
-    val isLoading: Boolean = false
-)
-
-data class SellerPaymentMethodDataListener(
     val cashEnabled: Boolean = false,
+
     val bankEnabled: Boolean = false,
-    val bankNumber: String = EMPTY_STRING,
+    val bankNumber: String = "",
+
     val ovoEnabled: Boolean = false,
-    val ovoNumber: String = EMPTY_STRING,
+    val ovoNumber: String = "",
+
     val danaEnabled: Boolean = false,
-    val danaNumber: String = EMPTY_STRING,
+    val danaNumber: String = "",
+
     val gopayEnabled: Boolean = false,
-    val gopayNumber: String = EMPTY_STRING
-)
-data class SellerPaymentMethodEventListener(
-    val onCashToggle: (Boolean) -> Unit = {},
-    val onBankToggle: (Boolean) -> Unit = {},
-    val onBankChange: (String) -> Unit = {},
-    val onOvoToggle: (Boolean) -> Unit = {},
-    val onOvoChange: (String) -> Unit = {},
-    val onDanaToggle: (Boolean) -> Unit = {},
-    val onDanaChange: (String) -> Unit = {},
-    val onGopayToggle: (Boolean) -> Unit = {},
-    val onGopayChange: (String) -> Unit = {},
-    val onSave: () -> Unit = {}
+    val gopayNumber: String = ""
 )
 
-data class SellerPaymentMethodNavigationListener(
-    val navigateBack: () -> Unit = {}
-)
+sealed class SellerPaymentMethodEvent {
+    object Load : SellerPaymentMethodEvent()
+    object DismissDialog : SellerPaymentMethodEvent()
+
+    data class ToggleCash(val value: Boolean) : SellerPaymentMethodEvent()
+
+    data class ToggleBank(val value: Boolean) : SellerPaymentMethodEvent()
+    data class ChangeBank(val value: String) : SellerPaymentMethodEvent()
+
+    data class ToggleOvo(val value: Boolean) : SellerPaymentMethodEvent()
+    data class ChangeOvo(val value: String) : SellerPaymentMethodEvent()
+
+    data class ToggleDana(val value: Boolean) : SellerPaymentMethodEvent()
+    data class ChangeDana(val value: String) : SellerPaymentMethodEvent()
+
+    data class ToggleGopay(val value: Boolean) : SellerPaymentMethodEvent()
+    data class ChangeGopay(val value: String) : SellerPaymentMethodEvent()
+
+    object Save : SellerPaymentMethodEvent()
+
+    object ClickBack : SellerPaymentMethodEvent()
+}
+
+sealed class SellerPaymentMethodEffect {
+    object NavigateBack : SellerPaymentMethodEffect()
+    object SaveSuccess : SellerPaymentMethodEffect()
+}

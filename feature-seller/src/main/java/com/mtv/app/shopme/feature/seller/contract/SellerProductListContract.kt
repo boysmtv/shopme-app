@@ -8,23 +8,27 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.app.shopme.feature.seller.model.SellerProduct
+import com.mtv.app.shopme.domain.model.ProductItem
 
-class SellerProductListStateListener(
-    var isLoading: Boolean = false,
-    val productList: List<SellerProduct> = emptyList()
+data class SellerProductListUiState(
+    val isLoading: Boolean = false,
+
+    val products: List<ProductItem> = emptyList()
 )
 
-class SellerProductListDataListener(
-    var productList: List<ProductItem> = emptyList()
-)
+sealed class SellerProductListEvent {
+    object Load : SellerProductListEvent()
+    object DismissDialog : SellerProductListEvent()
 
-class SellerProductListEventListener(
-    val onDeleteProduct: () -> Unit
-)
+    object ClickAdd : SellerProductListEvent()
+    data class ClickEdit(val productId: String) : SellerProductListEvent()
+    data class ClickDelete(val productId: String) : SellerProductListEvent()
 
-class SellerProductListNavigationListener(
-    val onBack: () -> Unit,
-    val onNavigateToAdd: () -> Unit,
-    val onNavigateToEdit: () -> Unit
-)
+    object ClickBack : SellerProductListEvent()
+}
+
+sealed class SellerProductListEffect {
+    object NavigateBack : SellerProductListEffect()
+    object NavigateToAdd : SellerProductListEffect()
+    data class NavigateToEdit(val productId: String) : SellerProductListEffect()
+}
