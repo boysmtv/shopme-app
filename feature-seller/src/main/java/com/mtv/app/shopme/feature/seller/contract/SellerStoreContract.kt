@@ -8,31 +8,41 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+data class SellerStoreUiState(
+    val isLoading: Boolean = false,
 
-class SellerStoreStateListener(
-    var isLoading: Boolean = false
+    val sellerName: String = "",
+    val email: String = "",
+    val phone: String = "",
+
+    val storeName: String = "",
+    val storeAddress: String = "",
+
+    val isOnline: Boolean = true
 )
 
-class SellerStoreDataListener(
-    var sellerName: String = EMPTY_STRING,
-    var email: String = EMPTY_STRING,
-    var phone: String = EMPTY_STRING,
-    var storeName: String = EMPTY_STRING,
-    var storeAddress: String = EMPTY_STRING,
-    var isOnline: Boolean = true
-)
+sealed class SellerStoreEvent {
+    object Load : SellerStoreEvent()
+    object DismissDialog : SellerStoreEvent()
 
-class SellerStoreEventListener(
-    val onToggleOnline: () -> Unit,
-    val onEditStore: () -> Unit,
-    val onLogout: () -> Unit
-)
+    object ToggleOnline : SellerStoreEvent()
 
-class SellerStoreNavigationListener(
-    val navigateToEditProfile: () -> Unit = {},
-    val navigateToStoreSettings: () -> Unit = {},
-    val navigateToBankAccount: () -> Unit = {},
-    val navigateToChangePassword: () -> Unit = {},
-    val navigateToHelpCenter: () -> Unit = {}
-)
+    object ClickEditProfile : SellerStoreEvent()
+    object ClickStoreSettings : SellerStoreEvent()
+    object ClickBankAccount : SellerStoreEvent()
+    object ClickChangePassword : SellerStoreEvent()
+    object ClickHelpCenter : SellerStoreEvent()
+
+    object Logout : SellerStoreEvent()
+    object ClickBack : SellerStoreEvent()
+}
+
+sealed class SellerStoreEffect {
+    object NavigateToEditProfile : SellerStoreEffect()
+    object NavigateToStoreSettings : SellerStoreEffect()
+    object NavigateToBankAccount : SellerStoreEffect()
+    object NavigateToChangePassword : SellerStoreEffect()
+    object NavigateToHelpCenter : SellerStoreEffect()
+
+    object LogoutSuccess : SellerStoreEffect()
+}

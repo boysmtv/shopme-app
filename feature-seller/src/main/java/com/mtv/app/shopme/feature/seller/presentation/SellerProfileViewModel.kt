@@ -8,25 +8,22 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.seller.contract.SellerStoreDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerStoreStateListener
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class SellerProfileViewModel @Inject constructor(
     private val sessionManager: SessionManager
-) : BaseViewModel(),
-    UiOwner<SellerStoreStateListener, SellerStoreDataListener> {
+) : BaseEventViewModel<SellerStoreEvent, SellerStoreEffect>() {
 
-    override val uiState = MutableStateFlow(SellerStoreStateListener())
-
-    override val uiData = MutableStateFlow(
-        SellerStoreDataListener(
+    private val _state = MutableStateFlow(
+        SellerStoreUiState(
             sellerName = "Dedy Wijaya",
             email = "seller@email.com",
             phone = "08123456789",
@@ -35,13 +32,45 @@ class SellerProfileViewModel @Inject constructor(
             isOnline = true
         )
     )
+    val uiState = _state.asStateFlow()
 
-    fun toggleOnline() {
+    override fun onEvent(event: SellerStoreEvent) {
+        when (event) {
 
+            SellerStoreEvent.Load -> {}
+
+            SellerStoreEvent.DismissDialog -> dismissDialog()
+
+            SellerStoreEvent.ToggleOnline ->
+                update { copy(isOnline = !isOnline) }
+
+            SellerStoreEvent.ClickEditProfile ->
+                emitEffect(SellerStoreEffect.NavigateToEditProfile)
+
+            SellerStoreEvent.ClickStoreSettings ->
+                emitEffect(SellerStoreEffect.NavigateToStoreSettings)
+
+            SellerStoreEvent.ClickBankAccount ->
+                emitEffect(SellerStoreEffect.NavigateToBankAccount)
+
+            SellerStoreEvent.ClickChangePassword ->
+                emitEffect(SellerStoreEffect.NavigateToChangePassword)
+
+            SellerStoreEvent.ClickHelpCenter ->
+                emitEffect(SellerStoreEffect.NavigateToHelpCenter)
+
+            SellerStoreEvent.ClickBack -> TODO()
+            SellerStoreEvent.Logout -> logout()
+            else -> {}
+        }
     }
 
-    fun logout() {
+    private fun update(block: SellerStoreUiState.() -> SellerStoreUiState) {
+        _state.update { it.block() }
+    }
+
+    private fun logout() {
         sessionManager.logout()
+        emitEffect(SellerStoreEffect.LogoutSuccess)
     }
 }
-

@@ -7,39 +7,73 @@
  */
 
 package com.mtv.app.shopme.feature.seller.presentation
-import com.mtv.based.core.provider.based.BaseViewModel
+
+import androidx.lifecycle.viewModelScope
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.ProductItem
+import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.app.shopme.feature.seller.contract.SellerProductListEffect.*
 import com.mtv.based.core.provider.utils.SessionManager
-import com.mtv.app.shopme.common.base.UiOwner
-import com.mtv.app.shopme.feature.seller.contract.ProductItem
-import com.mtv.app.shopme.feature.seller.contract.SellerProductListDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductListStateListener
-import com.mtv.app.shopme.feature.seller.model.SellerProduct
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerProductListViewModel @Inject constructor(
     private val sessionManager: SessionManager
-) : BaseViewModel(),
-    UiOwner<SellerProductListStateListener, SellerProductListDataListener> {
+) : BaseEventViewModel<SellerProductListEvent, SellerProductListEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(SellerProductListStateListener())
+    private val _state = MutableStateFlow(SellerProductListUiState())
+    val uiState = _state.asStateFlow()
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(SellerProductListDataListener())
+    override fun onEvent(event: SellerProductListEvent) {
+        when (event) {
 
-    init {
-        loadProducts()
+            SellerProductListEvent.Load -> load()
+
+            SellerProductListEvent.DismissDialog -> dismissDialog()
+
+            SellerProductListEvent.ClickAdd ->
+                emitEffect(NavigateToAdd)
+
+            is SellerProductListEvent.ClickEdit ->
+                emitEffect(NavigateToEdit(event.productId))
+
+            is SellerProductListEvent.ClickDelete ->
+                deleteProduct(event.productId)
+
+            SellerProductListEvent.ClickBack ->
+                emitEffect(NavigateBack)
+        }
     }
 
-    private fun loadProducts() {
-
+    private fun update(block: SellerProductListUiState.() -> SellerProductListUiState) {
+        _state.update { it.block() }
     }
 
-    fun deleteProduct() {
+    private fun load() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
 
+            delay(1000)
+
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    products = dummyProducts()
+                )
+            }
+        }
+    }
+
+    private fun deleteProduct(productId: String) {
+        val updated = _state.value.products.filterNot { it.id == productId }
+
+        _state.update { it.copy(products = updated) }
     }
 
     private fun dummyProducts(): List<ProductItem> {
@@ -49,9 +83,3 @@ class SellerProductListViewModel @Inject constructor(
         )
     }
 }
-
-fun mockSellerProducts(): List<SellerProduct> = listOf(
-    SellerProduct("1", "Double Beef Burger", "Rp 60.000", 10),
-    SellerProduct("2", "Cheese Pizza", "Rp 75.000", 5),
-    SellerProduct("3", "Padang Rice Set", "Rp 50.000", 12)
-)
