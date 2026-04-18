@@ -13,7 +13,6 @@ import android.content.pm.PackageManager
 
 data class SupportUiState(
     val isLoading: Boolean = false,
-
     val phone: String = "081234567890",
     val email: String = "support@shopme.com",
     val whatsapp: String = "6281234567890"
@@ -22,8 +21,7 @@ data class SupportUiState(
 sealed class SupportEvent {
     object Load : SupportEvent()
     object DismissDialog : SupportEvent()
-
-    data class OpenWhatsapp(val pm: PackageManager) : SupportEvent()
+    object OpenWhatsapp : SupportEvent()
     object OpenEmail : SupportEvent()
     object OpenDial : SupportEvent()
 

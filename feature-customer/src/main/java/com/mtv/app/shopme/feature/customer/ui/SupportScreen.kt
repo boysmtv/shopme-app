@@ -60,28 +60,21 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.customer.contract.SupportDataListener
-import com.mtv.app.shopme.feature.customer.contract.SupportEventListener
-import com.mtv.app.shopme.feature.customer.contract.SupportNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.SupportStateListener
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.text.style.TextAlign
+import com.mtv.app.shopme.feature.customer.contract.SupportEvent
+import com.mtv.app.shopme.feature.customer.contract.SupportUiState
 
 @Composable
 fun SupportScreen(
-    uiState: SupportStateListener,
-    uiData: SupportDataListener,
-    uiEvent: SupportEventListener,
-    uiNavigation: SupportNavigationListener
+    state: SupportUiState,
+    event: (SupportEvent) -> Unit
 ) {
 
     val isOpen = remember {
@@ -109,7 +102,7 @@ fun SupportScreen(
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = uiNavigation.onBack) {
+                    IconButton(onClick = { event(SupportEvent.ClickBack) }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
                     }
 
@@ -145,7 +138,7 @@ fun SupportScreen(
                 HeroSupportCard(
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        uiNavigation.onLiveChat()
+                        event(SupportEvent.ClickLiveChat)
                     }
                 )
             }
@@ -176,7 +169,7 @@ fun SupportScreen(
                         "Chat via WhatsApp",
                         Icons.AutoMirrored.Filled.Chat
                     ) {
-                        uiEvent.onOpenWhatsapp(uiData.whatsapp)
+                        event(SupportEvent.OpenWhatsapp)
                     }
 
                     AnimatedSupportCard(
@@ -184,7 +177,7 @@ fun SupportScreen(
                         "Kirim laporan + lampiran",
                         Icons.Default.Email
                     ) {
-                        uiEvent.onOpenEmail(uiData.email)
+                        event(SupportEvent.OpenEmail)
                     }
 
                     AnimatedSupportCard(
@@ -192,7 +185,7 @@ fun SupportScreen(
                         "Hubungi via telepon",
                         Icons.Default.Call
                     ) {
-                        uiEvent.onOpenDial(uiData.phone)
+                        event(SupportEvent.OpenDial)
                     }
 
                     Spacer(Modifier.height(6.dp))
@@ -394,22 +387,7 @@ private fun AnimatedSupportCard(
 @Composable
 fun SupportPreview() {
     SupportScreen(
-        uiState = SupportStateListener(
-            isLoading = false
-        ),
-        uiData = SupportDataListener(
-            phone = "081234567890",
-            email = "support@shopme.com",
-            whatsapp = "6281234567890"
-        ),
-        uiEvent = SupportEventListener(
-            onOpenWhatsapp = {},
-            onOpenEmail = {},
-            onOpenDial = {}
-        ),
-        uiNavigation = SupportNavigationListener(
-            onBack = {},
-            onLiveChat = {}
-        )
+        state = SupportUiState(),
+        event = {}
     )
 }

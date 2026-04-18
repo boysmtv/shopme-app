@@ -37,7 +37,7 @@ class SupportViewModel @Inject constructor() :
             is SupportEvent.Load -> {}
             is SupportEvent.DismissDialog -> dismissDialog()
 
-            is SupportEvent.OpenWhatsapp -> openWhatsapp(event.pm)
+            is SupportEvent.OpenWhatsapp -> openWhatsapp()
             is SupportEvent.OpenEmail -> {}
             is SupportEvent.OpenDial -> openDial()
 
@@ -62,6 +62,10 @@ class SupportViewModel @Inject constructor() :
         finalIntent?.let {
             emitEffect(SupportEffect.OpenIntent(it))
         }
+    }
+
+    private fun openWhatsapp() {
+
     }
 
     private fun openWhatsapp(pm: PackageManager) {

@@ -6,7 +6,7 @@
  * Last modified by Dedy Wijaya on 22/02/26 10.39
  */
 
-package com.mtv.app.shopme.nav.route
+package com.mtv.app.shopme.nav.route.customer
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -46,14 +46,7 @@ fun SupportRoute(nav: NavController) {
             ) {
                 SupportScreen(
                     state = uiState,
-                    event = { event ->
-                        when (event) {
-                            SupportEvent.OpenWhatsapp -> vm.onEvent(pm)
-                            SupportEvent.OpenEmail -> vm.onEvent(context, pm)
-                            SupportEvent.OpenDial -> vm.onEvent()
-                            else -> vm.onEvent(event)
-                        }
-                    }
+                    event = vm::onEvent
                 )
             }
         }
