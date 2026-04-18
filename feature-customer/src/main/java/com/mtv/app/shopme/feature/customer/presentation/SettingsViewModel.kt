@@ -75,7 +75,7 @@ class SettingsViewModel @Inject constructor(
                 emitEffect(SettingsEffect.LogoutSuccess)
             } catch (e: Exception) {
                 showError(
-                    UiError(message = e.message ?: ErrorMessages.GENERIC_ERROR)
+                    UiError.Unknown(message = e.message ?: ErrorMessages.GENERIC_ERROR)
                 )
             }
         }

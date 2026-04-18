@@ -13,25 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SplashResponse(
     val isAuthenticated: Boolean,
-    val user: User? = null,
-    val config: AppConfig? = null,
+    val user: UserResponse? = null,
+    val config: AppConfigResponse,
     val versionStatus: String
-)
-
-@Serializable
-data class User(
-    val id: String,
-    val name: String,
-    val email: String,
-    val phone: String,
-    val photo: String
-)
-
-@Serializable
-data class AppConfig(
-    val minVersion: Int,
-    val latestVersion: Int,
-    val forceUpdate: Boolean,
-    val maintenanceMode: Boolean,
-    val maintenanceMessage: String? = null
 )
