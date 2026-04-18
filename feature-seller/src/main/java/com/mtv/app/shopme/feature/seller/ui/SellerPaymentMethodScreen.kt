@@ -37,6 +37,7 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -56,17 +57,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodStateListener
+import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodUiState
 
 @Composable
 fun SellerPaymentMethodScreen(
-    uiState: SellerPaymentMethodStateListener,
-    uiData: SellerPaymentMethodDataListener,
-    uiEvent: SellerPaymentMethodEventListener,
-    uiNavigation: SellerPaymentMethodNavigationListener
+    state: SellerPaymentMethodUiState,
+    event: (SellerPaymentMethodEvent) -> Unit
 ) {
 
     Column(
@@ -79,7 +76,9 @@ fun SellerPaymentMethodScreen(
             )
     ) {
 
-        SellerPaymentHeader(uiNavigation)
+        SellerPaymentHeader(
+            onBack = { event(SellerPaymentMethodEvent.ClickBack) }
+        )
 
         Card(
             modifier = Modifier.fillMaxSize(),
@@ -93,12 +92,20 @@ fun SellerPaymentMethodScreen(
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
 
+                if (state.isLoading) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
                 PaymentMethodCard(
                     icon = "💵",
                     title = "Cash Payment",
                     description = "Customer pays when order arrives",
-                    enabled = uiData.cashEnabled,
-                    onToggle = uiEvent.onCashToggle
+                    enabled = state.cashEnabled,
+                    onToggle = {
+                        event(SellerPaymentMethodEvent.ToggleCash(it))
+                    }
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -107,18 +114,28 @@ fun SellerPaymentMethodScreen(
                     icon = "🏦",
                     title = "Bank Transfer",
                     description = "Input your bank account",
-                    enabled = uiData.bankEnabled,
-                    onToggle = uiEvent.onBankToggle
+                    enabled = state.bankEnabled,
+                    onToggle = {
+                        event(SellerPaymentMethodEvent.ToggleBank(it))
+                    }
                 ) {
 
-                    BankDropdown()
+                    BankDropdown(
+                        onSelected = {
+                            // optional kalau mau simpan bank type
+                        }
+                    )
 
                     Spacer(Modifier.height(12.dp))
 
                     OutlinedTextField(
-                        value = uiData.bankNumber,
+                        value = state.bankNumber,
                         onValueChange = {
-                            uiEvent.onBankChange(formatAccountNumber(it))
+                            event(
+                                SellerPaymentMethodEvent.ChangeBank(
+                                    formatAccountNumber(it)
+                                )
+                            )
                         },
                         label = { Text("Account Number") },
                         modifier = Modifier.fillMaxWidth(),
@@ -129,16 +146,42 @@ fun SellerPaymentMethodScreen(
                 Spacer(Modifier.height(16.dp))
 
                 PaymentMethodCard(
-                    icon = "🔵",
-                    title = "DANA Wallet",
-                    description = "Receive payment via DANA",
-                    enabled = uiData.danaEnabled,
-                    onToggle = uiEvent.onDanaToggle
+                    icon = "🟣",
+                    title = "OVO Wallet",
+                    description = "Receive payment via OVO",
+                    enabled = state.ovoEnabled,
+                    onToggle = {
+                        event(SellerPaymentMethodEvent.ToggleOvo(it))
+                    }
                 ) {
 
                     OutlinedTextField(
-                        value = uiData.danaNumber,
-                        onValueChange = uiEvent.onDanaChange,
+                        value = state.ovoNumber,
+                        onValueChange = {
+                            event(SellerPaymentMethodEvent.ChangeOvo(it))
+                        },
+                        label = { Text("OVO Number") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                PaymentMethodCard(
+                    icon = "🔵",
+                    title = "DANA Wallet",
+                    description = "Receive payment via DANA",
+                    enabled = state.danaEnabled,
+                    onToggle = {
+                        event(SellerPaymentMethodEvent.ToggleDana(it))
+                    }
+                ) {
+
+                    OutlinedTextField(
+                        value = state.danaNumber,
+                        onValueChange = {
+                            event(SellerPaymentMethodEvent.ChangeDana(it))
+                        },
                         label = { Text("DANA Number") },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -150,34 +193,30 @@ fun SellerPaymentMethodScreen(
                     icon = "🟢",
                     title = "GoPay Wallet",
                     description = "Receive payment via GoPay",
-                    enabled = uiData.gopayEnabled,
-                    onToggle = uiEvent.onGopayToggle
+                    enabled = state.gopayEnabled,
+                    onToggle = {
+                        event(SellerPaymentMethodEvent.ToggleGopay(it))
+                    }
                 ) {
 
                     OutlinedTextField(
-                        value = uiData.gopayNumber,
-                        onValueChange = uiEvent.onGopayChange,
+                        value = state.gopayNumber,
+                        onValueChange = {
+                            event(SellerPaymentMethodEvent.ChangeGopay(it))
+                        },
                         label = { Text("GoPay Number") },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(24.dp))
 
-                PaymentMethodCard(
-                    icon = "🟣",
-                    title = "OVO Wallet",
-                    description = "Receive payment via OVO",
-                    enabled = uiData.ovoEnabled,
-                    onToggle = uiEvent.onOvoToggle
+                Button(
+                    onClick = { event(SellerPaymentMethodEvent.Save) },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColor.Blue)
                 ) {
-
-                    OutlinedTextField(
-                        value = uiData.ovoNumber,
-                        onValueChange = uiEvent.onOvoChange,
-                        label = { Text("OVO Number") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Text("Save")
                 }
             }
         }
@@ -261,7 +300,9 @@ fun formatAccountNumber(input: String): String {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BankDropdown() {
+fun BankDropdown(
+    onSelected: (String) -> Unit
+) {
 
     var expanded by remember { mutableStateOf(false) }
     var selectedBank by remember { mutableStateOf("BCA") }
@@ -299,6 +340,7 @@ fun BankDropdown() {
                     onClick = {
                         selectedBank = it
                         expanded = false
+                        onSelected(it)
                     }
                 )
             }
@@ -306,9 +348,10 @@ fun BankDropdown() {
     }
 }
 
-
 @Composable
-fun SellerPaymentHeader(nav: SellerPaymentMethodNavigationListener) {
+fun SellerPaymentHeader(
+    onBack: () -> Unit
+) {
 
     Row(
         modifier = Modifier
@@ -318,7 +361,7 @@ fun SellerPaymentHeader(nav: SellerPaymentMethodNavigationListener) {
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        IconButton(onClick = nav.navigateBack) {
+        IconButton(onClick = onBack) {
 
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
@@ -341,26 +384,18 @@ fun SellerPaymentHeader(nav: SellerPaymentMethodNavigationListener) {
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerPaymentMethodPreview() {
-
     SellerPaymentMethodScreen(
-        uiState = SellerPaymentMethodStateListener(),
-        uiData = SellerPaymentMethodDataListener(
+        state = SellerPaymentMethodUiState(
             cashEnabled = true,
-            bankNumber = "1234567890",
-            gopayNumber = "08123456789",
+            bankEnabled = true,
+            bankNumber = "1234 5678 9012",
+            ovoEnabled = true,
+            ovoNumber = "08123456789",
+            danaEnabled = true,
             danaNumber = "08123456789",
-            ovoNumber = "08123456789"
+            gopayEnabled = true,
+            gopayNumber = "08123456789"
         ),
-        uiEvent = SellerPaymentMethodEventListener(
-            onCashToggle = {},
-            onBankChange = {},
-            onGopayChange = {},
-            onDanaChange = {},
-            onOvoChange = {},
-            onSave = {}
-        ),
-        uiNavigation = SellerPaymentMethodNavigationListener(
-            navigateBack = {}
-        )
+        event = {}
     )
 }

@@ -1,12 +1,14 @@
 /*
- * SellerProductFormScreen.kt
- * Clean Modern Marketplace Version
+ * Project: Shopme App
+ * Author: Boys.mtv@gmail.com
+ * File: SellerProductFormScreen.kt
+ *
+ * Last modified by Dedy Wijaya on 15/04/26 16.08
  */
 
 package com.mtv.app.shopme.feature.seller.ui
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -58,24 +60,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -84,60 +76,32 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerProductFormDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductFormNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductFormStateListener
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
-
+import com.mtv.app.shopme.domain.model.ProductItem
+import com.mtv.app.shopme.domain.model.VariantGroup
+import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerProductFormUiState
 
 enum class Availability { READY, PREORDER, JASTIP }
 enum class ProductStep { BASIC, PRICING, VARIANT, REVIEW }
 
-data class VariantGroupUi(
-    var name: String = EMPTY_STRING,
-    var options: SnapshotStateList<VariantOptionUi> = mutableStateListOf()
-)
-
-data class VariantOptionUi(
-    var name: String = EMPTY_STRING,
-    var price: String = EMPTY_STRING
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SellerProductFormScreen(
-    uiState: SellerProductFormStateListener,
-    uiData: SellerProductFormDataListener,
-    uiEvent: SellerProductFormEventListener,
-    uiNavigation: SellerProductFormNavigationListener,
-    initialStep: ProductStep = ProductStep.BASIC,
-    previewVariantGroups: SnapshotStateList<VariantGroupUi>? = null,
+    state: SellerProductFormUiState,
+    event: (SellerProductFormEvent) -> Unit
 ) {
-    var currentStep by remember(initialStep) {
-        mutableStateOf(initialStep)
-    }
-
-    val variantGroups = previewVariantGroups ?: remember {
-        mutableStateListOf()
-    }
-
-    var productName by remember { mutableStateOf(EMPTY_STRING) }
-    var description by remember { mutableStateOf(EMPTY_STRING) }
-    var price by remember { mutableStateOf(EMPTY_STRING) }
-    var stock by remember { mutableStateOf(EMPTY_STRING) }
-    var isActive by remember { mutableStateOf(true) }
-    var availability by remember { mutableStateOf(Availability.READY) }
-    val imageUris = remember { mutableStateListOf<Uri?>(null, null, null, null, null) }
+    val currentStep = state.step
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri ?: return@rememberLauncherForActivityResult
 
-        val firstEmptyIndex = imageUris.indexOfFirst { it == null }
+        val firstEmptyIndex = state.images.indexOfFirst { it == null }
         if (firstEmptyIndex != -1) {
-            imageUris[firstEmptyIndex] = uri
+            event(
+                SellerProductFormEvent.AddImage(uri.toString())
+            )
         }
     }
 
@@ -156,7 +120,9 @@ fun SellerProductFormScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        event(SellerProductFormEvent.ClickBack)
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null
@@ -190,8 +156,7 @@ fun SellerProductFormScreen(
                     if (currentStep != ProductStep.BASIC) {
                         OutlinedButton(
                             onClick = {
-                                currentStep =
-                                    ProductStep.entries[currentStep.ordinal - 1]
+                                event(SellerProductFormEvent.PrevStep)
                             }
                         ) {
                             Text(
@@ -203,9 +168,10 @@ fun SellerProductFormScreen(
 
                     Button(
                         onClick = {
-                            if (currentStep != ProductStep.REVIEW) {
-                                currentStep =
-                                    ProductStep.entries[currentStep.ordinal + 1]
+                            if (currentStep == ProductStep.REVIEW) {
+                                event(SellerProductFormEvent.Save)
+                            } else {
+                                event(SellerProductFormEvent.NextStep)
                             }
                         },
                         shape = RoundedCornerShape(24.dp),
@@ -255,7 +221,7 @@ fun SellerProductFormScreen(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    imageUris.forEachIndexed { index, uri ->
+                                    state.images.forEachIndexed { index, uri ->
                                         Box(
                                             modifier = Modifier
                                                 .weight(1f)
@@ -299,7 +265,7 @@ fun SellerProductFormScreen(
                                                         .clip(CircleShape)
                                                         .background(Color.Black.copy(alpha = 0.6f))
                                                         .clickable {
-                                                            imageUris[index] = null
+                                                            event(SellerProductFormEvent.RemoveImage(index))
                                                         },
                                                     contentAlignment = Alignment.Center
                                                 ) {
@@ -347,16 +313,20 @@ fun SellerProductFormScreen(
                             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
                                 ModernOutlinedField(
-                                    value = productName,
-                                    onValueChange = { productName = it },
+                                    value = state.product.name,
+                                    onValueChange = {
+                                        event(SellerProductFormEvent.ChangeName(it))
+                                    },
                                     label = "Product Name",
                                     icon = Icons.Default.Inventory2,
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
                                 ModernOutlinedField(
-                                    value = description,
-                                    onValueChange = { description = it },
+                                    value = state.product.description,
+                                    onValueChange = {
+                                        event(SellerProductFormEvent.ChangeDescription(it))
+                                    },
                                     label = "Description",
                                     icon = Icons.Default.Description,
                                     modifier = Modifier.fillMaxWidth()
@@ -386,8 +356,10 @@ fun SellerProductFormScreen(
                                         )
                                     }
                                     Switch(
-                                        checked = isActive,
-                                        onCheckedChange = { isActive = it },
+                                        checked = state.isActive,
+                                        onCheckedChange = {
+                                            event(SellerProductFormEvent.ChangeActive(it))
+                                        },
                                         colors = SwitchDefaults.colors(
                                             checkedThumbColor = Color.White,
                                             checkedTrackColor = AppColor.Blue,
@@ -409,9 +381,13 @@ fun SellerProductFormScreen(
                         ModernCard {
                             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 ModernOutlinedField(
-                                    value = price,
+                                    value = state.product.price,
                                     onValueChange = {
-                                        price = it.filter { c -> c.isDigit() }
+                                        event(
+                                            SellerProductFormEvent.ChangePrice(
+                                                it.filter { c -> c.isDigit() }
+                                            )
+                                        )
                                     },
                                     label = "Base Price",
                                     keyboardType = KeyboardType.Number,
@@ -419,16 +395,24 @@ fun SellerProductFormScreen(
                                 )
 
                                 ModernOutlinedField(
-                                    value = stock,
-                                    onValueChange = { stock = it },
+                                    value = state.product.stock.toString(),
+                                    onValueChange = {
+                                        event(
+                                            SellerProductFormEvent.ChangeStock(
+                                                it.toIntOrNull() ?: 0
+                                            )
+                                        )
+                                    },
                                     label = "Stock",
                                     keyboardType = KeyboardType.Number,
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
                                 AvailabilitySelector(
-                                    selected = availability,
-                                    onSelect = { availability = it }
+                                    selected = state.availability,
+                                    onSelect = {
+                                        event(SellerProductFormEvent.ChangeAvailability(it))
+                                    }
                                 )
                             }
                         }
@@ -443,23 +427,16 @@ fun SellerProductFormScreen(
 
                         ModernCard {
                             Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-
-                                variantGroups.forEach { group ->
+                                state.variants.forEachIndexed { index, group ->
                                     VariantGroupCard(
                                         group = group,
-                                        onAddOption = {
-                                            group.options.add(
-                                                VariantOptionUi()
-                                            )
-                                        }
+                                        groupIndex = index,
+                                        onEvent = event
                                     )
                                 }
-
                                 OutlinedButton(
                                     onClick = {
-                                        variantGroups.add(
-                                            VariantGroupUi()
-                                        )
+                                        event(SellerProductFormEvent.AddVariantGroup)
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
@@ -492,7 +469,7 @@ fun SellerProductFormScreen(
                                     )
 
                                     Text(
-                                        text = productName.ifEmpty { "-" },
+                                        text = state.product.name,
                                         fontFamily = PoppinsFont,
                                         fontWeight = FontWeight.SemiBold,
                                         fontSize = 16.sp
@@ -509,7 +486,7 @@ fun SellerProductFormScreen(
                                     )
 
                                     Text(
-                                        text = description.ifEmpty { "-" },
+                                        text = state.product.description.ifEmpty { "-" },
                                         fontFamily = PoppinsFont
                                     )
                                 }
@@ -529,7 +506,7 @@ fun SellerProductFormScreen(
                                         )
 
                                         Text(
-                                            formatRupiah(price),
+                                            formatRupiah(state.product.price),
                                             fontFamily = PoppinsFont,
                                             fontWeight = FontWeight.SemiBold,
                                             color = AppColor.Blue
@@ -545,7 +522,7 @@ fun SellerProductFormScreen(
                                         )
 
                                         Text(
-                                            stock.ifEmpty { "0" },
+                                            state.product.stock.toString(),
                                             fontFamily = PoppinsFont,
                                             fontWeight = FontWeight.SemiBold
                                         )
@@ -571,7 +548,7 @@ fun SellerProductFormScreen(
                                             .padding(horizontal = 12.dp, vertical = 4.dp)
                                     ) {
                                         Text(
-                                            text = availability.name,
+                                            text = state.availability.name,
                                             fontFamily = PoppinsFont,
                                             color = AppColor.Blue,
                                             fontSize = 12.sp
@@ -595,7 +572,7 @@ fun SellerProductFormScreen(
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(20.dp))
                                             .background(
-                                                if (isActive)
+                                                if (state.isActive)
                                                     Color(0xFFE8F5E9)
                                                 else
                                                     Color(0xFFFFEBEE)
@@ -603,16 +580,16 @@ fun SellerProductFormScreen(
                                             .padding(horizontal = 12.dp, vertical = 4.dp)
                                     ) {
                                         Text(
-                                            text = if (isActive) "Active" else "Hidden",
+                                            text = if (state.isActive) "Active" else "Hidden",
                                             fontFamily = PoppinsFont,
-                                            color = if (isActive) Color(0xFF2E7D32) else Color.Red,
+                                            color = if (state.isActive) Color(0xFF2E7D32) else Color.Red,
                                             fontSize = 12.sp
                                         )
                                     }
                                 }
 
                                 // Variants
-                                if (variantGroups.isNotEmpty()) {
+                                if (state.variants.isNotEmpty()) {
 
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
@@ -622,7 +599,7 @@ fun SellerProductFormScreen(
                                             fontWeight = FontWeight.SemiBold
                                         )
 
-                                        variantGroups.forEach { group ->
+                                        state.variants.forEach { group ->
 
                                             Column {
 
@@ -635,9 +612,7 @@ fun SellerProductFormScreen(
                                                 Spacer(Modifier.height(4.dp))
 
                                                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-
                                                     group.options.forEach { option ->
-
                                                         Box(
                                                             modifier = Modifier
                                                                 .clip(RoundedCornerShape(20.dp))
@@ -752,27 +727,40 @@ fun AvailabilitySelector(
 
 @Composable
 fun VariantGroupCard(
-    group: VariantGroupUi,
-    onAddOption: () -> Unit
+    group: VariantGroup,
+    groupIndex: Int,
+    onEvent: (SellerProductFormEvent) -> Unit
 ) {
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
         ModernOutlinedField(
             value = group.name,
-            onValueChange = { group.name = it },
+            onValueChange = {
+                onEvent(
+                    SellerProductFormEvent.ChangeVariantGroupName(groupIndex, it)
+                )
+            },
             label = "Variant Group Name",
             icon = Icons.Default.Inventory2,
             modifier = Modifier.fillMaxWidth()
         )
 
-        group.options.forEach { option ->
+        group.options.forEachIndexed { optionIndex, option ->
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
 
                 ModernOutlinedField(
                     value = option.name,
-                    onValueChange = { option.name = it },
+                    onValueChange = {
+                        onEvent(
+                            SellerProductFormEvent.ChangeVariantOptionName(
+                                groupIndex,
+                                optionIndex,
+                                it
+                            )
+                        )
+                    },
                     label = "Option",
                     modifier = Modifier.weight(1f)
                 )
@@ -780,7 +768,13 @@ fun VariantGroupCard(
                 ModernOutlinedField(
                     value = option.price,
                     onValueChange = {
-                        option.price = it.filter { c -> c.isDigit() }
+                        onEvent(
+                            SellerProductFormEvent.ChangeVariantOptionPrice(
+                                groupIndex,
+                                optionIndex,
+                                it.filter { c -> c.isDigit() }
+                            )
+                        )
                     },
                     label = "+ Price",
                     keyboardType = KeyboardType.Number,
@@ -789,7 +783,11 @@ fun VariantGroupCard(
             }
         }
 
-        TextButton(onClick = onAddOption) {
+        TextButton(onClick = {
+            onEvent(
+                SellerProductFormEvent.AddVariantOption(groupIndex)
+            )
+        }) {
             Text(
                 text = "+ Add Option",
                 fontFamily = PoppinsFont
@@ -803,39 +801,13 @@ fun formatRupiah(value: String): String {
     return "Rp %,d".format(value.toLong()).replace(',', '.')
 }
 
-class RupiahVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-
-        val digits = text.text.filter { it.isDigit() }
-        if (digits.isEmpty())
-            return TransformedText(
-                AnnotatedString(EMPTY_STRING),
-                OffsetMapping.Identity
-            )
-
-        val formatted =
-            "Rp %,d".format(digits.toLong()).replace(',', '.')
-
-        return TransformedText(
-            AnnotatedString(formatted),
-            object : OffsetMapping {
-                override fun originalToTransformed(offset: Int) =
-                    formatted.length
-
-                override fun transformedToOriginal(offset: Int) =
-                    digits.length
-            }
-        )
-    }
-}
-
 @Composable
 fun ModernOutlinedField(
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
     icon: ImageVector? = null,
-    modifier: Modifier = Modifier,
     keyboardType: KeyboardType = KeyboardType.Text,
     singleLine: Boolean = true
 ) {
@@ -878,11 +850,19 @@ fun ModernOutlinedField(
 fun PreviewStepBasic() {
     MaterialTheme {
         SellerProductFormScreen(
-            uiState = SellerProductFormStateListener(),
-            uiData = SellerProductFormDataListener(),
-            uiEvent = SellerProductFormEventListener({}, {}),
-            uiNavigation = SellerProductFormNavigationListener({}),
-            initialStep = ProductStep.BASIC
+            state = SellerProductFormUiState(
+                step = ProductStep.BASIC,
+                product = ProductItem(
+                    name = "Nasi Goreng",
+                    description = "Enak banget",
+                    price = "20000",
+                    stock = 10
+                ),
+                isActive = true,
+                availability = Availability.READY,
+                images = List(5) { null }
+            ),
+            event = {}
         )
     }
 }
@@ -892,11 +872,19 @@ fun PreviewStepBasic() {
 fun PreviewStepPricing() {
     MaterialTheme {
         SellerProductFormScreen(
-            uiState = SellerProductFormStateListener(),
-            uiData = SellerProductFormDataListener(),
-            uiEvent = SellerProductFormEventListener({}, {}),
-            uiNavigation = SellerProductFormNavigationListener({}),
-            initialStep = ProductStep.PRICING
+            state = SellerProductFormUiState(
+                step = ProductStep.BASIC,
+                product = ProductItem(
+                    name = "Nasi Goreng",
+                    description = "Enak banget",
+                    price = "20000",
+                    stock = 10
+                ),
+                isActive = true,
+                availability = Availability.READY,
+                images = List(5) { null }
+            ),
+            event = {}
         )
     }
 }
@@ -907,27 +895,19 @@ fun PreviewStepPricing() {
 fun PreviewStepVariant() {
     MaterialTheme {
         SellerProductFormScreen(
-            uiState = SellerProductFormStateListener(),
-            uiData = SellerProductFormDataListener(),
-            uiEvent = SellerProductFormEventListener({}, {}),
-            uiNavigation = SellerProductFormNavigationListener({}),
-            initialStep = ProductStep.VARIANT,
-            previewVariantGroups = mutableStateListOf(
-                VariantGroupUi(
-                    name = "Size",
-                    options = mutableStateListOf(
-                        VariantOptionUi("Small", "10000"),
-                        VariantOptionUi("Medium", "12000"),
-                    )
+            state = SellerProductFormUiState(
+                step = ProductStep.BASIC,
+                product = ProductItem(
+                    name = "Nasi Goreng",
+                    description = "Enak banget",
+                    price = "20000",
+                    stock = 10
                 ),
-                VariantGroupUi(
-                    name = "Color",
-                    options = mutableStateListOf(
-                        VariantOptionUi("Red", "0"),
-                        VariantOptionUi("Blue", "0")
-                    )
-                )
-            )
+                isActive = true,
+                availability = Availability.READY,
+                images = listOf(null, null, null, null, null)
+            ),
+            event = {}
         )
     }
 }
@@ -941,11 +921,19 @@ fun PreviewStepVariant() {
 fun PreviewStepReview() {
     MaterialTheme {
         SellerProductFormScreen(
-            uiState = SellerProductFormStateListener(),
-            uiData = SellerProductFormDataListener(),
-            uiEvent = SellerProductFormEventListener({}, {}),
-            uiNavigation = SellerProductFormNavigationListener({}),
-            initialStep = ProductStep.REVIEW
+            state = SellerProductFormUiState(
+                step = ProductStep.BASIC,
+                product = ProductItem(
+                    name = "Nasi Goreng",
+                    description = "Enak banget",
+                    price = "20000",
+                    stock = 10
+                ),
+                isActive = true,
+                availability = Availability.READY,
+                images = List(5) { null }
+            ),
+            event = {}
         )
     }
 }

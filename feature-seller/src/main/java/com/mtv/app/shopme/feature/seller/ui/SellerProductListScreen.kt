@@ -53,31 +53,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
-import com.mtv.app.shopme.feature.seller.contract.SellerProductListDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductListEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductListNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerProductListStateListener
-import com.mtv.app.shopme.feature.seller.model.SellerProduct
-import com.mtv.app.shopme.nav.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.domain.model.ProductItem
+import com.mtv.app.shopme.feature.seller.contract.SellerProductListEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerProductListUiState
 
 @Composable
 fun SellerProductListScreen(
-    uiState: SellerProductListStateListener,
-    uiData: SellerProductListDataListener,
-    uiEvent: SellerProductListEventListener,
-    uiNavigation: SellerProductListNavigationListener
+    state: SellerProductListUiState,
+    event: (SellerProductListEvent) -> Unit
 ) {
 
-    val totalProduct = uiState.productList.size
-    val totalStock = uiState.productList.sumOf { it.stock }
-    val lowStockCount = uiState.productList.count { it.stock <= 5 }
+    val totalProduct = state.products.size
+    val totalStock = state.products.sumOf { it.stock }
+    val lowStockCount = state.products.count { it.stock <= 5 }
 
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
         containerColor = AppColor.WhiteSoft,
         floatingActionButton = {
             Button(
-                onClick = { uiNavigation.onNavigateToAdd() },
+                onClick = {
+                    event(SellerProductListEvent.ClickAdd)
+                },
                 shape = RoundedCornerShape(50),
                 colors = ButtonDefaults.buttonColors(AppColor.Blue),
                 modifier = Modifier.shadow(8.dp, RoundedCornerShape(50))
@@ -95,23 +93,33 @@ fun SellerProductListScreen(
                 totalProduct = totalProduct,
                 totalStock = totalStock,
                 lowStock = lowStockCount,
-                onBack = uiNavigation.onBack
+                onBack = {
+                    event(SellerProductListEvent.ClickBack)
+                }
             )
 
             Spacer(Modifier.height(16.dp))
 
-            if (uiState.productList.isEmpty()) {
-                EmptyProductState()
+            if (state.products.isEmpty()) {
+                EmptyProductState(
+                    onAddClick = {
+                        event(SellerProductListEvent.ClickAdd)
+                    }
+                )
             } else {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.padding(horizontal = 20.dp)
                 ) {
-                    items(uiState.productList) { product ->
+                    items(state.products) { product ->
                         ModernProductItem(
                             product = product,
-                            onEdit = { uiNavigation.onNavigateToEdit() },
-                            onDelete = { uiEvent.onDeleteProduct() }
+                            onEdit = {
+                                event(SellerProductListEvent.ClickEdit(product.id))
+                            },
+                            onDelete = {
+                                event(SellerProductListEvent.ClickDelete(product.id))
+                            }
                         )
                     }
                 }
@@ -198,7 +206,7 @@ fun CleanStatItem(
 
 @Composable
 fun ModernProductItem(
-    product: SellerProduct,
+    product: ProductItem,
     onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -258,7 +266,7 @@ fun ModernProductItem(
                 Spacer(Modifier.height(6.dp))
 
                 Text(
-                    text = product.price,
+                    text = formatRupiah(product.price),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = AppColor.Blue
@@ -382,14 +390,24 @@ fun EmptyProductState(
 fun SellerProductListScreenPreview() {
     val navController = rememberNavController()
 
-    val mockState = SellerProductListStateListener(
-        productList = listOf(
-            SellerProduct("1", "Double Beef Burger", "Rp 60.000", 10),
-            SellerProduct("2", "Cheese Pizza", "Rp 75.000", 5),
-            SellerProduct("3", "Padang Rice Set", "Rp 50.000", 12),
-            SellerProduct("4", "Padang Rice Set", "Rp 50.000", 12),
-            SellerProduct("5", "Padang Rice Set", "Rp 50.000", 12),
-            SellerProduct("6", "Padang Rice Set", "Rp 50.000", 12),
+    val mockState = SellerProductListUiState(
+        products = listOf(
+            ProductItem(
+                id = "1",
+                name = "Coffee Latte",
+                price = "25000",
+                stock = 10,
+                category = "Drink",
+                description = "Hot coffee"
+            ),
+            ProductItem(
+                id = "2",
+                name = "Croissant",
+                price = "15000",
+                stock = 3,
+                category = "Food",
+                description = "Butter croissant"
+            )
         )
     )
 
@@ -405,10 +423,8 @@ fun SellerProductListScreenPreview() {
                 .background(AppColor.White)
         ) {
             SellerProductListScreen(
-                uiState = mockState,
-                uiData = SellerProductListDataListener(),
-                uiEvent = SellerProductListEventListener({}),
-                uiNavigation = SellerProductListNavigationListener({}, {}, {})
+                state = mockState,
+                event = {}
             )
         }
     }
