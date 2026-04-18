@@ -63,58 +63,46 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.seller.contract.SellerStoreDataListener
-import com.mtv.app.shopme.feature.seller.contract.SellerStoreEventListener
-import com.mtv.app.shopme.feature.seller.contract.SellerStoreNavigationListener
-import com.mtv.app.shopme.feature.seller.contract.SellerStoreStateListener
+import com.mtv.app.shopme.domain.model.ProfileMenuItem
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreEvent
+import com.mtv.app.shopme.feature.seller.contract.SellerStoreUiState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
-
-@Immutable
-data class ProfileMenuItemModel(
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector,
-    val onClick: () -> Unit
-)
 
 @Composable
 fun SellerStoreScreen(
-    uiState: SellerStoreStateListener,
-    uiData: SellerStoreDataListener,
-    uiEvent: SellerStoreEventListener,
-    uiNavigation: SellerStoreNavigationListener
+    state: SellerStoreUiState,
+    event: (SellerStoreEvent) -> Unit
 ) {
-
     val menuItems = listOf(
-        ProfileMenuItemModel(
+        ProfileMenuItem(
             title = "Order History",
             subtitle = "Order information",
             icon = Icons.AutoMirrored.Filled.ReceiptLong,
-            onClick = uiNavigation.navigateToChangePassword
+            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
         ),
-        ProfileMenuItemModel(
+        ProfileMenuItem(
             title = "Store Settings",
             subtitle = "Manage your store",
             icon = Icons.Default.Store,
-            onClick = uiNavigation.navigateToStoreSettings
+            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
         ),
-        ProfileMenuItemModel(
+        ProfileMenuItem(
             title = "Payment Methods",
             subtitle = "Manage payout account",
             icon = Icons.Default.AccountBalance,
-            onClick = uiNavigation.navigateToBankAccount
+            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
         ),
-        ProfileMenuItemModel(
+        ProfileMenuItem(
             title = "Change Password",
             subtitle = "Update your password",
             icon = Icons.Default.Lock,
-            onClick = uiNavigation.navigateToChangePassword
+            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
         ),
-        ProfileMenuItemModel(
+        ProfileMenuItem(
             title = "Back to Customer",
             subtitle = "Back to customer for buy something",
             icon = Icons.Default.Lock,
-            onClick = uiNavigation.navigateToChangePassword
+            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
         )
     )
 
@@ -133,8 +121,8 @@ fun SellerStoreScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             SellerStoreTopBar(
-                onBack = uiNavigation.navigateToChangePassword,
-                onLogout = uiEvent.onLogout
+                onBack = { event(SellerStoreEvent.ClickBack) },
+                onLogout = { event(SellerStoreEvent.Logout) }
             )
         }
 
@@ -148,8 +136,8 @@ fun SellerStoreScreen(
         ) {
             item {
                 SellerStoreHeader(
-                    uiData = uiData,
-                    uiEvent = uiEvent
+                    state = state,
+                    event = event
                 )
             }
 
@@ -217,7 +205,7 @@ fun SellerStoreTopBar(
 
 @Composable
 fun ProfileMenuItem(
-    item: ProfileMenuItemModel
+    item: ProfileMenuItem
 ) {
 
     val interaction = remember { MutableInteractionSource() }
@@ -294,8 +282,8 @@ fun ProfileMenuItem(
 
 @Composable
 fun SellerStoreHeader(
-    uiData: SellerStoreDataListener,
-    uiEvent: SellerStoreEventListener
+    state: SellerStoreUiState,
+    event: (SellerStoreEvent) -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -327,7 +315,7 @@ fun SellerStoreHeader(
                 Column {
 
                     Text(
-                        text = uiData.sellerName,
+                        text = state.sellerName,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = PoppinsFont
@@ -336,7 +324,7 @@ fun SellerStoreHeader(
                     Spacer(Modifier.height(4.dp))
 
                     Text(
-                        text = uiData.storeName,
+                        text = state.storeName,
                         fontSize = 14.sp,
                         color = AppColor.Gray,
                         fontFamily = PoppinsFont
@@ -347,7 +335,7 @@ fun SellerStoreHeader(
                     Row(verticalAlignment = Alignment.CenterVertically) {
 
                         val onlineColor =
-                            if (uiData.isOnline) Color(0xFF2E7D32) else AppColor.Gray
+                            if (state.isOnline) Color(0xFF2E7D32) else AppColor.Gray
 
                         Box(
                             modifier = Modifier
@@ -359,7 +347,7 @@ fun SellerStoreHeader(
                         Spacer(Modifier.width(6.dp))
 
                         Text(
-                            text = if (uiData.isOnline) "Online" else "Offline",
+                            text = if (state.isOnline) "Online" else "Offline",
                             fontSize = 12.sp,
                             color = onlineColor,
                             fontFamily = PoppinsFont
@@ -371,7 +359,7 @@ fun SellerStoreHeader(
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = uiData.storeAddress,
+                text = state.storeAddress,
                 fontSize = 12.sp,
                 color = AppColor.Gray,
                 fontFamily = PoppinsFont,
@@ -389,7 +377,7 @@ fun SellerStoreHeader(
                     background = AppColor.Blue,
                     textColor = Color.White,
                     modifier = Modifier.weight(1f),
-                    onClick = uiEvent.onEditStore
+                    onClick = { event(SellerStoreEvent.ClickStoreSettings) }
                 )
 
                 SellerActionButton(
@@ -397,7 +385,7 @@ fun SellerStoreHeader(
                     background = AppColor.BlueSoft,
                     textColor = AppColor.Blue,
                     modifier = Modifier.weight(1f),
-                    onClick = uiEvent.onToggleOnline
+                    onClick = { event(SellerStoreEvent.ToggleOnline) }
                 )
             }
         }
@@ -434,21 +422,18 @@ fun SellerActionButton(
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun SellerStoreScreenPreview() {
+
+    val mockState = SellerStoreUiState(
+        sellerName = "Dedy Wijaya",
+        email = "seller@email.com",
+        phone = "08123456789",
+        storeName = "Shopme Store",
+        storeAddress = "Jakarta, Indonesia",
+        isOnline = true
+    )
+
     SellerStoreScreen(
-        uiState = SellerStoreStateListener(),
-        uiData = SellerStoreDataListener(
-            sellerName = "Dedy Wijaya",
-            email = "seller@email.com",
-            phone = "08123456789",
-            storeName = "Shopme Store",
-            storeAddress = "Jakarta, Indonesia",
-            isOnline = true
-        ),
-        uiEvent = SellerStoreEventListener(
-            onToggleOnline = {},
-            onEditStore = {},
-            onLogout = {}
-        ),
-        uiNavigation = SellerStoreNavigationListener({}, {}, {})
+        state = mockState,
+        event = {}
     )
 }
