@@ -1,25 +1,38 @@
+/*
+ * Project: Shopme App
+ * Author: Boys.mtv@gmail.com
+ * File: SplashViewModel.kt
+ *
+ * Last modified by Dedy Wijaya on 03/03/26 14.12
+ */
+
 package com.mtv.app.shopme.feature.auth.presentation
 
-import com.mtv.based.core.provider.based.BaseViewModel
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.device.DeviceInfoProvider
-import com.mtv.based.core.provider.utils.device.InstallationIdProvider
 import com.mtv.app.shopme.common.Constant.PLATFORM
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
-import com.mtv.app.shopme.common.base.UiOwner
 import com.mtv.app.shopme.common.config.AppInfoProvider
-import com.mtv.app.shopme.common.valueFlowOf
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.request.SplashRequest
-import com.mtv.app.shopme.data.remote.response.AppConfig
-import com.mtv.app.shopme.data.remote.response.SplashResponse
-import com.mtv.app.shopme.data.remote.response.User
+import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.Splash
+import com.mtv.app.shopme.domain.param.SplashParam
 import com.mtv.app.shopme.domain.usecase.GetSplashUseCase
-import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
+import com.mtv.app.shopme.feature.auth.contract.SplashEffect
+import com.mtv.app.shopme.feature.auth.contract.SplashEvent
+import com.mtv.app.shopme.feature.auth.contract.SplashUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SecurePrefs
+import com.mtv.based.core.provider.utils.device.DeviceInfoProvider
+import com.mtv.based.core.provider.utils.device.InstallationIdProvider
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
@@ -28,69 +41,77 @@ class SplashViewModel @Inject constructor(
     private val deviceInfoProvider: DeviceInfoProvider,
     private val appInfoProvider: AppInfoProvider,
     private val splashUseCase: GetSplashUseCase
-) : BaseViewModel(), UiOwner<SplashStateListener, Unit> {
+) : BaseEventViewModel<SplashEvent, SplashEffect>() {
 
-    /** UI STATE : LOADING / ERROR / SUCCESS (API Response) */
-    override val uiState = MutableStateFlow(SplashStateListener())
+    private val _state = MutableStateFlow(SplashUiState())
+    val uiState = _state.asStateFlow()
 
-    /** UI DATA : DATA PERSIST (Prefs) */
-    override val uiData = MutableStateFlow(Unit)
-
-    fun doSplash() {
-        launchUseCase(
-            loading = false,
-            target = uiState.valueFlowOf(
-                get = { it.splashState },
-                set = { state -> copy(splashState = state) }
-            ),
-            block = {
-                splashUseCase(
-                    SplashRequest(
-                        deviceId = installationIdProvider.getInstallationId(),
-                        fcmToken = securePrefs.getString(FCM_TOKEN),
-                        appVersionName = appInfoProvider.versionName,
-                        appVersionCode = appInfoProvider.versionCode,
-                        deviceInfo = deviceInfoProvider.getAllDeviceInfo(),
-                        platform = PLATFORM,
-                        createdAt = System.currentTimeMillis().toString()
-                    )
-                )
-            },
-            onSuccess = { data ->
-                securePrefs.putObject(SPLASH_RESPONSE, data.data)
-            }
-        )
-//        uiState.update {
-//            it.copy(
-//                splashState = Resource.Success(mockApi)
-//            )
-//        }
+    override fun onEvent(event: SplashEvent) {
+        when (event) {
+            SplashEvent.Load -> doSplash()
+        }
     }
 
-    val mockApi = ApiResponse(
-        timestamp = "2026-03-08T10:15:30Z",
-        status = 200,
-        code = "SUCCESS",
-        message = "Request successful",
-        traceId = "trace-abc123xyz",
-        data = SplashResponse(
-            isAuthenticated = true,
-            versionStatus = "UP_TO_DATE",
-            user = User(
-                id = "cust_001",
-                name = "Dedy Wijaya",
-                email = "dedy@example.com",
-                phone = "081234567890",
-                photo = "https://cdn.example.com/users/dedy.png"
+    private fun doSplash() {
+        observeDataFlow(
+            flow = splashUseCase(
+                SplashParam(
+                    deviceId = installationIdProvider.getInstallationId(),
+                    fcmToken = securePrefs.getString(FCM_TOKEN),
+                    appVersionName = appInfoProvider.versionName,
+                    appVersionCode = appInfoProvider.versionCode,
+                    deviceInfo = deviceInfoProvider.getAllDeviceInfo(),
+                    platform = PLATFORM,
+                    createdAt = System.currentTimeMillis().toString()
+                )
             ),
-            config = AppConfig(
-                minVersion = 1,
-                latestVersion = 5,
-                forceUpdate = false,
-                maintenanceMode = false,
-                maintenanceMessage = null
+            onState = { state ->
+                _state.update {
+                    it.copy(splash = state)
+                }
+
+                if (state is LoadState.Success) {
+                    securePrefs.putObject(SPLASH_RESPONSE, state.data)
+                    handleNavigation(state.data)
+                }
+            },
+            onError = {
+                showError(it)
+            }
+        )
+    }
+
+    private fun handleNavigation(data: Splash) {
+        when {
+            data.config.maintenanceMode -> {
+                // TODO: maintenance screen
+            }
+
+            data.config.forceUpdate -> {
+                // TODO: force update screen
+            }
+
+            data.isAuthenticated -> {
+                emitEffect(SplashEffect.NavigateToHome)
+            }
+
+            else -> {
+                emitEffect(SplashEffect.NavigateToLogin)
+            }
+        }
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
             )
         )
-    )
+    }
 
 }

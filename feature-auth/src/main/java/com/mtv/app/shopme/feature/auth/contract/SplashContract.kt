@@ -8,19 +8,18 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.SplashResponse
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Splash
+import com.mtv.based.core.network.utils.LoadState
 
-data class SplashStateListener(
-    val splashState: Resource<ApiResponse<SplashResponse>> = Resource.Loading,
+data class SplashUiState(
+    val splash: LoadState<Splash> = LoadState.Loading,
 )
 
-data class SplashEventListener(
-    val doSplashScreen: () -> Unit,
-)
+sealed class SplashEvent {
+    data object Load : SplashEvent()
+}
 
-data class SplashNavigationListener(
-    val onNavigateToHome: () -> Unit = {},
-    val onNavigateToLogin: () -> Unit = {},
-)
+sealed class SplashEffect {
+    data object NavigateToHome : SplashEffect()
+    data object NavigateToLogin : SplashEffect()
+}

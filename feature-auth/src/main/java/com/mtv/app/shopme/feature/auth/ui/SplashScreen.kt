@@ -47,28 +47,16 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.auth.contract.SplashEventListener
-import com.mtv.app.shopme.feature.auth.contract.SplashNavigationListener
-import com.mtv.app.shopme.feature.auth.contract.SplashStateListener
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.feature.auth.contract.SplashEvent
+import com.mtv.app.shopme.feature.auth.contract.SplashUiState
 
 @Composable
 fun SplashScreen(
-    uiState: SplashStateListener,
-    uiEvent: SplashEventListener,
-    uiNavigation: SplashNavigationListener
+    state: SplashUiState,
+    event: (SplashEvent) -> Unit
 ) {
     LaunchedEffect(Unit) {
-        uiEvent.doSplashScreen()
-    }
-
-    LaunchedEffect(uiState.splashState) {
-        if (uiState.splashState is Resource.Success) {
-            uiState.splashState.data.data?.let {
-                if (it.isAuthenticated) uiNavigation.onNavigateToHome()
-                else uiNavigation.onNavigateToLogin()
-            }
-        }
+        event(SplashEvent.Load)
     }
 
     Box(
@@ -217,8 +205,7 @@ fun SplashScreen(
 @Composable
 fun SplashScreenPreview() {
     SplashScreen(
-        uiState = SplashStateListener(),
-        uiEvent = SplashEventListener {},
-        uiNavigation = SplashNavigationListener {}
+        state = SplashUiState(),
+        event = {}
     )
 }

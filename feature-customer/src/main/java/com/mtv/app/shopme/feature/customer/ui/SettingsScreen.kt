@@ -47,8 +47,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -63,7 +61,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
@@ -73,20 +70,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.feature.customer.contract.SettingsDataListener
-import com.mtv.app.shopme.feature.customer.contract.SettingsEventListener
-import com.mtv.app.shopme.feature.customer.contract.SettingsNavigationListener
-import com.mtv.app.shopme.feature.customer.contract.SettingsStateListener
+import com.mtv.app.shopme.feature.customer.contract.SettingsEvent
+import com.mtv.app.shopme.feature.customer.contract.SettingsUiState
 
 @Composable
 fun SettingsScreen(
-    uiState: SettingsStateListener,
-    uiData: SettingsDataListener,
-    uiEvent: SettingsEventListener,
-    uiNavigation: SettingsNavigationListener
+    state: SettingsUiState,
+    event: (SettingsEvent) -> Unit
 ) {
-
-    val isDark = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
     Column(
         modifier = Modifier
@@ -99,7 +90,7 @@ fun SettingsScreen(
             .statusBarsPadding()
     ) {
 
-        TopBar(uiNavigation)
+        TopBar(onBack = { event(SettingsEvent.ClickBack) })
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -107,7 +98,7 @@ fun SettingsScreen(
             color = AppColor.WhiteSoft
         ) {
 
-            if (uiState.isLoading) {
+            if (state.isLoading) {
                 SettingsSkeleton()
             } else {
 
@@ -122,7 +113,7 @@ fun SettingsScreen(
                                 icon = Icons.Default.Lock,
                                 title = "Keamanan Akun",
                                 subtitle = "Password, PIN & verifikasi",
-                                onClick = uiNavigation.onSecurity
+                                onClick = { event(SettingsEvent.ClickSecurity) }
                             )
                         }
                     }
@@ -134,15 +125,15 @@ fun SettingsScreen(
                                 icon = Icons.Default.Notifications,
                                 title = "Notifikasi",
                                 subtitle = "Atur pemberitahuan",
-                                onClick = uiNavigation.onNotification
+                                onClick = { event(SettingsEvent.ClickNotification) }
                             )
 
                             SettingsSwitchItem(
                                 icon = Icons.Default.DarkMode,
                                 title = "Dark Mode",
                                 subtitle = "Tema gelap otomatis",
-                                checked = uiData.darkMode,
-                                onCheckedChange = uiEvent.onToggleDarkMode
+                                checked = state.darkMode,
+                                onCheckedChange = { event(SettingsEvent.ToggleDarkMode(it)) }
                             )
                         }
                     }
@@ -153,7 +144,7 @@ fun SettingsScreen(
                                 icon = Icons.AutoMirrored.Filled.Help,
                                 title = "Pusat Bantuan",
                                 subtitle = "FAQ & Support",
-                                onClick = uiNavigation.onHelp
+                                onClick = { event(SettingsEvent.ClickHelp) }
                             )
                         }
                     }
@@ -161,7 +152,9 @@ fun SettingsScreen(
                     item {
                         Spacer(Modifier.height(8.dp))
 
-                        LogoutButton(uiEvent.onLogout)
+                        LogoutButton {
+                            event(SettingsEvent.Logout)
+                        }
                     }
                 }
             }
@@ -170,14 +163,14 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun TopBar(nav: SettingsNavigationListener) {
+private fun TopBar(onBack: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(onClick = nav.onBack) {
+        IconButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
         }
 
@@ -363,12 +356,7 @@ fun SettingsSkeleton() {
 @Composable
 fun SettingsScreenProPreview() {
     SettingsScreen(
-        uiState = SettingsStateListener(),
-        uiData = SettingsDataListener(
-            notificationEnabled = true,
-            darkMode = false
-        ),
-        uiEvent = SettingsEventListener(),
-        uiNavigation = SettingsNavigationListener()
+        state = SettingsUiState(),
+        event = {}
     )
 }
