@@ -49,7 +49,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifDialog
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifUiState
-import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
+import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1

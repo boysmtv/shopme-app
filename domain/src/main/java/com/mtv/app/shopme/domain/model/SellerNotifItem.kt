@@ -1,12 +1,4 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: SellerNotifItem.kt
- *
- * Last modified by Dedy Wijaya on 20/02/26 21.27
- */
-
-package com.mtv.app.shopme.feature.seller.model
+package com.mtv.app.shopme.domain.model
 
 data class SellerNotifItem(
     val title: String,

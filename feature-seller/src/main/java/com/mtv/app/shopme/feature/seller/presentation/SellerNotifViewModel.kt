@@ -11,7 +11,7 @@ package com.mtv.app.shopme.feature.seller.presentation
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_SELLER_NOTIFICATION
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.feature.seller.contract.*
-import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
+import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING

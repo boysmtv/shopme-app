@@ -37,19 +37,21 @@ class LoginViewModel @Inject constructor(
 
     override fun onEvent(event: LoginEvent) {
         when (event) {
-            is LoginEvent.OnEmailChange -> {
-                _state.update { it.copy(email = event.value) }
-            }
-
-            is LoginEvent.OnPasswordChange -> {
-                _state.update { it.copy(password = event.value) }
-            }
-
+            is LoginEvent.OnEmailChange -> onEmailChange(event)
+            is LoginEvent.OnPasswordChange -> onPasswordChange(event)
             LoginEvent.OnLoginClick -> doLogin()
             LoginEvent.DismissDialog -> dismissDialog()
             LoginEvent.NavigateToRegister -> emitEffect(LoginEffect.NavigateToRegister)
             LoginEvent.NavigateToForgotPassword -> emitEffect(LoginEffect.NavigateToForgotPassword)
         }
+    }
+
+    private fun onEmailChange(event: LoginEvent.OnEmailChange) {
+        _state.update { it.copy(email = event.value) }
+    }
+
+    private fun onPasswordChange(event: LoginEvent.OnPasswordChange) {
+        _state.update { it.copy(password = event.value) }
     }
 
     private fun doLogin() {

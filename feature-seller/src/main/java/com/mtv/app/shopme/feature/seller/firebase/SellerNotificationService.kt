@@ -17,7 +17,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
+import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 class SellerNotificationService : FirebaseMessagingService() {

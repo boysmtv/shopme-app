@@ -471,15 +471,3 @@ fun CafeScreenPreview() {
         event = {}
     )
 }
-
-@Preview(name = "Error")
-@Composable
-fun CafeScreenErrorPreview() {
-    CafeScreen(
-        state = CafeUiState(
-            cafe = LoadState.Error(UiError.Validation("Error")),
-            foods = LoadState.Error(UiError.Validation("Error"))
-        ),
-        event = {}
-    )
-}
