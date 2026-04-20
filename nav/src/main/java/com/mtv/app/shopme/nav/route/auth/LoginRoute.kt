@@ -52,7 +52,8 @@ private fun handleEffect(
     effect: LoginEffect
 ) {
     when (effect) {
-        LoginEffect.NavigateToHome -> CustomerNavActions.toHome(nav)
+//        LoginEffect.NavigateToHome -> CustomerNavActions.toHome(nav)
+        LoginEffect.NavigateToHome -> CustomerNavActions.toSeller(nav)
         LoginEffect.NavigateToRegister -> CustomerNavActions.toRegister(nav)
         LoginEffect.NavigateToForgotPassword -> CustomerNavActions.toForgetPassword(nav)
     }

@@ -873,7 +873,7 @@ fun PreviewStepPricing() {
     MaterialTheme {
         SellerProductFormScreen(
             state = SellerProductFormUiState(
-                step = ProductStep.BASIC,
+                step = ProductStep.PRICING,
                 product = ProductItem(
                     name = "Nasi Goreng",
                     description = "Enak banget",
@@ -896,7 +896,7 @@ fun PreviewStepVariant() {
     MaterialTheme {
         SellerProductFormScreen(
             state = SellerProductFormUiState(
-                step = ProductStep.BASIC,
+                step = ProductStep.VARIANT,
                 product = ProductItem(
                     name = "Nasi Goreng",
                     description = "Enak banget",
@@ -922,7 +922,7 @@ fun PreviewStepReview() {
     MaterialTheme {
         SellerProductFormScreen(
             state = SellerProductFormUiState(
-                step = ProductStep.BASIC,
+                step = ProductStep.REVIEW,
                 product = ProductItem(
                     name = "Nasi Goreng",
                     description = "Enak banget",

@@ -10,7 +10,7 @@ package com.mtv.app.shopme.feature.seller.firebase
 
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_SELLER_NOTIFICATION
-import com.mtv.app.shopme.feature.seller.model.SellerNotifItem
+import com.mtv.app.shopme.domain.model.SellerNotifItem
 
 class SellerNotificationRepository(
     private val securePrefs: SecurePrefs

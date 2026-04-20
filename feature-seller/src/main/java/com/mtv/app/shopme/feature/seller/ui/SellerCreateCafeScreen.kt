@@ -129,7 +129,7 @@ fun SellerCreateCafeScreen(
                                     value = state.openHours,
                                     onValueChange = { event(SellerCreateCafeEvent.ChangeOpenHours(it)) },
                                     icon = Icons.Default.WatchLater,
-                                    label = "Opening Hours",
+                                    label = "Open Hours",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(1f)
@@ -141,7 +141,7 @@ fun SellerCreateCafeScreen(
                                     value = state.closeHours,
                                     onValueChange = { event(SellerCreateCafeEvent.ChangeCloseHours(it)) },
                                     icon = Icons.Default.WatchLater,
-                                    label = "Closing Hours",
+                                    label = "Close Hours",
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .weight(1f)
@@ -596,7 +596,9 @@ fun CafeProfilePhotoUpload(
 fun PreviewCreateCafeBasic() {
     MaterialTheme {
         SellerCreateCafeScreen(
-            state = SellerCreateCafeUiState(),
+            state = SellerCreateCafeUiState(
+                step = 1
+            ),
             event = {}
         )
     }
@@ -611,7 +613,9 @@ fun PreviewCreateCafeBasic() {
 fun PreviewCreateCafeAddress() {
     MaterialTheme {
         SellerCreateCafeScreen(
-            state = SellerCreateCafeUiState(),
+            state = SellerCreateCafeUiState(
+                step = 2
+            ),
             event = {}
         )
     }
@@ -626,7 +630,9 @@ fun PreviewCreateCafeAddress() {
 fun PreviewCreateCafePhotoStep() {
     MaterialTheme {
         SellerCreateCafeScreen(
-            state = SellerCreateCafeUiState(),
+            state = SellerCreateCafeUiState(
+                step = 3
+            ),
             event = {}
         )
     }
@@ -641,7 +647,9 @@ fun PreviewCreateCafePhotoStep() {
 fun PreviewCreateCafeReview() {
     MaterialTheme {
         SellerCreateCafeScreen(
-            state = SellerCreateCafeUiState(),
+            state = SellerCreateCafeUiState(
+                step = 4
+            ),
             event = {}
         )
     }
