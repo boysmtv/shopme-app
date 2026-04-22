@@ -367,10 +367,12 @@ fun UpdateStatusBottomBar(currentStatus: OrderStatus, onUpdate: (OrderStatus) ->
 
 fun OrderStatus.statusColor(): Color {
     return when (this) {
+        OrderStatus.UNPAID -> Color(0xFFDC2626)
         OrderStatus.ORDERED -> Color(0xFFFFA000)
         OrderStatus.COOKING -> Color(0xFF1E88E5)
         OrderStatus.DELIVERING -> Color(0xFF00897B)
         OrderStatus.COMPLETED -> Color(0xFF2E7D32)
+        OrderStatus.CANCELLED -> Color(0xFF6B7280)
     }
 }
 

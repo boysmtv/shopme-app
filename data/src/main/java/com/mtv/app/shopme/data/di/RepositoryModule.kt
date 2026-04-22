@@ -6,6 +6,7 @@ import com.mtv.app.shopme.data.repository.CafeRepositoryImpl
 import com.mtv.app.shopme.data.repository.CartRepositoryImpl
 import com.mtv.app.shopme.data.repository.ChatRepositoryImpl
 import com.mtv.app.shopme.data.repository.FoodRepositoryImpl
+import com.mtv.app.shopme.data.repository.OrderRepositoryImpl
 import com.mtv.app.shopme.data.repository.ProfileRepositoryImpl
 import com.mtv.app.shopme.domain.repository.AppRepository
 import com.mtv.app.shopme.domain.repository.AuthRepository
@@ -14,6 +15,7 @@ import com.mtv.app.shopme.domain.repository.CartRepository
 import com.mtv.app.shopme.domain.repository.ChatRepository
 import com.mtv.app.shopme.domain.repository.FoodDetailRepository
 import com.mtv.app.shopme.domain.repository.FoodRepository
+import com.mtv.app.shopme.domain.repository.OrderRepository
 import com.mtv.app.shopme.domain.repository.ProfileRepository
 import dagger.Binds
 import dagger.Module
@@ -58,5 +60,10 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         impl: AuthRepositoryImpl
     ): AuthRepository
+
+    @Binds
+    abstract fun bindOrderRepository(
+        impl: OrderRepositoryImpl
+    ): OrderRepository
 
 }

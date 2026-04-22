@@ -40,7 +40,7 @@ class ChatListViewModel @Inject constructor(
             is ChatListEvent.Load -> observeChatList()
             is ChatListEvent.DismissDialog -> dismissDialog()
             is ChatListEvent.ClickItem -> emitEffect(NavigateToChat(event.id))
-            is ChatListEvent.ClickBack -> TODO()
+            is ChatListEvent.ClickBack -> emitEffect(NavigateBack)
         }
     }
 
@@ -163,4 +163,3 @@ val previewNotification = NotificationItem(
     signatureTime = "10.00",
     isRead = false
 )
-

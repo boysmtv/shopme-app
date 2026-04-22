@@ -14,5 +14,6 @@ import kotlinx.serialization.Serializable
 data class CustomerUpdateRequest(
     val name: String,
     val phone: String,
-    val photo: String
+    val photo: String?,
+    val fcmToken: String?
 )

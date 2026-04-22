@@ -14,5 +14,5 @@ import kotlinx.serialization.Serializable
 data class RegisterRequest(
     var email: String,
     var name: String,
-    var password: String?
+    var password: String
 )

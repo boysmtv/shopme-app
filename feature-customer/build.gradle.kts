@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
-    id("com.google.gms.google-services")
 }
 
 android {

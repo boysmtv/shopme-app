@@ -17,6 +17,7 @@ data class Order(
     val items: List<OrderItem> = emptyList(),
     val totalPrice: Double = 0.0,
     val status: OrderStatus = OrderStatus.ORDERED,
+    val paymentStatus: PaymentStatus = PaymentStatus.UNPAID,
     val timestamp: Long = System.currentTimeMillis(),
     val deliveryAddress: String = EMPTY_STRING,
     val paymentMethod: PaymentMethod = PaymentMethod.TRANSFER

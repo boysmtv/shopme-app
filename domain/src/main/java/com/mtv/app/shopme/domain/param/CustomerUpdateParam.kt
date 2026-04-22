@@ -11,5 +11,6 @@ package com.mtv.app.shopme.domain.param
 data class CustomerUpdateParam(
     val name: String,
     val phone: String,
-    val photo: String
+    val photo: String?,
+    val fcmToken: String?
 )

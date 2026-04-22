@@ -70,6 +70,7 @@ class ChatViewModel @Inject constructor(
                     it.copy(sendMessage = state)
                 }
             },
+            onSuccess = { observeChat() },
             onError = { showError(it) }
         )
     }

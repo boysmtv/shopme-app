@@ -32,7 +32,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -127,7 +126,7 @@ fun ChatScreen(
             Spacer(Modifier.weight(1f))
 
             IconButton(onClick = { event(ChatEvent.ClickBack) }) {
-                Icon(Icons.Default.Call, contentDescription = "Call")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
 
         }
@@ -179,9 +178,15 @@ fun ChatScreen(
             IconButton(
                 onClick = {
                     if (userMessage.isNotEmpty()) {
+                        val targetId = messages.firstOrNull()?.id.orEmpty()
+
+                        if (targetId.isBlank()) {
+                            return@IconButton
+                        }
+
                         event(
                             ChatEvent.SendMessage(
-                                id = "cafeId", // nanti ambil dari state / args
+                                id = targetId,
                                 message = userMessage
                             )
                         )

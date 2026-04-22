@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Add
@@ -92,7 +93,7 @@ fun OrderScreen(
     val filteredOrders = state.orders.filter {
         when (selectedFilter) {
             OrderFilter.SEMUA -> true
-            OrderFilter.ORDERED -> it.status == OrderStatus.ORDERED
+            OrderFilter.ORDERED -> it.status == OrderStatus.UNPAID || it.status == OrderStatus.ORDERED
             OrderFilter.COOKING -> it.status == OrderStatus.COOKING
             OrderFilter.DELIVERING -> it.status == OrderStatus.DELIVERING
             OrderFilter.COMPLETED -> it.status == OrderStatus.COMPLETED
@@ -222,10 +223,10 @@ private fun ModernOrderTopBar(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                Icons.AutoMirrored.Filled.Chat,
+                Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.clickable { onChat() }
+                modifier = Modifier.clickable { onBack() }
             )
         }
 
@@ -262,10 +263,12 @@ fun ModernOrderCard(
 ) {
 
     val statusColor = when (order.status) {
+        OrderStatus.UNPAID -> Color(0xFFDC2626)
         OrderStatus.ORDERED -> Color(0xFFF59E0B)
         OrderStatus.COOKING -> AppColor.Green
         OrderStatus.DELIVERING -> Color(0xFF2563EB)
         OrderStatus.COMPLETED -> Color(0xFF16A34A)
+        OrderStatus.CANCELLED -> Color(0xFF6B7280)
     }
 
     Card(
@@ -281,7 +284,7 @@ fun ModernOrderCard(
         Column(Modifier.padding(16.dp)) {
 
             Text(
-                order.cafeId,
+                "Cafe ID: ${order.cafeId}",
                 fontFamily = PoppinsFont,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
@@ -324,7 +327,7 @@ fun ModernOrderCard(
 
             order.items.take(2).forEach {
                 Text(
-                    "• Produk ${it.foodId} x${it.quantity}",
+                    "• Produk ID ${it.foodId} x${it.quantity}",
                     fontSize = 12.sp
                 )
             }
@@ -352,7 +355,7 @@ fun ModernOrderCard(
 
             Spacer(Modifier.height(14.dp))
 
-            val isOrdered = order.status == OrderStatus.ORDERED
+            val isWaitingForPayment = order.status == OrderStatus.UNPAID || order.status == OrderStatus.ORDERED
             val isCompleted = order.status == OrderStatus.COMPLETED
             val isTransfer = order.paymentMethod == PaymentMethod.TRANSFER
 
@@ -374,7 +377,7 @@ fun ModernOrderCard(
                     }
 
                 } else {
-                    if (isOrdered && isTransfer) {
+                    if (isWaitingForPayment && isTransfer) {
 
                         Button(
                             onClick = { onUploadProofClick(order.id) },
@@ -623,8 +626,8 @@ fun OrderScreenPreview() {
             customerId = "C001",
             cafeId = "Mamah Al Cafe",
             items = listOf(
-                OrderItem(foodId = 0, quantity = 2, price = 15000.0),
-                OrderItem(foodId = 3, quantity = 1, price = 15000.0)
+                OrderItem(foodId = "0", quantity = 2, price = 15000.0),
+                OrderItem(foodId = "3", quantity = 1, price = 15000.0)
             ),
             totalPrice = 45000.0,
             status = OrderStatus.ORDERED,
@@ -635,7 +638,7 @@ fun OrderScreenPreview() {
             customerId = "C001",
             cafeId = "Mamah Al Cafe",
             items = listOf(
-                OrderItem(foodId = 1, quantity = 1, price = 30000.0)
+                OrderItem(foodId = "1", quantity = 1, price = 30000.0)
             ),
             totalPrice = 30000.0,
             status = OrderStatus.DELIVERING,
@@ -646,8 +649,8 @@ fun OrderScreenPreview() {
             customerId = "C001",
             cafeId = "Mamah Al Cafe",
             items = listOf(
-                OrderItem(foodId = 2, quantity = 1, price = 20000.0),
-                OrderItem(foodId = 5, quantity = 2, price = 16000.0)
+                OrderItem(foodId = "2", quantity = 1, price = 20000.0),
+                OrderItem(foodId = "5", quantity = 2, price = 16000.0)
             ),
             totalPrice = 52000.0,
             status = OrderStatus.COMPLETED,

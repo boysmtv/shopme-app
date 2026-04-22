@@ -104,7 +104,8 @@ class EditProfileViewModel @Inject constructor(
                 CustomerUpdateParam(
                     name = event.name,
                     phone = event.phone,
-                    photo = event.photo
+                    photo = event.photo,
+                    fcmToken = null
                 )
             ),
             onState = { state ->
