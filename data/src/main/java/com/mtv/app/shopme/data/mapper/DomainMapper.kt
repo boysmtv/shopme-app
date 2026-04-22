@@ -44,11 +44,35 @@ import com.mtv.app.shopme.domain.model.SessionToken
 import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.domain.model.User
+import com.mtv.app.shopme.data.remote.response.OrderItemResponse
+import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.domain.model.Order
+import com.mtv.app.shopme.domain.model.OrderItem
 import com.mtv.app.shopme.domain.model.Village
 
 /* =========================================================
  * RESPONSE → DOMAIN
  * ========================================================= */
+
+fun OrderResponse.toDomain(): Order = Order(
+    id = id,
+    customerId = customerId,
+    cafeId = cafeId,
+    items = items.map { it.toDomain() },
+    totalPrice = totalPrice.toDouble(),
+    status = status,
+    paymentStatus = paymentStatus,
+    paymentMethod = paymentMethod
+)
+
+fun OrderItemResponse.toDomain(): OrderItem = OrderItem(
+    id = id,
+    foodId = foodId,
+    quantity = quantity,
+    price = price.toDouble(),
+    notes = notes,
+    status = status
+)
 
 fun CafeResponse.toDomain(): Cafe = Cafe(
     id = id,
@@ -109,7 +133,7 @@ fun CustomerResponse.toDomain(): Customer = Customer(
 
 fun AddressResponse.toDomain(): Address = Address(
     id = id,
-    village = village,
+    village = village.orEmpty(),
     block = block,
     number = number,
     rt = rt,
@@ -135,8 +159,8 @@ fun FoodResponse.toDomain(): Food = Food(
     id = id,
     cafeId = cafeId,
     name = name,
-    cafeName = cafeName,
-    cafeAddress = cafeAddress,
+    cafeName = cafeName.orEmpty(),
+    cafeAddress = cafeAddress.orEmpty(),
     description = description,
     price = price,
     category = category,
@@ -169,7 +193,7 @@ fun FoodResponse.toSearchDomain(): SearchFood = SearchFood(
     name = name,
     price = price,
     image = images.firstOrNull().orEmpty(),
-    cafeName = cafeName
+    cafeName = cafeName.orEmpty()
 )
 
 fun ChatListResponse.toDomain(): ChatList {
@@ -202,10 +226,10 @@ fun SplashResponse.toDomain() = Splash(
     user = user?.let {
         User(
             id = it.id,
-            name = it.name,
-            email = it.email,
-            phone = it.phone,
-            photo = it.photo
+            name = it.name.orEmpty(),
+            email = it.email.orEmpty(),
+            phone = it.phone.orEmpty(),
+            photo = it.photo.orEmpty()
         )
     },
     config = AppConfig(

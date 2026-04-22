@@ -22,8 +22,8 @@ data class FoodResponse(
     val id: String,
     val cafeId: String,
     val name: String,
-    val cafeName: String,
-    val cafeAddress: String,
+    val cafeName: String?,
+    val cafeAddress: String?,
     val description: String,
 
     @Serializable(with = BigDecimalSerializer::class)

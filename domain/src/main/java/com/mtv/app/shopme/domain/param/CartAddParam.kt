@@ -10,7 +10,7 @@ package com.mtv.app.shopme.domain.param
 
 data class CartAddParam(
     val foodId: String,
-    val variants: List<CartAddVariantParam>,
+    val variants: List<CartAddVariantParam>?,
     val quantity: Int,
     val note: String
 )

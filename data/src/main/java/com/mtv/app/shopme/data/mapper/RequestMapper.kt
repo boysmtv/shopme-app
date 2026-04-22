@@ -47,7 +47,7 @@ fun CartQuantityParam.toRequest() = CartQuantityRequest(
 
 fun CartAddParam.toRequest() = FoodAddToCartRequest(
     foodId = foodId,
-    variants = variants.map {
+    variants = variants?.map {
         FoodVariantAddToCartRequest(
             variantId = it.variantId,
             optionId = it.optionId
@@ -60,7 +60,8 @@ fun CartAddParam.toRequest() = FoodAddToCartRequest(
 fun CustomerUpdateParam.toRequest() = CustomerUpdateRequest(
     name = name,
     phone = phone,
-    photo = photo
+    photo = photo,
+    fcmToken = fcmToken
 )
 
 fun AddressAddParam.toRequest() = AddressAddRequest(

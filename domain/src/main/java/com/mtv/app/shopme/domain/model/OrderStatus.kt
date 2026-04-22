@@ -9,10 +9,12 @@
 package com.mtv.app.shopme.domain.model
 
 enum class OrderStatus(val value: String) {
+    UNPAID("UNPAID"),
     ORDERED("ORDERED"),
     COOKING("COOKING"),
     DELIVERING("DELIVERING"),
-    COMPLETED("COMPLETED");
+    COMPLETED("COMPLETED"),
+    CANCELLED("CANCELLED");
 
     companion object {
         fun fromValue(value: String): OrderStatus {

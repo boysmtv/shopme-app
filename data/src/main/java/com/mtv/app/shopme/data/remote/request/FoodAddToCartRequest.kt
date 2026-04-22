@@ -13,7 +13,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class FoodAddToCartRequest(
     val foodId: String,
-    val variants: List<FoodVariantAddToCartRequest>,
+    val variants: List<FoodVariantAddToCartRequest>?,
     val quantity: Int,
     val note: String
 )

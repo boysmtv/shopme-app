@@ -62,7 +62,6 @@ import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
-import com.mtv.app.shopme.feature.customer.presentation.mockChatList
 import com.mtv.based.core.network.utils.LoadState
 
 @Composable
@@ -119,7 +118,7 @@ fun ChatListScreen(
 
         val chats = when (val state = state.chatListState) {
             is LoadState.Success -> state.data.chatList
-            else -> mockChatList()
+            else -> emptyList()
         }
 
         LazyColumn(
@@ -152,7 +151,7 @@ fun ListChatItem(
     ) {
         ChatAvatar(
             base64Image = data.avatarBase64,
-            placeholderRes = data.id.toInt(),
+            placeholderRes = data.id.hashCode().mod(8).let { if (it < 0) it + 8 else it },
             modifier = Modifier.size(48.dp)
         )
 

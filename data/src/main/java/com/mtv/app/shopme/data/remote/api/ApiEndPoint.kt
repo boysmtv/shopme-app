@@ -121,6 +121,18 @@ object ApiEndPoint {
 
     object Order {
 
+        object GetList : IApiEndPoint {
+            override val path = "$API/$ORDER"
+            override val method = HttpMethod.Get
+            override val type = EndpointType.Json
+        }
+
+        class Detail(orderId: String) : IApiEndPoint {
+            override val path = "$API/$ORDER/$orderId"
+            override val method = HttpMethod.Get
+            override val type = EndpointType.Json
+        }
+
         object GetSession : IApiEndPoint {
             override val path = "$API/$ORDER/session"
             override val method = HttpMethod.Get
