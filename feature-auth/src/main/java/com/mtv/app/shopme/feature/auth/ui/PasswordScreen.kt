@@ -175,7 +175,7 @@ fun PasswordScreen(
                         color = AppColor.Green,
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
-                            .clickable { event(PasswordEvent.DismissDialog) }
+                            .clickable { event(PasswordEvent.OnBackClick) }
                     )
                 }
             }

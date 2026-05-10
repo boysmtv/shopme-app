@@ -68,9 +68,7 @@ private fun handleOrderEffect(
         }
 
         is OrderEffect.NavigateToDetail -> {
-            nav.navigate(CustomerDestinations.ORDER_DETAIL_GRAPH)
-            // next improvement:
-            // nav.navigate("order_detail/${effect.orderId}")
+            nav.navigate(CustomerDestinations.navigateToOrderDetail(effect.orderId))
         }
     }
 }

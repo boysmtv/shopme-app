@@ -62,13 +62,15 @@ private fun handleSecurityEffect(
             nav.navigate(AuthDestinations.CHANGE_PIN_GRAPH)
 
         SecurityEffect.LogoutSuccess -> {
-            // contoh:
-            // nav.navigate("login") { popUpTo(0) }
+            nav.navigate(AuthDestinations.LOGIN_GRAPH) {
+                popUpTo(0) { inclusive = true }
+            }
         }
 
         SecurityEffect.DeleteAccountSuccess -> {
-            // contoh:
-            // nav.navigate("register") { popUpTo(0) }
+            nav.navigate(AuthDestinations.LOGIN_GRAPH) {
+                popUpTo(0) { inclusive = true }
+            }
         }
     }
 }

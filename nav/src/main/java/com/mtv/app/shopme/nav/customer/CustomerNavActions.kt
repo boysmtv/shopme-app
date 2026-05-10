@@ -72,8 +72,11 @@ object CustomerNavActions {
         nav.navigate(CustomerDestinations.ORDER_GRAPH)
     }
 
-    fun toChat(nav: NavController) {
-        nav.navigate(CustomerDestinations.CHAT_GRAPH)
+    fun toChat(nav: NavController, id: String? = null) {
+        nav.navigate(
+            id?.let { CustomerDestinations.navigateToChat(it) }
+                ?: CustomerDestinations.CHAT_GRAPH
+        )
     }
 
     fun toEditProfile(nav: NavController) {

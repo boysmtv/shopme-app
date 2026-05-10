@@ -10,10 +10,12 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.customer.contract.ProfileEffect
 import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.update
 class ProfileViewModel @Inject constructor(
     private val securePrefs: SecurePrefs,
     private val customerUseCase: GetCustomerUseCase,
+    private val getSellerProfileUseCase: GetSellerProfileUseCase,
 ) : BaseEventViewModel<ProfileEvent, ProfileEffect>() {
 
     private val _state = MutableStateFlow(ProfileUiState())
@@ -48,39 +51,32 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun load() {
-        observeCustomer()
-    }
+    private fun load() { observeCustomer() }
 
     private fun observeCustomer() {
         observeDataFlow(
             flow = customerUseCase(),
-            onState = { state ->
-                _state.update {
-                    it.copy(customer = state)
-                }
-            },
-            onError = {
-                showError(it)
-            }
+            onState = { state -> _state.update { it.copy(customer = state) } },
+            onError = ::showError
         )
     }
 
     private fun handleCheckTnc() {
-        if (doCheckTncCafe()) {
-            emitEffect(ProfileEffect.NavigateToTnc)
-        } else {
-            emitEffect(ProfileEffect.NavigateToSeller)
-        }
+        observeDataFlow(
+            flow = getSellerProfileUseCase(),
+            onState = { state ->
+                if (state is LoadState.Success) {
+                    if (state.data.hasCafe) emitEffect(ProfileEffect.NavigateToSeller)
+                    else emitEffect(ProfileEffect.NavigateToTnc)
+                }
+            },
+            onError = { emitEffect(ProfileEffect.NavigateToTnc) }
+        )
     }
 
     private fun logout() {
         securePrefs.clear()
         emitEffect(ProfileEffect.NavigateToLogin)
-    }
-
-    private fun doCheckTncCafe(): Boolean {
-        return false
     }
 
     private fun showError(error: UiError) {
@@ -91,9 +87,7 @@ class ProfileViewModel @Inject constructor(
                     title = ErrorMessages.GENERIC_ERROR,
                     message = error.message
                 ),
-                onPrimary = {
-                    dismissDialog()
-                }
+                onPrimary = { dismissDialog() }
             )
         )
     }

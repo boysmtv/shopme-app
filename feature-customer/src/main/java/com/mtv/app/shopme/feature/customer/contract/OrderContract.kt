@@ -22,6 +22,7 @@ sealed class OrderEvent {
 
     object Reload : OrderEvent()
     data class ClickOrder(val orderId: String) : OrderEvent()
+    data class ConfirmTransfer(val orderId: String) : OrderEvent()
 
     object ClickBack : OrderEvent()
     object ClickChat : OrderEvent()

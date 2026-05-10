@@ -53,7 +53,7 @@ private fun handleEffect(
 ) {
     when (effect) {
         is ChatListEffect.NavigateToChat -> {
-            nav.navigate(CustomerDestinations.CHAT_GRAPH)
+            nav.navigate(CustomerDestinations.navigateToChat(effect.id))
         }
         ChatListEffect.NavigateBack -> nav.popBackStack()
     }

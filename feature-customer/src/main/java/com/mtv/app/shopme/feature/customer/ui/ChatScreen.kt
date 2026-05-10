@@ -178,7 +178,9 @@ fun ChatScreen(
             IconButton(
                 onClick = {
                     if (userMessage.isNotEmpty()) {
-                        val targetId = messages.firstOrNull()?.id.orEmpty()
+                        val targetId = state.activeChatId.ifBlank {
+                            messages.firstOrNull()?.id.orEmpty()
+                        }
 
                         if (targetId.isBlank()) {
                             return@IconButton

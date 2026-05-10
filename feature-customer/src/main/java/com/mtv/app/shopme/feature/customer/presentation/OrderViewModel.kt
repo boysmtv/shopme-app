@@ -7,6 +7,7 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
@@ -25,7 +26,8 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(
-    private val getOrdersUseCase: GetOrdersUseCase
+    private val getOrdersUseCase: GetOrdersUseCase,
+    private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase
 ) : BaseEventViewModel<OrderEvent, OrderEffect>() {
 
     private val _state = MutableStateFlow(OrderUiState())
@@ -37,6 +39,7 @@ class OrderViewModel @Inject constructor(
             is OrderEvent.DismissDialog -> dismissDialog()
             is OrderEvent.Reload -> loadOrders()
             is OrderEvent.ClickOrder -> emitEffect(OrderEffect.NavigateToDetail(event.orderId))
+            is OrderEvent.ConfirmTransfer -> confirmTransfer(event.orderId)
             is OrderEvent.ClickChat -> emitEffect(OrderEffect.NavigateToChat)
             is OrderEvent.ClickBack -> emitEffect(OrderEffect.NavigateBack)
         }
@@ -53,6 +56,20 @@ class OrderViewModel @Inject constructor(
                     )
                 }
             },
+            onError = { error ->
+                _state.update { it.copy(isLoading = false) }
+                showError(error)
+            }
+        )
+    }
+
+    private fun confirmTransfer(orderId: String) {
+        observeDataFlow(
+            flow = confirmOrderTransferUseCase(orderId),
+            onState = { state ->
+                _state.update { it.copy(isLoading = state is LoadState.Loading) }
+            },
+            onSuccess = { loadOrders() },
             onError = { error ->
                 _state.update { it.copy(isLoading = false) }
                 showError(error)

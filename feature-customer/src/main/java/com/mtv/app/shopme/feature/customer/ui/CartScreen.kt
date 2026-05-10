@@ -69,10 +69,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.mock.DataUiMock
@@ -499,7 +499,7 @@ fun CartItemRow(
                 contentScale = ContentScale.Crop
             )
         } else {
-            AsyncImage(
+            SmartImage(
                 model = itemResponse.image,
                 placeholder = painterResource(R.drawable.image_burger),
                 error = painterResource(R.drawable.image_burger),
@@ -770,7 +770,7 @@ fun PremiumCheckoutSheet(
                         .padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
                     Text(
-                        text = "Segera upload bukti pembayaran di halaman Order setelah melakukan transfer.",
+                        text = "Setelah transfer, buka halaman Order lalu tekan Konfirmasi Transfer.",
                         fontFamily = PoppinsFont,
                         fontSize = 13.sp,
                         color = Color(0xFF444444),

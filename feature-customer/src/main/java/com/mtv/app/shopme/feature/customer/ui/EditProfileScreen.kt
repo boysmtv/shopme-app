@@ -8,6 +8,8 @@
 
 package com.mtv.app.shopme.feature.customer.ui
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
@@ -73,6 +75,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -84,7 +88,9 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
+import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.data.mock.DataUiMock.addresses
 import com.mtv.app.shopme.data.mock.DataUiMock.customer
@@ -112,6 +118,7 @@ fun EditProfileScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAddAddress by remember { mutableStateOf(false) }
     val sheetController = rememberSheetController()
+    val context = LocalContext.current
 
     val customer = (state.customer as? LoadState.Success)?.data
     val addresses = (state.addresses as? LoadState.Success)?.data.orEmpty()
@@ -120,7 +127,13 @@ fun EditProfileScreen(
     var name by remember { mutableStateOf(EMPTY_STRING) }
     var phone by remember { mutableStateOf(EMPTY_STRING) }
     var email by remember { mutableStateOf(EMPTY_STRING) }
-    var photo by remember { mutableStateOf("https://i.pinimg.com/736x/b8/8d/d8/b88dd895727e06f977a7443a8f6d13c0.jpg") }
+    var photo by remember { mutableStateOf(EMPTY_STRING) }
+    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        val encoded = uri?.let { uriToBase64(context, it) }
+        if (!encoded.isNullOrBlank()) {
+            photo = "data:image/jpeg;base64,$encoded"
+        }
+    }
 
 
     val isValid = name.isNotBlank() && phone.length >= 10
@@ -130,6 +143,7 @@ fun EditProfileScreen(
             name = customer?.name.orEmpty()
             phone = customer?.phone.orEmpty()
             email = customer?.email.orEmpty()
+            photo = customer?.photo.orEmpty()
         }
     }
 
@@ -157,7 +171,9 @@ fun EditProfileScreen(
     ) {
 
         PremiumHeader(
-            onBack = { event(EditProfileEvent.ClickBack) }
+            photo = photo,
+            onBack = { event(EditProfileEvent.ClickBack) },
+            onUpload = { photoPicker.launch("image/*") }
         )
 
         Card(
@@ -254,7 +270,11 @@ fun EditProfileScreen(
 }
 
 @Composable
-fun PremiumHeader(onBack: () -> Unit) {
+fun PremiumHeader(
+    photo: String,
+    onBack: () -> Unit,
+    onUpload: () -> Unit
+) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -280,13 +300,23 @@ fun PremiumHeader(onBack: () -> Unit) {
             modifier = Modifier
                 .size(100.dp)
                 .clip(RoundedCornerShape(50))
-                .background(Color.White),
+                .background(Color.White)
+                .clickable { onUpload() },
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Upload", color = AppColor.Green,
-                fontFamily = PoppinsFont,
-            )
+            if (photo.isNotBlank()) {
+                SmartImage(
+                    model = photo,
+                    contentDescription = "Profile Photo",
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Text(
+                    text = "Upload", color = AppColor.Green,
+                    fontFamily = PoppinsFont,
+                )
+            }
         }
 
         Spacer(Modifier.height(32.dp))

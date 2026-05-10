@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderHistoryViewModel
@@ -54,9 +55,7 @@ private fun handleOrderHistoryEffect(
     when (effect) {
         OrderHistoryEffect.NavigateBack -> nav.popBackStack()
         is OrderHistoryEffect.NavigateToDetail -> {
-            // nanti bisa kirim ID / serialize object
-            // contoh:
-            // nav.navigate("order_detail/${effect.item.id}")
+            nav.navigate(CustomerDestinations.navigateToOrderDetail(effect.item.id))
         }
     }
 }

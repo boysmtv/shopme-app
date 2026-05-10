@@ -15,10 +15,12 @@ object CustomerDestinations {
     const val EDIT_PROFILE_GRAPH = "EDIT_PROFILE_GRAPH"
     const val NOTIF_GRAPH = "NOTIF_GRAPH"
     const val CHAT_GRAPH = "CHAT_GRAPH"
+    const val CHAT_GRAPH_WITH_ID = "CHAT_GRAPH/{chatId}"
     const val ORDER_GRAPH = "ORDER_GRAPH"
     const val CAFE_GRAPH = "CAFE_GRAPH"
     const val CAFE_GRAPH_WITH_ID = "CAFE_GRAPH_WITH_ID/{cafeId}"
     const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
+    const val ORDER_DETAIL_GRAPH_WITH_ID = "ORDER_DETAIL_GRAPH/{orderId}"
     const val ORDER_HISTORY_GRAPH = "ORDER_HISTORY_GRAPH"
     const val SETTINGS_GRAPH = "SETTINGS_GRAPH"
     const val SUPPORT_GRAPH = "SUPPORT_GRAPH"
@@ -30,5 +32,9 @@ object CustomerDestinations {
     fun navigateToDetail(foodId: String) = "DETAIL_GRAPH_WITH_ID/$foodId"
 
     fun navigateToCafe(cafeId: String) = "CAFE_GRAPH_WITH_ID/$cafeId"
+
+    fun navigateToChat(chatId: String) = "CHAT_GRAPH/$chatId"
+
+    fun navigateToOrderDetail(orderId: String) = "ORDER_DETAIL_GRAPH/$orderId"
 
 }

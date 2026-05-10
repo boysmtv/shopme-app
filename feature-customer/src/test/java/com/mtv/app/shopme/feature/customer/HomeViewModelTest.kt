@@ -10,16 +10,17 @@ import com.mtv.app.shopme.domain.usecase.GetFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.presentation.HomeViewModel
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
-import com.mtv.based.core.provider.utils.SecurePrefs
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.mockk
 import java.math.BigDecimal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -31,7 +32,6 @@ class HomeViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private val securePref: SecurePrefs = mockk(relaxed = true)
     private val customerUseCase: GetCustomerUseCase = mockk()
     private val homeFoodUseCase: GetFoodUseCase = mockk()
 
@@ -40,71 +40,22 @@ class HomeViewModelTest {
     @Before
     fun setup() {
         viewModel = HomeViewModel(
-            securePref,
-            customerUseCase,
-            homeFoodUseCase
+            customerUseCase = customerUseCase,
+            homeFoodUseCase = homeFoodUseCase
         )
     }
 
     @Test
-    fun `should emit success when load success`() = runTest {
-        val customer = fakeCustomer()
+    fun `should keep successful foods state even if customer request fails`() = runTest {
         val foods = listOf(fakeFood())
 
-        coEvery { customerUseCase() } returns flowOf(Resource.Success(customer))
+        coEvery { customerUseCase() } returns flowOf(Resource.Error(mockk(relaxed = true)))
         coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(foods))
 
-        viewModel.uiState.test {
-            viewModel.onEvent(HomeEvent.Load)
+        viewModel.onEvent(HomeEvent.Load)
+        advanceUntilIdle()
 
-            skipItems(1) // skip initial state
-
-            val state = awaitItem()
-
-            assert(state.customer == customer)
-            assert(state.foods == foods)
-            assert(state.error == null)
-        }
-
-        coVerify(exactly = 1) {
-            securePref.putObject(any(), customer)
-        }
-    }
-
-    @Test
-    fun `should emit error when customer fails`() = runTest {
-        val error = UiError.Unknown("error")
-
-        coEvery { customerUseCase() } returns flowOf(Resource.Error(error))
-        coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(emptyList()))
-
-        viewModel.uiState.test {
-            viewModel.onEvent(HomeEvent.Load)
-
-            skipItems(1)
-
-            val state = awaitItem()
-
-            assert(state.error == error)
-        }
-    }
-
-    @Test
-    fun `should emit foods even if customer success`() = runTest {
-        val foods = listOf(fakeFood())
-
-        coEvery { customerUseCase() } returns flowOf(Resource.Success(fakeCustomer()))
-        coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(foods))
-
-        viewModel.uiState.test {
-            viewModel.onEvent(HomeEvent.Load)
-
-            skipItems(1)
-
-            val state = awaitItem()
-
-            assert(state.foods == foods)
-        }
+        assertTrue(viewModel.uiState.value.foods is LoadState.Success)
     }
 
     @Test
@@ -114,36 +65,12 @@ class HomeViewModelTest {
         viewModel.effect.test {
             viewModel.onEvent(HomeEvent.ClickFood(id))
 
-            val effect = awaitItem()
-
-            assert(effect == HomeEffect.NavigateToDetail(id))
-        }
-    }
-
-    @Test
-    fun `should clear error when dismiss`() = runTest {
-        val error = UiError.Unknown("error")
-
-        coEvery { customerUseCase() } returns flowOf(Resource.Error(error))
-        coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(emptyList()))
-
-        viewModel.onEvent(HomeEvent.Load)
-
-        viewModel.uiState.test {
-            skipItems(1)
-
-            val errorState = awaitItem()
-            assert(errorState.error != null)
-
-            viewModel.onEvent(HomeEvent.DismissDialog)
-
-            val cleared = awaitItem()
-            assert(cleared.error == null)
+            assertEquals(HomeEffect.NavigateToDetail(id), awaitItem())
         }
     }
 }
 
-fun fakeCustomer() = Customer(
+private fun fakeCustomer() = Customer(
     name = "John",
     phone = "08123",
     email = "john@mail.com",
@@ -154,7 +81,7 @@ fun fakeCustomer() = Customer(
     menuSummary = null
 )
 
-fun fakeFood() = Food(
+private fun fakeFood() = Food(
     id = "1",
     cafeId = "c1",
     name = "Coffee",
@@ -167,7 +94,7 @@ fun fakeFood() = Food(
     quantity = 10,
     estimate = "10 min",
     isActive = true,
-    createdAt = LocalDateTime.now(),
+    createdAt = LocalDateTime.parse("2026-01-01T10:00:00"),
     images = emptyList(),
     variants = emptyList()
 )

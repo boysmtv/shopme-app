@@ -8,19 +8,15 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.feature.customer.contract.SupportEffect
 import com.mtv.app.shopme.feature.customer.contract.SupportEvent
 import com.mtv.app.shopme.feature.customer.contract.SupportUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.File
-import java.util.Calendar
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +34,7 @@ class SupportViewModel @Inject constructor() :
             is SupportEvent.DismissDialog -> dismissDialog()
 
             is SupportEvent.OpenWhatsapp -> openWhatsapp()
-            is SupportEvent.OpenEmail -> {}
+            is SupportEvent.OpenEmail -> openEmail()
             is SupportEvent.OpenDial -> openDial()
 
             is SupportEvent.ClickBack -> emitEffect(SupportEffect.NavigateBack)
@@ -46,37 +42,15 @@ class SupportViewModel @Inject constructor() :
         }
     }
 
-    private fun emitSafeIntent(
-        intent: Intent,
-        pm: PackageManager,
-        fallbackUrl: String? = null
-    ) {
-        val canOpen = intent.resolveActivity(pm) != null
-
-        val finalIntent = when {
-            canOpen || intent.action == Intent.ACTION_CHOOSER -> intent
-            fallbackUrl != null -> Intent(Intent.ACTION_VIEW, fallbackUrl.toUri())
-            else -> null
-        }
-
-        finalIntent?.let {
-            emitEffect(SupportEffect.OpenIntent(it))
-        }
-    }
-
     private fun openWhatsapp() {
-
-    }
-
-    private fun openWhatsapp(pm: PackageManager) {
         val number = _state.value.whatsapp
-        val uri = "https://wa.me/$number".toUri()
+        val encodedMessage = URLEncoder.encode(
+            "Halo tim Shopme, saya butuh bantuan.",
+            StandardCharsets.UTF_8.toString()
+        )
+        val uri = "https://wa.me/$number?text=$encodedMessage".toUri()
 
-        val intent = Intent(Intent.ACTION_VIEW, uri).apply {
-            setPackage("com.whatsapp")
-        }
-
-        emitSafeIntent(intent, pm, uri.toString())
+        emitEffect(SupportEffect.OpenIntent(Intent(Intent.ACTION_VIEW, uri)))
     }
 
     private fun openDial() {
@@ -86,49 +60,12 @@ class SupportViewModel @Inject constructor() :
         emitEffect(SupportEffect.OpenIntent(intent))
     }
 
-    private fun openEmailWithAttachment(
-        context: Context,
-        pm: PackageManager
-    ) {
+    private fun openEmail() {
         val email = _state.value.email
-        val authority = context.packageName + ".provider"
+        val subject = URLEncoder.encode("Support Request", StandardCharsets.UTF_8.toString())
+        val body = URLEncoder.encode("Mohon bantuan terkait aplikasi Shopme.", StandardCharsets.UTF_8.toString())
+        val uri = "mailto:$email?subject=$subject&body=$body".toUri()
 
-        val screenshotFile = File(context.cacheDir, "support.png")
-        val logFile = File(context.cacheDir, "support_log.txt")
-
-        val uris = ArrayList<Uri>()
-
-        if (screenshotFile.exists()) {
-            uris.add(FileProvider.getUriForFile(context, authority, screenshotFile))
-        }
-
-        if (logFile.exists()) {
-            uris.add(FileProvider.getUriForFile(context, authority, logFile))
-        }
-
-        val intent = if (uris.isEmpty()) {
-            Intent(Intent.ACTION_SENDTO).apply {
-                data = "mailto:$email".toUri()
-                putExtra(Intent.EXTRA_SUBJECT, "Support Request")
-                putExtra(Intent.EXTRA_TEXT, "Mohon bantuan terkait aplikasi.")
-            }
-        } else {
-            Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-                type = "*/*"
-                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
-                putExtra(Intent.EXTRA_SUBJECT, "Support Request")
-                putExtra(Intent.EXTRA_TEXT, "Mohon bantuan terkait aplikasi.")
-                putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-        }
-
-        val chooser = Intent.createChooser(intent, "Kirim Email")
-        emitSafeIntent(chooser, pm)
-    }
-
-    private fun isSupportOpen(): Boolean {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        return hour in 8..21
+        emitEffect(SupportEffect.OpenIntent(Intent(Intent.ACTION_SENDTO, uri)))
     }
 }

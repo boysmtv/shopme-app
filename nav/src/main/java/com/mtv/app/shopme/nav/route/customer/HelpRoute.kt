@@ -54,10 +54,10 @@ private fun handleHelpEffect(
 ) {
     when (effect) {
         HelpEffect.NavigateBack -> nav.popBackStack()
-        HelpEffect.NavigateAbout -> nav.navigate("about_graph")
-        HelpEffect.NavigatePrivacy -> nav.navigate("privacy_graph")
-        HelpEffect.NavigateShipping -> nav.navigate("shipping_help_graph")
-        HelpEffect.NavigatePayment -> nav.navigate("payment_help_graph")
+        HelpEffect.NavigateAbout -> nav.navigate(CustomerDestinations.SUPPORT_GRAPH)
+        HelpEffect.NavigatePrivacy -> nav.navigate(CustomerDestinations.SUPPORT_GRAPH)
+        HelpEffect.NavigateShipping -> nav.navigate(CustomerDestinations.SUPPORT_GRAPH)
+        HelpEffect.NavigatePayment -> nav.navigate(CustomerDestinations.SUPPORT_GRAPH)
         HelpEffect.NavigateContact -> nav.navigate(CustomerDestinations.SUPPORT_GRAPH)
     }
 }

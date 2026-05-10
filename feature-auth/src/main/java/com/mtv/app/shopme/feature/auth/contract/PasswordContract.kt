@@ -23,6 +23,7 @@ sealed class PasswordEvent {
     data class OnNewPasswordChange(val value: String) : PasswordEvent()
     data class OnConfirmPasswordChange(val value: String) : PasswordEvent()
     data object OnSubmitClick : PasswordEvent()
+    data object OnBackClick : PasswordEvent()
     data object DismissDialog : PasswordEvent()
 }
 

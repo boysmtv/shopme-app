@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,6 +46,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.feature.auth.contract.ResetEvent
+import com.mtv.app.shopme.feature.auth.contract.ResetStage
 import com.mtv.app.shopme.feature.auth.contract.ResetUiState
 import com.mtv.based.core.network.utils.LoadState
 
@@ -108,7 +111,11 @@ fun ResetScreen(
                     Spacer(Modifier.height(16.dp))
 
                     Text(
-                        text = "Enter your email to receive reset link",
+                        text = when (state.stage) {
+                            ResetStage.EMAIL -> "Masukkan email untuk menerima OTP reset password"
+                            ResetStage.OTP -> "Masukkan OTP yang dikirim ke email kamu"
+                            ResetStage.PASSWORD -> "Masukkan password baru untuk akun kamu"
+                        },
                         fontFamily = PoppinsFont,
                         fontSize = 13.sp,
                         color = AppColor.Gray,
@@ -118,25 +125,47 @@ fun ResetScreen(
 
                     Spacer(Modifier.height(20.dp))
 
-                    Text("Email", fontFamily = PoppinsFont)
-                    Spacer(Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = state.email,
-                        onValueChange = { event(ResetEvent.OnEmailChange(it)) },
-                        leadingIcon = {
-                            Icon(Icons.Outlined.Email, contentDescription = null)
-                        },
-                        placeholder = {
-                            Text(
-                                "Enter your email",
-                                fontFamily = PoppinsFont,
-                                fontSize = 12.sp
+                    when (state.stage) {
+                        ResetStage.EMAIL -> {
+                            ResetField(
+                                title = "Email",
+                                value = state.email,
+                                placeholder = "Enter your email",
+                                leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null) },
+                                onValueChange = { event(ResetEvent.OnEmailChange(it)) }
                             )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp)
-                    )
+                        }
+
+                        ResetStage.OTP -> {
+                            ResetField(
+                                title = "OTP Code",
+                                value = state.otp,
+                                placeholder = "Enter OTP code",
+                                leadingIcon = { Icon(Icons.Outlined.Key, contentDescription = null) },
+                                onValueChange = { event(ResetEvent.OnOtpChange(it)) }
+                            )
+                        }
+
+                        ResetStage.PASSWORD -> {
+                            ResetField(
+                                title = "New Password",
+                                value = state.newPassword,
+                                placeholder = "Enter new password",
+                                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
+                                onValueChange = { event(ResetEvent.OnNewPasswordChange(it)) }
+                            )
+
+                            Spacer(Modifier.height(16.dp))
+
+                            ResetField(
+                                title = "Confirm Password",
+                                value = state.confirmPassword,
+                                placeholder = "Confirm new password",
+                                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
+                                onValueChange = { event(ResetEvent.OnConfirmPasswordChange(it)) }
+                            )
+                        }
+                    }
 
                     Spacer(Modifier.height(24.dp))
 
@@ -152,7 +181,11 @@ fun ResetScreen(
                         )
                     ) {
                         Text(
-                            "Send Reset Link",
+                            when (state.stage) {
+                                ResetStage.EMAIL -> "Send OTP"
+                                ResetStage.OTP -> "Verify OTP"
+                                ResetStage.PASSWORD -> "Update Password"
+                            },
                             fontFamily = PoppinsFont,
                             color = Color.White
                         )
@@ -165,7 +198,11 @@ fun ResetScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
                         Text(
-                            "Back to Login",
+                            when (state.stage) {
+                                ResetStage.EMAIL -> "Back to Login"
+                                ResetStage.OTP -> "Back to Email"
+                                ResetStage.PASSWORD -> "Back to OTP"
+                            },
                             color = AppColor.Green,
                             fontFamily = PoppinsFont
                         )
@@ -174,6 +211,33 @@ fun ResetScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ResetField(
+    title: String,
+    value: String,
+    placeholder: String,
+    leadingIcon: @Composable () -> Unit,
+    onValueChange: (String) -> Unit
+) {
+    Text(title, fontFamily = PoppinsFont)
+    Spacer(Modifier.height(8.dp))
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        leadingIcon = leadingIcon,
+        placeholder = {
+            Text(
+                placeholder,
+                fontFamily = PoppinsFont,
+                fontSize = 12.sp
+            )
+        },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp)
+    )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
