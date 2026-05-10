@@ -74,10 +74,10 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.Food
@@ -366,7 +366,7 @@ fun DetailImage(
             modifier = Modifier.fillMaxSize()
         ) { page ->
 
-            AsyncImage(
+            SmartImage(
                 model = images[page],
                 contentDescription = null,
                 modifier = Modifier
@@ -514,7 +514,7 @@ fun SimilarItemRow(
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AsyncImage(
+        SmartImage(
             model = Food.images.first(),
             contentDescription = Food.name,
             modifier = Modifier

@@ -8,25 +8,33 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.domain.model.SellerOrderItem
+import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
+import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect.*
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerDashboardViewModel @Inject constructor(
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val getSellerOrdersUseCase: GetSellerOrdersUseCase,
+    private val getSellerProfileUseCase: GetSellerProfileUseCase,
+    private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase
 ) : BaseEventViewModel<SellerDashboardEvent, SellerDashboardEffect>() {
 
     private val _state = MutableStateFlow(SellerDashboardUiState())
@@ -49,53 +57,76 @@ class SellerDashboardViewModel @Inject constructor(
             SellerDashboardEvent.ClickNotif ->
                 emitEffect(SellerDashboardEffect.NavigateToNotif)
 
-            is SellerDashboardEvent.ChangeFilter -> TODO()
-            is SellerDashboardEvent.ChangeSort -> TODO()
-            SellerDashboardEvent.ToggleOnline -> TODO()
+            is SellerDashboardEvent.ChangeFilter ->
+                _state.update { it.copy(selectedFilter = event.value) }
+
+            is SellerDashboardEvent.ChangeSort ->
+                _state.update { it.copy(selectedSort = event.value) }
+
+            SellerDashboardEvent.ToggleOnline ->
+                toggleOnline()
         }
     }
 
     private fun load() {
+        observeProfile()
         refresh()
     }
 
-    private fun refresh() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            delay(1000)
-            _state.update { it.copy(isLoading = false) }
-        }
-
-        _state.update {
-            it.copy(
-                isLoading = false,
-                orders = mockOrders()
-            )
-        }
+    private fun observeProfile() {
+        observeDataFlow(
+            flow = getSellerProfileUseCase(),
+            onState = { result ->
+                _state.update {
+                    val profile = (result as? LoadState.Success)?.data
+                    it.copy(isOnline = profile?.isOnline ?: it.isOnline)
+                }
+            },
+            onError = ::showError
+        )
     }
 
-    private fun mockOrders(): List<SellerOrderItem> = listOf(
-        SellerOrderItem(
-            id = "1",
-            invoice = "INV-2026-001",
-            customer = "John Doe",
-            total = "Rp 120.000",
-            date = "18 Feb 2026",
-            time = "09:45",
-            paymentMethod = "Transfer Bank",
-            status = "Pending",
-            location = "Puri Lestari - Blok H12/12"
-        ),
-        SellerOrderItem(
-            id = "2",
-            invoice = "INV-2026-002",
-            customer = "Jane Smith",
-            total = "Rp 250.000",
-            date = "17 Feb 2026",
-            time = "14:30",
-            paymentMethod = "E-Wallet",
-            status = "Completed",
-            location = "Puri Lestari - Blok H11/10"
+    private fun refresh() {
+        observeDataFlow(
+            flow = getSellerOrdersUseCase(),
+            onState = { result ->
+                _state.update {
+                    it.copy(
+                        isLoading = result is LoadState.Loading,
+                        orders = if (result is LoadState.Success) result.data else it.orders
+                    )
+                }
+            },
+            onError = ::showError
         )
-    )
+    }
+
+    private fun toggleOnline() {
+        observeDataFlow(
+            flow = updateSellerAvailabilityUseCase(!_state.value.isOnline),
+            onState = { result ->
+                _state.update {
+                    val profile = (result as? LoadState.Success)?.data
+                    it.copy(
+                        isLoading = result is LoadState.Loading || it.isLoading,
+                        isOnline = profile?.isOnline ?: it.isOnline
+                    )
+                }
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
+            )
+        )
+    }
 }

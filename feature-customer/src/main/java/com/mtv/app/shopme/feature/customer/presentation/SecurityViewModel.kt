@@ -8,26 +8,29 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.DeleteAccountUseCase
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.app.shopme.feature.customer.contract.SecurityEffect
 import com.mtv.app.shopme.feature.customer.contract.SecurityEvent
 import com.mtv.app.shopme.feature.customer.contract.SecurityUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
-class SecurityViewModel @Inject constructor() :
+class SecurityViewModel @Inject constructor(
+    private val securePrefs: SecurePrefs,
+    private val deleteAccountUseCase: DeleteAccountUseCase
+) :
     BaseEventViewModel<SecurityEvent, SecurityEffect>() {
 
     private val _state = MutableStateFlow(SecurityUiState())
@@ -56,27 +59,27 @@ class SecurityViewModel @Inject constructor() :
     }
 
     private fun logoutAllDevice() {
-        viewModelScope.launch {
-            _state.update { it.copy(loading = true) }
-
-            delay(800) // simulate API
-
-            _state.update { it.copy(loading = false) }
-
-            emitEffect(SecurityEffect.LogoutSuccess)
-        }
+        securePrefs.clear()
+        _state.update { it.copy(loading = false) }
+        emitEffect(SecurityEffect.LogoutSuccess)
     }
 
     private fun deleteAccount() {
-        viewModelScope.launch {
-            _state.update { it.copy(loading = true) }
-
-            delay(800) // simulate API
-
-            _state.update { it.copy(loading = false) }
-
-            emitEffect(SecurityEffect.DeleteAccountSuccess)
-        }
+        observeDataFlow(
+            flow = deleteAccountUseCase(),
+            onState = { state ->
+                _state.update { it.copy(loading = state is LoadState.Loading) }
+            },
+            onSuccess = {
+                securePrefs.clear()
+                _state.update { it.copy(loading = false) }
+                emitEffect(SecurityEffect.DeleteAccountSuccess)
+            },
+            onError = { error ->
+                _state.update { it.copy(loading = false) }
+                showError(error)
+            }
+        )
     }
 
     private fun showError(error: UiError) {

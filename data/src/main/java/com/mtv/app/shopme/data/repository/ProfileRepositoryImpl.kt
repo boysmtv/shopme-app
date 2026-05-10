@@ -15,6 +15,7 @@ import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
 import com.mtv.app.shopme.domain.param.AddressDeleteParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
+import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
 import com.mtv.app.shopme.domain.repository.ProfileRepository
 import javax.inject.Inject
 
@@ -31,6 +32,21 @@ class ProfileRepositoryImpl @Inject constructor(
     override fun updateProfile(param: CustomerUpdateParam) =
         resultFlow.create {
             remote.updateProfile(param)
+        }
+
+    override fun deleteAccount() =
+        resultFlow.create {
+            remote.deleteAccount()
+        }
+
+    override fun getNotificationPreferences() =
+        resultFlow.create {
+            remote.getNotificationPreferences().toDomain()
+        }
+
+    override fun updateNotificationPreferences(param: NotificationPreferencesParam) =
+        resultFlow.create {
+            remote.updateNotificationPreferences(param).toDomain()
         }
 
     override fun getAddresses() =

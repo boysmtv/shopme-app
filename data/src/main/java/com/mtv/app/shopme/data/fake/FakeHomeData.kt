@@ -28,7 +28,7 @@ fun fakeCustomerResponse(): CustomerResponse {
             rw = "002",
             isDefault = true
         ),
-        photo = "https://picsum.photos/200",
+        photo = "",
         verified = true,
         stats = StatsResponse(
             totalOrders = 120,

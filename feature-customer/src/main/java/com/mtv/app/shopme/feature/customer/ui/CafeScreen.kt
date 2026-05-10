@@ -53,10 +53,10 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.Cafe
@@ -209,7 +209,7 @@ fun CafeHeader(
     ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
+                SmartImage(
                     model = cafe?.image?.firstOrNull(),
                     contentDescription = null,
                     modifier = Modifier
@@ -371,7 +371,7 @@ fun CafeFoodItem(
         Column {
             Box {
                 Box {
-                    AsyncImage(
+                    SmartImage(
                         model = item.images.firstOrNull(),
                         contentDescription = null,
                         modifier = Modifier

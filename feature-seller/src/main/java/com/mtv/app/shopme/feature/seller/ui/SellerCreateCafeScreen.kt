@@ -8,7 +8,6 @@
 
 package com.mtv.app.shopme.feature.seller.ui
 
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -55,17 +54,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.SmartImage
+import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeUiState
-import androidx.core.net.toUri
 
 enum class CafeStep { BASIC, ADDRESS, PHOTO, REVIEW }
 
@@ -74,9 +74,18 @@ fun SellerCreateCafeScreen(
     state: SellerCreateCafeUiState,
     event: (SellerCreateCafeEvent) -> Unit
 ) {
-
+    val context = LocalContext.current
     val currentStep = CafeStep.entries.getOrElse(state.step - 1) { CafeStep.BASIC }
     val photo = state.cafePhoto
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        val encoded = uriToBase64(context, uri)
+        if (encoded.isNotBlank()) {
+            event(SellerCreateCafeEvent.ImageSelected("data:image/jpeg;base64,$encoded"))
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -240,9 +249,9 @@ fun SellerCreateCafeScreen(
                         ModernCard {
 
                             CafeProfilePhotoUpload(
-                                photoUri = photo?.toUri(),
+                                photoData = photo,
                                 onUploadClick = {
-                                    event(SellerCreateCafeEvent.UploadPhoto)
+                                    imagePicker.launch("image/*")
                                 },
                                 onRemoveClick = {
                                     event(SellerCreateCafeEvent.RemovePhoto)
@@ -273,7 +282,7 @@ fun SellerCreateCafeScreen(
 
                                         Spacer(Modifier.height(12.dp))
 
-                                        AsyncImage(
+                                        SmartImage(
                                             model = it,
                                             contentDescription = null,
                                             modifier = Modifier
@@ -503,7 +512,7 @@ fun SectionSmallTitle(title: String) {
 
 @Composable
 fun CafeProfilePhotoUpload(
-    photoUri: Uri?,
+    photoData: String?,
     onUploadClick: () -> Unit,
     onRemoveClick: () -> Unit
 ) {
@@ -527,9 +536,9 @@ fun CafeProfilePhotoUpload(
                 .clickable { onUploadClick() },
             contentAlignment = Alignment.Center
         ) {
-            if (photoUri != null) {
-                AsyncImage(
-                    model = photoUri,
+            if (photoData != null) {
+                SmartImage(
+                    model = photoData,
                     contentDescription = null,
                     modifier = Modifier.matchParentSize(),
                     contentScale = ContentScale.Crop

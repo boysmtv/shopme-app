@@ -8,28 +8,27 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerChatListViewModel @Inject constructor(
-
+    private val getChatListUseCase: GetChatListUseCase
 ) : BaseEventViewModel<SellerChatListEvent, SellerChatListEffect>() {
 
     private val _state = MutableStateFlow(SellerChatListUiState())
@@ -52,18 +51,33 @@ class SellerChatListViewModel @Inject constructor(
     }
 
     private fun loadChats() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+        observeDataFlow(
+            flow = getChatListUseCase(asSeller = true),
+            onState = { state ->
+                _state.update {
+                    val chatItems = (state as? LoadState.Success)
+                        ?.data
+                        ?.chatList
+                        ?.map { item ->
+                            SellerChatListItem(
+                                id = item.id,
+                                name = item.name,
+                                lastMessage = item.lastMessage,
+                                time = item.time,
+                                unreadCount = item.unreadCount,
+                                avatarBase64 = item.avatarBase64
+                            )
+                        }
+                        .orEmpty()
 
-            delay(500)
-
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    chatList = mockSellerChatList()
-                )
-            }
-        }
+                    it.copy(
+                        isLoading = state is LoadState.Loading,
+                        chatList = if (chatItems.isNotEmpty()) chatItems else it.chatList
+                    )
+                }
+            },
+            onError = ::showError
+        )
     }
 
     private fun deleteChat(item: SellerChatListItem) {
@@ -87,9 +101,3 @@ class SellerChatListViewModel @Inject constructor(
         )
     }
 }
-
-fun mockSellerChatList(): List<SellerChatListItem> = listOf(
-    SellerChatListItem("1", "Dedy Wijaya", "Terima kasih pesanan sudah sampai", "10:32", 2),
-    SellerChatListItem("2", "Rina Sari", "Bisa tambah extra cheese?", "09:45", 0),
-    SellerChatListItem("3", "Andi Saputra", "Pesanan sudah dibayar", "Kemarin", 1)
-)

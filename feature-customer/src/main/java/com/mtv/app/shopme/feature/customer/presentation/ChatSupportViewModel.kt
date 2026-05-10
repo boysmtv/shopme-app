@@ -8,7 +8,8 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
-import androidx.lifecycle.viewModelScope
+import android.content.Intent
+import androidx.core.net.toUri
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportEffect
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportEvent
@@ -21,12 +22,12 @@ import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import com.mtv.based.core.network.utils.ErrorMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ChatSupportViewModel @Inject constructor() :
@@ -74,36 +75,23 @@ class ChatSupportViewModel @Inject constructor() :
             isFromUser = true,
             timestamp = "Now"
         )
+        val encodedMessage = URLEncoder.encode(message, StandardCharsets.UTF_8.toString())
+        val uri = "https://wa.me/6281234567890?text=$encodedMessage".toUri()
 
         _state.update {
             it.copy(
                 messages = it.messages + newMessage,
                 currentMessage = "",
-                isAgentTyping = true,
-                sendMessage = LoadState.Loading
+                isAgentTyping = false,
+                sendMessage = LoadState.Success(Unit)
             )
         }
 
-        simulateAgentReply()
-    }
-
-    private fun simulateAgentReply() {
-        viewModelScope.launch {
-            delay(1500)
-
-            _state.update {
-                it.copy(
-                    messages = it.messages + SupportMessage(
-                        id = System.currentTimeMillis().toString(),
-                        message = "Terima kasih atas pesan Anda 🙌 Tim kami sedang memproses.",
-                        isFromUser = false,
-                        timestamp = "Now"
-                    ),
-                    isAgentTyping = false,
-                    sendMessage = LoadState.Success(Unit)
-                )
-            }
-        }
+        emitEffect(
+            ChatSupportEffect.OpenIntent(
+                Intent(Intent.ACTION_VIEW, uri)
+            )
+        )
     }
 
     private fun showError(error: UiError) {

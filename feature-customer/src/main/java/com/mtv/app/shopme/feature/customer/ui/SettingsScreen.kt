@@ -124,7 +124,11 @@ fun SettingsScreen(
                             SettingsItem(
                                 icon = Icons.Default.Notifications,
                                 title = "Notifikasi",
-                                subtitle = "Atur pemberitahuan",
+                                subtitle = if (state.notificationEnabled) {
+                                    "Preferensi notifikasi aktif"
+                                } else {
+                                    "Semua notifikasi dimatikan"
+                                },
                                 onClick = { event(SettingsEvent.ClickNotification) }
                             )
 

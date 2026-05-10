@@ -62,10 +62,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.feature.customer.contract.SearchEvent
@@ -302,7 +302,7 @@ fun SearchItem(
                     shape = RoundedCornerShape(8.dp)
                 )
 
-            AsyncImage(
+            SmartImage(
                 model = food.image,
                 contentDescription = null,
                 modifier = imageModifier,

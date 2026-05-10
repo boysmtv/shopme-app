@@ -14,11 +14,11 @@ import com.mtv.based.core.network.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-    fun getChatList(): Flow<Resource<ChatList>>
+    fun getChatList(asSeller: Boolean = false): Flow<Resource<ChatList>>
 
-    fun getChats(): Flow<Resource<List<ChatListItem>>>
+    fun getChats(chatId: String? = null, asSeller: Boolean = false): Flow<Resource<List<ChatListItem>>>
 
-    fun sendMessage(id: String, message: String): Flow<Resource<Unit>>
+    fun sendMessage(id: String, message: String, asSeller: Boolean = false): Flow<Resource<Unit>>
 
-    fun readAllMessage(id: String): Flow<Resource<Unit>>
+    fun readAllMessage(id: String, asSeller: Boolean = false): Flow<Resource<Unit>>
 }

@@ -8,33 +8,45 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.Village
+import com.mtv.app.shopme.domain.param.CafeAddParam
+import com.mtv.app.shopme.domain.param.CafeAddressUpsertParam
+import com.mtv.app.shopme.domain.usecase.CreateCafeUseCase
+import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
+import com.mtv.app.shopme.domain.usecase.GetVillageUseCase
+import com.mtv.app.shopme.domain.usecase.UpsertCafeAddressUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeUiState
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerCreateCafeViewModel @Inject constructor(
+    private val createCafeUseCase: CreateCafeUseCase,
+    private val getSellerProfileUseCase: GetSellerProfileUseCase,
+    private val getVillageUseCase: GetVillageUseCase,
+    private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase
 ) : BaseEventViewModel<SellerCreateCafeEvent, SellerCreateCafeEffect>() {
 
     private val _state = MutableStateFlow(SellerCreateCafeUiState())
     val uiState = _state.asStateFlow()
+    private var villages: List<Village> = emptyList()
 
     override fun onEvent(event: SellerCreateCafeEvent) {
         when (event) {
 
-            is SellerCreateCafeEvent.Load -> {}
+            is SellerCreateCafeEvent.Load -> load()
             is SellerCreateCafeEvent.DismissDialog -> dismissDialog()
 
             is SellerCreateCafeEvent.ChangeCafeName -> update { copy(cafeName = event.value) }
@@ -73,6 +85,20 @@ class SellerCreateCafeViewModel @Inject constructor(
         _state.update { it.block() }
     }
 
+    private fun load() {
+        observeDataFlow(
+            flow = getVillageUseCase(),
+            onState = { state ->
+                _state.update { it.copy(isLoading = state is LoadState.Loading) }
+                if (state is LoadState.Success) {
+                    villages = state.data
+                    _state.update { it.copy(isLoading = false) }
+                }
+            },
+            onError = ::showError
+        )
+    }
+
     private fun nextStep() {
         val state = _state.value
 
@@ -98,27 +124,102 @@ class SellerCreateCafeViewModel @Inject constructor(
     }
 
     private fun createCafe() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-
-            delay(1000)
-
-            _state.update { it.copy(isLoading = false) }
-
-            emitEffect(SellerCreateCafeEffect.NavigateSuccess)
+        val state = _state.value
+        val villageId = resolveVillageId(state.village) ?: run {
+            showError(UiError.Validation(message = "Village harus sesuai data backend"))
+            return
         }
+
+        val cafeRequest = CafeAddParam(
+            name = state.cafeName,
+            phone = state.phone,
+            description = state.description,
+            minimalOrder = state.minOrder,
+            openTime = state.openHours,
+            closeTime = state.closeHours,
+            image = state.cafePhoto.orEmpty(),
+            isActive = true
+        )
+
+        observeDataFlow(
+            flow = createCafeUseCase(cafeRequest),
+            onState = { createState ->
+                _state.update { it.copy(isLoading = createState is LoadState.Loading) }
+                if (createState is LoadState.Success) {
+                    attachAddress(villageId)
+                }
+            },
+            onError = ::showError
+        )
     }
 
-    private fun showError(message: String) {
+    private fun attachAddress(villageId: String) {
+        observeDataFlow(
+            flow = getSellerProfileUseCase(),
+            onState = { profileState ->
+                if (profileState is LoadState.Success) {
+                    val cafeId = profileState.data.cafeId
+                    if (cafeId.isNullOrBlank()) {
+                        _state.update { it.copy(isLoading = false) }
+                        showError(UiError.Unknown(message = "Cafe seller belum tersedia"))
+                    } else {
+                        upsertAddress(cafeId, villageId)
+                    }
+                } else {
+                    _state.update { it.copy(isLoading = profileState is LoadState.Loading) }
+                }
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun upsertAddress(cafeId: String, villageId: String) {
+        val state = _state.value
+        observeDataFlow(
+            flow = upsertCafeAddressUseCase(
+                CafeAddressUpsertParam(
+                    cafeId = cafeId,
+                    villageId = villageId,
+                    block = state.block,
+                    number = state.number,
+                    rt = state.rt,
+                    rw = state.rw
+                )
+            ),
+            onState = { addressState ->
+                _state.update { it.copy(isLoading = addressState is LoadState.Loading) }
+                if (addressState is LoadState.Success) {
+                    emitEffect(SellerCreateCafeEffect.NavigateSuccess)
+                }
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun resolveVillageId(name: String): String? {
+        return villages.firstOrNull { it.name.equals(name.trim(), ignoreCase = true) }?.id
+    }
+
+    private fun showError(error: UiError) {
+        _state.update { it.copy(isLoading = false) }
         setDialog(
             UiDialog.Center(
                 state = DialogStateV1(
                     type = DialogType.ERROR,
-                    title = "Error",
-                    message = message
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
                 ),
                 onPrimary = { dismissDialog() }
             )
         )
+    }
+
+    private fun showError(message: String) {
+        showError(UiError.Validation(message = message))
+    }
+
+    private fun dismissDialog() {
+        super.dismissDialog()
+        _state.update { it.copy(isLoading = false) }
     }
 }

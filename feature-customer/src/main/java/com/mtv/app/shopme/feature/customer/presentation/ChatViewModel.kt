@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
+import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
@@ -28,12 +29,18 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val chatMessageUseCase: GetChatMessageUseCase,
     private val chatSendMessageUseCase: CreateChatMessageSendUseCase,
     private val chatMessageMarkAsReadUseCase: ChatMessageMarkAsReadUseCase,
 ) : BaseEventViewModel<ChatEvent, ChatEffect>() {
 
-    private val _state = MutableStateFlow(ChatUiState())
+    private val routeChatId: String = savedStateHandle.get<String>("chatId").orEmpty()
+    private var lastReadChatId: String? = null
+
+    private val _state = MutableStateFlow(
+        ChatUiState(activeChatId = routeChatId)
+    )
     val uiState = _state.asStateFlow()
 
     override fun onEvent(event: ChatEvent) {
@@ -52,11 +59,24 @@ class ChatViewModel @Inject constructor(
 
     private fun observeChat() {
         observeDataFlow(
-            flow = chatMessageUseCase(),
+            flow = chatMessageUseCase(routeChatId.ifBlank { null }),
             onState = { state ->
+                var nextActiveChatId = _state.value.activeChatId
                 _state.update {
-                    it.copy(chats = state)
+                    val activeId = (state as? com.mtv.based.core.network.utils.LoadState.Success)
+                        ?.data
+                        ?.firstOrNull()
+                        ?.id
+                        .orEmpty()
+
+                    it.copy(
+                        activeChatId = it.activeChatId.ifBlank { activeId },
+                        chats = state
+                    ).also { nextState ->
+                        nextActiveChatId = nextState.activeChatId
+                    }
                 }
+                markAsReadIfNeeded(nextActiveChatId)
             },
             onError = { showError(it) }
         )
@@ -83,6 +103,15 @@ class ChatViewModel @Inject constructor(
                     it.copy(readAll = state)
                 }
             },
+            onError = { showError(it) }
+        )
+    }
+
+    private fun markAsReadIfNeeded(chatId: String) {
+        if (chatId.isBlank() || lastReadChatId == chatId) return
+        lastReadChatId = chatId
+        observeDataFlow(
+            flow = chatMessageMarkAsReadUseCase(chatId),
             onError = { showError(it) }
         )
     }

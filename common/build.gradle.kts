@@ -9,6 +9,34 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
+import java.util.Properties
+
+val localProps = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        localFile.inputStream().use(::load)
+    }
+}
+
+fun resolveConfig(localKey: String, envKey: String, fallback: String): String {
+    return localProps.getProperty(localKey)
+        ?.takeIf { it.isNotBlank() }
+        ?: System.getenv(envKey)
+            ?.takeIf { it.isNotBlank() }
+        ?: fallback
+}
+
+val debugBaseUrl = resolveConfig(
+    localKey = "shopme.baseUrl",
+    envKey = "SHOPME_BASE_URL",
+    fallback = "http://10.0.2.2:8080/"
+)
+val releaseBaseUrl = resolveConfig(
+    localKey = "shopme.releaseBaseUrl",
+    envKey = "SHOPME_RELEASE_BASE_URL",
+    fallback = "https://api.prod.com/"
+)
+
 android {
     namespace = "com.mtv.app.shopme.common"
     compileSdk {
@@ -24,7 +52,7 @@ android {
 
     buildTypes {
         release {
-            buildConfigField("String", "BASE_URL", "\"https://api.prod.com/\"")
+            buildConfigField("String", "BASE_URL", "\"$releaseBaseUrl\"")
             buildConfigField("Boolean", "USE_KTOR", "false")
             isMinifyEnabled = false
             proguardFiles(
@@ -33,7 +61,7 @@ android {
             )
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://192.168.1.107:8080/\"")
+            buildConfigField("String", "BASE_URL", "\"$debugBaseUrl\"")
             buildConfigField("Boolean", "USE_KTOR", "true")
 
             buildConfigField("String", "FIREBASE_PROJECT_ID", "\"app-movie-e85f3\"")

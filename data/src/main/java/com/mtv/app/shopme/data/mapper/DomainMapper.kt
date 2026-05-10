@@ -9,7 +9,10 @@
 package com.mtv.app.shopme.data.mapper
 
 import com.mtv.app.shopme.data.remote.response.ChatListItemResponse
+import com.mtv.app.shopme.data.remote.response.ChatItem
+import com.mtv.app.shopme.data.remote.response.ChatResponse
 import com.mtv.app.shopme.data.remote.response.AddressResponse
+import com.mtv.app.shopme.data.remote.response.AppNotificationResponse
 import com.mtv.app.shopme.data.remote.response.CafeAddressResponse
 import com.mtv.app.shopme.data.remote.response.CafeResponse
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
@@ -20,6 +23,7 @@ import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
 import com.mtv.app.shopme.data.remote.response.LoginResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
+import com.mtv.app.shopme.data.remote.response.NotificationPreferencesResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
@@ -38,16 +42,25 @@ import com.mtv.app.shopme.domain.model.FoodOption
 import com.mtv.app.shopme.domain.model.FoodVariant
 import com.mtv.app.shopme.domain.model.Login
 import com.mtv.app.shopme.domain.model.MenuSummary
+import com.mtv.app.shopme.domain.model.NotificationItem
+import com.mtv.app.shopme.domain.model.NotificationPreferences
 import com.mtv.app.shopme.domain.model.Register
 import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.app.shopme.domain.model.SessionToken
 import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.domain.model.User
 import com.mtv.app.shopme.data.remote.response.OrderItemResponse
 import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
+import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
+import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderItem
+import com.mtv.app.shopme.domain.model.SellerOrderItem
+import com.mtv.app.shopme.domain.model.SellerPaymentMethod
+import com.mtv.app.shopme.domain.model.SellerProfile
 import com.mtv.app.shopme.domain.model.Village
 
 /* =========================================================
@@ -57,17 +70,22 @@ import com.mtv.app.shopme.domain.model.Village
 fun OrderResponse.toDomain(): Order = Order(
     id = id,
     customerId = customerId,
+    customerName = customerName.orEmpty(),
     cafeId = cafeId,
+    cafeName = cafeName.orEmpty(),
     items = items.map { it.toDomain() },
     totalPrice = totalPrice.toDouble(),
     status = status,
     paymentStatus = paymentStatus,
-    paymentMethod = paymentMethod
+    paymentMethod = paymentMethod,
+    createdAt = createdAt.orEmpty(),
+    deliveryAddress = deliveryAddress.orEmpty()
 )
 
 fun OrderItemResponse.toDomain(): OrderItem = OrderItem(
     id = id,
     foodId = foodId,
+    foodName = foodName.orEmpty(),
     quantity = quantity,
     price = price.toDouble(),
     notes = notes,
@@ -155,6 +173,14 @@ fun MenuSummaryResponse.toDomain(): MenuSummary = MenuSummary(
     cancelled = cancelled
 )
 
+fun NotificationPreferencesResponse.toDomain(): NotificationPreferences = NotificationPreferences(
+    orderNotification = orderNotification,
+    promoNotification = promoNotification,
+    chatNotification = chatNotification,
+    pushEnabled = pushEnabled,
+    emailEnabled = emailEnabled
+)
+
 fun FoodResponse.toDomain(): Food = Food(
     id = id,
     cafeId = cafeId,
@@ -213,6 +239,59 @@ fun ChatListItemResponse.toDomain(): ChatListItem {
     )
 }
 
+fun ChatResponse.toDomain(): List<ChatListItem> {
+    return chatList.map { it.toDomain() }
+}
+
+fun ChatItem.toDomain(): ChatListItem {
+    return ChatListItem(
+        id = id,
+        name = "",
+        lastMessage = message,
+        time = "",
+        unreadCount = 0,
+        avatarBase64 = null,
+        isFromUser = isFromUser
+    )
+}
+
+fun SellerProfileResponse.toDomain(): SellerProfile = SellerProfile(
+    cafeId = cafeId,
+    sellerName = sellerName,
+    sellerPhoto = sellerPhoto,
+    email = email,
+    phone = phone,
+    storeName = storeName,
+    storePhoto = storePhoto,
+    storeAddress = storeAddress,
+    isOnline = isOnline,
+    hasCafe = hasCafe
+)
+
+fun SellerPaymentMethodResponse.toDomain(): SellerPaymentMethod = SellerPaymentMethod(
+    cashEnabled = cashEnabled,
+    bankEnabled = bankEnabled,
+    bankNumber = bankNumber.orEmpty(),
+    ovoEnabled = ovoEnabled,
+    ovoNumber = ovoNumber.orEmpty(),
+    danaEnabled = danaEnabled,
+    danaNumber = danaNumber.orEmpty(),
+    gopayEnabled = gopayEnabled,
+    gopayNumber = gopayNumber.orEmpty()
+)
+
+fun SellerOrderSummaryResponse.toDomain(): SellerOrderItem = SellerOrderItem(
+    id = orderId,
+    invoice = orderId,
+    customer = customerName,
+    total = total,
+    date = date,
+    time = time,
+    paymentMethod = paymentMethod,
+    status = status,
+    location = location
+)
+
 fun VillageResponse.toDomain(): Village {
     return Village(
         id = id,
@@ -232,13 +311,15 @@ fun SplashResponse.toDomain() = Splash(
             photo = it.photo.orEmpty()
         )
     },
-    config = AppConfig(
-        minVersion = config.minVersion,
-        latestVersion = config.latestVersion,
-        forceUpdate = config.forceUpdate,
-        maintenanceMode = config.maintenanceMode,
-        maintenanceMessage = config.maintenanceMessage
-    )
+    config = (config ?: AppConfigResponse()).let {
+        AppConfig(
+            minVersion = it.minVersion,
+            latestVersion = it.latestVersion,
+            forceUpdate = it.forceUpdate,
+            maintenanceMode = it.maintenanceMode,
+            maintenanceMessage = it.maintenanceMessage
+        )
+    }
 )
 
 fun LoginResponse.toDomain() = Login(
@@ -246,3 +327,24 @@ fun LoginResponse.toDomain() = Login(
 )
 
 fun Unit.toDomain() = Register(success = true)
+
+
+fun AppNotificationResponse.toCustomerNotification() = NotificationItem(
+    title = title,
+    message = message,
+    photo = "",
+    signatureName = title,
+    signatureDate = createdAt.substringBefore("T"),
+    signatureTime = createdAt.substringAfter("T", "").substringBefore("."),
+    isRead = isRead
+)
+
+fun AppNotificationResponse.toSellerNotification() = SellerNotifItem(
+    title = title,
+    message = message,
+    orderId = id,
+    buyerName = title,
+    date = createdAt.substringBefore("T"),
+    time = createdAt.substringAfter("T", "").substringBefore("."),
+    isRead = isRead
+)

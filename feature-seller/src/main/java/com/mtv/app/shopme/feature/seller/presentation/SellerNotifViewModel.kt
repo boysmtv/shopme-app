@@ -8,13 +8,12 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import com.mtv.app.shopme.common.ConstantPreferences.FCM_SELLER_NOTIFICATION
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.ClearNotificationsUseCase
+import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
-import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.based.core.network.utils.ResourceFirebase
-import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import com.mtv.based.core.network.utils.UiError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +22,8 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class SellerNotifViewModel @Inject constructor(
-    private val securePrefs: SecurePrefs,
+    private val getSellerNotificationsUseCase: GetSellerNotificationsUseCase,
+    private val clearNotificationsUseCase: ClearNotificationsUseCase,
 ) : BaseEventViewModel<SellerNotifEvent, SellerNotifEffect>() {
 
     private val _state = MutableStateFlow(SellerNotifUiState())
@@ -31,46 +31,56 @@ class SellerNotifViewModel @Inject constructor(
 
     override fun onEvent(event: SellerNotifEvent) {
         when (event) {
-
-            SellerNotifEvent.Load -> getLocalNotification()
-
+            SellerNotifEvent.Load, SellerNotifEvent.GetNotification -> getNotifications()
             SellerNotifEvent.DismissDialog -> dismissDialog()
-
-            SellerNotifEvent.GetNotification -> getLocalNotification()
-
-            SellerNotifEvent.ClearNotification -> clearNotification()
-
-            is SellerNotifEvent.ClickNotification -> {
-                // nanti bisa navigate ke detail notif / order dll
-            }
-
-            SellerNotifEvent.ClickBack ->
-                emitEffect(SellerNotifEffect.NavigateBack)
+            SellerNotifEvent.ClearNotification -> clearNotifications()
+            is SellerNotifEvent.ClickNotification -> Unit
+            SellerNotifEvent.ClickBack -> emitEffect(SellerNotifEffect.NavigateBack)
         }
     }
 
-    private fun getLocalNotification() {
-        val local = securePrefs.getObject(
-            FCM_SELLER_NOTIFICATION,
-            Array<SellerNotifItem>::class.java
-        )?.toList() ?: emptyList()
-
-        _state.update {
-            it.copy(
-                notifications = local,
-                notificationState = ResourceFirebase.Success(EMPTY_STRING)
-            )
-        }
+    private fun getNotifications() {
+        observeDataFlow(
+            flow = getSellerNotificationsUseCase(),
+            onState = { state ->
+                _state.update {
+                    it.copy(
+                        notifications = if (state is com.mtv.based.core.network.utils.LoadState.Success) state.data else it.notifications,
+                        notificationState = when (state) {
+                            is com.mtv.based.core.network.utils.LoadState.Loading -> ResourceFirebase.Loading
+                            is com.mtv.based.core.network.utils.LoadState.Success -> ResourceFirebase.Success("")
+                            is com.mtv.based.core.network.utils.LoadState.Error -> ResourceFirebase.Success("")
+                            else -> ResourceFirebase.Success("")
+                        }
+                    )
+                }
+            },
+            onError = ::showError
+        )
     }
 
-    private fun clearNotification() {
-        securePrefs.remove(FCM_SELLER_NOTIFICATION)
+    private fun clearNotifications() {
+        observeDataFlow(
+            flow = clearNotificationsUseCase(),
+            onState = { state ->
+                _state.update {
+                    it.copy(
+                        notifications = if (state is com.mtv.based.core.network.utils.LoadState.Success) emptyList() else it.notifications,
+                        activeDialog = if (state is com.mtv.based.core.network.utils.LoadState.Success) SellerNotifDialog.Success else it.activeDialog,
+                        notificationState = when (state) {
+                            is com.mtv.based.core.network.utils.LoadState.Loading -> ResourceFirebase.Loading
+                            is com.mtv.based.core.network.utils.LoadState.Success -> ResourceFirebase.Success("")
+                            is com.mtv.based.core.network.utils.LoadState.Error -> ResourceFirebase.Success("")
+                            else -> ResourceFirebase.Success("")
+                        }
+                    )
+                }
+            },
+            onError = ::showError
+        )
+    }
 
-        _state.update {
-            it.copy(
-                notifications = emptyList(),
-                activeDialog = SellerNotifDialog.Success
-            )
-        }
+    private fun showError(error: UiError) {
+        _state.update { it.copy(activeDialog = SellerNotifDialog.Error(error.message), notificationState = ResourceFirebase.Success("")) }
     }
 }

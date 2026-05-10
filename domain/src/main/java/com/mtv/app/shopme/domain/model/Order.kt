@@ -13,12 +13,15 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 data class Order(
     val id: String = EMPTY_STRING,
     val customerId: String = EMPTY_STRING,
+    val customerName: String = EMPTY_STRING,
     val cafeId: String = EMPTY_STRING,
+    val cafeName: String = EMPTY_STRING,
     val items: List<OrderItem> = emptyList(),
     val totalPrice: Double = 0.0,
     val status: OrderStatus = OrderStatus.ORDERED,
     val paymentStatus: PaymentStatus = PaymentStatus.UNPAID,
     val timestamp: Long = System.currentTimeMillis(),
+    val createdAt: String = EMPTY_STRING,
     val deliveryAddress: String = EMPTY_STRING,
     val paymentMethod: PaymentMethod = PaymentMethod.TRANSFER
 )

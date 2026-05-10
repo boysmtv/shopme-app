@@ -14,6 +14,6 @@ import javax.inject.Inject
 class ChatMessageMarkAsReadUseCase @Inject constructor(
     private val repository: ChatRepository
 ) {
-    operator fun invoke(id: String) =
-        repository.readAllMessage(id)
+    operator fun invoke(id: String, asSeller: Boolean = false) =
+        repository.readAllMessage(id, asSeller)
 }

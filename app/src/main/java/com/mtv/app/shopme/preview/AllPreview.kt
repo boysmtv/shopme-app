@@ -151,7 +151,6 @@
 //import com.mtv.app.shopme.feature.customer.contract.SupportNavigationListener
 //import com.mtv.app.shopme.feature.customer.contract.SupportStateListener
 //import com.mtv.app.shopme.feature.customer.presentation.mockChatListState
-//import com.mtv.app.shopme.feature.customer.presentation.previewNotification
 //import com.mtv.app.shopme.feature.customer.ui.AddressSection
 //import com.mtv.app.shopme.feature.customer.ui.AnimatedTab
 //import com.mtv.app.shopme.feature.customer.ui.CafeScreen
@@ -776,7 +775,6 @@
 //    NotificationScreen(
 //        uiState = NotifStateListener(),
 //        uiData = NotifDataListener(
-//            localNotification = List(9) { previewNotification }
 //        ),
 //        uiEvent = NotifEventListener({}, {}, {}, {}),
 //        uiNavigation = NotifNavigationListener {}

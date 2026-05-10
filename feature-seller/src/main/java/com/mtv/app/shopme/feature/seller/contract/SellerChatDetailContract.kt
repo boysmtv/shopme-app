@@ -10,7 +10,8 @@ package com.mtv.app.shopme.feature.seller.contract
 
 data class SellerChatDetailUiState(
     val messages: List<SellerChatDetailMessage> = emptyList(),
-    val currentMessage: String = ""
+    val currentMessage: String = "",
+    val activeChatId: String = ""
 )
 
 sealed class SellerChatDetailEvent {

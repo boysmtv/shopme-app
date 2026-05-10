@@ -52,7 +52,6 @@ import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.feature.customer.contract.NotifDialog
 import com.mtv.app.shopme.feature.customer.contract.NotifEvent
 import com.mtv.app.shopme.feature.customer.contract.NotifUiState
-import com.mtv.app.shopme.feature.customer.presentation.previewNotification
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
@@ -276,7 +275,7 @@ fun InitialAvatar(
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun NotificationItemPreview() {
-    NotificationItemCard(item = previewNotification)
+    NotificationItemCard(item = previewNotificationItem())
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4)
@@ -284,10 +283,20 @@ fun NotificationItemPreview() {
 fun NotificationScreenPreview() {
     NotifScreen(
         state = NotifUiState(
-            localNotification = List(5) { previewNotification },
+            localNotification = List(5) { previewNotificationItem() },
             notificationState = LoadState.Success(""),
             activeDialog = null
         ),
         event = {}
     )
 }
+
+private fun previewNotificationItem() = NotificationItem(
+    title = "Order Confirmed",
+    message = "Pesanan Anda sedang diproses oleh toko.",
+    photo = "",
+    signatureName = "Shopme",
+    signatureDate = "May 10, 2026",
+    signatureTime = "10.00",
+    isRead = false
+)

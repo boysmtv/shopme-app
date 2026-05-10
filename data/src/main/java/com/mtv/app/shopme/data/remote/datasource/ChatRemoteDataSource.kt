@@ -13,8 +13,10 @@ import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.ChatMessageMarkAsReadRequest
 import com.mtv.app.shopme.data.remote.request.ChatMessageSendRequest
+import com.mtv.app.shopme.data.remote.response.ChatResponse
 import com.mtv.app.shopme.data.remote.response.ChatListResponse
 import com.mtv.app.shopme.data.utils.requireData
+import com.mtv.based.core.network.model.RequestOptions
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 
@@ -22,26 +24,41 @@ class ChatRemoteDataSource @Inject constructor(
     network: NetworkRepository
 ) : BaseRemoteDataSource(network) {
 
-    suspend fun getChatList() =
+    suspend fun getChatList(asSeller: Boolean = false) =
         request<ApiResponse<ChatListResponse>>(
-            endpoint = ApiEndPoint.Chat.GetList
+            endpoint = ApiEndPoint.Chat.GetList,
+            options = RequestOptions(
+                query = mapOf("asSeller" to asSeller.toString())
+            )
         ).requireData()
 
 
-    suspend fun getChats() =
-        request<ApiResponse<ChatListResponse>>(
-            endpoint = ApiEndPoint.Chat.Get
+    suspend fun getChats(id: String? = null, asSeller: Boolean = false) =
+        request<ApiResponse<ChatResponse>>(
+            endpoint = ApiEndPoint.Chat.Get,
+            options = RequestOptions(
+                query = buildMap {
+                    put("asSeller", asSeller.toString())
+                    id?.takeIf { it.isNotBlank() }?.let { put("id", it) }
+                }
+            )
         ).requireData()
 
-    suspend fun sendMessage(body: ChatMessageSendRequest) =
+    suspend fun sendMessage(body: ChatMessageSendRequest, asSeller: Boolean = false) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Chat.SendMessage,
-            body = body
+            body = body,
+            options = RequestOptions(
+                query = mapOf("asSeller" to asSeller.toString())
+            )
         ).requireData()
 
-    suspend fun readAll(body: ChatMessageMarkAsReadRequest) =
+    suspend fun readAll(body: ChatMessageMarkAsReadRequest, asSeller: Boolean = false) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Chat.MarkAllRead,
-            body = body
+            body = body,
+            options = RequestOptions(
+                query = mapOf("asSeller" to asSeller.toString())
+            )
         ).requireData()
 }

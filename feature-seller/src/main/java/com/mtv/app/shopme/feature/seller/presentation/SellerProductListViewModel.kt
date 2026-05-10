@@ -8,23 +8,28 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.ProductItem
+import com.mtv.app.shopme.domain.usecase.DeleteFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
+import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEffect.*
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.provider.utils.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerProductListViewModel @Inject constructor(
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val getSellerProfileUseCase: GetSellerProfileUseCase,
+    private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase,
+    private val deleteFoodUseCase: DeleteFoodUseCase
 ) : BaseEventViewModel<SellerProductListEvent, SellerProductListEffect>() {
 
     private val _state = MutableStateFlow(SellerProductListUiState())
@@ -51,35 +56,72 @@ class SellerProductListViewModel @Inject constructor(
         }
     }
 
-    private fun update(block: SellerProductListUiState.() -> SellerProductListUiState) {
-        _state.update { it.block() }
-    }
-
     private fun load() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-
-            delay(1000)
-
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    products = dummyProducts()
-                )
-            }
-        }
+        observeDataFlow(
+            flow = getSellerProfileUseCase(),
+            onState = { state ->
+                when (state) {
+                    is LoadState.Loading -> _state.update { it.copy(isLoading = true) }
+                    is LoadState.Success -> {
+                        val cafeId = state.data.cafeId
+                        if (cafeId.isNullOrBlank()) {
+                            _state.update { it.copy(isLoading = false, products = emptyList()) }
+                        } else {
+                            loadProducts(cafeId)
+                        }
+                    }
+                    is LoadState.Error -> _state.update { it.copy(isLoading = false) }
+                    else -> Unit
+                }
+            },
+            onError = { _state.update { it.copy(isLoading = false) } }
+        )
     }
 
     private fun deleteProduct(productId: String) {
-        val updated = _state.value.products.filterNot { it.id == productId }
-
-        _state.update { it.copy(products = updated) }
-    }
-
-    private fun dummyProducts(): List<ProductItem> {
-        return listOf(
-            ProductItem("1", "Coffee Latte", "25000", 10, "Drink", "Hot coffee"),
-            ProductItem("2", "Croissant", "15000", 20, "Food", "Butter croissant")
+        observeDataFlow(
+            flow = deleteFoodUseCase(productId),
+            onState = { state ->
+                _state.update {
+                    if (state is LoadState.Success) {
+                        it.copy(
+                            isLoading = false,
+                            products = it.products.filterNot { product -> product.id == productId }
+                        )
+                    } else {
+                        it.copy(isLoading = state is LoadState.Loading)
+                    }
+                }
+            },
+            onError = { _state.update { it.copy(isLoading = false) } }
         )
     }
+
+    private fun loadProducts(cafeId: String) {
+        observeDataFlow(
+            flow = getFoodsByCafeUseCase(cafeId),
+            onState = { state ->
+                _state.update {
+                    if (state is LoadState.Success) {
+                        it.copy(
+                            isLoading = false,
+                            products = state.data.map(Food::toProductItem)
+                        )
+                    } else {
+                        it.copy(isLoading = state is LoadState.Loading)
+                    }
+                }
+            },
+            onError = { _state.update { it.copy(isLoading = false) } }
+        )
+    }
+
+    private fun Food.toProductItem() = ProductItem(
+        id = id,
+        name = name,
+        price = price.stripTrailingZeros().toPlainString(),
+        stock = quantity.toInt(),
+        category = category.name,
+        description = description
+    )
 }

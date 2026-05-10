@@ -15,14 +15,9 @@ import com.mtv.based.core.network.config.NetworkConfigProvider
 
 class AppNetworkConfigProvider : NetworkConfigProvider {
     override fun provide(): NetworkConfig =
-//        AppNetworkConfig(
-//            baseUrl = BuildConfig.BASE_URL,
-//            useKtor = BuildConfig.USE_KTOR,
-//            isDebug = BuildConfig.DEBUG
-//        )
         AppNetworkConfig(
-            baseUrl = "http://192.168.100.50:8080/",
-            useKtor = true,
-            isDebug = true
+            baseUrl = BuildConfig.BASE_URL,
+            useKtor = BuildConfig.USE_KTOR,
+            isDebug = BuildConfig.DEBUG
         )
 }

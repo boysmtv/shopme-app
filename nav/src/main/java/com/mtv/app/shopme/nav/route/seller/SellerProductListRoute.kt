@@ -62,6 +62,6 @@ private fun handleEffect(
             nav.navigate(SellerDestinations.SELLER_PRODUCT_ADD_GRAPH)
 
         is SellerProductListEffect.NavigateToEdit ->
-            nav.navigate("seller_product_edit/${effect.productId}")
+            nav.navigate(SellerDestinations.navigateToProductEdit(effect.productId))
     }
 }

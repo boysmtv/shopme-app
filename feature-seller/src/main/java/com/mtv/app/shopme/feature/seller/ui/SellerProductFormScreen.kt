@@ -60,6 +60,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,9 +74,10 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.SmartImage
+import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.domain.model.VariantGroup
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEvent
@@ -91,6 +93,7 @@ fun SellerProductFormScreen(
     event: (SellerProductFormEvent) -> Unit
 ) {
     val currentStep = state.step
+    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -99,8 +102,10 @@ fun SellerProductFormScreen(
 
         val firstEmptyIndex = state.images.indexOfFirst { it == null }
         if (firstEmptyIndex != -1) {
+            val encoded = uriToBase64(context, uri)
+            if (encoded.isBlank()) return@rememberLauncherForActivityResult
             event(
-                SellerProductFormEvent.AddImage(uri.toString())
+                SellerProductFormEvent.AddImage("data:image/jpeg;base64,$encoded")
             )
         }
     }
@@ -249,7 +254,7 @@ fun SellerProductFormScreen(
 
                                             if (uri != null) {
 
-                                                AsyncImage(
+                                                SmartImage(
                                                     model = uri,
                                                     contentDescription = null,
                                                     contentScale = ContentScale.Crop,

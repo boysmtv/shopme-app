@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import android.content.Intent
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 import com.mtv.based.core.network.utils.LoadState
@@ -32,6 +33,7 @@ sealed class ChatSupportEvent {
 
 sealed class ChatSupportEffect {
     object NavigateBack : ChatSupportEffect()
+    data class OpenIntent(val intent: Intent) : ChatSupportEffect()
 }
 
 data class SupportMessage(

@@ -16,6 +16,7 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.app.shopme.domain.param.SplashParam
 import com.mtv.app.shopme.domain.usecase.GetSplashUseCase
+import com.mtv.app.shopme.feature.auth.contract.SplashBlockingState
 import com.mtv.app.shopme.feature.auth.contract.SplashEffect
 import com.mtv.app.shopme.feature.auth.contract.SplashEvent
 import com.mtv.app.shopme.feature.auth.contract.SplashUiState
@@ -67,7 +68,10 @@ class SplashViewModel @Inject constructor(
             ),
             onState = { state ->
                 _state.update {
-                    it.copy(splash = state)
+                    it.copy(
+                        splash = state,
+                        blockingState = if (state is LoadState.Loading) null else it.blockingState
+                    )
                 }
 
                 if (state is LoadState.Success) {
@@ -84,11 +88,17 @@ class SplashViewModel @Inject constructor(
     private fun handleNavigation(data: Splash) {
         when {
             data.config.maintenanceMode -> {
-                // TODO: maintenance screen
+                _state.update {
+                    it.copy(
+                        blockingState = SplashBlockingState.Maintenance(
+                            message = data.config.maintenanceMessage
+                        )
+                    )
+                }
             }
 
-            data.config.forceUpdate -> {
-                // TODO: force update screen
+            data.versionStatus == "FORCE_UPDATE" || data.config.forceUpdate -> {
+                _state.update { it.copy(blockingState = SplashBlockingState.ForceUpdate) }
             }
 
             data.isAuthenticated -> {

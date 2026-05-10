@@ -8,9 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.ui
 
-import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,26 +24,19 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,19 +47,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderItem
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
+import com.mtv.app.shopme.domain.model.PaymentStatus
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderUiState
 
@@ -86,9 +76,6 @@ fun OrderScreen(
     event: (OrderEvent) -> Unit
 ) {
     var selectedFilter by remember { mutableStateOf(OrderFilter.SEMUA) }
-    var showUploadSheet by remember { mutableStateOf(false) }
-    var proofUri by remember { mutableStateOf<Uri?>(null) }
-    var selectedOrderId by remember { mutableStateOf<String?>(null) }
 
     val filteredOrders = state.orders.filter {
         when (selectedFilter) {
@@ -98,19 +85,6 @@ fun OrderScreen(
             OrderFilter.DELIVERING -> it.status == OrderStatus.DELIVERING
             OrderFilter.COMPLETED -> it.status == OrderStatus.COMPLETED
         }
-    }
-    if (showUploadSheet) {
-        UploadProofSheet(
-            imageUri = proofUri,
-            onTakePhoto = { /* TODO camera */ },
-            onPickGallery = { /* TODO gallery */ },
-            onUpload = {
-                showUploadSheet = false
-            },
-            onDismiss = {
-                showUploadSheet = false
-            }
-        )
     }
 
     Column(
@@ -153,9 +127,11 @@ fun OrderScreen(
                                 onClick = {
                                     event(OrderEvent.ClickOrder(order.id))
                                 },
-                                onUploadProofClick = { orderId ->
-                                    selectedOrderId = orderId
-                                    showUploadSheet = true
+                                onConfirmTransferClick = { orderId ->
+                                    event(OrderEvent.ConfirmTransfer(orderId))
+                                },
+                                onChatClick = {
+                                    event(OrderEvent.ClickChat)
                                 }
                             )
                         }
@@ -250,7 +226,8 @@ private fun ModernOrderTopBar(
         Icon(
             Icons.AutoMirrored.Filled.Chat,
             contentDescription = null,
-            tint = Color.White
+            tint = Color.White,
+            modifier = Modifier.clickable { onChat() }
         )
     }
 }
@@ -259,7 +236,8 @@ private fun ModernOrderTopBar(
 fun ModernOrderCard(
     order: Order,
     onClick: () -> Unit,
-    onUploadProofClick: (String) -> Unit
+    onConfirmTransferClick: (String) -> Unit,
+    onChatClick: () -> Unit
 ) {
 
     val statusColor = when (order.status) {
@@ -355,9 +333,9 @@ fun ModernOrderCard(
 
             Spacer(Modifier.height(14.dp))
 
-            val isWaitingForPayment = order.status == OrderStatus.UNPAID || order.status == OrderStatus.ORDERED
+            val needsTransferConfirmation = order.paymentMethod == PaymentMethod.TRANSFER &&
+                    order.paymentStatus in setOf(PaymentStatus.WAITING_UPLOAD, PaymentStatus.FAILED)
             val isCompleted = order.status == OrderStatus.COMPLETED
-            val isTransfer = order.paymentMethod == PaymentMethod.TRANSFER
 
             Row(
                 modifier = Modifier.align(Alignment.End),
@@ -377,23 +355,23 @@ fun ModernOrderCard(
                     }
 
                 } else {
-                    if (isWaitingForPayment && isTransfer) {
+                    if (needsTransferConfirmation) {
 
                         Button(
-                            onClick = { onUploadProofClick(order.id) },
+                            onClick = { onConfirmTransferClick(order.id) },
                             shape = RoundedCornerShape(50),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFFF59E0B)
                             )
                         ) {
-                            Text("Upload Bukti Transfer", color = Color.White)
+                            Text("Konfirmasi Transfer", color = Color.White)
                         }
 
                         Spacer(Modifier.width(10.dp))
                     }
 
                     OutlinedButton(
-                        onClick = onClick,
+                        onClick = onChatClick,
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = AppColor.Green
@@ -437,182 +415,6 @@ fun ModernEmptyOrder() {
             )
             Spacer(Modifier.height(8.dp))
             Text("Belum ada pesanan aktif", fontFamily = PoppinsFont)
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UploadProofSheet(
-    imageUri: Uri?,
-    onTakePhoto: () -> Unit,
-    onPickGallery: () -> Unit,
-    onUpload: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        containerColor = AppColor.GreenSoft,
-        dragHandle = {
-            Box(
-                Modifier
-                    .padding(vertical = 10.dp)
-                    .size(width = 42.dp, height = 4.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(AppColor.Gray.copy(alpha = 0.3f))
-            )
-        }
-    ) {
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 22.dp, vertical = 18.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            // ===== HEADER ICON =====
-            Box(
-                modifier = Modifier
-                    .size(70.dp)
-                    .clip(CircleShape)
-                    .background(AppColor.Green.copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
-                    contentDescription = null,
-                    tint = AppColor.Green,
-                    modifier = Modifier.size(34.dp)
-                )
-            }
-
-            Spacer(Modifier.height(14.dp))
-
-            Text(
-                text = "Upload Bukti Transfer",
-                fontFamily = PoppinsFont,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp
-            )
-
-            Spacer(Modifier.height(6.dp))
-
-            Text(
-                text = "Upload foto bukti pembayaran kamu",
-                fontSize = 13.sp,
-                color = AppColor.Gray
-            )
-
-            Spacer(Modifier.height(18.dp))
-
-            // ===== IMAGE PREVIEW CARD =====
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(210.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color(0xFFF7F7F7))
-                    .border(
-                        width = 1.dp,
-                        color = Color(0xFFE5E5E5),
-                        shape = RoundedCornerShape(18.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                if (imageUri == null) {
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null,
-                            tint = AppColor.Gray,
-                            modifier = Modifier.size(32.dp)
-                        )
-
-                        Spacer(Modifier.height(6.dp))
-
-                        Text(
-                            "Belum ada foto",
-                            fontSize = 13.sp,
-                            color = AppColor.Gray
-                        )
-                    }
-
-                } else {
-                    AsyncImage(
-                        model = imageUri,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = "Pastikan nominal & rekening terlihat jelas",
-                fontSize = 12.sp,
-                color = AppColor.Gray
-            )
-
-            Spacer(Modifier.height(18.dp))
-
-            // ===== PICK BUTTONS =====
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-
-                OutlinedButton(
-                    onClick = onTakePhoto,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(Icons.Default.PhotoCamera, null, Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("Kamera")
-                }
-
-                OutlinedButton(
-                    onClick = onPickGallery,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Icon(Icons.Default.Image, null, Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text("Gallery")
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // ===== UPLOAD BUTTON =====
-            Button(
-                onClick = onUpload,
-                enabled = imageUri != null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppColor.Green,
-                    disabledContainerColor = AppColor.Gray.copy(alpha = 0.3f)
-                )
-            ) {
-                Text(
-                    text = if (imageUri == null) "Pilih Foto Dulu" else "Upload Bukti Transfer",
-                    color = Color.White,
-                    fontFamily = PoppinsFont
-                )
-            }
-
-            Spacer(Modifier.height(6.dp))
         }
     }
 }
@@ -665,23 +467,4 @@ fun OrderScreenPreview() {
         ),
         event = {}
     )
-}
-
-@Preview(showBackground = true, device = Devices.PIXEL_4_XL)
-@Composable
-fun UploadProofSheetPreview_Empty() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0x66000000)),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-        UploadProofSheet(
-            imageUri = null,
-            onTakePhoto = {},
-            onPickGallery = {},
-            onUpload = {},
-            onDismiss = {}
-        )
-    }
 }

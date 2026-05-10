@@ -13,10 +13,16 @@ import com.mtv.based.core.network.utils.LoadState
 
 data class SplashUiState(
     val splash: LoadState<Splash> = LoadState.Loading,
+    val blockingState: SplashBlockingState? = null,
 )
 
 sealed class SplashEvent {
     data object Load : SplashEvent()
+}
+
+sealed class SplashBlockingState {
+    data class Maintenance(val message: String?) : SplashBlockingState()
+    data object ForceUpdate : SplashBlockingState()
 }
 
 sealed class SplashEffect {

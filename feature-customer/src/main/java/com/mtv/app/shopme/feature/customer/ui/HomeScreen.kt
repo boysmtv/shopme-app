@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.*
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
@@ -456,7 +455,7 @@ fun FoodCard(
         Column {
 
             Box {
-                AsyncImage(
+                SmartImage(
                     model = item.images.first(),
                     contentDescription = item.name,
                     modifier = Modifier

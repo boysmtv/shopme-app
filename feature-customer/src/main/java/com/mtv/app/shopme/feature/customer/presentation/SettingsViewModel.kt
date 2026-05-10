@@ -10,9 +10,11 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.GetNotificationPreferencesUseCase
 import com.mtv.app.shopme.feature.customer.contract.SettingsEffect
 import com.mtv.app.shopme.feature.customer.contract.SettingsEvent
 import com.mtv.app.shopme.feature.customer.contract.SettingsUiState
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.UiError
@@ -28,7 +30,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val getNotificationPreferencesUseCase: GetNotificationPreferencesUseCase
 ) : BaseEventViewModel<SettingsEvent, SettingsEffect>() {
 
     private val _state = MutableStateFlow(SettingsUiState())
@@ -36,7 +39,7 @@ class SettingsViewModel @Inject constructor(
 
     override fun onEvent(event: SettingsEvent) {
         when (event) {
-            is SettingsEvent.Load -> {}
+            is SettingsEvent.Load -> load()
             is SettingsEvent.DismissDialog -> dismissDialog()
 
             is SettingsEvent.ToggleNotification -> toggleNotification(event.enabled)
@@ -49,6 +52,26 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ClickHelp -> emitEffect(SettingsEffect.NavigateHelp)
             is SettingsEvent.ClickNotification -> emitEffect(SettingsEffect.NavigateNotification)
         }
+    }
+
+    private fun load() {
+        observeDataFlow(
+            flow = getNotificationPreferencesUseCase(),
+            onState = { state ->
+                _state.update {
+                    val enabled = if (state is LoadState.Success) {
+                        state.data.hasAnyEnabled()
+                    } else {
+                        it.notificationEnabled
+                    }
+                    it.copy(
+                        isLoading = state is LoadState.Loading,
+                        notificationEnabled = enabled
+                    )
+                }
+            },
+            onError = ::showError
+        )
     }
 
     private fun toggleNotification(enabled: Boolean) {

@@ -232,7 +232,11 @@ fun SellerChatListPreview() {
         ) {
             SellerChatListScreen(
                 state = SellerChatListUiState(
-                    chatList = mockSellerChatList()
+                    chatList = listOf(
+                        SellerChatListItem("1", "Cafe Kopi Kita", "Pesanan siap dikirim.", "10:32", 2),
+                        SellerChatListItem("2", "Bakery Mantap", "Bisa tambah extra cheese?", "09:45", 0),
+                        SellerChatListItem("3", "Warung Sederhana", "Pesanan sudah dibayar.", "Kemarin", 1)
+                    )
                 ),
                 event = {}
             )

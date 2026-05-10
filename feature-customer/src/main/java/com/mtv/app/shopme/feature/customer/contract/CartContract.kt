@@ -44,10 +44,10 @@ sealed class CartEvent {
 
     data class ClearCartByCafe(val cafeId: String) : CartEvent()
     object ClearCart : CartEvent()
-    object ShowSuccessDialog : CartEffect()
 }
 
 sealed class CartEffect {
     object OpenPinSheet : CartEffect()
     object NavigateToOrder : CartEffect()
+    object ShowSuccessDialog : CartEffect()
 }
