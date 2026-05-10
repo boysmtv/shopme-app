@@ -15,6 +15,7 @@ import com.mtv.app.shopme.data.remote.datasource.FoodRemoteDataSource
 import com.mtv.app.shopme.data.remote.datasource.SearchRemoteDataSource
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.repository.FoodRepository
 import com.mtv.based.core.network.utils.Resource
@@ -55,6 +56,21 @@ class FoodRepositoryImpl @Inject constructor(
                 page = response.page,
                 last = response.last
             )
+        }
+
+    override fun createFood(param: FoodUpsertParam) =
+        resultFlow.create {
+            remote.createFood(param)
+        }
+
+    override fun updateFood(foodId: String, param: FoodUpsertParam) =
+        resultFlow.create {
+            remote.updateFood(foodId, param)
+        }
+
+    override fun deleteFood(foodId: String) =
+        resultFlow.create {
+            remote.deleteFood(foodId)
         }
 
 }

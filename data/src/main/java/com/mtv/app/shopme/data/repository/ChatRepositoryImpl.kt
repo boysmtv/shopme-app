@@ -21,28 +21,30 @@ class ChatRepositoryImpl @Inject constructor(
     private val resultFlow: ResultFlowFactory
 ) : ChatRepository {
 
-    override fun getChatList() =
+    override fun getChatList(asSeller: Boolean) =
         resultFlow.create {
-            remote.getChatList().toDomain()
+            remote.getChatList(asSeller).toDomain()
         }
 
 
-    override fun getChats() =
+    override fun getChats(chatId: String?, asSeller: Boolean) =
         resultFlow.create {
-            remote.getChats().toDomain().chatList
+            remote.getChats(chatId, asSeller).toDomain()
         }
 
-    override fun sendMessage(id: String, message: String) =
+    override fun sendMessage(id: String, message: String, asSeller: Boolean) =
         resultFlow.create {
             remote.sendMessage(
-                ChatMessageSendRequest(id, message)
+                body = ChatMessageSendRequest(id, message),
+                asSeller = asSeller
             )
         }
 
-    override fun readAllMessage(id: String) =
+    override fun readAllMessage(id: String, asSeller: Boolean) =
         resultFlow.create {
             remote.readAll(
-                ChatMessageMarkAsReadRequest(id, "")
+                body = ChatMessageMarkAsReadRequest(id, ""),
+                asSeller = asSeller
             )
         }
 }

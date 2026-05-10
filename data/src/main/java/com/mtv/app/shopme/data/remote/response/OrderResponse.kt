@@ -11,11 +11,15 @@ import java.math.BigDecimal
 data class OrderResponse(
     val id: String,
     val customerId: String,
+    val customerName: String? = null,
     val cafeId: String,
+    val cafeName: String? = null,
+    val deliveryAddress: String? = null,
     @Serializable(with = BigDecimalSerializer::class)
     val totalPrice: BigDecimal,
     val status: OrderStatus,
     val paymentMethod: PaymentMethod,
     val paymentStatus: PaymentStatus,
+    val createdAt: String? = null,
     val items: List<OrderItemResponse>
 )

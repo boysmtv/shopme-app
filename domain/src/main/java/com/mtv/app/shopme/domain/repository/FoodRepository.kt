@@ -11,6 +11,7 @@ package com.mtv.app.shopme.domain.repository
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.based.core.network.utils.Resource
 import kotlinx.coroutines.flow.Flow
@@ -26,5 +27,11 @@ interface FoodRepository {
     fun getSimilarFoods(cafeId: String): Flow<Resource<List<Food>>>
 
     fun searchFoods(request: SearchParam): Flow<Resource<PagedData<SearchFood>>>
+
+    fun createFood(param: FoodUpsertParam): Flow<Resource<Unit>>
+
+    fun updateFood(foodId: String, param: FoodUpsertParam): Flow<Resource<Unit>>
+
+    fun deleteFood(foodId: String): Flow<Resource<Unit>>
 
 }

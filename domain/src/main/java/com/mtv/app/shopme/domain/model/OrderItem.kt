@@ -13,6 +13,7 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 data class OrderItem(
     val id: String = EMPTY_STRING,
     val foodId: String = EMPTY_STRING,
+    val foodName: String = EMPTY_STRING,
     val quantity: Int = 0,
     val price: Double = 0.0,
     val notes: String? = null,

@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface OrderRepository {
     fun getOrders(): Flow<Resource<List<Order>>>
     fun getOrderDetail(orderId: String): Flow<Resource<Order>>
+    fun confirmTransfer(orderId: String): Flow<Resource<Unit>>
 }

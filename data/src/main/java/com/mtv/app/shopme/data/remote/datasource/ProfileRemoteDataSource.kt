@@ -14,12 +14,14 @@ import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.app.shopme.data.remote.response.NotificationPreferencesResponse
 import com.mtv.app.shopme.data.remote.response.VillageResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
 import com.mtv.app.shopme.domain.param.AddressDeleteParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
+import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 
@@ -34,6 +36,21 @@ class ProfileRemoteDataSource @Inject constructor(
     suspend fun updateProfile(param: CustomerUpdateParam) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Customer.Update,
+            body = param.toRequest()
+        ).requireData()
+
+    suspend fun deleteAccount() =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Customer.Delete
+        ).requireData()
+
+    suspend fun getNotificationPreferences() = request<ApiResponse<NotificationPreferencesResponse>>(
+        endpoint = ApiEndPoint.Customer.GetNotificationPreferences
+    ).requireData()
+
+    suspend fun updateNotificationPreferences(param: NotificationPreferencesParam) =
+        request<ApiResponse<NotificationPreferencesResponse>>(
+            endpoint = ApiEndPoint.Customer.UpdateNotificationPreferences,
             body = param.toRequest()
         ).requireData()
 

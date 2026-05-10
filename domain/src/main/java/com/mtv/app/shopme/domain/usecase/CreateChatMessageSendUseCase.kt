@@ -14,6 +14,6 @@ import javax.inject.Inject
 class CreateChatMessageSendUseCase @Inject constructor(
     private val repository: ChatRepository
 ) {
-    operator fun invoke(id: String, message: String) =
-        repository.sendMessage(id, message)
+    operator fun invoke(id: String, message: String, asSeller: Boolean = false) =
+        repository.sendMessage(id, message, asSeller)
 }

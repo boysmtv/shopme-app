@@ -21,4 +21,9 @@ class OrderRemoteDataSource @Inject constructor(
         request<ApiResponse<OrderResponse>>(
             endpoint = ApiEndPoint.Order.Detail(orderId)
         ).requireData()
+
+    suspend fun confirmTransfer(orderId: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Order.ConfirmTransfer(orderId)
+        ).requireData()
 }

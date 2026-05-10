@@ -20,4 +20,9 @@ class OrderRepositoryImpl @Inject constructor(
         resultFlow.create {
             remoteDataSource.getOrderDetail(orderId).toDomain()
         }
+
+    override fun confirmTransfer(orderId: String) =
+        resultFlow.create {
+            remoteDataSource.confirmTransfer(orderId)
+        }
 }

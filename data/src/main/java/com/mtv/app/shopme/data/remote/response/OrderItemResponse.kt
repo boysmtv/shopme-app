@@ -9,9 +9,10 @@ import java.math.BigDecimal
 data class OrderItemResponse(
     val id: String,
     val foodId: String,
+    val foodName: String? = null,
     val quantity: Int,
     @Serializable(with = BigDecimalSerializer::class)
     val price: BigDecimal,
-    val notes: String?,
+    val notes: String? = null,
     val status: OrderItemStatus
 )
