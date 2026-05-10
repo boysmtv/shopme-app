@@ -41,7 +41,7 @@ object DataUiMock {
             rw = "002",
             isDefault = true
         ),
-        photo = "https://picsum.photos/200",
+        photo = "",
         verified = true,
         stats = Stats(
             totalOrders = 120,
@@ -72,7 +72,7 @@ object DataUiMock {
             estimate = "15-20 menit",
             isActive = index % 2 == 0,
             createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
-            images = listOf("https://picsum.photos/200?random=$index"),
+            images = emptyList(),
 
             variants = listOf(
                 FoodVariant(
@@ -148,7 +148,7 @@ object DataUiMock {
             cafeId = "cafe_1",
             cafeName = "Burger Queen",
             price = 12000.toBigDecimal(),
-            image = "https://example.com/images/burger.png",
+            image = "",
             name = "Classic Burger",
             variants = listOf(
                 CartVariant(
@@ -177,7 +177,7 @@ object DataUiMock {
             cafeId = "cafe_1",
             cafeName = "Burger Queen",
             price = 15000.toBigDecimal(),
-            image = "https://example.com/images/cheese_burger.png",
+            image = "",
             name = "Cheese Burger",
             variants = listOf(
                 CartVariant(
@@ -199,7 +199,7 @@ object DataUiMock {
             cafeId = "cafe_2",
             cafeName = "Pizza Palace",
             price = 30000.toBigDecimal(),
-            image = "https://example.com/images/pizza.png",
+            image = "",
             name = "Pepperoni Pizza",
             variants = listOf(
                 CartVariant(
@@ -221,7 +221,7 @@ object DataUiMock {
             cafeId = "cafe_2",
             cafeName = "Pizza Palace",
             price = 28000.toBigDecimal(),
-            image = "https://example.com/images/margherita.png",
+            image = "",
             name = "Margherita Pizza",
             variants = listOf(
                 CartVariant(
@@ -243,7 +243,7 @@ object DataUiMock {
             cafeId = "cafe_3",
             cafeName = "Coffee Corner",
             price = 18000.toBigDecimal(),
-            image = "https://example.com/images/cappuccino.png",
+            image = "",
             name = "Cappuccino",
             variants = listOf(
                 CartVariant(
@@ -265,7 +265,7 @@ object DataUiMock {
             cafeId = "cafe_3",
             cafeName = "Coffee Corner",
             price = 20000.toBigDecimal(),
-            image = "https://example.com/images/latte.png",
+            image = "",
             name = "Latte",
             variants = emptyList()
         )

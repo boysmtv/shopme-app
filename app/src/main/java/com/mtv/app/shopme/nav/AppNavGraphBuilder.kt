@@ -32,6 +32,7 @@ import com.mtv.app.shopme.nav.route.customer.ChatSupportRoute
 import com.mtv.app.shopme.nav.route.customer.HelpRoute
 import com.mtv.app.shopme.nav.route.customer.NotifRoute
 import com.mtv.app.shopme.nav.route.customer.NotificationRoute
+import com.mtv.app.shopme.nav.route.customer.OrderDetailRoute
 import com.mtv.app.shopme.nav.route.customer.OrderHistoryRoute
 import com.mtv.app.shopme.nav.route.customer.OrderRoute
 import com.mtv.app.shopme.nav.route.customer.ProfileRoute
@@ -43,9 +44,11 @@ import com.mtv.app.shopme.nav.route.seller.SellerChatListRoute
 import com.mtv.app.shopme.nav.route.seller.SellerCreateCafeRoute
 import com.mtv.app.shopme.nav.route.seller.SellerCreateCafeTncRoute
 import com.mtv.app.shopme.nav.route.seller.SellerDashboardRoute
+import com.mtv.app.shopme.nav.route.seller.SellerEditStoreRoute
 import com.mtv.app.shopme.nav.route.seller.SellerNotifRoute
 import com.mtv.app.shopme.nav.route.seller.SellerOrderDetailRoute
 import com.mtv.app.shopme.nav.route.seller.SellerOrderRoute
+import com.mtv.app.shopme.nav.route.seller.SellerPaymentMethodRoute
 import com.mtv.app.shopme.nav.route.seller.SellerProductFormRoute
 import com.mtv.app.shopme.nav.route.seller.SellerProductListRoute
 import com.mtv.app.shopme.nav.route.seller.SellerStoreRoute
@@ -126,6 +129,16 @@ fun NavGraphBuilder.notificationGraph(nav: NavHostController) {
     composable(CustomerDestinations.CHAT_GRAPH) {
         ChatRoute(nav)
     }
+    composable(
+        route = CustomerDestinations.CHAT_GRAPH_WITH_ID,
+        arguments = listOf(
+            navArgument("chatId") {
+                type = NavType.StringType
+            }
+        )
+    ) {
+        ChatRoute(nav)
+    }
 }
 
 fun NavGraphBuilder.profileGraph(nav: NavHostController) {
@@ -177,6 +190,12 @@ fun NavGraphBuilder.orderGraph(nav: NavHostController) {
     composable(CustomerDestinations.ORDER_GRAPH) {
         OrderRoute(nav)
     }
+    composable(
+        route = CustomerDestinations.ORDER_DETAIL_GRAPH_WITH_ID,
+        arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+    ) {
+        OrderDetailRoute(nav)
+    }
 }
 
 fun NavGraphBuilder.sellerGraph(nav: NavHostController) {
@@ -214,20 +233,37 @@ fun NavGraphBuilder.sellerDetailGraph(nav: NavHostController) {
         SellerCreateCafeRoute(nav)
     }
 
-    composable(SellerDestinations.SELLER_ORDER_DETAIL_GRAPH) {
+    composable(
+        route = SellerDestinations.SELLER_ORDER_DETAIL_GRAPH,
+        arguments = listOf(navArgument("orderId") { type = NavType.StringType })
+    ) {
         SellerOrderDetailRoute(nav)
     }
 
-    composable(SellerDestinations.SELLER_CHAT_DETAIL_GRAPH) {
+    composable(
+        route = SellerDestinations.SELLER_CHAT_DETAIL_GRAPH,
+        arguments = listOf(navArgument("chatId") { type = NavType.StringType })
+    ) {
         SellerChatDetailRoute(nav)
     }
 
     composable(SellerDestinations.SELLER_PRODUCT_ADD_GRAPH) {
         SellerProductFormRoute(nav)
     }
+    composable(
+        route = SellerDestinations.SELLER_PRODUCT_EDIT_GRAPH,
+        arguments = listOf(navArgument("productId") { type = NavType.StringType })
+    ) {
+        SellerProductFormRoute(nav)
+    }
 
     composable(SellerDestinations.SELLER_NOTIFICATION_GRAPH) {
         SellerNotifRoute(nav)
     }
+    composable(SellerDestinations.SELLER_EDIT_STORE_GRAPH) {
+        SellerEditStoreRoute(nav)
+    }
+    composable(SellerDestinations.SELLER_PAYMENT_METHOD_GRAPH) {
+        SellerPaymentMethodRoute(nav)
+    }
 }
-
