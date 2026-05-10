@@ -125,7 +125,7 @@ class NotificationViewModel @Inject constructor(
         chatNotification = chatNotification,
         pushEnabled = pushEnabled,
         emailEnabled = emailEnabled
-    }
+    )
 
     private fun showError(error: UiError) {
         setDialog(

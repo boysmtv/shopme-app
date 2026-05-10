@@ -47,7 +47,7 @@ class SellerCreateCafeViewModel @Inject constructor(
         when (event) {
 
             is SellerCreateCafeEvent.Load -> load()
-            is SellerCreateCafeEvent.DismissDialog -> dismissDialog()
+            is SellerCreateCafeEvent.DismissDialog -> clearDialog()
 
             is SellerCreateCafeEvent.ChangeCafeName -> update { copy(cafeName = event.value) }
             is SellerCreateCafeEvent.ChangePhone -> update { copy(phone = event.value) }
@@ -209,7 +209,7 @@ class SellerCreateCafeViewModel @Inject constructor(
                     title = ErrorMessages.GENERIC_ERROR,
                     message = error.message
                 ),
-                onPrimary = { dismissDialog() }
+                onPrimary = { clearDialog() }
             )
         )
     }
@@ -218,7 +218,7 @@ class SellerCreateCafeViewModel @Inject constructor(
         showError(UiError.Validation(message = message))
     }
 
-    private fun dismissDialog() {
+    private fun clearDialog() {
         super.dismissDialog()
         _state.update { it.copy(isLoading = false) }
     }

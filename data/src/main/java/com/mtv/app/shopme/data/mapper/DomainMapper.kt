@@ -12,6 +12,7 @@ import com.mtv.app.shopme.data.remote.response.ChatListItemResponse
 import com.mtv.app.shopme.data.remote.response.ChatItem
 import com.mtv.app.shopme.data.remote.response.ChatResponse
 import com.mtv.app.shopme.data.remote.response.AddressResponse
+import com.mtv.app.shopme.data.remote.response.AppConfigResponse
 import com.mtv.app.shopme.data.remote.response.AppNotificationResponse
 import com.mtv.app.shopme.data.remote.response.CafeAddressResponse
 import com.mtv.app.shopme.data.remote.response.CafeResponse

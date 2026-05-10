@@ -29,7 +29,7 @@ fun resolveConfig(localKey: String, envKey: String, fallback: String): String {
 val debugBaseUrl = resolveConfig(
     localKey = "shopme.baseUrl",
     envKey = "SHOPME_BASE_URL",
-    fallback = "http://10.0.2.2:8080/"
+    fallback = "http://192.168.100.20:8080/"
 )
 val releaseBaseUrl = resolveConfig(
     localKey = "shopme.releaseBaseUrl",
@@ -149,6 +149,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.coil.compose)
     implementation(libs.exifinterface)
 
     /* =========================
