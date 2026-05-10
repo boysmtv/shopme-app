@@ -59,7 +59,7 @@ private fun handleEffect(
         SellerDashboardEffect.NavigateToOrder ->
             nav.navigate(SellerDestinations.ORDER)
         is SellerDashboardEffect.NavigateToOrderDetail ->
-            nav.navigate("seller_order_detail/${effect.orderId}")
+            nav.navigate(SellerDestinations.navigateToOrderDetail(effect.orderId))
         SellerDashboardEffect.NavigateToNotif ->
             nav.navigate(SellerDestinations.SELLER_NOTIFICATION_GRAPH)
     }

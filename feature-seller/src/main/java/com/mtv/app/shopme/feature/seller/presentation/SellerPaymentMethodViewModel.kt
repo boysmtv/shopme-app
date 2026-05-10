@@ -8,23 +8,27 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.param.SellerPaymentMethodParam
+import com.mtv.app.shopme.domain.usecase.GetSellerPaymentMethodsUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateSellerPaymentMethodsUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerPaymentMethodViewModel @Inject constructor(
-
+    private val getSellerPaymentMethodsUseCase: GetSellerPaymentMethodsUseCase,
+    private val updateSellerPaymentMethodsUseCase: UpdateSellerPaymentMethodsUseCase
 ) : BaseEventViewModel<SellerPaymentMethodEvent, SellerPaymentMethodEffect>() {
 
     private val _state = MutableStateFlow(SellerPaymentMethodUiState())
@@ -33,7 +37,7 @@ class SellerPaymentMethodViewModel @Inject constructor(
     override fun onEvent(event: SellerPaymentMethodEvent) {
         when (event) {
 
-            SellerPaymentMethodEvent.Load -> {}
+            SellerPaymentMethodEvent.Load -> load()
 
             SellerPaymentMethodEvent.DismissDialog -> dismissDialog()
 
@@ -98,24 +102,86 @@ class SellerPaymentMethodViewModel @Inject constructor(
             return
         }
 
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+        observeDataFlow(
+            flow = updateSellerPaymentMethodsUseCase(
+                SellerPaymentMethodParam(
+                    cashEnabled = state.cashEnabled,
+                    bankEnabled = state.bankEnabled,
+                    bankNumber = state.bankNumber,
+                    ovoEnabled = state.ovoEnabled,
+                    ovoNumber = state.ovoNumber,
+                    danaEnabled = state.danaEnabled,
+                    danaNumber = state.danaNumber,
+                    gopayEnabled = state.gopayEnabled,
+                    gopayNumber = state.gopayNumber
+                )
+            ),
+            onState = { result ->
+                _state.update {
+                    if (result is LoadState.Success) {
+                        it.copy(
+                            isLoading = false,
+                            cashEnabled = result.data.cashEnabled,
+                            bankEnabled = result.data.bankEnabled,
+                            bankNumber = result.data.bankNumber,
+                            ovoEnabled = result.data.ovoEnabled,
+                            ovoNumber = result.data.ovoNumber,
+                            danaEnabled = result.data.danaEnabled,
+                            danaNumber = result.data.danaNumber,
+                            gopayEnabled = result.data.gopayEnabled,
+                            gopayNumber = result.data.gopayNumber
+                        )
+                    } else {
+                        it.copy(isLoading = result is LoadState.Loading)
+                    }
+                }
+                if (result is LoadState.Success) {
+                    emitEffect(SellerPaymentMethodEffect.SaveSuccess)
+                }
+            },
+            onError = ::showError
+        )
+    }
 
-            delay(1000) // simulate API
-
-            _state.update { it.copy(isLoading = false) }
-
-            emitEffect(SellerPaymentMethodEffect.SaveSuccess)
-        }
+    private fun load() {
+        observeDataFlow(
+            flow = getSellerPaymentMethodsUseCase(),
+            onState = { result ->
+                _state.update {
+                    if (result is LoadState.Success) {
+                        it.copy(
+                            isLoading = false,
+                            cashEnabled = result.data.cashEnabled,
+                            bankEnabled = result.data.bankEnabled,
+                            bankNumber = result.data.bankNumber,
+                            ovoEnabled = result.data.ovoEnabled,
+                            ovoNumber = result.data.ovoNumber,
+                            danaEnabled = result.data.danaEnabled,
+                            danaNumber = result.data.danaNumber,
+                            gopayEnabled = result.data.gopayEnabled,
+                            gopayNumber = result.data.gopayNumber
+                        )
+                    } else {
+                        it.copy(isLoading = result is LoadState.Loading)
+                    }
+                }
+            },
+            onError = ::showError
+        )
     }
 
     private fun showError(message: String) {
+        showError(UiError.Validation(message = message))
+    }
+
+    private fun showError(error: UiError) {
+        _state.update { it.copy(isLoading = false) }
         setDialog(
             UiDialog.Center(
                 state = DialogStateV1(
                     type = DialogType.ERROR,
-                    title = "Error",
-                    message = message
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
                 ),
                 onPrimary = { dismissDialog() }
             )

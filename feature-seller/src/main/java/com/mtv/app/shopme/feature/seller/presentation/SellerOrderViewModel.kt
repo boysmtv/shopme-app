@@ -8,21 +8,31 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.SellerOrderItem
+import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
+import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerOrderViewModel @Inject constructor(
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val getSellerOrdersUseCase: GetSellerOrdersUseCase,
+    private val getSellerProfileUseCase: GetSellerProfileUseCase,
+    private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase
 ) : BaseEventViewModel<SellerOrderEvent, SellerOrderEffect>() {
 
     private val _state = MutableStateFlow(SellerOrderUiState())
@@ -39,7 +49,7 @@ class SellerOrderViewModel @Inject constructor(
                 update { copy(selectedFilter = event.value) }
 
             SellerOrderEvent.ToggleOnline ->
-                update { copy(isOnline = !isOnline) }
+                toggleOnline()
 
             is SellerOrderEvent.ClickOrder ->
                 emitEffect(SellerOrderEffect.NavigateToOrderDetail(event.orderId))
@@ -51,41 +61,78 @@ class SellerOrderViewModel @Inject constructor(
     }
 
     private fun load() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-
-            delay(1000) // simulate API
-
-            _state.update {
-                it.copy(
-                    isLoading = false,
-                    orders = dummyOrders()
-                )
-            }
-        }
+        observeProfile()
+        observeDataFlow(
+            flow = getSellerOrdersUseCase(),
+            onState = { result ->
+                _state.update {
+                    it.copy(
+                        isLoading = result is LoadState.Loading,
+                        orders = if (result is LoadState.Success) {
+                            result.data.map { sellerOrder ->
+                                sellerOrder.toOrderSummary()
+                            }
+                        } else {
+                            it.orders
+                        }
+                    )
+                }
+            },
+            onError = ::showError
+        )
     }
 
-    private fun dummyOrders(): List<OrderSummary> {
-        return listOf(
-            OrderSummary(
-                orderId = "1",
-                customerName = "John Doe",
-                total = "50000",
-                date = "2026-02-18",
-                time = "12:30",
-                paymentMethod = "Cash",
-                status = "ORDERED",
-                location = "Jakarta"
-            ),
-            OrderSummary(
-                orderId = "2",
-                customerName = "Jane Doe",
-                total = "75000",
-                date = "2026-02-18",
-                time = "13:00",
-                paymentMethod = "QRIS",
-                status = "PROCESS",
-                location = "Bandung"
+    private fun observeProfile() {
+        observeDataFlow(
+            flow = getSellerProfileUseCase(),
+            onState = { result ->
+                _state.update {
+                    val profile = (result as? LoadState.Success)?.data
+                    it.copy(isOnline = profile?.isOnline ?: it.isOnline)
+                }
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun toggleOnline() {
+        observeDataFlow(
+            flow = updateSellerAvailabilityUseCase(!_state.value.isOnline),
+            onState = { result ->
+                _state.update {
+                    val profile = (result as? LoadState.Success)?.data
+                    it.copy(
+                        isLoading = result is LoadState.Loading || it.isLoading,
+                        isOnline = profile?.isOnline ?: it.isOnline
+                    )
+                }
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun SellerOrderItem.toOrderSummary(): OrderSummary {
+        return OrderSummary(
+            orderId = id,
+            customerName = customer,
+            total = total,
+            date = date,
+            time = time,
+            paymentMethod = paymentMethod,
+            status = status,
+            location = location
+        )
+    }
+
+    private fun showError(error: UiError) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = ErrorMessages.GENERIC_ERROR,
+                    message = error.message
+                ),
+                onPrimary = { dismissDialog() }
             )
         )
     }

@@ -8,40 +8,48 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
+import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
+import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerChatDetailViewModel @Inject constructor(
-
+    savedStateHandle: SavedStateHandle,
+    private val getChatMessageUseCase: GetChatMessageUseCase,
+    private val sendChatMessageUseCase: CreateChatMessageSendUseCase,
+    private val chatMessageMarkAsReadUseCase: ChatMessageMarkAsReadUseCase,
 ) : BaseEventViewModel<SellerChatDetailEvent, SellerChatDetailEffect>() {
+
+    private val routeChatId: String = savedStateHandle.get<String>("chatId").orEmpty()
+    private var lastReadChatId: String? = null
 
     private val _state = MutableStateFlow(
         SellerChatDetailUiState(
-            messages = mockSellerChatMessages()
+            activeChatId = routeChatId
         )
     )
     val uiState = _state.asStateFlow()
 
     override fun onEvent(event: SellerChatDetailEvent) {
         when (event) {
-            is SellerChatDetailEvent.Load -> {}
+            is SellerChatDetailEvent.Load -> load()
             is SellerChatDetailEvent.DismissDialog -> dismissDialog()
 
             is SellerChatDetailEvent.ChangeMessage -> {
@@ -55,38 +63,71 @@ class SellerChatDetailViewModel @Inject constructor(
         }
     }
 
+    private fun load() {
+        observeChat()
+    }
+
+    private fun observeChat() {
+        observeDataFlow(
+            flow = getChatMessageUseCase(routeChatId.ifBlank { null }, asSeller = true),
+            onState = { state ->
+                var nextActiveChatId = _state.value.activeChatId
+                _state.update {
+                    val activeId = (state as? LoadState.Success)
+                        ?.data
+                        ?.firstOrNull()
+                        ?.id
+                        .orEmpty()
+                    val messages = (state as? LoadState.Success)
+                        ?.data
+                        ?.map { item ->
+                            SellerChatDetailMessage(
+                                message = item.lastMessage,
+                                isFromSeller = !item.isFromUser
+                            )
+                        }
+                        .orEmpty()
+
+                    it.copy(
+                        activeChatId = it.activeChatId.ifBlank { activeId },
+                        messages = if (messages.isNotEmpty()) messages else it.messages
+                    ).also { nextState ->
+                        nextActiveChatId = nextState.activeChatId
+                    }
+                }
+                markAsReadIfNeeded(nextActiveChatId)
+            },
+            onError = ::showError
+        )
+    }
+
     private fun sendMessage() {
         val message = _state.value.currentMessage
         if (message.isBlank()) return
+        val chatId = _state.value.activeChatId
+        if (chatId.isBlank()) return
 
-        val newMessage = SellerChatDetailMessage(
-            message = message,
-            isFromSeller = true
+        observeDataFlow(
+            flow = sendChatMessageUseCase(chatId, message, asSeller = true),
+            onSuccess = {
+                _state.update { it.copy(currentMessage = "") }
+                observeChat()
+            },
+            onError = ::showError
         )
-
-        _state.update {
-            it.copy(
-                messages = it.messages + newMessage,
-                currentMessage = ""
-            )
-        }
-
-        simulateCustomerReply()
     }
 
-    private fun simulateCustomerReply() {
-        viewModelScope.launch {
-            delay(1000)
+    private fun readAll(chatId: String) {
+        observeDataFlow(
+            flow = chatMessageMarkAsReadUseCase(chatId, asSeller = true),
+            onError = ::showError
+        )
+    }
 
-            _state.update {
-                it.copy(
-                    messages = it.messages + SellerChatDetailMessage(
-                        message = "Baik kak, terima kasih 🙏",
-                        isFromSeller = false
-                    )
-                )
-            }
-        }
+    private fun markAsReadIfNeeded(chatId: String) {
+        if (chatId.isBlank() || lastReadChatId == chatId) return
+        lastReadChatId = chatId
+        readAll(chatId)
     }
 
     private fun showError(error: UiError) {
@@ -102,11 +143,3 @@ class SellerChatDetailViewModel @Inject constructor(
         )
     }
 }
-
-fun mockSellerChatMessages(): List<SellerChatDetailMessage> = listOf(
-    SellerChatDetailMessage("Halo kak! Ada yang bisa kami bantu?", true),
-    SellerChatDetailMessage("Saya mau pesan nasi goreng.", false),
-    SellerChatDetailMessage("Siap kak, mau level pedasnya bagaimana?", true),
-    SellerChatDetailMessage("Sedang saja.", false),
-    SellerChatDetailMessage("Oke 😊 Pesanan akan segera dikirim.", true)
-)

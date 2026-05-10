@@ -53,6 +53,7 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailUiState
+import com.mtv.app.shopme.feature.seller.contract.SellerOrderLineItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +61,6 @@ fun SellerOrderDetailScreen(
     state: SellerOrderDetailUiState,
     event: (SellerOrderDetailEvent) -> Unit
 ) {
-
     Scaffold(
         containerColor = AppColor.White,
         bottomBar = {
@@ -73,26 +73,19 @@ fun SellerOrderDetailScreen(
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
             SellerOrderDetailHeader(
                 orderId = state.orderId,
                 status = state.currentStatus,
-                onBack = {
-                    event(SellerOrderDetailEvent.ClickBack)
-                }
+                onBack = { event(SellerOrderDetailEvent.ClickBack) }
             )
 
-            // 🔥 Loading (optional tapi bagus)
             if (state.isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
 
             LazyColumn(
@@ -103,22 +96,10 @@ fun SellerOrderDetailScreen(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
-
                 item { OrderTimeline(state.currentStatus) }
-
-                item { OrderItemSection() }
-
-                item {
-                    CustomerSection(
-                        customerName = state.customerName
-                    )
-                }
-
-                item {
-                    PaymentSection(
-                        total = state.total
-                    )
-                }
+                item { OrderItemSection(state.items) }
+                item { CustomerSection(state.customerName, state.customerAddress) }
+                item { PaymentSection(state.total, state.paymentMethod) }
             }
         }
     }
@@ -191,7 +172,6 @@ fun StatusChip(status: OrderStatus) {
 @Composable
 fun OrderTimeline(status: OrderStatus) {
     val steps = OrderStatus.entries
-
     Column {
         Text("Order Progress", fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFont)
         Spacer(Modifier.height(16.dp))
@@ -232,7 +212,11 @@ fun OrderTimeline(status: OrderStatus) {
                                 brush = Brush.horizontalGradient(
                                     colors = listOf(
                                         color,
-                                        if (steps[index + 1].ordinal <= status.ordinal) steps[index + 1].statusColor() else Color.LightGray
+                                        if (steps[index + 1].ordinal <= status.ordinal) {
+                                            steps[index + 1].statusColor()
+                                        } else {
+                                            Color.LightGray
+                                        }
                                     )
                                 ),
                                 shape = RoundedCornerShape(2.dp)
@@ -245,16 +229,16 @@ fun OrderTimeline(status: OrderStatus) {
 }
 
 @Composable
-fun OrderItemSection() {
+fun OrderItemSection(items: List<SellerOrderLineItem>) {
     Column {
         Text("Order Items", fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFont)
         Spacer(Modifier.height(12.dp))
-
-        repeat(2) {
+        items.forEach { item ->
             OrderItemRow(
-                title = "Double Beef Burger",
-                qty = 2,
-                price = "Rp 60.000"
+                title = item.title,
+                qty = item.qty,
+                price = item.price,
+                notes = item.notes
             )
             Spacer(Modifier.height(12.dp))
         }
@@ -266,9 +250,9 @@ fun OrderItemRow(
     title: String,
     qty: Int,
     price: String,
+    notes: String,
     imageUrl: String? = null
 ) {
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -291,8 +275,10 @@ fun OrderItemRow(
             Text(title, fontWeight = FontWeight.Medium, fontFamily = PoppinsFont)
             Spacer(Modifier.height(6.dp))
             Text("Qty: $qty", fontSize = 12.sp, color = Color.Gray)
-            Spacer(Modifier.height(6.dp))
-            Text("Notes: Extra spicy, no onion", fontSize = 12.sp, color = Color.Gray)
+            if (notes.isNotBlank()) {
+                Spacer(Modifier.height(6.dp))
+                Text("Notes: $notes", fontSize = 12.sp, color = Color.Gray)
+            }
         }
 
         Text(price, fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFont)
@@ -300,22 +286,22 @@ fun OrderItemRow(
 }
 
 @Composable
-fun CustomerSection(customerName: String) {
+fun CustomerSection(customerName: String, customerAddress: String) {
     Column {
         Text("Customer Info", fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFont)
         Spacer(Modifier.height(12.dp))
         InfoCard("Name", customerName)
         Spacer(Modifier.height(8.dp))
-        InfoCard("Address", "Puri Lestari Blok H12/01")
+        InfoCard("Address", customerAddress)
     }
 }
 
 @Composable
-fun PaymentSection(total: String) {
+fun PaymentSection(total: String, paymentMethod: String) {
     Column {
         Text("Payment Info", fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFont)
         Spacer(Modifier.height(12.dp))
-        InfoCard("Method", "Bank Transfer")
+        InfoCard("Method", paymentMethod)
         Spacer(Modifier.height(8.dp))
         InfoCard("Total Paid", total, highlight = true)
     }
@@ -365,15 +351,13 @@ fun UpdateStatusBottomBar(currentStatus: OrderStatus, onUpdate: (OrderStatus) ->
     }
 }
 
-fun OrderStatus.statusColor(): Color {
-    return when (this) {
-        OrderStatus.UNPAID -> Color(0xFFDC2626)
-        OrderStatus.ORDERED -> Color(0xFFFFA000)
-        OrderStatus.COOKING -> Color(0xFF1E88E5)
-        OrderStatus.DELIVERING -> Color(0xFF00897B)
-        OrderStatus.COMPLETED -> Color(0xFF2E7D32)
-        OrderStatus.CANCELLED -> Color(0xFF6B7280)
-    }
+fun OrderStatus.statusColor(): Color = when (this) {
+    OrderStatus.UNPAID -> Color(0xFFDC2626)
+    OrderStatus.ORDERED -> Color(0xFFFFA000)
+    OrderStatus.COOKING -> Color(0xFF1E88E5)
+    OrderStatus.DELIVERING -> Color(0xFF00897B)
+    OrderStatus.COMPLETED -> Color(0xFF2E7D32)
+    OrderStatus.CANCELLED -> Color(0xFF6B7280)
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
@@ -384,7 +368,11 @@ fun SellerOrderDetailPreview() {
             orderId = "INV-001",
             currentStatus = OrderStatus.COOKING,
             customerName = "Dedy Wijaya",
-            total = "Rp 120.000"
+            total = "Rp 120.000",
+            paymentMethod = "TRANSFER",
+            items = listOf(
+                SellerOrderLineItem("Iced Latte", 2, "Rp 60.000", "Less sugar")
+            )
         ),
         event = {}
     )

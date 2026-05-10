@@ -13,6 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.mtv.app.shopme.common.navbar.auth.AuthDestinations
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
+import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEffect
@@ -53,25 +56,34 @@ private fun handleEffect(
     effect: SellerStoreEffect
 ) {
     when (effect) {
+        SellerStoreEffect.NavigateBack ->
+            nav.popBackStack()
+
+        SellerStoreEffect.NavigateToOrders ->
+            nav.navigate(SellerDestinations.ORDER)
 
         SellerStoreEffect.NavigateToEditProfile ->
-            nav.navigate("seller_edit_profile")
+            nav.navigate(CustomerDestinations.EDIT_PROFILE_GRAPH)
 
         SellerStoreEffect.NavigateToStoreSettings ->
-            nav.navigate("seller_store_settings")
+            nav.navigate(SellerDestinations.SELLER_EDIT_STORE_GRAPH)
 
         SellerStoreEffect.NavigateToBankAccount ->
-            nav.navigate("seller_bank_account")
+            nav.navigate(SellerDestinations.SELLER_PAYMENT_METHOD_GRAPH)
 
         SellerStoreEffect.NavigateToChangePassword ->
-            nav.navigate("seller_change_password")
+            nav.navigate(AuthDestinations.PASSWORD_GRAPH)
 
         SellerStoreEffect.NavigateToHelpCenter ->
-            nav.navigate("seller_help_center")
+            nav.navigate(CustomerDestinations.HELP_GRAPH)
+
+        SellerStoreEffect.NavigateToCustomerHome ->
+            nav.navigate(CustomerDestinations.HOME_GRAPH) {
+                popUpTo(SellerDestinations.SELLER_GRAPH) { inclusive = true }
+            }
 
         SellerStoreEffect.LogoutSuccess -> {
-            // biasanya ke login screen
-            nav.navigate("login") {
+            nav.navigate(AuthDestinations.LOGIN_GRAPH) {
                 popUpTo(0) { inclusive = true }
             }
         }

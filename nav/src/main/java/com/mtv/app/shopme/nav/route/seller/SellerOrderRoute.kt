@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
+import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerOrderViewModel
@@ -54,6 +55,6 @@ private fun handleEffect(
 ) {
     when (effect) {
         is SellerOrderEffect.NavigateToOrderDetail ->
-            nav.navigate("seller_order_detail/${effect.orderId}")
+            nav.navigate(SellerDestinations.navigateToOrderDetail(effect.orderId))
     }
 }

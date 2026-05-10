@@ -55,10 +55,7 @@ private fun handleSellerChatListEffect(
     when (effect) {
         SellerChatListEffect.NavigateBack -> nav.popBackStack()
 
-        is SellerChatListEffect.NavigateToChat -> {
-            nav.navigate(SellerDestinations.SELLER_CHAT_DETAIL_GRAPH)
-            // next improvement:
-            // nav.navigate("seller_chat_detail/${effect.chatId}")
-        }
+        is SellerChatListEffect.NavigateToChat ->
+            nav.navigate(SellerDestinations.navigateToChatDetail(effect.chatId))
     }
 }

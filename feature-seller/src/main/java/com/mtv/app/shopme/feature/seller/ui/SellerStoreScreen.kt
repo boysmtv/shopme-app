@@ -54,15 +54,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.domain.model.ProfileMenuItem
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreUiState
@@ -78,7 +78,7 @@ fun SellerStoreScreen(
             title = "Order History",
             subtitle = "Order information",
             icon = Icons.AutoMirrored.Filled.ReceiptLong,
-            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
+            onClick = { event(SellerStoreEvent.ClickOrderHistory) }
         ),
         ProfileMenuItem(
             title = "Store Settings",
@@ -90,19 +90,19 @@ fun SellerStoreScreen(
             title = "Payment Methods",
             subtitle = "Manage payout account",
             icon = Icons.Default.AccountBalance,
-            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
+            onClick = { event(SellerStoreEvent.ClickBankAccount) }
         ),
         ProfileMenuItem(
             title = "Change Password",
             subtitle = "Update your password",
             icon = Icons.Default.Lock,
-            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
+            onClick = { event(SellerStoreEvent.ClickChangePassword) }
         ),
         ProfileMenuItem(
             title = "Back to Customer",
             subtitle = "Back to customer for buy something",
             icon = Icons.Default.Lock,
-            onClick = { event(SellerStoreEvent.ClickStoreSettings) }
+            onClick = { event(SellerStoreEvent.ClickBackToCustomer) }
         )
     )
 
@@ -300,15 +300,35 @@ fun SellerStoreHeader(
         ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val headerImage = state.storePhoto.ifBlank { state.sellerPhoto }
 
-                AsyncImage(
-                    model = "https://i.pravatar.cc/300",
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(90.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
+                if (headerImage.isNotBlank()) {
+                    SmartImage(
+                        model = headerImage,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(90.dp)
+                            .clip(CircleShape)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(90.dp)
+                            .clip(CircleShape)
+                            .background(AppColor.Blue.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = state.storeName.firstOrNull()?.uppercase() ?: state.sellerName.firstOrNull()
+                                ?.uppercase() ?: "S",
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = PoppinsFont,
+                            color = AppColor.Blue,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
 
                 Spacer(Modifier.width(16.dp))
 
