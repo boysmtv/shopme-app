@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.seller.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEvent
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class SellerChatListViewModel @Inject constructor(
     private val getChatListUseCase: GetChatListUseCase,
+    private val clearChatListUseCase: ClearChatListUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<SellerChatListEvent, SellerChatListEffect>() {
 
@@ -44,8 +46,8 @@ class SellerChatListViewModel @Inject constructor(
             is SellerChatListEvent.ClickChat ->
                 emitEffect(SellerChatListEffect.NavigateToChat(event.item.id))
 
-            is SellerChatListEvent.DeleteChat ->
-                deleteChat(event.item)
+            is SellerChatListEvent.ClickClearAll ->
+                clearChats()
 
             is SellerChatListEvent.ClickBack ->
                 emitEffect(SellerChatListEffect.NavigateBack)
@@ -57,37 +59,42 @@ class SellerChatListViewModel @Inject constructor(
             flow = getChatListUseCase(asSeller = true),
             onState = { state ->
                 _state.update {
-                    val chatItems = (state as? LoadState.Success)
-                        ?.data
-                        ?.chatList
-                        ?.map { item ->
-                            SellerChatListItem(
-                                id = item.id,
-                                name = item.name,
-                                lastMessage = item.lastMessage,
-                                time = item.time,
-                                unreadCount = item.unreadCount,
-                                avatarBase64 = item.avatarBase64
-                            )
-                        }
-                        .orEmpty()
+                    when (state) {
+                        is LoadState.Success -> it.copy(
+                            isLoading = false,
+                            chatList = state.data.chatList.map { item ->
+                                SellerChatListItem(
+                                    id = item.id,
+                                    name = item.name,
+                                    lastMessage = item.lastMessage,
+                                    time = item.time,
+                                    unreadCount = item.unreadCount,
+                                    avatarBase64 = item.avatarBase64
+                                )
+                            }
+                        )
 
-                    it.copy(
-                        isLoading = state is LoadState.Loading,
-                        chatList = if (chatItems.isNotEmpty()) chatItems else it.chatList
-                    )
+                        is LoadState.Loading -> it.copy(isLoading = true)
+                        else -> it.copy(isLoading = false)
+                    }
                 }
             },
             onError = ::showError
         )
     }
 
-    private fun deleteChat(item: SellerChatListItem) {
-        _state.update {
-            it.copy(
-                chatList = it.chatList.filter { chat -> chat.id != item.id }
-            )
-        }
+    private fun clearChats() {
+        observeIndependentDataFlow(
+            flow = clearChatListUseCase(asSeller = true),
+            onLoad = { _state.update { it.copy(isLoading = true) } },
+            onSuccess = {
+                _state.update { it.copy(isLoading = false, chatList = emptyList()) }
+            },
+            onError = { error ->
+                _state.update { it.copy(isLoading = false) }
+                showError(error)
+            }
+        )
     }
 
     private fun showError(error: UiError) {

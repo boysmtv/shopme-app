@@ -9,12 +9,15 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.ChatList
+import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatListEffect
 import com.mtv.app.shopme.feature.customer.contract.ChatListEffect.*
 import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -29,6 +32,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
     private val chatListUseCase: GetChatListUseCase,
+    private val clearChatListUseCase: ClearChatListUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<ChatListEvent, ChatListEffect>() {
 
@@ -38,6 +42,7 @@ class ChatListViewModel @Inject constructor(
     override fun onEvent(event: ChatListEvent) {
         when (event) {
             is ChatListEvent.Load -> observeChatList()
+            is ChatListEvent.ClickClearAll -> clearChats()
             is ChatListEvent.DismissDialog -> dismissDialog()
             is ChatListEvent.ClickItem -> emitEffect(NavigateToChat(event.id))
             is ChatListEvent.ClickBack -> emitEffect(NavigateBack)
@@ -48,12 +53,33 @@ class ChatListViewModel @Inject constructor(
         observeDataFlow(
             flow = chatListUseCase(),
             onLoad = ::showLoading,
+            onSuccess = { hideLoading() },
             onState = { state ->
                 _state.update {
                     it.copy(chatListState = state)
                 }
             },
-            onError = ::showError
+            onError = {
+                hideLoading()
+                showError(it)
+            }
+        )
+    }
+
+    private fun clearChats() {
+        observeIndependentDataFlow(
+            flow = clearChatListUseCase(),
+            onLoad = ::showLoading,
+            onSuccess = {
+                hideLoading()
+                _state.update {
+                    it.copy(chatListState = LoadState.Success(ChatList(emptyList())))
+                }
+            },
+            onError = { error ->
+                hideLoading()
+                showError(error)
+            }
         )
     }
 

@@ -18,7 +18,7 @@ sealed class SellerChatListEvent {
     object DismissDialog : SellerChatListEvent()
 
     data class ClickChat(val item: SellerChatListItem) : SellerChatListEvent()
-    data class DeleteChat(val item: SellerChatListItem) : SellerChatListEvent()
+    object ClickClearAll : SellerChatListEvent()
 
     object ClickBack : SellerChatListEvent()
 }

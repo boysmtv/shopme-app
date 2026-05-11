@@ -61,4 +61,12 @@ class ChatRemoteDataSource @Inject constructor(
                 query = mapOf("asSeller" to asSeller.toString())
             )
         ).requireData()
+
+    suspend fun clearAll(asSeller: Boolean = false) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Chat.Clear,
+            options = RequestOptions(
+                query = mapOf("asSeller" to asSeller.toString())
+            )
+        ).requireData()
 }

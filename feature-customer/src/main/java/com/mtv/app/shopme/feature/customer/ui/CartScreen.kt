@@ -90,7 +90,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun CartScreen(
     state: CartUiState,
-    event: (CartEvent) -> Unit
+    event: (CartEvent) -> Unit,
+    onNavigateToDetail: (String) -> Unit = {}
 ) {
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var showPinSheet by remember { mutableStateOf(false) }
@@ -235,7 +236,7 @@ fun CartScreen(
                             state = state,
                             event = event,
                             itemResponses = items,
-                            onNavigateToDetail = { },
+                            onNavigateToDetail = onNavigateToDetail,
                             onDeleteFoodByCafe = { event(CartEvent.ClearCartByCafe(it)) }
                         )
                     }

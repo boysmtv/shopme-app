@@ -12,7 +12,9 @@ import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.SplashRequest
+import com.mtv.app.shopme.data.remote.request.SupportChatMessageRequest
 import com.mtv.app.shopme.data.remote.response.SplashResponse
+import com.mtv.app.shopme.data.remote.response.SupportChatResponse
 import com.mtv.app.shopme.data.remote.response.SupportCenterResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.based.core.network.repository.NetworkRepository
@@ -31,5 +33,16 @@ class AppRemoteDataSource @Inject constructor(
     suspend fun getSupportCenter() =
         request<ApiResponse<SupportCenterResponse>>(
             endpoint = ApiEndPoint.Misc.Support
+        ).requireData()
+
+    suspend fun getSupportChat() =
+        request<ApiResponse<SupportChatResponse>>(
+            endpoint = ApiEndPoint.Misc.SupportChat
+        ).requireData()
+
+    suspend fun sendSupportChatMessage(message: String) =
+        request<ApiResponse<SupportChatResponse>>(
+            endpoint = ApiEndPoint.Misc.SendSupportChat,
+            body = SupportChatMessageRequest(message = message)
         ).requireData()
 }

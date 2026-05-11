@@ -124,7 +124,7 @@ fun ResetPasswordParam.toRequest() = ResetPasswordRequest(
 )
 
 fun VerifyPinParam.toRequest() = VerifyPinRequest(
-    token = token,
+    trxId = token,
     pin = pin
 )
 

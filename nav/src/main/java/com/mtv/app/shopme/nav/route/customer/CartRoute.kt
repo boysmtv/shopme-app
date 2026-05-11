@@ -41,7 +41,10 @@ fun CartRoute(nav: NavController) {
         ) {
             CartScreen(
                 state = uiState,
-                event = vm::onEvent
+                event = vm::onEvent,
+                onNavigateToDetail = { foodId ->
+                    CustomerNavActions.toDetail(nav, foodId)
+                }
             )
         }
     }

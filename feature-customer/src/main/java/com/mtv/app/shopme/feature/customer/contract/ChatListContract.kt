@@ -19,6 +19,7 @@ sealed class ChatListEvent {
     object Load : ChatListEvent()
     object DismissDialog : ChatListEvent()
     object ClickBack : ChatListEvent()
+    object ClickClearAll : ChatListEvent()
     data class ClickItem(val id: String) : ChatListEvent()
 }
 

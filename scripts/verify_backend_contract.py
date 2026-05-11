@@ -295,6 +295,7 @@ def verify_runtime(base_url: str) -> list[str]:
             },
         }),
         ("GET", "/api/support", None, {"token": buyer_token}),
+        ("GET", "/api/support/chat", None, {"token": buyer_token}),
         ("GET", "/api/customer", None, {"token": buyer_token}),
         ("GET", "/api/address", None, {"token": buyer_token}),
         ("GET", "/api/village", None, {"token": buyer_token}),
@@ -359,6 +360,31 @@ def verify_runtime(base_url: str) -> list[str]:
         failures.append("GET /api/support bootstrapMessages is empty")
     if not isinstance(support_data.get("sellerTerms"), list) or not support_data.get("sellerTerms"):
         failures.append("GET /api/support sellerTerms is empty")
+
+    support_chat_payload = captured_payloads.get("/api/support/chat", {})
+    support_chat_data = support_chat_payload.get("data", {})
+    if not isinstance(support_chat_data, dict):
+        failures.append("GET /api/support/chat missing data object")
+    elif not isinstance(support_chat_data.get("messages"), list) or not support_chat_data.get("messages"):
+        failures.append("GET /api/support/chat messages is empty")
+
+    support_chat_message = "android verifier support ping"
+    support_chat_send_status, support_chat_send_payload = request_json(
+        f"{base_url}/api/support/chat",
+        method="POST",
+        token=buyer_token,
+        body={"message": support_chat_message},
+    )
+    expect_status(failures, "POST /api/support/chat", support_chat_send_status, {200})
+    failures.extend(assert_envelope(support_chat_send_payload, "POST /api/support/chat"))
+    send_data = support_chat_send_payload.get("data", {})
+    if not isinstance(send_data, dict) or not isinstance(send_data.get("messages"), list):
+        failures.append("POST /api/support/chat missing messages list")
+    elif not any(
+        isinstance(item, dict) and item.get("message") == support_chat_message
+        for item in send_data["messages"]
+    ):
+        failures.append("POST /api/support/chat did not echo sent support message in conversation")
 
     foods_payload = captured_payloads.get("/api/foods", {})
     food_item = first_list_item(foods_payload)
@@ -616,6 +642,46 @@ def verify_runtime(base_url: str) -> list[str]:
         expect_status(failures, "POST /api/chat/read?asSeller=true", seller_mark_read_status, {200})
         failures.extend(assert_envelope(seller_mark_read_payload, "POST /api/chat/read?asSeller=true"))
 
+        buyer_clear_chat_status, buyer_clear_chat_payload = request_json(
+            f"{base_url}/api/chat",
+            method="DELETE",
+            token=buyer_token,
+        )
+        expect_status(failures, "DELETE /api/chat", buyer_clear_chat_status, {200})
+        failures.extend(assert_envelope(buyer_clear_chat_payload, "DELETE /api/chat"))
+
+        buyer_chat_list_empty_status, buyer_chat_list_empty_payload = request_json(
+            f"{base_url}/api/chat/list",
+            method="GET",
+            token=buyer_token,
+        )
+        expect_status(failures, "GET /api/chat/list after clear", buyer_chat_list_empty_status, {200})
+        failures.extend(assert_envelope(buyer_chat_list_empty_payload, "GET /api/chat/list after clear"))
+
+        buyer_chat_list_after_clear = buyer_chat_list_empty_payload.get("data", {}).get("chatList")
+        if buyer_chat_list_after_clear != []:
+            failures.append("DELETE /api/chat did not clear buyer chat list")
+
+        seller_chat_list_empty_status, seller_chat_list_empty_payload = request_json(
+            f"{base_url}/api/chat/list?asSeller=true",
+            method="GET",
+            token=seller_token,
+        )
+        expect_status(failures, "GET /api/chat/list?asSeller=true after clear", seller_chat_list_empty_status, {200})
+        failures.extend(assert_envelope(seller_chat_list_empty_payload, "GET /api/chat/list?asSeller=true after clear"))
+
+        seller_chat_list_after_clear = seller_chat_list_empty_payload.get("data", {}).get("chatList")
+        if seller_chat_list_after_clear != []:
+            failures.append("DELETE /api/chat did not clear seller chat list for shared conversation")
+
+        seller_clear_chat_status, seller_clear_chat_payload = request_json(
+            f"{base_url}/api/chat?asSeller=true",
+            method="DELETE",
+            token=seller_token,
+        )
+        expect_status(failures, "DELETE /api/chat?asSeller=true", seller_clear_chat_status, {200})
+        failures.extend(assert_envelope(seller_clear_chat_payload, "DELETE /api/chat?asSeller=true"))
+
     return failures
 
 
@@ -681,6 +747,9 @@ def verify_dtos(android_root: Path, backend_root: Path) -> list[str]:
         DtoPair("SupportFaqResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportCenterResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportCenterResponse.kt"),
         DtoPair("SupportBootstrapMessageResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportCenterResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportCenterResponse.kt"),
         DtoPair("SupportSellerTermResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportCenterResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportCenterResponse.kt"),
+        DtoPair("SupportChatMessageRequest", "data/src/main/java/com/mtv/app/shopme/data/remote/request/SupportChatMessageRequest.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/request/SupportChatMessageRequest.kt"),
+        DtoPair("SupportChatResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportChatResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportChatResponse.kt"),
+        DtoPair("SupportChatMessageResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportChatResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportChatResponse.kt"),
         DtoPair("AddressResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/AddressResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/AddressResponse.kt"),
         DtoPair("VillageResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/VillageResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/VillageResponse.kt"),
         DtoPair("AppConfigResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/AppConfigResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/AppConfigResponse.kt"),

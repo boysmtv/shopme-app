@@ -47,4 +47,9 @@ class ChatRepositoryImpl @Inject constructor(
                 asSeller = asSeller
             )
         }
+
+    override fun clearAllMessages(asSeller: Boolean) =
+        resultFlow.create {
+            remote.clearAll(asSeller)
+        }
 }
