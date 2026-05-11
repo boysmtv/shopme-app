@@ -8,6 +8,7 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.update
 class OrderViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase,
+    private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<OrderEvent, OrderEffect>() {
 
@@ -42,9 +44,22 @@ class OrderViewModel @Inject constructor(
             is OrderEvent.Reload -> loadOrders()
             is OrderEvent.ClickOrder -> emitEffect(OrderEffect.NavigateToDetail(event.orderId))
             is OrderEvent.ConfirmTransfer -> confirmTransfer(event.orderId)
-            is OrderEvent.ClickChat -> emitEffect(OrderEffect.NavigateToChat)
+            is OrderEvent.ClickChatList -> emitEffect(OrderEffect.NavigateToChatList)
+            is OrderEvent.ClickChat -> openChat(event.cafeId)
             is OrderEvent.ClickBack -> emitEffect(OrderEffect.NavigateBack)
         }
+    }
+
+    private fun openChat(cafeId: String) {
+        if (cafeId.isBlank()) return
+        observeDataFlow(
+            flow = ensureChatConversationUseCase(cafeId),
+            onSuccess = { emitEffect(OrderEffect.NavigateToChat(it)) },
+            onError = { error ->
+                _state.update { it.copy(isLoading = false) }
+                showError(error)
+            }
+        )
     }
 
     private fun loadOrders() {

@@ -9,10 +9,13 @@
 package com.mtv.app.shopme.nav.route.seller
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
 import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
@@ -25,9 +28,22 @@ import com.mtv.app.shopme.feature.seller.ui.SellerOrderScreen
 fun SellerOrderRoute(nav: NavController) {
 
     val vm: SellerOrderViewModel = hiltViewModel()
+    val currentBackStackEntry by nav.currentBackStackEntryAsState()
 
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+    val shouldRefresh by (currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("sellerOrderRefresh", false)
+        ?.collectAsStateWithLifecycle()
+        ?: mutableStateOf(false))
+
+    LaunchedEffect(shouldRefresh) {
+        if (shouldRefresh) {
+            currentBackStackEntry?.savedStateHandle?.set("sellerOrderRefresh", false)
+            vm.onEvent(SellerOrderEvent.Load)
+        }
+    }
 
     BaseRoute(
         viewModel = vm,

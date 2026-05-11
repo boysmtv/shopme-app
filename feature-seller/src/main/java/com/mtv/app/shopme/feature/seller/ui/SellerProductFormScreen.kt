@@ -135,7 +135,9 @@ fun SellerProductFormScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = {
+                        event(SellerProductFormEvent.ClickHelpCenter)
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Help,
                             contentDescription = null

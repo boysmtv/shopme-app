@@ -100,7 +100,7 @@ fun OrderScreen(
 
         ModernOrderTopBar(
             onBack = { event(OrderEvent.ClickBack) },
-            onChat = { event(OrderEvent.ClickChat) }
+            onChat = { event(OrderEvent.ClickChatList) }
         )
         Card(
             modifier = Modifier.fillMaxSize(),
@@ -131,7 +131,7 @@ fun OrderScreen(
                                     event(OrderEvent.ConfirmTransfer(orderId))
                                 },
                                 onChatClick = {
-                                    event(OrderEvent.ClickChat)
+                                    event(OrderEvent.ClickChat(order.cafeId))
                                 }
                             )
                         }

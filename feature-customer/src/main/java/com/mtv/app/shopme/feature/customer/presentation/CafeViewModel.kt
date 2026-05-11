@@ -10,6 +10,7 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
 import com.mtv.app.shopme.feature.customer.contract.CafeEffect
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class CafeViewModel @Inject constructor(
+    private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
     private val getCafeUseCase: GetCafeUseCase,
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase,
     private val sessionManager: SessionManager,
@@ -46,9 +48,38 @@ class CafeViewModel @Inject constructor(
             is CafeEvent.DismissDialog -> dismissDialog()
             is CafeEvent.ClickFood -> emitEffect(CafeEffect.NavigateToDetail(event.id))
             is CafeEvent.ClickBack -> emitEffect(CafeEffect.NavigateBack)
-            is CafeEvent.ClickChat -> emitEffect(CafeEffect.NavigateToChat)
-            is CafeEvent.ClickWhatsapp -> emitEffect(CafeEffect.NavigateToWhatsapp)
+            is CafeEvent.ClickChat -> openChat()
+            is CafeEvent.ClickWhatsapp -> openWhatsapp()
+            is CafeEvent.ClickSearch -> emitEffect(CafeEffect.NavigateToSearch)
         }
+    }
+
+    private fun openChat() {
+        observeDataFlow(
+            flow = ensureChatConversationUseCase(cafeId),
+            onError = { showError(it) },
+            onSuccess = { emitEffect(CafeEffect.NavigateToChat(it)) }
+        )
+    }
+
+    private fun openWhatsapp() {
+        val cafePhone = (_state.value.cafe as? com.mtv.based.core.network.utils.LoadState.Success)
+            ?.data
+            ?.phone
+            .orEmpty()
+            .trim()
+
+        if (cafePhone.isBlank()) {
+            showError(UiError.Validation(message = "Nomor WhatsApp cafe belum tersedia"))
+            return
+        }
+
+        val normalizedPhone = cafePhone
+            .replace(" ", "")
+            .replace("-", "")
+            .removePrefix("+")
+
+        emitEffect(CafeEffect.OpenWhatsapp(normalizedPhone))
     }
 
     private fun load() {

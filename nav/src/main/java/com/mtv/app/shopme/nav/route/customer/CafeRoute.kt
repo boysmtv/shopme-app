@@ -8,8 +8,12 @@
 
 package com.mtv.app.shopme.nav.route.customer
 
+import android.content.Context
+import android.content.Intent
+import androidx.core.net.toUri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -28,11 +32,12 @@ fun CafeRoute(nav: NavController) {
 
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     BaseRoute(
         viewModel = vm,
         onLoad = CafeEvent.Load,
-        onEffect = { handleCafeEffect(nav, it) },
+        onEffect = { handleCafeEffect(nav, context, it) },
         onEvent = vm::onEvent,
         content = {
             BaseScreen(
@@ -50,12 +55,17 @@ fun CafeRoute(nav: NavController) {
 
 private fun handleCafeEffect(
     nav: NavController,
+    context: Context,
     effect: CafeEffect
 ) {
     when (effect) {
         is CafeEffect.NavigateBack -> nav.popBackStack()
-        is CafeEffect.NavigateToChat -> CustomerNavActions.toChat(nav)
-        is CafeEffect.NavigateToWhatsapp -> CustomerNavActions.toChat(nav)
+        is CafeEffect.NavigateToChat -> CustomerNavActions.toChat(nav, effect.chatId)
+        is CafeEffect.NavigateToSearch -> CustomerNavActions.toSearch(nav)
+        is CafeEffect.OpenWhatsapp -> {
+            val uri = "https://wa.me/${effect.phone}".toUri()
+            context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+        }
         is CafeEffect.NavigateToDetail -> CustomerNavActions.toDetail(nav, effect.id)
     }
 }

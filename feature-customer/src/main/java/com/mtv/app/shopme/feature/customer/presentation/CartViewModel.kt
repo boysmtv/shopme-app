@@ -116,7 +116,7 @@ class CartViewModel @Inject constructor(
             },
             onError = {
                 _state.update { error -> error.copy(verifyPin = LoadState.Error(it)) }
-                showError(it)
+                showError(it, allowBusinessUnauthorized = true)
             }
         )
     }
@@ -206,11 +206,20 @@ class CartViewModel @Inject constructor(
         )
     }
 
-    private fun showError(error: UiError) {
+    private fun showError(
+        error: UiError,
+        allowBusinessUnauthorized: Boolean = false
+    ) {
         handleSessionError(
             error = error,
             sessionManager = sessionManager,
-            beforeLogout = { hideLoading() }
+            beforeLogout = { hideLoading() },
+            shouldForceLogout = { currentError ->
+                currentError is UiError.Unauthorized && (
+                    !allowBusinessUnauthorized ||
+                        !currentError.message.contains("pin", ignoreCase = true)
+                    )
+            }
         ) {
             setDialog(
                 UiDialog.Center(

@@ -139,4 +139,22 @@ class SellerProductFormViewModelTest {
         assertEquals(listOf("data:image/jpeg;base64,abc123"), requestSlot.captured.images)
         assertEquals(SellerProductFormEffect.SaveSuccess, effect.await())
     }
+
+    @Test
+    fun `help center event should emit navigation effect`() = runTest {
+        val vm = SellerProductFormViewModel(
+            sessionManager = sessionManager,
+            getSellerProfileUseCase = getSellerProfileUseCase,
+            getFoodDetailUseCase = getFoodDetailUseCase,
+            createFoodUseCase = createFoodUseCase,
+            updateFoodUseCase = updateFoodUseCase,
+            deleteFoodUseCase = deleteFoodUseCase,
+            savedStateHandle = SavedStateHandle()
+        )
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(SellerProductFormEvent.ClickHelpCenter)
+
+        assertEquals(SellerProductFormEffect.NavigateToHelpCenter, effect.await())
+    }
 }

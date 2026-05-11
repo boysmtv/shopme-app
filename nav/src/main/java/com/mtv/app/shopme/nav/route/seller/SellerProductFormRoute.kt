@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEffect
@@ -61,5 +62,8 @@ private fun handleEffect(
 
         SellerProductFormEffect.DeleteSuccess ->
             nav.popBackStack()
+
+        SellerProductFormEffect.NavigateToHelpCenter ->
+            nav.navigate(CustomerDestinations.HELP_GRAPH)
     }
 }

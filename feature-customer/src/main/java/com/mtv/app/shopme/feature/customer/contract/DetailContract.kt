@@ -39,7 +39,7 @@ sealed class DetailEvent {
 sealed class DetailEffect {
     object NavigateBack : DetailEffect()
     object NavigateToCart : DetailEffect()
-    object NavigateToChat : DetailEffect()
+    data class NavigateToChat(val chatId: String) : DetailEffect()
     data class NavigateToCafe(val cafeId: String) : DetailEffect()
     data class NavigateToDetail(val foodId: String) : DetailEffect()
 }

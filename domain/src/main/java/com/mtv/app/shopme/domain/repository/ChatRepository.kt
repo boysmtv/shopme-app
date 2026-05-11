@@ -18,6 +18,8 @@ interface ChatRepository {
 
     fun getChats(chatId: String? = null, asSeller: Boolean = false): Flow<Resource<List<ChatListItem>>>
 
+    fun ensureConversation(cafeId: String): Flow<Resource<String>>
+
     fun sendMessage(id: String, message: String, asSeller: Boolean = false): Flow<Resource<Unit>>
 
     fun readAllMessage(id: String, asSeller: Boolean = false): Flow<Resource<Unit>>

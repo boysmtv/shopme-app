@@ -56,7 +56,11 @@ private fun handleEffect(
         SellerOrderDetailEffect.NavigateBack ->
             nav.popBackStack()
 
-        SellerOrderDetailEffect.UpdateSuccess ->
+        SellerOrderDetailEffect.UpdateSuccess -> {
+            nav.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("sellerOrderRefresh", true)
             nav.popBackStack()
+        }
     }
 }

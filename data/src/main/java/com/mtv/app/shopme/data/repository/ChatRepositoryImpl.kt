@@ -32,6 +32,11 @@ class ChatRepositoryImpl @Inject constructor(
             remote.getChats(chatId, asSeller).toDomain()
         }
 
+    override fun ensureConversation(cafeId: String) =
+        resultFlow.create {
+            remote.ensureConversation(cafeId).id
+        }
+
     override fun sendMessage(id: String, message: String, asSeller: Boolean) =
         resultFlow.create {
             remote.sendMessage(

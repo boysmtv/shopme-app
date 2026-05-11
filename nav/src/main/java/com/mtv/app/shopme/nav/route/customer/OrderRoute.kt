@@ -21,6 +21,7 @@ import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
 import com.mtv.app.shopme.feature.customer.ui.OrderScreen
+import com.mtv.app.shopme.nav.customer.CustomerNavActions
 
 @Composable
 fun OrderRoute(nav: NavController) {
@@ -56,7 +57,7 @@ private fun handleOrderEffect(
     when (effect) {
         OrderEffect.NavigateBack -> nav.popBackStack()
 
-        OrderEffect.NavigateToChat -> {
+        OrderEffect.NavigateToChatList -> {
             nav.navigate(CustomerBottomNavItem.Chat.route) {
                 launchSingleTop = true
                 restoreState = true
@@ -65,6 +66,10 @@ private fun handleOrderEffect(
                     saveState = true
                 }
             }
+        }
+
+        is OrderEffect.NavigateToChat -> {
+            CustomerNavActions.toChat(nav, effect.chatId)
         }
 
         is OrderEffect.NavigateToDetail -> {

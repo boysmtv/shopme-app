@@ -3,6 +3,7 @@ package com.mtv.app.shopme.feature.customer.presentation
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrderDetailUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEvent
@@ -25,6 +26,7 @@ class OrderDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getOrderDetailUseCase: GetOrderDetailUseCase,
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase,
+    private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<OrderDetailEvent, OrderDetailEffect>() {
 
@@ -37,9 +39,19 @@ class OrderDetailViewModel @Inject constructor(
             OrderDetailEvent.Load -> load()
             OrderDetailEvent.DismissDialog -> dismissDialog()
             OrderDetailEvent.ClickBack -> emitEffect(OrderDetailEffect.NavigateBack)
-            OrderDetailEvent.ClickChat -> emitEffect(OrderDetailEffect.NavigateToChat)
+            OrderDetailEvent.ClickChat -> openChat()
             OrderDetailEvent.ConfirmTransfer -> confirmTransfer()
         }
+    }
+
+    private fun openChat() {
+        val cafeId = _state.value.order?.cafeId.orEmpty()
+        if (cafeId.isBlank()) return
+        observeDataFlow(
+            flow = ensureChatConversationUseCase(cafeId),
+            onSuccess = { emitEffect(OrderDetailEffect.NavigateToChat(it)) },
+            onError = { showError(it) }
+        )
     }
 
     private fun load() {

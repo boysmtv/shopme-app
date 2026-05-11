@@ -13,6 +13,7 @@ import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.ChatMessageMarkAsReadRequest
 import com.mtv.app.shopme.data.remote.request.ChatMessageSendRequest
+import com.mtv.app.shopme.data.remote.response.ChatConversationResponse
 import com.mtv.app.shopme.data.remote.response.ChatResponse
 import com.mtv.app.shopme.data.remote.response.ChatListResponse
 import com.mtv.app.shopme.data.utils.requireData
@@ -50,6 +51,14 @@ class ChatRemoteDataSource @Inject constructor(
             body = body,
             options = RequestOptions(
                 query = mapOf("asSeller" to asSeller.toString())
+            )
+        ).requireData()
+
+    suspend fun ensureConversation(cafeId: String) =
+        request<ApiResponse<ChatConversationResponse>>(
+            endpoint = ApiEndPoint.Chat.EnsureConversation,
+            options = RequestOptions(
+                query = mapOf("cafeId" to cafeId)
             )
         ).requireData()
 

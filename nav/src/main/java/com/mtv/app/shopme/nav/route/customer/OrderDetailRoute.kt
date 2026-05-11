@@ -7,11 +7,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavItem
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderDetailViewModel
 import com.mtv.app.shopme.feature.customer.ui.OrderDetailScreen
+import com.mtv.app.shopme.nav.customer.CustomerNavActions
 
 @Composable
 fun OrderDetailRoute(nav: NavController) {
@@ -44,11 +44,6 @@ private fun handleOrderDetailEffect(
 ) {
     when (effect) {
         OrderDetailEffect.NavigateBack -> nav.popBackStack()
-        OrderDetailEffect.NavigateToChat -> {
-            nav.navigate(CustomerBottomNavItem.Chat.route) {
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
+        is OrderDetailEffect.NavigateToChat -> CustomerNavActions.toChat(nav, effect.chatId)
     }
 }
