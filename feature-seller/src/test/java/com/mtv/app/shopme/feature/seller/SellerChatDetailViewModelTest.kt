@@ -93,4 +93,59 @@ class SellerChatDetailViewModelTest {
         assertTrue(vm.uiState.value.messages.first().isFromSeller)
         verify(exactly = 1) { realtimeGateway.ensureConnected() }
     }
+
+    @Test
+    fun `load should fall back to first valid seller conversation when route id is stale`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
+        every { getChatListUseCase.invoke(true) } returns flowOf(
+            Resource.Success(
+                ChatList(
+                    listOf(
+                        ChatListItem(
+                            id = "conv-valid",
+                            name = "Raka Pratama",
+                            lastMessage = "Halo seller",
+                            time = "10:31",
+                            unreadCount = 1,
+                            avatarBase64 = null,
+                            isFromUser = true
+                        )
+                    )
+                )
+            )
+        )
+        every { getChatMessageUseCase.invoke("conv-valid", true) } returns flowOf(
+            Resource.Success(
+                listOf(
+                    ChatListItem(
+                        id = "conv-valid",
+                        name = "",
+                        lastMessage = "Halo seller",
+                        time = "",
+                        unreadCount = 0,
+                        avatarBase64 = null,
+                        isFromUser = true
+                    )
+                )
+            )
+        )
+        every { markReadUseCase.invoke("conv-valid", true) } returns flowOf(Resource.Success(Unit))
+
+        val vm = SellerChatDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("chatId" to "stale-id")),
+            getChatListUseCase = getChatListUseCase,
+            getChatMessageUseCase = getChatMessageUseCase,
+            sendChatMessageUseCase = sendUseCase,
+            chatMessageMarkAsReadUseCase = markReadUseCase,
+            realtimeGateway = realtimeGateway,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(SellerChatDetailEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals("conv-valid", vm.uiState.value.activeChatId)
+        verify(exactly = 1) { getChatMessageUseCase.invoke("conv-valid", true) }
+        verify(exactly = 1) { markReadUseCase.invoke("conv-valid", true) }
+    }
 }

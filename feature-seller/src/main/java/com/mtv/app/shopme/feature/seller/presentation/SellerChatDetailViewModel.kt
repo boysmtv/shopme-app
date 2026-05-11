@@ -64,7 +64,6 @@ class SellerChatDetailViewModel @Inject constructor(
                     ShopmeRealtimeEventType.CHAT_MESSAGE,
                     ShopmeRealtimeEventType.CHAT_READ -> {
                         observeChatMetadata()
-                        observeChat()
                     }
 
                     else -> Unit
@@ -92,7 +91,6 @@ class SellerChatDetailViewModel @Inject constructor(
     private fun load() {
         realtimeGateway.ensureConnected()
         observeChatMetadata()
-        observeChat()
     }
 
     private fun observeChatMetadata() {
@@ -104,23 +102,28 @@ class SellerChatDetailViewModel @Inject constructor(
                     ?.chatList
                     .orEmpty()
                 _state.update {
-                    val resolvedActiveId = it.activeChatId.ifBlank { items.firstOrNull()?.id.orEmpty() }
+                    val resolvedActiveId = when {
+                        it.activeChatId.isBlank() -> items.firstOrNull()?.id.orEmpty()
+                        items.any { item -> item.id == it.activeChatId } -> it.activeChatId
+                        else -> items.firstOrNull()?.id.orEmpty()
+                    }
                     val activeChat = items.firstOrNull { item -> item.id == resolvedActiveId }
                         ?: items.firstOrNull()
                     it.copy(
-                        activeChatId = resolvedActiveId,
+                        activeChatId = activeChat?.id.orEmpty(),
                         chatName = activeChat?.name.orEmpty(),
                         chatAvatarBase64 = activeChat?.avatarBase64
                     )
                 }
+                observeChat(_state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null })
             },
             onError = ::showError
         )
     }
 
-    private fun observeChat() {
+    private fun observeChat(chatId: String? = _state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null }) {
         observeDataFlow(
-            flow = getChatMessageUseCase(routeChatId.ifBlank { null }, asSeller = true),
+            flow = getChatMessageUseCase(chatId, asSeller = true),
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {

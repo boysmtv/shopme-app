@@ -16,9 +16,9 @@ import kotlinx.serialization.Serializable
 data class CartItemResponse(
     val id: String,
     val name: String,
-    val image: String,
+    val image: String?,
     val quantity: Int,
-    val notes: String,
+    val notes: String?,
     val cafeId: String,
     val cafeName: String,
     val foodId: String,
@@ -27,5 +27,5 @@ data class CartItemResponse(
     @Serializable(with = BigDecimalSerializer::class)
     val price: BigDecimal,
 
-    val variants: List<CartItemVariantResponse> = emptyList()
+    val variants: List<CartItemVariantResponse>? = null
 )
