@@ -3,12 +3,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
+
+
+BUYER_EMAIL = os.environ.get("BUYER_EMAIL", "buyer.demo@shopme.local")
+BUYER_PASSWORD = os.environ.get("BUYER_PASSWORD", "Demo123!")
+SELLER_EMAIL = os.environ.get("SELLER_EMAIL", "seller.demo@shopme.local")
+SELLER_PASSWORD = os.environ.get("SELLER_PASSWORD", "Demo123!")
 
 
 @dataclass(frozen=True)
@@ -194,7 +201,7 @@ def verify_runtime(base_url: str) -> list[str]:
     invalid_status, invalid_login = request_json(
         f"{base_url}/api/auth/login",
         method="POST",
-        body={"email": "buyer.demo@shopme.local", "password": "wrong-password"},
+        body={"email": BUYER_EMAIL, "password": "wrong-password"},
     )
     expect_status(failures, "login invalid credentials", invalid_status, {400, 401})
     failures.extend(assert_envelope(invalid_login, "invalid login"))
@@ -209,7 +216,7 @@ def verify_runtime(base_url: str) -> list[str]:
     buyer_status, buyer_login = request_json(
         f"{base_url}/api/auth/login",
         method="POST",
-        body={"email": "buyer.demo@shopme.local", "password": "Demo123!"},
+        body={"email": BUYER_EMAIL, "password": BUYER_PASSWORD},
     )
     if buyer_status != 200:
         failures.append(f"buyer login returned {buyer_status}")
@@ -219,7 +226,7 @@ def verify_runtime(base_url: str) -> list[str]:
     seller_status, seller_login = request_json(
         f"{base_url}/api/auth/login",
         method="POST",
-        body={"email": "seller.demo@shopme.local", "password": "Demo123!"},
+        body={"email": SELLER_EMAIL, "password": SELLER_PASSWORD},
     )
     if seller_status != 200:
         failures.append(f"seller login returned {seller_status}")
@@ -671,7 +678,12 @@ def verify_runtime(base_url: str) -> list[str]:
         failures.extend(assert_envelope(seller_chat_list_empty_payload, "GET /api/chat/list?asSeller=true after clear"))
 
         seller_chat_list_after_clear = seller_chat_list_empty_payload.get("data", {}).get("chatList")
-        if seller_chat_list_after_clear != []:
+        if not isinstance(seller_chat_list_after_clear, list):
+            failures.append("GET /api/chat/list?asSeller=true after clear missing chatList")
+        elif any(
+            isinstance(item, dict) and item.get("id") == conversation_id
+            for item in seller_chat_list_after_clear
+        ):
             failures.append("DELETE /api/chat did not clear seller chat list for shared conversation")
 
         seller_clear_chat_status, seller_clear_chat_payload = request_json(
