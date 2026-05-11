@@ -19,6 +19,7 @@ object ApiEndPoint {
     private const val ORDER = "order"
     private const val SELLER = "seller"
     private const val NOTIFICATIONS = "notifications"
+    private const val SUPPORT = "support"
 
     object Auth {
 
@@ -169,5 +170,8 @@ object ApiEndPoint {
     }
 
     object Village { object Get : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Get; override val type = EndpointType.Json } }
-    object Misc { object Splash : IApiEndPoint { override val path = "$API/splash"; override val method = HttpMethod.Post; override val type = EndpointType.Json } }
+    object Misc {
+        object Splash : IApiEndPoint { override val path = "$API/splash"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
+        object Support : IApiEndPoint { override val path = "$API/$SUPPORT"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+    }
 }

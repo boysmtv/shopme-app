@@ -36,4 +36,9 @@ class AppRepositoryImpl @Inject constructor(
             ).toDomain()
         }
 
+    override fun getSupportCenter() =
+        resultFlow.create {
+            remote.getSupportCenter().toDomain()
+        }
+
 }

@@ -61,6 +61,10 @@ import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardUiState
+import java.text.NumberFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.math.max
 
 @Composable
@@ -97,6 +101,9 @@ fun SellerDashboardScreen(
         ) {
             item {
                 DashboardHeader(
+                    storeName = state.storeName,
+                    storeAddress = state.storeAddress,
+                    notificationCount = state.notificationCount,
                     isOnline = isOnline,
                     onToggle = { event(SellerDashboardEvent.ToggleOnline) },
                     onNotifClick = { event(SellerDashboardEvent.ClickNotif) }
@@ -105,11 +112,11 @@ fun SellerDashboardScreen(
 
             item { Spacer(Modifier.height(20.dp)) }
 
-            item { WeeklySummaryCard() }
+            item { WeeklySummaryCard(orders) }
 
             item { Spacer(Modifier.height(24.dp)) }
 
-            item { WeeklyOrdersChart() }
+            item { WeeklyOrdersChart(orders) }
 
             item { Spacer(Modifier.height(20.dp)) }
 
@@ -251,6 +258,9 @@ fun ModernOrderItemCompact(
 
 @Composable
 fun DashboardHeader(
+    storeName: String,
+    storeAddress: String,
+    notificationCount: Int,
     isOnline: Boolean,
     onToggle: () -> Unit,
     onNotifClick: () -> Unit
@@ -271,7 +281,7 @@ fun DashboardHeader(
             ) {
                 Column {
                     Text(
-                        text = "Joe's Burger Cafe",
+                        text = storeName.ifBlank { "Seller Store" },
                         color = AppColor.White,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold
@@ -279,7 +289,7 @@ fun DashboardHeader(
                     Spacer(Modifier.height(8.dp))
 
                     Text(
-                        text = "Puri Lestari - Blok H12/12",
+                        text = storeAddress.ifBlank { "-" },
                         color = AppColor.White,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
@@ -304,7 +314,7 @@ fun DashboardHeader(
 
                 Spacer(Modifier.weight(1f))
                 NotificationBadge(
-                    count = 3,
+                    count = notificationCount,
                     onNotifClick = { onNotifClick() }
                 )
             }
@@ -354,7 +364,11 @@ fun NotificationBadge(
 }
 
 @Composable
-fun WeeklySummaryCard() {
+fun WeeklySummaryCard(orders: List<SellerOrderItem>) {
+    val totalOrders = orders.size
+    val totalRevenue = orders.sumOf { parseCurrencyAmount(it.total) }
+    val completedOrders = orders.count { it.status.equals("COMPLETED", ignoreCase = true) }
+
     Card(
         shape = RoundedCornerShape(20.dp),
         modifier = Modifier
@@ -373,9 +387,9 @@ fun WeeklySummaryCard() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                SummaryItem("Orders", "86")
-                SummaryItem("Revenue", "Rp 8.2M")
-                SummaryItem("Rating", "4.8")
+                SummaryItem("Orders", totalOrders.toString())
+                SummaryItem("Revenue", formatRupiah(totalRevenue))
+                SummaryItem("Completed", completedOrders.toString())
             }
         }
     }
@@ -390,10 +404,11 @@ fun SummaryItem(label: String, value: String) {
 }
 
 @Composable
-fun WeeklyOrdersChart() {
-    val data = listOf(12f, 25f, 18f, 30f, 22f, 35f, 28f)
+fun WeeklyOrdersChart(orders: List<SellerOrderItem>) {
+    val weeklyCounts = buildWeeklyOrderCounts(orders)
+    val data = weeklyCounts.map { it.second.toFloat() }
     val maxValue = max(data.max(), 1f)
-    val days = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val days = weeklyCounts.map { it.first }
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -471,6 +486,30 @@ fun WeeklyOrdersChart() {
                 }
             }
         }
+    }
+}
+
+private fun parseCurrencyAmount(total: String): Long =
+    total.replace(Regex("[^0-9]"), "").toLongOrNull() ?: 0L
+
+private fun formatRupiah(amount: Long): String =
+    "Rp ${NumberFormat.getNumberInstance(Locale.US).format(amount)}"
+
+private fun buildWeeklyOrderCounts(orders: List<SellerOrderItem>): List<Pair<String, Int>> {
+    val formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH)
+    val today = LocalDate.now()
+    val dates = (6 downTo 0).map { today.minusDays(it.toLong()) }
+    val counts = dates.associateWith { 0 }.toMutableMap()
+
+    orders.forEach { order ->
+        val parsedDate = runCatching { LocalDate.parse(order.date, formatter) }.getOrNull() ?: return@forEach
+        if (parsedDate in counts.keys) {
+            counts[parsedDate] = (counts[parsedDate] ?: 0) + 1
+        }
+    }
+
+    return dates.map { date ->
+        date.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() } to (counts[date] ?: 0)
     }
 }
 

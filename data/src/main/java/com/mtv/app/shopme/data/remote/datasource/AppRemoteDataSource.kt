@@ -13,6 +13,7 @@ import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.SplashRequest
 import com.mtv.app.shopme.data.remote.response.SplashResponse
+import com.mtv.app.shopme.data.remote.response.SupportCenterResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
@@ -25,5 +26,10 @@ class AppRemoteDataSource @Inject constructor(
         request<ApiResponse<SplashResponse>>(
             endpoint = ApiEndPoint.Misc.Splash,
             body = param
+        ).requireData()
+
+    suspend fun getSupportCenter() =
+        request<ApiResponse<SupportCenterResponse>>(
+            endpoint = ApiEndPoint.Misc.Support
         ).requireData()
 }

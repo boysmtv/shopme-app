@@ -17,6 +17,9 @@ data class SellerDashboardUiState(
 
     val orders: List<SellerOrderItem> = emptyList(),
 
+    val storeName: String = "",
+    val storeAddress: String = "",
+    val notificationCount: Int = 0,
     val isOnline: Boolean = true,
     val selectedFilter: String = "All",
     val selectedSort: String = "Asc"

@@ -71,7 +71,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun observeCustomer() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = customerUseCase(),
             onState = { state ->
                 _state.update { it.copy(customer = state) }
@@ -81,7 +81,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun observeAddress() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = addressUseCase(),
             onState = { state ->
                 _state.update { it.copy(addresses = state) }
@@ -91,7 +91,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun observeVillage() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = villageUseCase(),
             onState = { state ->
                 _state.update { it.copy(villages = state) }

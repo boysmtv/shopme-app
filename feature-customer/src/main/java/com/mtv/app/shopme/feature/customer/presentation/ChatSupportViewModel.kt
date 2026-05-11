@@ -11,12 +11,15 @@ package com.mtv.app.shopme.feature.customer.presentation
 import android.content.Intent
 import androidx.core.net.toUri
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.SupportCenter
+import com.mtv.app.shopme.domain.usecase.GetSupportCenterUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportEffect
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportUiState
 import com.mtv.app.shopme.feature.customer.contract.SupportMessage
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -30,26 +33,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class ChatSupportViewModel @Inject constructor() :
+class ChatSupportViewModel @Inject constructor(
+    private val getSupportCenterUseCase: GetSupportCenterUseCase,
+    private val sessionManager: SessionManager
+) :
     BaseEventViewModel<ChatSupportEvent, ChatSupportEffect>() {
 
-    private val _state = MutableStateFlow(
-        ChatSupportUiState(
-            messages = listOf(
-                SupportMessage(
-                    id = "1",
-                    message = "Halo 👋 Ada yang bisa kami bantu?",
-                    isFromUser = false,
-                    timestamp = "10:00"
-                )
-            )
-        )
-    )
+    private val _state = MutableStateFlow(ChatSupportUiState())
     val uiState = _state.asStateFlow()
 
     override fun onEvent(event: ChatSupportEvent) {
         when (event) {
-            is ChatSupportEvent.Load -> {}
+            is ChatSupportEvent.Load -> load()
             is ChatSupportEvent.DismissDialog -> dismissDialog()
 
             is ChatSupportEvent.OnMessageChange -> onMessageChange(event.value)
@@ -57,6 +52,21 @@ class ChatSupportViewModel @Inject constructor() :
 
             is ChatSupportEvent.ClickBack -> emitEffect(ChatSupportEffect.NavigateBack)
         }
+    }
+
+    private fun load() {
+        observeDataFlow(
+            flow = getSupportCenterUseCase(),
+            onState = { state ->
+                _state.update { current ->
+                    when (state) {
+                        is LoadState.Success -> state.data.toUiState()
+                        else -> current.copy(isLoading = state is LoadState.Loading)
+                    }
+                }
+            },
+            onError = ::showError
+        )
     }
 
     private fun onMessageChange(value: String) {
@@ -67,7 +77,8 @@ class ChatSupportViewModel @Inject constructor() :
 
     private fun sendMessage() {
         val message = _state.value.currentMessage
-        if (message.isBlank()) return
+        val whatsapp = _state.value.whatsapp
+        if (message.isBlank() || whatsapp.isBlank()) return
 
         val newMessage = SupportMessage(
             id = System.currentTimeMillis().toString(),
@@ -76,7 +87,7 @@ class ChatSupportViewModel @Inject constructor() :
             timestamp = "Now"
         )
         val encodedMessage = URLEncoder.encode(message, StandardCharsets.UTF_8.toString())
-        val uri = "https://wa.me/6281234567890?text=$encodedMessage".toUri()
+        val uri = "https://wa.me/$whatsapp?text=$encodedMessage".toUri()
 
         _state.update {
             it.copy(
@@ -94,16 +105,40 @@ class ChatSupportViewModel @Inject constructor() :
         )
     }
 
-    private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+    private fun SupportCenter.toUiState() = ChatSupportUiState(
+        isLoading = false,
+        title = liveChatTitle,
+        statusLabel = liveChatStatusOnlineLabel,
+        whatsapp = whatsapp,
+        messages = bootstrapMessages.map {
+            SupportMessage(
+                id = it.id,
+                message = it.message,
+                isFromUser = it.isFromUser,
+                timestamp = it.timestamp
             )
-        )
+        },
+        currentMessage = "",
+        isAgentTyping = false,
+        sendMessage = LoadState.Idle
+    )
+
+    private fun showError(error: UiError) {
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
+            )
+        }
     }
 }

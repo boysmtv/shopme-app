@@ -9,12 +9,15 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.GetSupportCenterUseCase
 import com.mtv.app.shopme.feature.customer.contract.HelpEffect
 import com.mtv.app.shopme.feature.customer.contract.HelpEvent
 import com.mtv.app.shopme.feature.customer.contract.HelpFaq
 import com.mtv.app.shopme.feature.customer.contract.HelpUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -25,34 +28,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
-class HelpViewModel @Inject constructor() :
+class HelpViewModel @Inject constructor(
+    private val getSupportCenterUseCase: GetSupportCenterUseCase,
+    private val sessionManager: SessionManager
+) :
     BaseEventViewModel<HelpEvent, HelpEffect>() {
 
-    private val _state = MutableStateFlow(
-        HelpUiState(
-            faq = listOf(
-                HelpFaq(
-                    "Bagaimana cara melacak pesanan?",
-                    "Masuk ke menu Pesanan Saya → pilih pesanan → lihat status pengiriman."
-                ),
-                HelpFaq(
-                    "Metode pembayaran apa saja?",
-                    "Transfer bank, e-wallet, dan COD tersedia."
-                ),
-                HelpFaq(
-                    "Bagaimana menghubungi support?",
-                    "Gunakan menu Hubungi Kami atau Live Chat."
-                )
-            )
-        )
-    )
+    private val _state = MutableStateFlow(HelpUiState())
     val uiState = _state.asStateFlow()
 
     override fun onEvent(event: HelpEvent) {
         when (event) {
-            is HelpEvent.Load -> {}
+            is HelpEvent.Load -> load()
             is HelpEvent.DismissDialog -> dismissDialog()
-            is HelpEvent.Refresh -> {}
+            is HelpEvent.Refresh -> load()
             is HelpEvent.ToggleFaq -> toggleFaq(event.faq)
             is HelpEvent.ClickBack -> emitEffect(HelpEffect.NavigateBack)
             is HelpEvent.ClickAbout -> emitEffect(HelpEffect.NavigateAbout)
@@ -61,6 +50,30 @@ class HelpViewModel @Inject constructor() :
             is HelpEvent.ClickPayment -> emitEffect(HelpEffect.NavigatePayment)
             is HelpEvent.ClickContact -> emitEffect(HelpEffect.NavigateContact)
         }
+    }
+
+    private fun load() {
+        observeDataFlow(
+            flow = getSupportCenterUseCase(),
+            onState = { state ->
+                _state.update { current ->
+                    when (state) {
+                        is LoadState.Success -> HelpUiState(
+                            faq = state.data.faq.map {
+                                HelpFaq(
+                                    question = it.question,
+                                    answer = it.answer
+                                )
+                            },
+                            isLoading = false
+                        )
+
+                        else -> current.copy(isLoading = state is LoadState.Loading)
+                    }
+                }
+            },
+            onError = ::showError
+        )
     }
 
     private fun toggleFaq(target: HelpFaq) {
@@ -77,15 +90,21 @@ class HelpViewModel @Inject constructor() :
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

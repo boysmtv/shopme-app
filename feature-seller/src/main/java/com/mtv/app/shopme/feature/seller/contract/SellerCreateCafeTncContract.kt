@@ -10,19 +10,24 @@ package com.mtv.app.shopme.feature.seller.contract
 
 data class SellerCreateCafeTncUiState(
     val isLoading: Boolean = false,
+    val title: String = "",
+    val description: String = "",
+    val footer: String = "",
+    val terms: List<SellerCreateCafeTncItemUiState> = emptyList()
+)
 
-    val agreeTerms: Boolean = false,
-    val agreeFoodSafety: Boolean = false,
-    val agreeLocation: Boolean = false
+data class SellerCreateCafeTncItemUiState(
+    val id: String,
+    val title: String,
+    val description: String,
+    val checked: Boolean = false
 )
 
 sealed class SellerCreateCafeTncEvent {
     object Load : SellerCreateCafeTncEvent()
     object DismissDialog : SellerCreateCafeTncEvent()
 
-    data class AgreeTerms(val value: Boolean) : SellerCreateCafeTncEvent()
-    data class AgreeFoodSafety(val value: Boolean) : SellerCreateCafeTncEvent()
-    data class AgreeLocation(val value: Boolean) : SellerCreateCafeTncEvent()
+    data class ToggleTerm(val id: String, val value: Boolean) : SellerCreateCafeTncEvent()
 
     object Next : SellerCreateCafeTncEvent()
     object ClickBack : SellerCreateCafeTncEvent()

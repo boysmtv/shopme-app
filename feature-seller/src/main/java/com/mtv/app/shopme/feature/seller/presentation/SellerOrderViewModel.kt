@@ -62,7 +62,7 @@ class SellerOrderViewModel @Inject constructor(
 
     private fun load() {
         observeProfile()
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getSellerOrdersUseCase(),
             onState = { result ->
                 _state.update {
@@ -83,7 +83,7 @@ class SellerOrderViewModel @Inject constructor(
     }
 
     private fun observeProfile() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getSellerProfileUseCase(),
             onState = { result ->
                 _state.update {

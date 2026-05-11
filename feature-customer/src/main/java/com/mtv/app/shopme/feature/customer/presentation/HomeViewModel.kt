@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun observeFoods() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = homeFoodUseCase(),
             onState = { state ->
                 _state.update {
@@ -65,7 +65,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun observeCustomer() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = customerUseCase(),
             onState = { state ->
                 _state.update {

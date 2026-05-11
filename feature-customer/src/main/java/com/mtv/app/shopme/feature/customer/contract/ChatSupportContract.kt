@@ -14,6 +14,10 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import com.mtv.based.core.network.utils.LoadState
 
 data class ChatSupportUiState(
+    val isLoading: Boolean = false,
+    val title: String = "",
+    val statusLabel: String = "",
+    val whatsapp: String = "",
     val messages: List<SupportMessage> = emptyList(),
     val currentMessage: String = "",
     val isAgentTyping: Boolean = false,

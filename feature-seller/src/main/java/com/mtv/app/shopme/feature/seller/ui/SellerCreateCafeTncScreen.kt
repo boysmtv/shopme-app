@@ -46,10 +46,7 @@ fun SellerCreateCafeTncScreen(
     event: (SellerCreateCafeTncEvent) -> Unit
 ) {
 
-    val isValid =
-        state.agreeTerms &&
-                state.agreeFoodSafety &&
-                state.agreeLocation
+    val isValid = state.terms.isNotEmpty() && state.terms.all { it.checked }
 
     Column(
         modifier = Modifier
@@ -65,7 +62,7 @@ fun SellerCreateCafeTncScreen(
         ) {
 
             Text(
-                text = "Create Your Cafe",
+                text = state.title.ifBlank { "Create Your Cafe" },
                 fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
                 fontFamily = PoppinsFont
@@ -74,7 +71,9 @@ fun SellerCreateCafeTncScreen(
             Spacer(Modifier.height(8.dp))
 
             Text(
-                text = "Before continuing to create your cafe profile, please read and agree to the following terms and conditions. These rules are designed to ensure that all cafes listed on the platform provide a safe, reliable, and trustworthy experience for customers.",
+                text = state.description.ifBlank {
+                    "Before continuing to create your cafe profile, please read and agree to the following terms and conditions. These rules are designed to ensure that all cafes listed on the platform provide a safe, reliable, and trustworthy experience for customers."
+                },
                 fontSize = 14.sp,
                 color = Color.Gray,
                 fontFamily = PoppinsFont
@@ -82,37 +81,27 @@ fun SellerCreateCafeTncScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            SellerTncCard(
-                checked = state.agreeTerms,
-                title = "Accurate Cafe Information",
-                description = "I confirm that all information provided about my cafe including the cafe name, contact number, description, menu offerings, and other related details are accurate and truthful. I understand that providing misleading or incorrect information may lead to the suspension or removal of my cafe listing from the platform.",
-                onCheckedChange = {
-                    event(SellerCreateCafeTncEvent.AgreeTerms(it))
+            state.terms.forEachIndexed { index, item ->
+                SellerTncCard(
+                    checked = item.checked,
+                    title = item.title,
+                    description = item.description,
+                    onCheckedChange = {
+                        event(SellerCreateCafeTncEvent.ToggleTerm(item.id, it))
+                    }
+                )
+
+                if (index < state.terms.lastIndex) {
+                    Spacer(Modifier.height(16.dp))
                 }
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            SellerTncCard(
-                checked = state.agreeFoodSafety,
-                title = "Food Safety and Quality Compliance",
-                description = "I agree that all food and beverages sold through my cafe comply with local food safety regulations and hygiene standards. I will ensure that the preparation, storage, and serving of food maintain proper cleanliness and safety practices to protect the health and well-being of customers.",
-                onCheckedChange = { event(SellerCreateCafeTncEvent.AgreeFoodSafety(it)) }
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            SellerTncCard(
-                checked = state.agreeLocation,
-                title = "Valid and Accessible Cafe Location",
-                description = "I confirm that the cafe address and location provided are correct and accessible for customers and delivery partners. I understand that inaccurate location information may cause order delivery issues and negatively affect customer experience.",
-                onCheckedChange = { event(SellerCreateCafeTncEvent.AgreeLocation(it)) }
-            )
+            }
 
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text = "By continuing, you acknowledge that you have read and agreed to the terms above. These agreements help maintain the quality of cafes on our platform and ensure a better experience for all users.",
+                text = state.footer.ifBlank {
+                    "By continuing, you acknowledge that you have read and agreed to the terms above. These agreements help maintain the quality of cafes on our platform and ensure a better experience for all users."
+                },
                 fontSize = 13.sp,
                 color = Color.Gray,
                 fontFamily = PoppinsFont
@@ -197,9 +186,23 @@ fun SellerTncCard(
 fun SellerCreateCafeTncScreenPreview() {
     SellerCreateCafeTncScreen(
         state = SellerCreateCafeTncUiState(
-            agreeTerms = true,
-            agreeFoodSafety = false,
-            agreeLocation = false
+            title = "Create Your Cafe",
+            description = "Before continuing, please read and agree to the following terms.",
+            footer = "By continuing, you agree to the seller terms.",
+            terms = listOf(
+                com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncItemUiState(
+                    id = "term-1",
+                    title = "Accurate Cafe Information",
+                    description = "All cafe information must be accurate.",
+                    checked = true
+                ),
+                com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncItemUiState(
+                    id = "term-2",
+                    title = "Food Safety and Quality Compliance",
+                    description = "All food must meet hygiene standards.",
+                    checked = false
+                )
+            )
         ),
         event = {}
     )

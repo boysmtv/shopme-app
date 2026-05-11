@@ -1,53 +1,53 @@
 package com.mtv.app.shopme.feature.customer
 
-import android.content.Intent
 import com.mtv.app.shopme.domain.model.SupportBootstrapMessage
 import com.mtv.app.shopme.domain.model.SupportCenter
 import com.mtv.app.shopme.domain.model.SupportFaq
 import com.mtv.app.shopme.domain.usecase.GetSupportCenterUseCase
-import com.mtv.app.shopme.feature.customer.contract.ChatSupportEffect
-import com.mtv.app.shopme.feature.customer.contract.ChatSupportEvent
-import com.mtv.app.shopme.feature.customer.presentation.ChatSupportViewModel
+import com.mtv.app.shopme.feature.customer.contract.HelpEvent
+import com.mtv.app.shopme.feature.customer.presentation.HelpViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
 
-@RunWith(RobolectricTestRunner::class)
-class ChatSupportViewModelTest {
+class HelpViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
     private val getSupportCenterUseCase: GetSupportCenterUseCase = mockk()
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `send message should emit whatsapp intent with encoded text`() = runTest {
+    fun `load should reflect backend faq`() = runTest {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(supportCenter()))
 
-        val vm = ChatSupportViewModel(getSupportCenterUseCase, sessionManager)
-        vm.onEvent(ChatSupportEvent.Load)
-        advanceUntilIdle()
-        val effect = async { vm.effect.first() as ChatSupportEffect.OpenIntent }
-
-        vm.onEvent(ChatSupportEvent.OnMessageChange("butuh bantuan order"))
-        vm.onEvent(ChatSupportEvent.SendMessage)
+        val vm = HelpViewModel(getSupportCenterUseCase, sessionManager)
+        vm.onEvent(HelpEvent.Load)
         advanceUntilIdle()
 
-        val result = effect.await().intent
-        assertEquals(Intent.ACTION_VIEW, result.action)
-        assertTrue(result.data.toString().contains("https://wa.me/6281234567890"))
-        assertEquals("", vm.uiState.value.currentMessage)
+        assertEquals(2, vm.uiState.value.faq.size)
+        assertEquals("Bagaimana cara melacak pesanan?", vm.uiState.value.faq.first().question)
+    }
+
+    @Test
+    fun `unauthorized help load should force logout`() = runTest {
+        every { getSupportCenterUseCase.invoke() } returns flowOf(
+            Resource.Error(UiError.Unauthorized("Session expired"))
+        )
+
+        val vm = HelpViewModel(getSupportCenterUseCase, sessionManager)
+        vm.onEvent(HelpEvent.Load)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { sessionManager.forceLogout() }
     }
 
     private fun supportCenter() = SupportCenter(
@@ -68,7 +68,10 @@ class ChatSupportViewModelTest {
         sellerOnboardingTitle = "Create Your Cafe",
         sellerOnboardingDescription = "Read and agree before continuing.",
         sellerOnboardingFooter = "By continuing, you agree.",
-        faq = listOf(SupportFaq("faq-1", "Q", "A")),
+        faq = listOf(
+            SupportFaq("faq-1", "Bagaimana cara melacak pesanan?", "Masuk ke menu pesanan."),
+            SupportFaq("faq-2", "Metode pembayaran apa saja?", "Transfer bank tersedia.")
+        ),
         bootstrapMessages = listOf(
             SupportBootstrapMessage("msg-1", "Halo 👋 Ada yang bisa kami bantu?", false, "10:00")
         ),

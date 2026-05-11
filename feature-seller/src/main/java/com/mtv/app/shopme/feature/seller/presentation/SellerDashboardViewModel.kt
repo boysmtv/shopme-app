@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.seller.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.update
 class SellerDashboardViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val getSellerOrdersUseCase: GetSellerOrdersUseCase,
+    private val getSellerNotificationsUseCase: GetSellerNotificationsUseCase,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase
 ) : BaseEventViewModel<SellerDashboardEvent, SellerDashboardEffect>() {
@@ -70,16 +72,36 @@ class SellerDashboardViewModel @Inject constructor(
 
     private fun load() {
         observeProfile()
+        observeNotifications()
         refresh()
     }
 
     private fun observeProfile() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getSellerProfileUseCase(),
             onState = { result ->
                 _state.update {
                     val profile = (result as? LoadState.Success)?.data
-                    it.copy(isOnline = profile?.isOnline ?: it.isOnline)
+                    it.copy(
+                        isOnline = profile?.isOnline ?: it.isOnline,
+                        storeName = profile?.storeName ?: it.storeName,
+                        storeAddress = profile?.storeAddress ?: it.storeAddress
+                    )
+                }
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun observeNotifications() {
+        observeIndependentDataFlow(
+            flow = getSellerNotificationsUseCase(),
+            onState = { result ->
+                _state.update {
+                    val notifications = (result as? LoadState.Success)?.data.orEmpty()
+                    it.copy(
+                        notificationCount = notifications.count { item -> !item.isRead }
+                    )
                 }
             },
             onError = ::showError
@@ -87,7 +109,7 @@ class SellerDashboardViewModel @Inject constructor(
     }
 
     private fun refresh() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getSellerOrdersUseCase(),
             onState = { result ->
                 _state.update {

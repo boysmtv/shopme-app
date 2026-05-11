@@ -294,6 +294,7 @@ def verify_runtime(base_url: str) -> list[str]:
                 "createdAt": "2026-05-11T00:00:00Z"
             },
         }),
+        ("GET", "/api/support", None, {"token": buyer_token}),
         ("GET", "/api/customer", None, {"token": buyer_token}),
         ("GET", "/api/address", None, {"token": buyer_token}),
         ("GET", "/api/village", None, {"token": buyer_token}),
@@ -321,6 +322,43 @@ def verify_runtime(base_url: str) -> list[str]:
             failures.append(f"{method} {path} returned {status}")
         failures.extend(assert_envelope(payload, f"{method} {path}"))
         captured_payloads[path] = payload
+
+    support_payload = captured_payloads.get("/api/support", {})
+    support_data = support_payload.get("data", {})
+    if not isinstance(support_data, dict):
+        failures.append("GET /api/support missing data object")
+        return failures
+    required_support_fields = {
+        "phone",
+        "email",
+        "whatsapp",
+        "whatsappMessageTemplate",
+        "emailSubject",
+        "emailBodyTemplate",
+        "operationalStartHour",
+        "operationalEndHour",
+        "operationalTimezone",
+        "operationalHoursLabel",
+        "statusOnlineLabel",
+        "statusOfflineLabel",
+        "liveChatTitle",
+        "liveChatStatusOnlineLabel",
+        "sellerOnboardingTitle",
+        "sellerOnboardingDescription",
+        "sellerOnboardingFooter",
+        "faq",
+        "bootstrapMessages",
+        "sellerTerms",
+    }
+    missing_support_fields = sorted(required_support_fields.difference(support_data.keys()))
+    if missing_support_fields:
+        failures.append(f"GET /api/support missing fields {missing_support_fields}")
+    if not isinstance(support_data.get("faq"), list) or not support_data.get("faq"):
+        failures.append("GET /api/support faq is empty")
+    if not isinstance(support_data.get("bootstrapMessages"), list) or not support_data.get("bootstrapMessages"):
+        failures.append("GET /api/support bootstrapMessages is empty")
+    if not isinstance(support_data.get("sellerTerms"), list) or not support_data.get("sellerTerms"):
+        failures.append("GET /api/support sellerTerms is empty")
 
     foods_payload = captured_payloads.get("/api/foods", {})
     food_item = first_list_item(foods_payload)
@@ -522,13 +560,35 @@ def verify_runtime(base_url: str) -> list[str]:
     expect_status(failures, "PUT /api/seller/availability", seller_availability_status, {200})
     failures.extend(assert_envelope(seller_availability_payload, "PUT /api/seller/availability"))
 
-    seller_order_detail_status, seller_order_detail_payload = request_json(
-        f"{base_url}/api/seller/orders/{order_id}",
+    seller_orders_refresh_status, seller_orders_refresh_payload = request_json(
+        f"{base_url}/api/seller/orders",
         method="GET",
         token=seller_token,
     )
-    expect_status(failures, f"GET /api/seller/orders/{order_id}", seller_order_detail_status, {200})
-    failures.extend(assert_envelope(seller_order_detail_payload, f"GET /api/seller/orders/{order_id}"))
+    expect_status(failures, "GET /api/seller/orders after buyer checkout", seller_orders_refresh_status, {200})
+    failures.extend(assert_envelope(seller_orders_refresh_payload, "GET /api/seller/orders after buyer checkout"))
+
+    seller_order_id = None
+    for item in seller_orders_refresh_payload.get("data", []):
+        if not isinstance(item, dict):
+            continue
+        candidate_id = item.get("orderId")
+        if isinstance(candidate_id, str) and candidate_id:
+            seller_order_id = candidate_id
+            if candidate_id == order_id:
+                break
+
+    if not isinstance(seller_order_id, str) or not seller_order_id:
+        failures.append("GET /api/seller/orders after buyer checkout missing seller order id")
+        return failures
+
+    seller_order_detail_status, seller_order_detail_payload = request_json(
+        f"{base_url}/api/seller/orders/{seller_order_id}",
+        method="GET",
+        token=seller_token,
+    )
+    expect_status(failures, f"GET /api/seller/orders/{seller_order_id}", seller_order_detail_status, {200})
+    failures.extend(assert_envelope(seller_order_detail_payload, f"GET /api/seller/orders/{seller_order_id}"))
 
     seller_chat_list_status, seller_chat_list_payload = request_json(
         f"{base_url}/api/chat/list?asSeller=true",
@@ -617,6 +677,10 @@ def verify_dtos(android_root: Path, backend_root: Path) -> list[str]:
         DtoPair("SplashRequest", "data/src/main/java/com/mtv/app/shopme/data/remote/request/SplashRequest.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/request/SplashRequest.kt"),
         DtoPair("LoginResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/LoginResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/LoginResponse.kt"),
         DtoPair("SplashResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SplashResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SplashResponse.kt"),
+        DtoPair("SupportCenterResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportCenterResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportCenterResponse.kt"),
+        DtoPair("SupportFaqResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportCenterResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportCenterResponse.kt"),
+        DtoPair("SupportBootstrapMessageResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportCenterResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportCenterResponse.kt"),
+        DtoPair("SupportSellerTermResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportCenterResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportCenterResponse.kt"),
         DtoPair("AddressResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/AddressResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/AddressResponse.kt"),
         DtoPair("VillageResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/VillageResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/VillageResponse.kt"),
         DtoPair("AppConfigResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/AppConfigResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/AppConfigResponse.kt"),

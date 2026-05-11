@@ -57,7 +57,7 @@ class CafeViewModel @Inject constructor(
     }
 
     private fun observeCafe() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getCafeUseCase(cafeId),
             onState = { state ->
                 _state.update {
@@ -71,7 +71,7 @@ class CafeViewModel @Inject constructor(
     }
 
     private fun observeFoods() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getFoodsByCafeUseCase(cafeId),
             onState = { state ->
                 _state.update {

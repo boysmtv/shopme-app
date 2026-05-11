@@ -79,13 +79,13 @@ fun ChatSupportScreen(
 
             Column {
                 Text(
-                    "Support Agent",
+                    state.title,
                     fontFamily = PoppinsFont,
                     fontSize = 14.sp
                 )
                 Text(
                     if (state.isAgentTyping) "Mengetik..."
-                    else "Online • Respon cepat",
+                    else state.statusLabel,
                     fontSize = 11.sp,
                     color = Color(0xFF4CAF50),
                     fontFamily = PoppinsFont
