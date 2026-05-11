@@ -25,12 +25,14 @@ sealed class OrderEvent {
     data class ConfirmTransfer(val orderId: String) : OrderEvent()
 
     object ClickBack : OrderEvent()
-    object ClickChat : OrderEvent()
+    object ClickChatList : OrderEvent()
+    data class ClickChat(val cafeId: String) : OrderEvent()
 }
 
 sealed class OrderEffect {
     object NavigateBack : OrderEffect()
-    object NavigateToChat : OrderEffect()
+    object NavigateToChatList : OrderEffect()
+    data class NavigateToChat(val chatId: String) : OrderEffect()
     data class NavigateToDetail(val orderId: String) : OrderEffect()
 }
 

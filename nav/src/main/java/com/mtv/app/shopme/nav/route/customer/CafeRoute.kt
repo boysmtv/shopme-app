@@ -60,7 +60,7 @@ private fun handleCafeEffect(
 ) {
     when (effect) {
         is CafeEffect.NavigateBack -> nav.popBackStack()
-        is CafeEffect.NavigateToChat -> CustomerNavActions.toChat(nav)
+        is CafeEffect.NavigateToChat -> CustomerNavActions.toChat(nav, effect.chatId)
         is CafeEffect.NavigateToSearch -> CustomerNavActions.toSearch(nav)
         is CafeEffect.OpenWhatsapp -> {
             val uri = "https://wa.me/${effect.phone}".toUri()

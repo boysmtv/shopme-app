@@ -12,6 +12,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
+import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.CreateFoodToCartUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodSimilarUseCase
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
+    private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
     private val foodDetailUseCase: GetFoodDetailUseCase,
     private val foodSimilarUseCase: GetFoodSimilarUseCase,
     private val foodAddToCartUseCase: CreateFoodToCartUseCase,
@@ -42,12 +44,22 @@ class DetailViewModel @Inject constructor(
         when (event) {
             is DetailEvent.Load -> loadDetail()
             is DetailEvent.BackClicked -> emitEffect(DetailEffect.NavigateBack)
-            is DetailEvent.ChatClicked -> emitEffect(DetailEffect.NavigateToChat)
+            is DetailEvent.ChatClicked -> openChat()
             is DetailEvent.OpenCart -> emitEffect(DetailEffect.NavigateToCart)
             is DetailEvent.ClickCafe -> emitEffect(DetailEffect.NavigateToCafe(event.cafeId))
             is DetailEvent.ClickSimilarFood -> emitEffect(DetailEffect.NavigateToDetail(event.foodId))
             is DetailEvent.AddToCart -> doAddToCart(event)
         }
+    }
+
+    private fun openChat() {
+        val cafeId = (_state.value.food as? LoadState.Success)?.data?.cafeId.orEmpty()
+        if (cafeId.isBlank()) return
+
+        observeDataFlow(
+            flow = ensureChatConversationUseCase(cafeId),
+            onSuccess = { emitEffect(DetailEffect.NavigateToChat(it)) }
+        )
     }
 
     private fun loadDetail() {

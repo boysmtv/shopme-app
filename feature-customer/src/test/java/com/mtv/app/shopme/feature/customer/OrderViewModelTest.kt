@@ -5,7 +5,9 @@ import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
+import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
 import com.mtv.based.core.network.utils.Resource
@@ -15,6 +17,8 @@ import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -27,6 +31,7 @@ class OrderViewModelTest {
 
     private val getOrdersUseCase: GetOrdersUseCase = mockk()
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase = mockk()
+    private val ensureChatConversationUseCase: EnsureChatConversationUseCase = mockk()
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -48,6 +53,7 @@ class OrderViewModelTest {
         val vm = OrderViewModel(
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
             sessionManager = sessionManager
         )
 
@@ -70,6 +76,7 @@ class OrderViewModelTest {
         val vm = OrderViewModel(
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
             sessionManager = sessionManager
         )
 
@@ -78,5 +85,23 @@ class OrderViewModelTest {
 
         assertEquals(false, vm.uiState.value.isLoading)
         coVerify(exactly = 0) { sessionManager.forceLogout() }
+    }
+
+    @Test
+    fun `click chat should ensure conversation for selected cafe`() = runTest {
+        every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
+
+        val vm = OrderViewModel(
+            getOrdersUseCase = getOrdersUseCase,
+            confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            sessionManager = sessionManager
+        )
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(OrderEvent.ClickChat("cafe-1"))
+        advanceUntilIdle()
+
+        assertEquals(OrderEffect.NavigateToChat("conv-1"), effect.await())
     }
 }

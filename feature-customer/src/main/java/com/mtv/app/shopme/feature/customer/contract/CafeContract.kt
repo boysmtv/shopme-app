@@ -30,7 +30,7 @@ sealed class CafeEvent {
 
 sealed class CafeEffect {
     object NavigateBack : CafeEffect()
-    object NavigateToChat : CafeEffect()
+    data class NavigateToChat(val chatId: String) : CafeEffect()
     object NavigateToSearch : CafeEffect()
     data class OpenWhatsapp(val phone: String) : CafeEffect()
     data class NavigateToDetail(val id: String) : CafeEffect()

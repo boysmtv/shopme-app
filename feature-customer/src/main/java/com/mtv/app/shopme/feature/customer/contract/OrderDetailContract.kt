@@ -18,5 +18,5 @@ sealed class OrderDetailEvent {
 
 sealed class OrderDetailEffect {
     object NavigateBack : OrderDetailEffect()
-    object NavigateToChat : OrderDetailEffect()
+    data class NavigateToChat(val chatId: String) : OrderDetailEffect()
 }

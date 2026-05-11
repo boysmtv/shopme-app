@@ -3,6 +3,7 @@ package com.mtv.app.shopme.feature.customer
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
+import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
 import com.mtv.app.shopme.feature.customer.contract.CafeEffect
@@ -27,6 +28,7 @@ class CafeViewModelTest {
 
     private val getCafeUseCase: GetCafeUseCase = mockk()
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase = mockk()
+    private val ensureChatConversationUseCase: EnsureChatConversationUseCase = mockk()
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -61,6 +63,7 @@ class CafeViewModelTest {
         val vm = CafeViewModel(
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
             sessionManager = sessionManager,
             savedStateHandle = SavedStateHandle(mapOf("cafeId" to "cafe-1"))
         )
@@ -78,6 +81,7 @@ class CafeViewModelTest {
         val vm = CafeViewModel(
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
             sessionManager = sessionManager,
             savedStateHandle = SavedStateHandle(mapOf("cafeId" to "cafe-1"))
         )
@@ -86,5 +90,24 @@ class CafeViewModelTest {
         vm.onEvent(CafeEvent.ClickSearch)
 
         assertEquals(CafeEffect.NavigateToSearch, effect.await())
+    }
+
+    @Test
+    fun `click chat should ensure scoped conversation then navigate to that chat`() = runTest {
+        every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
+
+        val vm = CafeViewModel(
+            getCafeUseCase = getCafeUseCase,
+            getFoodsByCafeUseCase = getFoodsByCafeUseCase,
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            sessionManager = sessionManager,
+            savedStateHandle = SavedStateHandle(mapOf("cafeId" to "cafe-1"))
+        )
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(CafeEvent.ClickChat)
+        advanceUntilIdle()
+
+        assertEquals(CafeEffect.NavigateToChat("conv-1"), effect.await())
     }
 }

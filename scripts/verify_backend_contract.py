@@ -520,6 +520,17 @@ def verify_runtime(base_url: str) -> list[str]:
     expect_status(failures, f"POST /api/order/{order_id}/confirm-transfer", confirm_transfer_status, {200})
     failures.extend(assert_envelope(confirm_transfer_payload, f"POST /api/order/{order_id}/confirm-transfer"))
 
+    ensure_conversation_status, ensure_conversation_payload = request_json(
+        f"{base_url}/api/chat/conversation?cafeId={seller_cafe_id}",
+        method="POST",
+        token=buyer_token,
+    )
+    expect_status(failures, "POST /api/chat/conversation", ensure_conversation_status, {200})
+    failures.extend(assert_envelope(ensure_conversation_payload, "POST /api/chat/conversation"))
+    ensured_conversation_id = ensure_conversation_payload.get("data", {}).get("id")
+    if not isinstance(ensured_conversation_id, str) or not ensured_conversation_id:
+        failures.append("POST /api/chat/conversation missing conversation id")
+
     notifications_status, notifications_payload = request_json(
         f"{base_url}/api/notifications",
         method="GET",
@@ -538,8 +549,16 @@ def verify_runtime(base_url: str) -> list[str]:
 
     chat_list = chat_list_payload.get("data", {}).get("chatList")
     conversation_id = None
+    if isinstance(chat_list, list) and isinstance(ensured_conversation_id, str) and ensured_conversation_id:
+        if any(
+            isinstance(item, dict) and item.get("id") == ensured_conversation_id
+            for item in chat_list
+        ):
+            conversation_id = ensured_conversation_id
+        else:
+            failures.append("GET /api/chat/list after order missing ensured conversation")
     if isinstance(chat_list, list) and chat_list:
-        conversation_id = chat_list[0].get("id") if isinstance(chat_list[0], dict) else None
+        conversation_id = conversation_id or (chat_list[0].get("id") if isinstance(chat_list[0], dict) else None)
         if isinstance(conversation_id, str) and conversation_id:
             chat_detail_status, chat_detail_payload = request_json(
                 f"{base_url}/api/chat?id={conversation_id}",
