@@ -63,7 +63,7 @@ class SellerProductListViewModelTest {
                         estimate = "10 min",
                         isActive = true,
                         createdAt = LocalDateTime.of(2026, 5, 10, 8, 0),
-                        images = emptyList(),
+                        images = listOf("data:image/jpeg;base64,coffee"),
                         variants = emptyList()
                     )
                 )
@@ -83,5 +83,6 @@ class SellerProductListViewModelTest {
         assertEquals(1, vm.uiState.value.products.size)
         assertEquals("Coffee Latte", vm.uiState.value.products.first().name)
         assertEquals("25000", vm.uiState.value.products.first().price)
+        assertEquals("data:image/jpeg;base64,coffee", vm.uiState.value.products.first().image)
     }
 }

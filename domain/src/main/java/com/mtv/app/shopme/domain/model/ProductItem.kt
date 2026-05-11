@@ -14,5 +14,6 @@ data class ProductItem(
     val price: String = "",
     val stock: Int = 0,
     val category: String = "",
-    val description: String = ""
+    val description: String = "",
+    val image: String = ""
 )

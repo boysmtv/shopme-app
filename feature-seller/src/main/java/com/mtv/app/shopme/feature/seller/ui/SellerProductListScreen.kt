@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEvent
@@ -213,6 +214,17 @@ fun ModernProductItem(
 
     val isLowStock = product.stock <= 5
     val placeholderRes = product.id.hashCode() % 8
+    val placeholder = when (placeholderRes) {
+        0 -> com.mtv.app.shopme.common.R.drawable.image_burger
+        1 -> com.mtv.app.shopme.common.R.drawable.image_pizza
+        2 -> com.mtv.app.shopme.common.R.drawable.image_platbread
+        3 -> com.mtv.app.shopme.common.R.drawable.image_cheese_burger
+        4 -> com.mtv.app.shopme.common.R.drawable.image_bakso
+        5 -> com.mtv.app.shopme.common.R.drawable.image_pempek
+        6 -> com.mtv.app.shopme.common.R.drawable.image_padang
+        7 -> com.mtv.app.shopme.common.R.drawable.image_sate
+        else -> com.mtv.app.shopme.common.R.drawable.image_burger
+    }
 
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -230,23 +242,13 @@ fun ModernProductItem(
                     .size(90.dp)
                     .clip(RoundedCornerShape(16.dp))
             ) {
-                Image(
-                    painter = painterResource(
-                        id = when (placeholderRes) {
-                            0 -> com.mtv.app.shopme.common.R.drawable.image_burger
-                            1 -> com.mtv.app.shopme.common.R.drawable.image_pizza
-                            2 -> com.mtv.app.shopme.common.R.drawable.image_platbread
-                            3 -> com.mtv.app.shopme.common.R.drawable.image_cheese_burger
-                            4 -> com.mtv.app.shopme.common.R.drawable.image_bakso
-                            5 -> com.mtv.app.shopme.common.R.drawable.image_pempek
-                            6 -> com.mtv.app.shopme.common.R.drawable.image_padang
-                            7 -> com.mtv.app.shopme.common.R.drawable.image_sate
-                            else -> com.mtv.app.shopme.common.R.drawable.image_burger
-                        }
-                    ),
+                SmartImage(
+                    model = product.image,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(placeholder),
+                    error = painterResource(placeholder)
                 )
             }
 

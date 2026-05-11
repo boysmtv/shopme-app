@@ -300,7 +300,7 @@ fun SellerStoreHeader(
         ) {
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val headerImage = state.storePhoto.ifBlank { state.sellerPhoto }
+                val headerImage = state.sellerPhoto.ifBlank { state.storePhoto }
 
                 if (headerImage.isNotBlank()) {
                     SmartImage(

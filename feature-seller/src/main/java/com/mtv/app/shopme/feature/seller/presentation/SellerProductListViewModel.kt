@@ -122,6 +122,7 @@ class SellerProductListViewModel @Inject constructor(
         price = price.stripTrailingZeros().toPlainString(),
         stock = quantity.toInt(),
         category = category.name,
-        description = description
+        description = description,
+        image = images.firstOrNull().orEmpty()
     )
 }

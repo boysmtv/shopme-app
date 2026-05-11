@@ -171,17 +171,23 @@ fun StatusChip(status: OrderStatus) {
 
 @Composable
 fun OrderTimeline(status: OrderStatus) {
-    val steps = OrderStatus.entries
+    val steps = sellerProgressSteps()
+    val activeIndex = steps.indexOf(status)
     Column {
         Text("Order Progress", fontWeight = FontWeight.SemiBold, fontFamily = PoppinsFont)
         Spacer(Modifier.height(16.dp))
+
+        if (status == OrderStatus.UNPAID || status == OrderStatus.CANCELLED) {
+            StatusChip(status)
+            Spacer(Modifier.height(12.dp))
+        }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             steps.forEachIndexed { index, step ->
-                val isActive = step.ordinal <= status.ordinal
+                val isActive = activeIndex >= 0 && index <= activeIndex
                 val color = if (isActive) step.statusColor() else Color.LightGray
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -212,7 +218,7 @@ fun OrderTimeline(status: OrderStatus) {
                                 brush = Brush.horizontalGradient(
                                     colors = listOf(
                                         color,
-                                        if (steps[index + 1].ordinal <= status.ordinal) {
+                                        if (activeIndex >= 0 && index + 1 <= activeIndex) {
                                             steps[index + 1].statusColor()
                                         } else {
                                             Color.LightGray
@@ -329,7 +335,7 @@ fun InfoCard(label: String, value: String, highlight: Boolean = false) {
 
 @Composable
 fun UpdateStatusBottomBar(currentStatus: OrderStatus, onUpdate: (OrderStatus) -> Unit) {
-    val nextStatus = OrderStatus.entries.getOrNull(currentStatus.ordinal + 1) ?: return
+    val nextStatus = nextSellerStatus(currentStatus) ?: return
     val color = nextStatus.statusColor()
 
     Button(
@@ -349,6 +355,20 @@ fun UpdateStatusBottomBar(currentStatus: OrderStatus, onUpdate: (OrderStatus) ->
             fontFamily = PoppinsFont
         )
     }
+}
+
+private fun sellerProgressSteps(): List<OrderStatus> = listOf(
+    OrderStatus.ORDERED,
+    OrderStatus.COOKING,
+    OrderStatus.DELIVERING,
+    OrderStatus.COMPLETED
+)
+
+private fun nextSellerStatus(currentStatus: OrderStatus): OrderStatus? = when (currentStatus) {
+    OrderStatus.ORDERED -> OrderStatus.COOKING
+    OrderStatus.COOKING -> OrderStatus.DELIVERING
+    OrderStatus.DELIVERING -> OrderStatus.COMPLETED
+    else -> null
 }
 
 fun OrderStatus.statusColor(): Color = when (this) {

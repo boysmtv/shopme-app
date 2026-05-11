@@ -43,9 +43,10 @@ abstract class BaseEventViewModel<EVENT, EFFECT> : BaseViewModel() {
         error: UiError,
         sessionManager: SessionManager,
         beforeLogout: (() -> Unit)? = null,
+        shouldForceLogout: (UiError) -> Boolean = { it is UiError.Unauthorized },
         onOtherError: (UiError) -> Unit
     ) {
-        if (error is UiError.Unauthorized) {
+        if (shouldForceLogout(error)) {
             beforeLogout?.invoke()
             viewModelScope.launch {
                 sessionManager.forceLogout()
