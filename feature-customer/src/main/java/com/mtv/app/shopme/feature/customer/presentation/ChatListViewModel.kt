@@ -9,13 +9,17 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.model.ChatList
+import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatListEffect
 import com.mtv.app.shopme.feature.customer.contract.ChatListEffect.*
 import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -27,7 +31,9 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
-    private val chatListUseCase: GetChatListUseCase
+    private val chatListUseCase: GetChatListUseCase,
+    private val clearChatListUseCase: ClearChatListUseCase,
+    private val sessionManager: SessionManager
 ) : BaseEventViewModel<ChatListEvent, ChatListEffect>() {
 
     private val _state = MutableStateFlow(ChatListUiState())
@@ -36,6 +42,7 @@ class ChatListViewModel @Inject constructor(
     override fun onEvent(event: ChatListEvent) {
         when (event) {
             is ChatListEvent.Load -> observeChatList()
+            is ChatListEvent.ClickClearAll -> clearChats()
             is ChatListEvent.DismissDialog -> dismissDialog()
             is ChatListEvent.ClickItem -> emitEffect(NavigateToChat(event.id))
             is ChatListEvent.ClickBack -> emitEffect(NavigateBack)
@@ -46,25 +53,52 @@ class ChatListViewModel @Inject constructor(
         observeDataFlow(
             flow = chatListUseCase(),
             onLoad = ::showLoading,
+            onSuccess = { hideLoading() },
             onState = { state ->
                 _state.update {
                     it.copy(chatListState = state)
                 }
             },
-            onError = ::showError
+            onError = {
+                hideLoading()
+                showError(it)
+            }
+        )
+    }
+
+    private fun clearChats() {
+        observeIndependentDataFlow(
+            flow = clearChatListUseCase(),
+            onLoad = ::showLoading,
+            onSuccess = {
+                hideLoading()
+                _state.update {
+                    it.copy(chatListState = LoadState.Success(ChatList(emptyList())))
+                }
+            },
+            onError = { error ->
+                hideLoading()
+                showError(error)
+            }
         )
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { hideLoading() }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

@@ -17,6 +17,7 @@ import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.contract.CafeUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.update
 class CafeViewModel @Inject constructor(
     private val getCafeUseCase: GetCafeUseCase,
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase,
+    private val sessionManager: SessionManager,
     savedStateHandle: SavedStateHandle
 ) : BaseEventViewModel<CafeEvent, CafeEffect>() {
 
@@ -55,7 +57,7 @@ class CafeViewModel @Inject constructor(
     }
 
     private fun observeCafe() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getCafeUseCase(cafeId),
             onState = { state ->
                 _state.update {
@@ -69,7 +71,7 @@ class CafeViewModel @Inject constructor(
     }
 
     private fun observeFoods() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getFoodsByCafeUseCase(cafeId),
             onState = { state ->
                 _state.update {
@@ -83,15 +85,17 @@ class CafeViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(error, sessionManager) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

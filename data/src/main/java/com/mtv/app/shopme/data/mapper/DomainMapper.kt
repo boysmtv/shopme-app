@@ -12,6 +12,7 @@ import com.mtv.app.shopme.data.remote.response.ChatListItemResponse
 import com.mtv.app.shopme.data.remote.response.ChatItem
 import com.mtv.app.shopme.data.remote.response.ChatResponse
 import com.mtv.app.shopme.data.remote.response.AddressResponse
+import com.mtv.app.shopme.data.remote.response.AppConfigResponse
 import com.mtv.app.shopme.data.remote.response.AppNotificationResponse
 import com.mtv.app.shopme.data.remote.response.CafeAddressResponse
 import com.mtv.app.shopme.data.remote.response.CafeResponse
@@ -27,6 +28,12 @@ import com.mtv.app.shopme.data.remote.response.NotificationPreferencesResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
+import com.mtv.app.shopme.data.remote.response.SupportBootstrapMessageResponse
+import com.mtv.app.shopme.data.remote.response.SupportChatMessageResponse
+import com.mtv.app.shopme.data.remote.response.SupportChatResponse
+import com.mtv.app.shopme.data.remote.response.SupportCenterResponse
+import com.mtv.app.shopme.data.remote.response.SupportFaqResponse
+import com.mtv.app.shopme.data.remote.response.SupportSellerTermResponse
 import com.mtv.app.shopme.data.remote.response.VillageResponse
 import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.AppConfig
@@ -50,6 +57,12 @@ import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.app.shopme.domain.model.SessionToken
 import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.app.shopme.domain.model.Stats
+import com.mtv.app.shopme.domain.model.SupportBootstrapMessage
+import com.mtv.app.shopme.domain.model.SupportCenter
+import com.mtv.app.shopme.domain.model.SupportChat
+import com.mtv.app.shopme.domain.model.SupportChatMessage
+import com.mtv.app.shopme.domain.model.SupportFaq
+import com.mtv.app.shopme.domain.model.SupportSellerTerm
 import com.mtv.app.shopme.domain.model.User
 import com.mtv.app.shopme.data.remote.response.OrderItemResponse
 import com.mtv.app.shopme.data.remote.response.OrderResponse
@@ -320,6 +333,59 @@ fun SplashResponse.toDomain() = Splash(
             maintenanceMessage = it.maintenanceMessage
         )
     }
+)
+
+fun SupportCenterResponse.toDomain() = SupportCenter(
+    phone = phone,
+    email = email,
+    whatsapp = whatsapp,
+    whatsappMessageTemplate = whatsappMessageTemplate,
+    emailSubject = emailSubject,
+    emailBodyTemplate = emailBodyTemplate,
+    operationalStartHour = operationalStartHour,
+    operationalEndHour = operationalEndHour,
+    operationalTimezone = operationalTimezone,
+    operationalHoursLabel = operationalHoursLabel,
+    statusOnlineLabel = statusOnlineLabel,
+    statusOfflineLabel = statusOfflineLabel,
+    liveChatTitle = liveChatTitle,
+    liveChatStatusOnlineLabel = liveChatStatusOnlineLabel,
+    sellerOnboardingTitle = sellerOnboardingTitle,
+    sellerOnboardingDescription = sellerOnboardingDescription,
+    sellerOnboardingFooter = sellerOnboardingFooter,
+    faq = faq.map { it.toDomain() },
+    bootstrapMessages = bootstrapMessages.map { it.toDomain() },
+    sellerTerms = sellerTerms.map { it.toDomain() }
+)
+
+fun SupportChatResponse.toDomain() = SupportChat(
+    messages = messages.map { it.toDomain() }
+)
+
+fun SupportFaqResponse.toDomain() = SupportFaq(
+    id = id,
+    question = question,
+    answer = answer
+)
+
+fun SupportBootstrapMessageResponse.toDomain() = SupportBootstrapMessage(
+    id = id,
+    message = message,
+    isFromUser = isFromUser,
+    timestamp = timestamp
+)
+
+fun SupportChatMessageResponse.toDomain() = SupportChatMessage(
+    id = id,
+    message = message,
+    isFromUser = isFromUser,
+    timestamp = timestamp
+)
+
+fun SupportSellerTermResponse.toDomain() = SupportSellerTerm(
+    id = id,
+    title = title,
+    description = description
 )
 
 fun LoginResponse.toDomain() = Login(

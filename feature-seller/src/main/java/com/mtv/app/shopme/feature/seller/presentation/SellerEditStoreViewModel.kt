@@ -24,6 +24,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -35,6 +36,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class SellerEditStoreViewModel @Inject constructor(
+    private val sessionManager: SessionManager,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val getCafeUseCase: GetCafeUseCase,
     private val getCafeAddressUseCase: GetCafeAddressUseCase,
@@ -140,7 +142,6 @@ class SellerEditStoreViewModel @Inject constructor(
                     } else {
                         cafeId = sellerCafeId
                         loadCafeDetail(sellerCafeId)
-                        loadCafeAddress(sellerCafeId)
                     }
                 } else {
                     _state.update { it.copy(isLoading = profileState is LoadState.Loading) }
@@ -164,11 +165,19 @@ class SellerEditStoreViewModel @Inject constructor(
                             minOrder = state.data.minimalOrder.stripTrailingZeros().toPlainString(),
                             storeOpen = state.data.openTime,
                             description = state.data.description,
-                            storePhoto = state.data.image
+                            storePhoto = state.data.image,
+                            village = state.data.address.name,
+                            block = state.data.address.block,
+                            number = state.data.address.number,
+                            rt = state.data.address.rt,
+                            rw = state.data.address.rw
                         )
                     } else {
                         it.copy(isLoading = state is LoadState.Loading)
                     }
+                }
+                if (state is LoadState.Success) {
+                    loadCafeAddress(id)
                 }
             },
             onError = ::showError
@@ -270,16 +279,21 @@ class SellerEditStoreViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        _state.update { it.copy(isLoading = false) }
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

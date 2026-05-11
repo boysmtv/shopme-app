@@ -26,6 +26,7 @@ import com.mtv.app.shopme.feature.customer.contract.CartUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -44,6 +45,7 @@ class CartViewModel @Inject constructor(
     private val cartQuantityUseCase: UpdateCartQuantityUseCase,
     private val clearCartByCafeIdUseCase: DeleteCartByCafeIdUseCase,
     private val clearCartUseCase: DeleteCartUseCase,
+    private val sessionManager: SessionManager,
 ) : BaseEventViewModel<CartEvent, CartEffect>() {
 
     private val _state = MutableStateFlow(CartUiState())
@@ -205,15 +207,21 @@ class CartViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { hideLoading() }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

@@ -10,6 +10,9 @@ import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerCreateCafeViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.async
@@ -28,6 +31,7 @@ class SellerCreateCafeViewModelTest {
     private val getSellerProfileUseCase: GetSellerProfileUseCase = mockk()
     private val getVillageUseCase: GetVillageUseCase = mockk()
     private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `create cafe should create cafe and address then navigate success`() = runTest {
@@ -53,7 +57,8 @@ class SellerCreateCafeViewModelTest {
             createCafeUseCase = createCafeUseCase,
             getSellerProfileUseCase = getSellerProfileUseCase,
             getVillageUseCase = getVillageUseCase,
-            upsertCafeAddressUseCase = upsertCafeAddressUseCase
+            upsertCafeAddressUseCase = upsertCafeAddressUseCase,
+            sessionManager = sessionManager
         )
         val effect = async { vm.effect.first() }
 
@@ -66,5 +71,26 @@ class SellerCreateCafeViewModelTest {
         advanceUntilIdle()
 
         assertEquals(SellerCreateCafeEffect.NavigateSuccess, effect.await())
+    }
+
+    @Test
+    fun `unauthorized village load should force logout`() = runTest {
+        every { getVillageUseCase.invoke() } returns flowOf(
+            Resource.Error(UiError.Unauthorized("Session expired"))
+        )
+
+        val vm = SellerCreateCafeViewModel(
+            createCafeUseCase = createCafeUseCase,
+            getSellerProfileUseCase = getSellerProfileUseCase,
+            getVillageUseCase = getVillageUseCase,
+            upsertCafeAddressUseCase = upsertCafeAddressUseCase,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(SellerCreateCafeEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals(false, vm.uiState.value.isLoading)
+        coVerify(exactly = 1) { sessionManager.forceLogout() }
     }
 }

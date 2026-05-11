@@ -36,4 +36,19 @@ class AppRepositoryImpl @Inject constructor(
             ).toDomain()
         }
 
+    override fun getSupportCenter() =
+        resultFlow.create {
+            remote.getSupportCenter().toDomain()
+        }
+
+    override fun getSupportChat() =
+        resultFlow.create {
+            remote.getSupportChat().toDomain()
+        }
+
+    override fun sendSupportChatMessage(message: String) =
+        resultFlow.create {
+            remote.sendSupportChatMessage(message).toDomain()
+        }
+
 }

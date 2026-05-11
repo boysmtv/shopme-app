@@ -210,7 +210,7 @@ fun CafeHeader(
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SmartImage(
-                    model = cafe?.image?.firstOrNull(),
+                    model = cafe?.image,
                     contentDescription = null,
                     modifier = Modifier
                         .size(80.dp)

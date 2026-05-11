@@ -105,7 +105,7 @@ class SellerProductListViewModel @Inject constructor(
                     if (state is LoadState.Success) {
                         it.copy(
                             isLoading = false,
-                            products = state.data.map(Food::toProductItem)
+                            products = state.data.map { food -> food.toProductItem() }
                         )
                     } else {
                         it.copy(isLoading = state is LoadState.Loading)

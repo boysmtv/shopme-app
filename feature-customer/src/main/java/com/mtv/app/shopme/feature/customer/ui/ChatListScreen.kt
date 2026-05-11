@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -103,7 +104,7 @@ fun ChatListScreen(
                 )
             }
 
-            IconButton(onClick = { event(ChatListEvent.ClickBack) }) {
+            IconButton(onClick = { event(ChatListEvent.ClickClearAll) }) {
                 Icon(
                     imageVector = Icons.Default.DeleteOutline,
                     contentDescription = null,
@@ -121,15 +122,50 @@ fun ChatListScreen(
             else -> emptyList()
         }
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp)
-        ) {
-            items(chats) { item ->
-                ListChatItem(
-                    data = item,
-                    onClick = { event(ChatListEvent.ClickItem(item.id)) }
-                )
+        when (val chatListState = state.chatListState) {
+            is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 40.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = AppColor.Green)
+                }
+            }
+
+            is LoadState.Success -> {
+                if (chatListState.data.chatList.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Chat belum ada",
+                            fontFamily = PoppinsFont,
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                    ) {
+                        items(chats) { item ->
+                            ListChatItem(
+                                data = item,
+                                onClick = { event(ChatListEvent.ClickItem(item.id)) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            else -> {
+                Unit
             }
         }
     }

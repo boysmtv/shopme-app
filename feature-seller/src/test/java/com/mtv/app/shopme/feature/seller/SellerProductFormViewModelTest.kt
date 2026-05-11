@@ -71,7 +71,7 @@ class SellerProductFormViewModelTest {
                     quantity = 10,
                     estimate = "10 min",
                     isActive = true,
-                    createdAt = LocalDateTime.now(),
+                    createdAt = LocalDateTime.of(2026, 5, 10, 8, 0),
                     images = listOf("https://cdn.example.com/latte.png"),
                     variants = emptyList()
                 )

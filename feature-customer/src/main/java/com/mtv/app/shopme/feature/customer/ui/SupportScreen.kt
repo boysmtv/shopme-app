@@ -76,12 +76,6 @@ fun SupportScreen(
     state: SupportUiState,
     event: (SupportEvent) -> Unit
 ) {
-
-    val isOpen = remember {
-        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-        hour in 8..21
-    }
-
     val haptic = LocalHapticFeedback.current
 
     Box(
@@ -118,15 +112,12 @@ fun SupportScreen(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
 
-                    PulseOnlineDot(isOpen)
+                    PulseOnlineDot(state.isOnline)
 
                     Spacer(Modifier.width(8.dp))
 
                     Text(
-                        text = if (isOpen)
-                            "Online • Respon < 2 menit"
-                        else
-                            "Offline • Buka 08:00",
+                        text = state.statusLabel,
                         color = Color.White.copy(.95f),
                         fontFamily = PoppinsFont,
                         fontSize = 13.sp
@@ -200,7 +191,7 @@ fun SupportScreen(
                     )
 
                     Text(
-                        text = "Senin - Minggu • 08:00 - 22:00",
+                        text = state.operationalHoursLabel,
                         fontFamily = PoppinsFont
                     )
                 }
@@ -212,13 +203,15 @@ fun SupportScreen(
 @Composable
 private fun PulseOnlineDot(isOnline: Boolean) {
 
-    val infinite = rememberInfiniteTransition()
+    val infinite = rememberInfiniteTransition(label = "support-online")
     val scale by infinite.animateFloat(
-        1f, 1.4f,
+        initialValue = 1f,
+        targetValue = 1.4f,
         animationSpec = infiniteRepeatable(
             tween(900),
             RepeatMode.Reverse
-        )
+        ),
+        label = "support-online-scale"
     )
 
     Box(

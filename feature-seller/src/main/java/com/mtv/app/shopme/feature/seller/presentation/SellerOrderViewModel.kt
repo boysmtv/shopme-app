@@ -62,7 +62,7 @@ class SellerOrderViewModel @Inject constructor(
 
     private fun load() {
         observeProfile()
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getSellerOrdersUseCase(),
             onState = { result ->
                 _state.update {
@@ -83,7 +83,7 @@ class SellerOrderViewModel @Inject constructor(
     }
 
     private fun observeProfile() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getSellerProfileUseCase(),
             onState = { result ->
                 _state.update {
@@ -125,15 +125,21 @@ class SellerOrderViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { update { copy(isLoading = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

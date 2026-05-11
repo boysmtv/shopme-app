@@ -30,6 +30,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -79,13 +80,13 @@ fun ChatSupportScreen(
 
             Column {
                 Text(
-                    "Support Agent",
+                    state.title,
                     fontFamily = PoppinsFont,
                     fontSize = 14.sp
                 )
                 Text(
                     if (state.isAgentTyping) "Mengetik..."
-                    else "Online • Respon cepat",
+                    else state.statusLabel,
                     fontSize = 11.sp,
                     color = Color(0xFF4CAF50),
                     fontFamily = PoppinsFont
@@ -103,6 +104,33 @@ fun ChatSupportScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            if (state.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = AppColor.Green)
+                    }
+                }
+            } else if (state.messages.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Belum ada pesan",
+                            color = Color.Gray,
+                            fontFamily = PoppinsFont
+                        )
+                    }
+                }
+            }
 
             items(state.messages) { message ->
                 ChatBubbleSuper(message)

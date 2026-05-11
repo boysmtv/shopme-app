@@ -22,6 +22,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -36,7 +37,8 @@ class SellerCreateCafeViewModel @Inject constructor(
     private val createCafeUseCase: CreateCafeUseCase,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val getVillageUseCase: GetVillageUseCase,
-    private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase
+    private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase,
+    private val sessionManager: SessionManager
 ) : BaseEventViewModel<SellerCreateCafeEvent, SellerCreateCafeEffect>() {
 
     private val _state = MutableStateFlow(SellerCreateCafeUiState())
@@ -47,7 +49,7 @@ class SellerCreateCafeViewModel @Inject constructor(
         when (event) {
 
             is SellerCreateCafeEvent.Load -> load()
-            is SellerCreateCafeEvent.DismissDialog -> dismissDialog()
+            is SellerCreateCafeEvent.DismissDialog -> clearDialog()
 
             is SellerCreateCafeEvent.ChangeCafeName -> update { copy(cafeName = event.value) }
             is SellerCreateCafeEvent.ChangePhone -> update { copy(phone = event.value) }
@@ -201,24 +203,29 @@ class SellerCreateCafeViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        _state.update { it.copy(isLoading = false) }
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { clearDialog() }
+                )
             )
-        )
+        }
     }
 
     private fun showError(message: String) {
         showError(UiError.Validation(message = message))
     }
 
-    private fun dismissDialog() {
+    private fun clearDialog() {
         super.dismissDialog()
         _state.update { it.copy(isLoading = false) }
     }

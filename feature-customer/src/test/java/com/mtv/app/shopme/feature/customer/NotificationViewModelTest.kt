@@ -7,6 +7,9 @@ import com.mtv.app.shopme.domain.usecase.UpdateNotificationPreferencesUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotificationEvent
 import com.mtv.app.shopme.feature.customer.presentation.NotificationViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -21,6 +24,7 @@ class NotificationViewModelTest {
 
     private val getNotificationPreferencesUseCase: GetNotificationPreferencesUseCase = mockk()
     private val updateNotificationPreferencesUseCase: UpdateNotificationPreferencesUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should reflect backend notification preferences`() = runTest {
@@ -38,7 +42,8 @@ class NotificationViewModelTest {
 
         val vm = NotificationViewModel(
             getNotificationPreferencesUseCase = getNotificationPreferencesUseCase,
-            updateNotificationPreferencesUseCase = updateNotificationPreferencesUseCase
+            updateNotificationPreferencesUseCase = updateNotificationPreferencesUseCase,
+            sessionManager = sessionManager
         )
 
         vm.onEvent(NotificationEvent.Load)
@@ -86,7 +91,8 @@ class NotificationViewModelTest {
 
         val vm = NotificationViewModel(
             getNotificationPreferencesUseCase = getNotificationPreferencesUseCase,
-            updateNotificationPreferencesUseCase = updateNotificationPreferencesUseCase
+            updateNotificationPreferencesUseCase = updateNotificationPreferencesUseCase,
+            sessionManager = sessionManager
         )
 
         vm.onEvent(NotificationEvent.Load)
@@ -95,5 +101,24 @@ class NotificationViewModelTest {
         advanceUntilIdle()
 
         assertEquals(false, vm.uiState.value.pushEnabled)
+    }
+
+    @Test
+    fun `unauthorized notification load should force logout`() = runTest {
+        every { getNotificationPreferencesUseCase.invoke() } returns flowOf(
+            Resource.Error(UiError.Unauthorized("Session expired"))
+        )
+
+        val vm = NotificationViewModel(
+            getNotificationPreferencesUseCase = getNotificationPreferencesUseCase,
+            updateNotificationPreferencesUseCase = updateNotificationPreferencesUseCase,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(NotificationEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals(false, vm.uiState.value.loading)
+        coVerify(exactly = 1) { sessionManager.forceLogout() }
     }
 }

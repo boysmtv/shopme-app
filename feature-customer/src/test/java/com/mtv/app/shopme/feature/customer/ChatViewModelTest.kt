@@ -8,6 +8,7 @@ import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.presentation.ChatViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -23,6 +24,7 @@ class ChatViewModelTest {
     private val getChatMessageUseCase: GetChatMessageUseCase = mockk()
     private val sendUseCase: CreateChatMessageSendUseCase = mockk(relaxed = true)
     private val markReadUseCase: ChatMessageMarkAsReadUseCase = mockk(relaxed = true)
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should infer active chat and mark it as read`() = runTest {
@@ -47,7 +49,8 @@ class ChatViewModelTest {
             savedStateHandle = SavedStateHandle(),
             chatMessageUseCase = getChatMessageUseCase,
             chatSendMessageUseCase = sendUseCase,
-            chatMessageMarkAsReadUseCase = markReadUseCase
+            chatMessageMarkAsReadUseCase = markReadUseCase,
+            sessionManager = sessionManager
         )
 
         vm.onEvent(ChatEvent.Load)

@@ -12,6 +12,7 @@ import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.presentation.HomeViewModel
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.coEvery
 import io.mockk.mockk
 import java.math.BigDecimal
@@ -34,6 +35,7 @@ class HomeViewModelTest {
 
     private val customerUseCase: GetCustomerUseCase = mockk()
     private val homeFoodUseCase: GetFoodUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     private lateinit var viewModel: HomeViewModel
 
@@ -41,7 +43,8 @@ class HomeViewModelTest {
     fun setup() {
         viewModel = HomeViewModel(
             customerUseCase = customerUseCase,
-            homeFoodUseCase = homeFoodUseCase
+            homeFoodUseCase = homeFoodUseCase,
+            sessionManager = sessionManager
         )
     }
 
@@ -68,6 +71,7 @@ class HomeViewModelTest {
             assertEquals(HomeEffect.NavigateToDetail(id), awaitItem())
         }
     }
+
 }
 
 private fun fakeCustomer() = Customer(

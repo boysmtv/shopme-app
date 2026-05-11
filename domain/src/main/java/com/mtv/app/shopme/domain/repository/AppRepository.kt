@@ -9,10 +9,15 @@
 package com.mtv.app.shopme.domain.repository
 
 import com.mtv.app.shopme.domain.param.SplashParam
+import com.mtv.app.shopme.domain.model.SupportChat
 import com.mtv.app.shopme.domain.model.Splash
+import com.mtv.app.shopme.domain.model.SupportCenter
 import com.mtv.based.core.network.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {
     fun getSplash(param: SplashParam): Flow<Resource<Splash>>
+    fun getSupportCenter(): Flow<Resource<SupportCenter>>
+    fun getSupportChat(): Flow<Resource<SupportChat>>
+    fun sendSupportChatMessage(message: String): Flow<Resource<SupportChat>>
 }

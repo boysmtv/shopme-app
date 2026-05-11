@@ -811,7 +811,11 @@ fun EditProfileAddressTabPreview() {
             )
     ) {
 
-        PremiumHeader {}
+        PremiumHeader(
+            photo = EMPTY_STRING,
+            onBack = {},
+            onUpload = {}
+        )
 
         Card(
             modifier = Modifier.fillMaxSize(),

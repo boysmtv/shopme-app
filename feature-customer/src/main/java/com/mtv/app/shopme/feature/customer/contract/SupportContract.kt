@@ -13,9 +13,15 @@ import android.content.pm.PackageManager
 
 data class SupportUiState(
     val isLoading: Boolean = false,
-    val phone: String = "081234567890",
-    val email: String = "support@shopme.com",
-    val whatsapp: String = "6281234567890"
+    val phone: String = "",
+    val email: String = "",
+    val whatsapp: String = "",
+    val whatsappMessageTemplate: String = "",
+    val emailSubject: String = "",
+    val emailBodyTemplate: String = "",
+    val operationalHoursLabel: String = "",
+    val statusLabel: String = "",
+    val isOnline: Boolean = false
 )
 
 sealed class SupportEvent {

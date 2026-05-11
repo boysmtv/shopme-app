@@ -29,6 +29,7 @@ class PasswordViewModelTest {
         vm.onEvent(PasswordEvent.OnNewPasswordChange("newpass"))
         vm.onEvent(PasswordEvent.OnConfirmPasswordChange("newpass"))
         vm.onEvent(PasswordEvent.OnSubmitClick)
+        advanceUntilIdle()
         assertTrue(vm.uiState.value.changePassword is com.mtv.based.core.network.utils.LoadState.Success)
     }
 

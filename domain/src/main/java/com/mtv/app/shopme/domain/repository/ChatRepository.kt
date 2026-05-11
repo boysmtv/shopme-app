@@ -21,4 +21,6 @@ interface ChatRepository {
     fun sendMessage(id: String, message: String, asSeller: Boolean = false): Flow<Resource<Unit>>
 
     fun readAllMessage(id: String, asSeller: Boolean = false): Flow<Resource<Unit>>
+
+    fun clearAllMessages(asSeller: Boolean = false): Flow<Resource<Unit>>
 }

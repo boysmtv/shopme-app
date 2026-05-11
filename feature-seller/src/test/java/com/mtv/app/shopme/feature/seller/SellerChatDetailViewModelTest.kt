@@ -8,6 +8,7 @@ import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerChatDetailViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -24,6 +25,7 @@ class SellerChatDetailViewModelTest {
     private val getChatMessageUseCase: GetChatMessageUseCase = mockk()
     private val sendUseCase: CreateChatMessageSendUseCase = mockk(relaxed = true)
     private val markReadUseCase: ChatMessageMarkAsReadUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should read seller conversation and map seller message state`() = runTest {
@@ -48,7 +50,8 @@ class SellerChatDetailViewModelTest {
             savedStateHandle = SavedStateHandle(mapOf("chatId" to "conv-1")),
             getChatMessageUseCase = getChatMessageUseCase,
             sendChatMessageUseCase = sendUseCase,
-            chatMessageMarkAsReadUseCase = markReadUseCase
+            chatMessageMarkAsReadUseCase = markReadUseCase,
+            sessionManager = sessionManager
         )
 
         vm.onEvent(SellerChatDetailEvent.Load)

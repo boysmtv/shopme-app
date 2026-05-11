@@ -26,6 +26,7 @@ import com.mtv.app.shopme.feature.customer.contract.EditProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.EditProfileUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -37,6 +38,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
+    private val sessionManager: SessionManager,
     private val customerUseCase: GetCustomerUseCase,
     private val customerUpdateUseCase: UpdateCustomerUseCase,
     private val addressUseCase: GetAddressUseCase,
@@ -69,7 +71,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun observeCustomer() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = customerUseCase(),
             onState = { state ->
                 _state.update { it.copy(customer = state) }
@@ -79,7 +81,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun observeAddress() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = addressUseCase(),
             onState = { state ->
                 _state.update { it.copy(addresses = state) }
@@ -89,7 +91,7 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun observeVillage() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = villageUseCase(),
             onState = { state ->
                 _state.update { it.copy(villages = state) }
@@ -171,15 +173,17 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(error, sessionManager) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }
