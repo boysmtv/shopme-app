@@ -102,7 +102,9 @@ fun SellerChatListScreen(
             state.isLoading && state.chatList.isEmpty() -> {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
                 ) {
                     items(5) {
                         SellerChatListShimmerItem()
@@ -129,7 +131,9 @@ fun SellerChatListScreen(
             else -> {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
                 ) {
                     items(state.chatList) { item ->
                         SellerListChatItem(

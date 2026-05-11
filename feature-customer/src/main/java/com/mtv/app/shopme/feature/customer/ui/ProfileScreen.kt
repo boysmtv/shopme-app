@@ -220,6 +220,7 @@ fun ProfileScreen(
 
                         Column(
                             modifier = Modifier
+                                .weight(1f, fill = false)
                                 .verticalScroll(scrollState)
                         ) {
                             ProfileMenuItem(

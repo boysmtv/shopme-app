@@ -30,55 +30,51 @@ import com.mtv.app.shopme.common.ShimmerLine
 
 @Composable
 fun ShimmerHomeContentSkeleton() {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                ShimmerLine(widthFraction = 0.62f, heightDp = 24)
-                ShimmerBlock(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(24.dp)
-                )
-                ShimmerBlock(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(110.dp),
-                    shape = RoundedCornerShape(20.dp)
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    repeat(5) {
-                        Column(
-                            modifier = Modifier.width(80.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            ShimmerBlock(
-                                modifier = Modifier.size(80.dp),
-                                shape = RoundedCornerShape(16.dp)
-                            )
-                        }
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            ShimmerLine(widthFraction = 0.62f, heightDp = 24)
+            ShimmerBlock(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(24.dp)
+            )
+            ShimmerBlock(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(110.dp),
+                shape = RoundedCornerShape(20.dp)
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                repeat(5) {
+                    Column(
+                        modifier = Modifier.width(80.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ShimmerBlock(
+                            modifier = Modifier.size(80.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        )
                     }
                 }
-                ShimmerLine(widthFraction = 0.35f, heightDp = 18)
             }
+            ShimmerLine(widthFraction = 0.35f, heightDp = 18)
         }
 
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                repeat(3) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        repeat(2) {
-                            ShimmerHomeFoodCard(modifier = Modifier.weight(1f))
-                        }
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            repeat(3) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    repeat(2) {
+                        ShimmerHomeFoodCard(modifier = Modifier.weight(1f))
                     }
                 }
             }

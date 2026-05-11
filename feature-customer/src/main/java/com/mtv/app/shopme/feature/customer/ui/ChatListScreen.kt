@@ -127,7 +127,9 @@ fun ChatListScreen(
             is LoadState.Loading -> {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 20.dp, end = 20.dp)
                 ) {
                     items(5) {
                         ChatListShimmerItem()
@@ -153,7 +155,9 @@ fun ChatListScreen(
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 20.dp, end = 20.dp)
                     ) {
                         items(chats) { item ->
                             ListChatItem(
