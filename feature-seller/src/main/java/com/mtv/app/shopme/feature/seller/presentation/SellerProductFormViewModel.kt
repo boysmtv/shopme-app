@@ -84,6 +84,9 @@ class SellerProductFormViewModel @Inject constructor(
 
             SellerProductFormEvent.Delete -> delete()
 
+            SellerProductFormEvent.ClickHelpCenter ->
+                emitEffect(SellerProductFormEffect.NavigateToHelpCenter)
+
             SellerProductFormEvent.ClickBack ->
                 emitEffect(SellerProductFormEffect.NavigateBack)
 

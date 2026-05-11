@@ -50,6 +50,7 @@ sealed class SellerProductFormEvent {
 
     object Save : SellerProductFormEvent()
     object Delete : SellerProductFormEvent()
+    object ClickHelpCenter : SellerProductFormEvent()
 
     object ClickBack : SellerProductFormEvent()
 
@@ -69,4 +70,5 @@ sealed class SellerProductFormEffect {
     object NavigateBack : SellerProductFormEffect()
     object SaveSuccess : SellerProductFormEffect()
     object DeleteSuccess : SellerProductFormEffect()
+    object NavigateToHelpCenter : SellerProductFormEffect()
 }

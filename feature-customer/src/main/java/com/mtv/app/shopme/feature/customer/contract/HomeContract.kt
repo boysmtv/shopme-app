@@ -23,6 +23,7 @@ sealed class HomeEvent {
     object Load : HomeEvent()
     object DismissDialog : HomeEvent()
     object ClickSearch : HomeEvent()
+    data class ClickCategory(val value: String) : HomeEvent()
     object ClickNotif : HomeEvent()
     data class ClickFood(val id: String) : HomeEvent()
 }

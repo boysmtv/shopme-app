@@ -25,11 +25,13 @@ sealed class CafeEvent {
     object ClickBack : CafeEvent()
     object ClickChat : CafeEvent()
     object ClickWhatsapp : CafeEvent()
+    object ClickSearch : CafeEvent()
 }
 
 sealed class CafeEffect {
     object NavigateBack : CafeEffect()
     object NavigateToChat : CafeEffect()
-    object NavigateToWhatsapp : CafeEffect()
+    object NavigateToSearch : CafeEffect()
+    data class OpenWhatsapp(val phone: String) : CafeEffect()
     data class NavigateToDetail(val id: String) : CafeEffect()
 }

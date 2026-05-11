@@ -47,8 +47,29 @@ class CafeViewModel @Inject constructor(
             is CafeEvent.ClickFood -> emitEffect(CafeEffect.NavigateToDetail(event.id))
             is CafeEvent.ClickBack -> emitEffect(CafeEffect.NavigateBack)
             is CafeEvent.ClickChat -> emitEffect(CafeEffect.NavigateToChat)
-            is CafeEvent.ClickWhatsapp -> emitEffect(CafeEffect.NavigateToWhatsapp)
+            is CafeEvent.ClickWhatsapp -> openWhatsapp()
+            is CafeEvent.ClickSearch -> emitEffect(CafeEffect.NavigateToSearch)
         }
+    }
+
+    private fun openWhatsapp() {
+        val cafePhone = (_state.value.cafe as? com.mtv.based.core.network.utils.LoadState.Success)
+            ?.data
+            ?.phone
+            .orEmpty()
+            .trim()
+
+        if (cafePhone.isBlank()) {
+            showError(UiError.Validation(message = "Nomor WhatsApp cafe belum tersedia"))
+            return
+        }
+
+        val normalizedPhone = cafePhone
+            .replace(" ", "")
+            .replace("-", "")
+            .removePrefix("+")
+
+        emitEffect(CafeEffect.OpenWhatsapp(normalizedPhone))
     }
 
     private fun load() {

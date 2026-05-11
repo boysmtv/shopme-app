@@ -41,6 +41,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.DismissDialog -> dismissDialog()
             is HomeEvent.ClickFood -> emitEffect(HomeEffect.NavigateToDetail(event.id))
             is HomeEvent.ClickSearch -> emitEffect(HomeEffect.NavigateToSearch)
+            is HomeEvent.ClickCategory -> emitEffect(HomeEffect.NavigateToSearch)
             is HomeEvent.ClickNotif -> emitEffect(HomeEffect.NavigateToNotif)
         }
     }

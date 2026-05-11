@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -36,7 +37,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailUiState
@@ -76,9 +82,31 @@ fun SellerChatScreen(
             }
 
             Spacer(Modifier.width(12.dp))
+            SmartImage(
+                model = state.chatAvatarBase64,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.image_burger),
+                error = painterResource(R.drawable.image_burger)
+            )
+
+            Spacer(Modifier.width(12.dp))
             Column {
-                Text("Customer Name", fontFamily = PoppinsFont, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                Text("Online", fontFamily = PoppinsFont, fontSize = 12.sp, color = Color(0xFF4CAF50))
+                Text(
+                    state.chatName.ifBlank { "Customer" },
+                    fontFamily = PoppinsFont,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "Percakapan aktif",
+                    fontFamily = PoppinsFont,
+                    fontSize = 12.sp,
+                    color = Color(0xFF4CAF50)
+                )
             }
 
             Spacer(Modifier.weight(1f))

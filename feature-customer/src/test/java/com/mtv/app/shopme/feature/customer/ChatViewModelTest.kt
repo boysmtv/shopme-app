@@ -4,7 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
+import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
+import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.presentation.ChatViewModel
 import com.mtv.based.core.network.utils.Resource
@@ -22,12 +24,30 @@ class ChatViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
     private val getChatMessageUseCase: GetChatMessageUseCase = mockk()
+    private val getChatListUseCase: GetChatListUseCase = mockk()
     private val sendUseCase: CreateChatMessageSendUseCase = mockk(relaxed = true)
     private val markReadUseCase: ChatMessageMarkAsReadUseCase = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should infer active chat and mark it as read`() = runTest {
+        every { getChatListUseCase.invoke(false) } returns flowOf(
+            Resource.Success(
+                ChatList(
+                    listOf(
+                        ChatListItem(
+                            id = "conv-1",
+                            name = "Cafe Kopi Kita",
+                            lastMessage = "Pesanan sedang diproses",
+                            time = "10:30",
+                            unreadCount = 1,
+                            avatarBase64 = "data:image/png;base64,CAFE",
+                            isFromUser = false
+                        )
+                    )
+                )
+            )
+        )
         every { getChatMessageUseCase.invoke(null, false) } returns flowOf(
             Resource.Success(
                 listOf(
@@ -47,6 +67,7 @@ class ChatViewModelTest {
 
         val vm = ChatViewModel(
             savedStateHandle = SavedStateHandle(),
+            chatListUseCase = getChatListUseCase,
             chatMessageUseCase = getChatMessageUseCase,
             chatSendMessageUseCase = sendUseCase,
             chatMessageMarkAsReadUseCase = markReadUseCase,
@@ -57,5 +78,7 @@ class ChatViewModelTest {
         advanceUntilIdle()
 
         assertEquals("conv-1", vm.uiState.value.activeChatId)
+        assertEquals("Cafe Kopi Kita", vm.uiState.value.chatName)
+        assertEquals("data:image/png;base64,CAFE", vm.uiState.value.chatAvatarBase64)
     }
 }

@@ -80,7 +80,7 @@ fun CafeScreen(
         topBar = {
             CafeToolbar(
                 onBack = { event(CafeEvent.ClickBack) },
-                onSearchClick = {}
+                onSearchClick = { event(CafeEvent.ClickSearch) }
             )
         },
         containerColor = Color.Transparent

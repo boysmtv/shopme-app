@@ -85,7 +85,8 @@ fun HomeScreen(
         HomeContent(
             state = state,
             onClickFood = { event(HomeEvent.ClickFood(it)) },
-            onClickSearch = { event(HomeEvent.ClickSearch) }
+            onClickSearch = { event(HomeEvent.ClickSearch) },
+            onCategoryClick = { event(HomeEvent.ClickCategory(it)) }
         )
     }
 }
@@ -94,7 +95,8 @@ fun HomeScreen(
 private fun HomeContent(
     state: HomeUiState,
     onClickFood: (String) -> Unit,
-    onClickSearch: () -> Unit
+    onClickSearch: () -> Unit,
+    onCategoryClick: (String) -> Unit
 ) {
 
     val listState = rememberSaveable(saver = LazyListState.Saver) {
@@ -119,7 +121,9 @@ private fun HomeContent(
 
                 Spacer(Modifier.height(16.dp))
 
-                HomeMenuBar()
+                HomeMenuBar(
+                    onCategoryClick = onCategoryClick
+                )
 
                 Spacer(Modifier.height(20.dp))
             }
@@ -404,7 +408,9 @@ private fun HomePromoBanner() {
 }
 
 @Composable
-private fun HomeMenuBar() {
+private fun HomeMenuBar(
+    onCategoryClick: (String) -> Unit
+) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -412,20 +418,26 @@ private fun HomeMenuBar() {
         items(
             listOf("Burger", "Sandwich", "Sushi", "Pizza", "Noodles", "Steak", "Coffee", "Dessert")
         ) { title ->
-            CategoryItem(title)
+            CategoryItem(
+                title = title,
+                onClick = { onCategoryClick(title) }
+            )
         }
     }
 }
 
 @Composable
-fun CategoryItem(title: String) {
+fun CategoryItem(
+    title: String,
+    onClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .size(80.dp)
             .background(AppColor.White, RoundedCornerShape(16.dp))
-            .clickable {}
+            .clickable { onClick() }
             .padding(12.dp)
     ) {
         Icon(Icons.Default.Fastfood, contentDescription = null, tint = AppColor.Green)

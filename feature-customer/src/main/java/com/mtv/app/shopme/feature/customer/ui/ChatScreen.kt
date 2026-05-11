@@ -8,7 +8,6 @@
 
 package com.mtv.app.shopme.feature.customer.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -57,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
@@ -96,27 +95,28 @@ fun ChatScreen(
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
 
-            Image(
-                painter = painterResource(R.drawable.image_cheese_burger),
+            SmartImage(
+                model = state.chatAvatarBase64,
                 contentDescription = null,
-                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(40.dp)
                     .aspectRatio(1f)
-                    .clip(CircleShape)
+                    .clip(CircleShape),
+                placeholder = painterResource(R.drawable.image_cheese_burger),
+                error = painterResource(R.drawable.image_cheese_burger)
             )
 
             Spacer(Modifier.width(16.dp))
 
             Column {
                 Text(
-                    "Cafe Kopi Kita",
+                    state.chatName.ifBlank { "Chat" },
                     fontFamily = PoppinsFont,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "Online",
+                    "Percakapan aktif",
                     fontFamily = PoppinsFont,
                     fontSize = 12.sp,
                     color = Color(0xFF4CAF50)
@@ -124,11 +124,6 @@ fun ChatScreen(
             }
 
             Spacer(Modifier.weight(1f))
-
-            IconButton(onClick = { event(ChatEvent.ClickBack) }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-            }
-
         }
         Spacer(Modifier.height(16.dp))
 

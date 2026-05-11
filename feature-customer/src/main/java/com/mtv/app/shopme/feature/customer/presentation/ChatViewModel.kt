@@ -12,6 +12,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
+import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatEffect
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
+    private val chatListUseCase: GetChatListUseCase,
     private val chatMessageUseCase: GetChatMessageUseCase,
     private val chatSendMessageUseCase: CreateChatMessageSendUseCase,
     private val chatMessageMarkAsReadUseCase: ChatMessageMarkAsReadUseCase,
@@ -56,7 +58,31 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun load() {
+        observeChatMetadata()
         observeChat()
+    }
+
+    private fun observeChatMetadata() {
+        observeDataFlow(
+            flow = chatListUseCase(),
+            onState = { state ->
+                val items = (state as? com.mtv.based.core.network.utils.LoadState.Success)
+                    ?.data
+                    ?.chatList
+                    .orEmpty()
+                _state.update {
+                    val resolvedActiveId = it.activeChatId.ifBlank { items.firstOrNull()?.id.orEmpty() }
+                    val activeChat = items.firstOrNull { item -> item.id == resolvedActiveId }
+                        ?: items.firstOrNull()
+                    it.copy(
+                        activeChatId = resolvedActiveId,
+                        chatName = activeChat?.name.orEmpty(),
+                        chatAvatarBase64 = activeChat?.avatarBase64
+                    )
+                }
+            },
+            onError = { showError(it) }
+        )
     }
 
     private fun observeChat() {
@@ -92,7 +118,10 @@ class ChatViewModel @Inject constructor(
                     it.copy(sendMessage = state)
                 }
             },
-            onSuccess = { observeChat() },
+            onSuccess = {
+                observeChatMetadata()
+                observeChat()
+            },
             onError = { showError(it) }
         )
     }
