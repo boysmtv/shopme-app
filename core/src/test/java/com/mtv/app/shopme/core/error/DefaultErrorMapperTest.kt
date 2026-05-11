@@ -24,6 +24,20 @@ class DefaultErrorMapperTest {
     }
 
     @Test
+    fun `map should preserve conflict message from backend`() {
+        val result = mapper.map(
+            ApiException.Conflict(
+                statusCode = 409,
+                errorCode = "CONFLICT",
+                message = "Village is still referenced by other data"
+            )
+        )
+
+        assertTrue(result is UiError.Validation)
+        assertEquals("Village is still referenced by other data", result.message)
+    }
+
+    @Test
     fun `map should preserve server message from backend`() {
         val result = mapper.map(
             ApiException.ServerError(

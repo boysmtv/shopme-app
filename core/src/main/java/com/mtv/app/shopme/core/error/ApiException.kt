@@ -27,6 +27,12 @@ sealed class ApiException(
         message: String = "Forbidden"
     ) : ApiException(statusCode, errorCode, message)
 
+    class Conflict(
+        override val statusCode: Int? = 409,
+        override val errorCode: String? = null,
+        message: String = "Conflict"
+    ) : ApiException(statusCode, errorCode, message)
+
     class ServerError(
         override val statusCode: Int? = 500,
         override val errorCode: String? = null,

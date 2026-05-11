@@ -69,6 +69,12 @@ abstract class BaseRemoteDataSource(
                 message = message
             )
 
+            409 -> ApiException.Conflict(
+                statusCode = httpCode,
+                errorCode = errorCode,
+                message = message
+            )
+
             in 400..499 -> ApiException.Validation(
                 message = message,
                 statusCode = httpCode,
@@ -108,6 +114,7 @@ abstract class BaseRemoteDataSource(
         when (statusCode) {
             401 -> "Unauthorized"
             403 -> "Forbidden"
+            409 -> "Conflict"
             in 400..499 -> "Validation error"
             in 500..599 -> "Server error"
             else -> "Unknown error"

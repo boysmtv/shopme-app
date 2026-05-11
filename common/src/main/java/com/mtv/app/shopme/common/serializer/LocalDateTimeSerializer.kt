@@ -8,12 +8,13 @@
 
 package com.mtv.app.shopme.common.serializer
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalDateTime
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
 
@@ -24,8 +25,15 @@ object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
         encoder.encodeString(value.toString())
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun deserialize(decoder: Decoder): LocalDateTime {
-        return LocalDateTime.parse(decoder.decodeString())
+        val rawValue = decoder.decodeString()
+
+        return runCatching {
+            LocalDateTime.parse(rawValue)
+        }.recoverCatching {
+            OffsetDateTime.parse(rawValue).toLocalDateTime()
+        }.recoverCatching {
+            Instant.parse(rawValue).atOffset(ZoneOffset.UTC).toLocalDateTime()
+        }.getOrThrow()
     }
 }

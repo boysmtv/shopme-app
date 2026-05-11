@@ -97,7 +97,7 @@ class BaseRemoteDataSourceTest {
     }
 
     @Test
-    fun `request should expose backend validation message on conflict`() = runTest {
+    fun `request should expose backend conflict message and code`() = runTest {
         coEvery {
             handler.handle<ApiResponse<String>>(
                 client = client,
@@ -117,8 +117,8 @@ class BaseRemoteDataSourceTest {
             dataSource.execute<ApiResponse<String>>()
         }.exceptionOrNull()
 
-        assertTrue(throwable is ApiException.Validation)
-        throwable as ApiException.Validation
+        assertTrue(throwable is ApiException.Conflict)
+        throwable as ApiException.Conflict
         assertEquals(409, throwable.statusCode)
         assertEquals("CONFLICT", throwable.errorCode)
         assertEquals("Village is still referenced by other data", throwable.message)

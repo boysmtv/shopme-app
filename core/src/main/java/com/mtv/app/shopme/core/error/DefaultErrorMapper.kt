@@ -33,6 +33,10 @@ class DefaultErrorMapper @Inject constructor() : ErrorMapper {
                 message = throwable.message ?: ErrorMessages.ACCESS_DENIED
             )
 
+            is ApiException.Conflict -> UiError.Validation(
+                message = throwable.message ?: "Conflict"
+            )
+
             is ApiException.ServerError -> UiError.Server(
                 message = throwable.message ?: ErrorMessages.SERVER_ERROR
             )
