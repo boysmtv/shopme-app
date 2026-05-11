@@ -112,70 +112,109 @@ fun SellerDashboardScreen(
 
             item { Spacer(Modifier.height(20.dp)) }
 
-            item { WeeklySummaryCard(orders) }
+            if (state.isLoading && orders.isEmpty()) {
+                item { SellerDashboardShimmer() }
+            } else {
+                item { WeeklySummaryCard(orders) }
 
-            item { Spacer(Modifier.height(24.dp)) }
+                item { Spacer(Modifier.height(24.dp)) }
 
-            item { WeeklyOrdersChart(orders) }
+                item { WeeklyOrdersChart(orders) }
 
-            item { Spacer(Modifier.height(20.dp)) }
+                item { Spacer(Modifier.height(20.dp)) }
 
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OrderFilterChips(
-                        selected = selectedFilter,
-                        onSelected = { event(SellerDashboardEvent.ChangeFilter(it)) })
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OrderFilterChips(
+                            selected = selectedFilter,
+                            onSelected = { event(SellerDashboardEvent.ChangeFilter(it)) })
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf("Asc", "Desc").forEach { sortOption ->
-                            val isSelected = sortOption == selectedSort
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(50))
-                                    .background(
-                                        if (isSelected) AppColor.Blue
-                                        else Color.LightGray.copy(alpha = 0.3f)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf("Asc", "Desc").forEach { sortOption ->
+                                val isSelected = sortOption == selectedSort
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .background(
+                                            if (isSelected) AppColor.Blue
+                                            else Color.LightGray.copy(alpha = 0.3f)
+                                        )
+                                        .clickable { event(SellerDashboardEvent.ChangeSort(sortOption)) }
+                                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                                ) {
+                                    Text(
+                                        sortOption,
+                                        color = if (isSelected) AppColor.White else Color.Black,
+                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                        fontSize = 12.sp
                                     )
-                                    .clickable { event(SellerDashboardEvent.ChangeSort(sortOption)) }
-                                    .padding(horizontal = 12.dp, vertical = 6.dp)
-                            ) {
-                                Text(
-                                    sortOption,
-                                    color = if (isSelected) AppColor.White else Color.Black,
-                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                    fontSize = 12.sp
-                                )
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            items(sortedOrders.size) { index ->
-                val order = sortedOrders[index]
-                if (selectedFilter == "All" || order.status == selectedFilter) {
-                    ModernOrderItemCompact(
-                        invoice = order.invoice,
-                        customer = order.customer,
-                        total = order.total,
-                        date = order.date,
-                        time = order.time,
-                        paymentMethod = order.paymentMethod,
-                        status = order.status,
-                        location = order.location,
-                    )
-                    Spacer(Modifier.height(8.dp))
+                items(sortedOrders.size) { index ->
+                    val order = sortedOrders[index]
+                    if (matchesOrderFilter(selectedFilter, order.status)) {
+                        ModernOrderItemCompact(
+                            invoice = order.invoice,
+                            customer = order.customer,
+                            total = order.total,
+                            date = order.date,
+                            time = order.time,
+                            paymentMethod = order.paymentMethod,
+                            status = order.status,
+                            location = order.location,
+                            onClick = { event(SellerDashboardEvent.ClickOrderDetail(order.id)) }
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
                 }
             }
         }
     }
 
+}
+
+@Composable
+private fun SellerDashboardShimmer() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color.LightGray.copy(alpha = 0.25f))
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(180.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Color.LightGray.copy(alpha = 0.2f))
+        )
+        repeat(2) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(104.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color.LightGray.copy(alpha = 0.2f))
+            )
+        }
+    }
 }
 
 @Composable
@@ -187,12 +226,15 @@ fun ModernOrderItemCompact(
     time: String,
     paymentMethod: String,
     status: String,
-    location: String
+    location: String,
+    onClick: () -> Unit
 ) {
     val statusColor = when (status.lowercase()) {
         "completed" -> Color(0xFF4CAF50)
-        "pending" -> Color(0xFFFF5722)
-        "canceled" -> Color(0xFFFF0D00)
+        "ordered", "pending", "unpaid" -> Color(0xFFFF5722)
+        "cooking" -> Color(0xFFFF8A65)
+        "delivering" -> Color(0xFF29B6F6)
+        "cancelled", "canceled" -> Color(0xFFFF0D00)
         else -> AppColor.Blue
     }
 
@@ -200,6 +242,7 @@ fun ModernOrderItemCompact(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(horizontal = 20.dp, vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(3.dp)
@@ -518,14 +561,14 @@ private fun OrderFilterChips(
     selected: String,
     onSelected: (String) -> Unit
 ) {
-    val filters = listOf("All", "Ordered", "Cooking", "Completed", "Cancelled")
+    val filters = listOf("All", "ORDERED", "COOKING", "DELIVERING", "COMPLETED", "CANCELLED")
 
     LazyRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(filters.size) { index ->
             val filter = filters[index]
-            val isSelected = filter == selected
+            val isSelected = filter.equals(selected, ignoreCase = true)
 
             Box(
                 modifier = Modifier
@@ -538,13 +581,27 @@ private fun OrderFilterChips(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    filter,
+                    filter.toUiFilterLabel(),
                     color = if (isSelected) AppColor.White else Color.Black,
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
                 )
             }
         }
     }
+}
+
+private fun matchesOrderFilter(selectedFilter: String, status: String): Boolean {
+    if (selectedFilter == "All") return true
+    return status.equals(selectedFilter, ignoreCase = true)
+}
+
+private fun String.toUiFilterLabel(): String = when (this) {
+    "ORDERED" -> "Ordered"
+    "COOKING" -> "Cooking"
+    "DELIVERING" -> "Delivering"
+    "COMPLETED" -> "Completed"
+    "CANCELLED" -> "Cancelled"
+    else -> this
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

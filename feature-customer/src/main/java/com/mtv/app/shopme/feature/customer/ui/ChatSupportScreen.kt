@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportUiState
 import com.mtv.app.shopme.feature.customer.contract.SupportMessage
@@ -105,15 +106,8 @@ fun ChatSupportScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             if (state.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = AppColor.Green)
-                    }
+                items(4) {
+                    SupportBubbleShimmer()
                 }
             } else if (state.messages.isEmpty()) {
                 item {
@@ -183,6 +177,22 @@ fun ChatSupportScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SupportBubbleShimmer() {
+    val brush = shimmerBrush()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.7f)
+                .height(54.dp)
+                .background(brush, RoundedCornerShape(18.dp))
+        )
     }
 }
 

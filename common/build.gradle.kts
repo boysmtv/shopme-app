@@ -29,7 +29,7 @@ fun resolveConfig(localKey: String, envKey: String, fallback: String): String {
 val debugBaseUrl = resolveConfig(
     localKey = "shopme.baseUrl",
     envKey = "SHOPME_BASE_URL",
-    fallback = "http://192.168.100.20:8080/"
+    fallback = "http://192.168.1.104:8080/"
 )
 val releaseBaseUrl = resolveConfig(
     localKey = "shopme.releaseBaseUrl",

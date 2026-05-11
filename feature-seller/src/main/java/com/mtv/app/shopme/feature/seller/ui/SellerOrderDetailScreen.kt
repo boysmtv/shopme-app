@@ -32,7 +32,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailUiState
@@ -85,21 +85,60 @@ fun SellerOrderDetailScreen(
             )
 
             if (state.isLoading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                SellerOrderDetailShimmer()
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .background(AppColor.WhiteSoft)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    item { OrderTimeline(state.currentStatus) }
+                    item { OrderItemSection(state.items) }
+                    item { CustomerSection(state.customerName, state.customerAddress) }
+                    item { PaymentSection(state.total, state.paymentMethod) }
+                }
             }
+        }
+    }
+}
 
-            LazyColumn(
+@Composable
+private fun SellerOrderDetailShimmer() {
+    val brush = shimmerBrush()
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxSize()
+            .background(AppColor.WhiteSoft)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        items(4) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .background(AppColor.WhiteSoft)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                    .background(Color.White, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
             ) {
-                item { OrderTimeline(state.currentStatus) }
-                item { OrderItemSection(state.items) }
-                item { CustomerSection(state.customerName, state.customerAddress) }
-                item { PaymentSection(state.total, state.paymentMethod) }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .height(18.dp)
+                        .background(brush, RoundedCornerShape(8.dp))
+                )
+                Spacer(Modifier.height(12.dp))
+                repeat(3) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(14.dp)
+                            .background(brush, RoundedCornerShape(8.dp))
+                    )
+                    Spacer(Modifier.height(10.dp))
+                }
             }
         }
     }

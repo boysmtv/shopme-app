@@ -86,6 +86,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.contract.DetailUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerSearchScreen
 import com.mtv.app.shopme.feature.customer.utils.StatItem
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
@@ -140,7 +141,7 @@ fun DetailScreen(
         when (state.food) {
 
             is LoadState.Loading -> {
-                // pakai shimmer kamu
+                ShimmerSearchScreen()
             }
 
             is LoadState.Success -> {
@@ -158,7 +159,9 @@ fun DetailScreen(
 
                     item {
                         DetailHeader(
-                            onBack = { event(DetailEvent.BackClicked) }
+                            isFavorite = state.isFavorite,
+                            onBack = { event(DetailEvent.BackClicked) },
+                            onToggleFavorite = { event(DetailEvent.ToggleFavorite) }
                         )
                     }
 
@@ -298,7 +301,9 @@ fun AddToCartBar(
 
 @Composable
 fun DetailHeader(
-    onBack: () -> Unit
+    isFavorite: Boolean,
+    onBack: () -> Unit,
+    onToggleFavorite: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -337,8 +342,9 @@ fun DetailHeader(
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Color.White)
+                .clickable { onToggleFavorite() }
                 .padding(12.dp),
-            tint = Color.Red
+            tint = if (isFavorite) Color.Red else Color.Gray
         )
     }
 }

@@ -57,6 +57,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base64ToBitmap
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.ChatList
@@ -124,13 +125,13 @@ fun ChatListScreen(
 
         when (val chatListState = state.chatListState) {
             is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 40.dp),
-                    contentAlignment = Alignment.Center
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(start = 20.dp, end = 20.dp)
                 ) {
-                    CircularProgressIndicator(color = AppColor.Green)
+                    items(5) {
+                        ChatListShimmerItem()
+                    }
                 }
             }
 
@@ -168,6 +169,52 @@ fun ChatListScreen(
                 Unit
             }
         }
+    }
+}
+
+@Composable
+private fun ChatListShimmerItem() {
+    val brush = shimmerBrush()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .background(AppColor.WhiteSoft, RoundedCornerShape(12.dp))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(brush)
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(16.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+            Spacer(Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .height(12.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(brush)
+        )
     }
 }
 

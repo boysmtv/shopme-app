@@ -103,6 +103,24 @@ object ApiEndPoint {
             override val method = HttpMethod.Put
             override val type = EndpointType.Json
         }
+
+        object Favorites : IApiEndPoint {
+            override val path = "$API/$CUSTOMER/favorites"
+            override val method = HttpMethod.Get
+            override val type = EndpointType.Json
+        }
+
+        class AddFavorite(foodId: String) : IApiEndPoint {
+            override val path = "$API/$CUSTOMER/favorites/$foodId"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Json
+        }
+
+        class RemoveFavorite(foodId: String) : IApiEndPoint {
+            override val path = "$API/$CUSTOMER/favorites/$foodId"
+            override val method = HttpMethod.Delete
+            override val type = EndpointType.Json
+        }
     }
 
     object Foods {

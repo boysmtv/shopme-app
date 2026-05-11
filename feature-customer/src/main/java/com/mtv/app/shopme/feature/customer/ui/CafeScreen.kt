@@ -130,7 +130,9 @@ fun CafeScreen(
             ) { item ->
                 CafeFoodItem(
                     item = item,
-                    onClickDetail = { event(CafeEvent.ClickFood(it)) }
+                    isFavorite = state.favoriteIds.contains(item.id),
+                    onClickDetail = { event(CafeEvent.ClickFood(it)) },
+                    onToggleFavorite = { event(CafeEvent.ToggleFavorite(item.id)) }
                 )
             }
         }
@@ -354,7 +356,9 @@ fun ActionButton(
 @Composable
 fun CafeFoodItem(
     item: Food,
-    onClickDetail: (String) -> Unit
+    isFavorite: Boolean,
+    onClickDetail: (String) -> Unit,
+    onToggleFavorite: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(18.dp),
@@ -408,7 +412,7 @@ fun CafeFoodItem(
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = if (isFavorite) Color.Red else Color.White,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
@@ -417,6 +421,7 @@ fun CafeFoodItem(
                             Color.Black.copy(alpha = 0.4f),
                             CircleShape
                         )
+                        .clickable { onToggleFavorite() }
                         .padding(4.dp)
                 )
             }
@@ -447,8 +452,10 @@ fun CafeFoodItem(
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
-                        tint = AppColor.Green,
-                        modifier = Modifier.size(18.dp)
+                        tint = if (isFavorite) Color.Red else AppColor.Green,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .clickable { onToggleFavorite() }
                     )
                 }
             }

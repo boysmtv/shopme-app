@@ -73,4 +73,19 @@ class ProfileRepositoryImpl @Inject constructor(
         resultFlow.create {
             remote.setDefaultAddress(param)
         }
+
+    override fun getFavoriteFoodIds() =
+        resultFlow.create {
+            remote.getFavoriteFoodIds()
+        }
+
+    override fun addFavoriteFood(foodId: String) =
+        resultFlow.create {
+            remote.addFavoriteFood(foodId)
+        }
+
+    override fun removeFavoriteFood(foodId: String) =
+        resultFlow.create {
+            remote.removeFavoriteFood(foodId)
+        }
 }

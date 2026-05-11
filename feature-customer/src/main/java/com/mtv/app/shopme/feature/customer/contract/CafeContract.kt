@@ -14,7 +14,8 @@ import com.mtv.based.core.network.utils.LoadState
 
 data class CafeUiState(
     val cafe: LoadState<Cafe> = LoadState.Idle,
-    val foods: LoadState<List<Food>> = LoadState.Idle
+    val foods: LoadState<List<Food>> = LoadState.Idle,
+    val favoriteIds: Set<String> = emptySet()
 )
 
 sealed class CafeEvent {
@@ -26,6 +27,7 @@ sealed class CafeEvent {
     object ClickChat : CafeEvent()
     object ClickWhatsapp : CafeEvent()
     object ClickSearch : CafeEvent()
+    data class ToggleFavorite(val foodId: String) : CafeEvent()
 }
 
 sealed class CafeEffect {

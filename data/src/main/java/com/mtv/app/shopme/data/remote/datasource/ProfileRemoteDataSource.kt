@@ -80,4 +80,19 @@ class ProfileRemoteDataSource @Inject constructor(
             endpoint = ApiEndPoint.Address.SetDefault(param.id)
         ).requireData()
 
+    suspend fun getFavoriteFoodIds() =
+        request<ApiResponse<List<String>>>(
+            endpoint = ApiEndPoint.Customer.Favorites
+        ).requireData()
+
+    suspend fun addFavoriteFood(foodId: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Customer.AddFavorite(foodId)
+        ).requireData()
+
+    suspend fun removeFavoriteFood(foodId: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Customer.RemoveFavorite(foodId)
+        ).requireData()
+
 }

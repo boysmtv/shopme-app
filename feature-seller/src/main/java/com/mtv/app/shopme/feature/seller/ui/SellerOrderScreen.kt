@@ -37,7 +37,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -92,9 +91,7 @@ fun SellerOrderScreen(
             Spacer(Modifier.height(12.dp))
 
             if (state.isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
+                SellerOrderShimmer()
             }
 
             LazyColumn(
@@ -125,6 +122,26 @@ fun SellerOrderScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SellerOrderShimmer() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        repeat(3) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(118.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color.LightGray.copy(alpha = 0.25f))
+            )
         }
     }
 }
@@ -210,8 +227,9 @@ fun ModernOrderCard(
     onClick: () -> Unit
 ) {
     val statusColor = when (status.lowercase()) {
-        "pending" -> Color(0xFFFFB74D)
+        "ordered", "pending", "unpaid" -> Color(0xFFFFB74D)
         "cooking" -> Color(0xFFFF8A65)
+        "delivering" -> Color(0xFF29B6F6)
         "completed" -> Color(0xFF81C784)
         "cancelled" -> Color(0xFFE57373)
         else -> Color.LightGray
@@ -323,7 +341,7 @@ fun ModernOrderCard(
 
 @Composable
 private fun OrderFilterChips(selected: String, onSelected: (String) -> Unit) {
-    val filters = listOf("All", "Pending", "Cooking", "Completed", "Cancelled")
+    val filters = listOf("All", "ORDERED", "COOKING", "DELIVERING", "COMPLETED", "CANCELLED")
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -335,12 +353,19 @@ private fun OrderFilterChips(selected: String, onSelected: (String) -> Unit) {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(if (filter == selected) AppColor.Blue else Color.LightGray.copy(alpha = 0.3f))
+                    .background(if (filter.equals(selected, ignoreCase = true)) AppColor.Blue else Color.LightGray.copy(alpha = 0.3f))
                     .clickable { onSelected(filter) }
                     .padding(horizontal = 16.dp, vertical = 8.dp)) {
                 Text(
-                    filter,
-                    color = if (filter == selected) AppColor.White else Color.Black
+                    when (filter) {
+                        "ORDERED" -> "Ordered"
+                        "COOKING" -> "Cooking"
+                        "DELIVERING" -> "Delivering"
+                        "COMPLETED" -> "Completed"
+                        "CANCELLED" -> "Cancelled"
+                        else -> filter
+                    },
+                    color = if (filter.equals(selected, ignoreCase = true)) AppColor.White else Color.Black
                 )
             }
         }

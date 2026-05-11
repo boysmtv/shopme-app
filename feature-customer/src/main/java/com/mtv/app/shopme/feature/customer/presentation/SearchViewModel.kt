@@ -8,11 +8,15 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.param.SearchParam
+import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSearchFoodUseCase
+import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.SearchEffect
 import com.mtv.app.shopme.feature.customer.contract.SearchEvent
 import com.mtv.app.shopme.feature.customer.contract.SearchUiState
@@ -35,22 +39,32 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val searchFoodUseCase: GetSearchFoodUseCase,
+    private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase,
+    private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase,
+    private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<SearchEvent, SearchEffect>() {
 
-    private val _state = MutableStateFlow(SearchUiState())
+    private val initialQuery = savedStateHandle.get<String>("query").orEmpty()
+
+    private val _state = MutableStateFlow(SearchUiState(query = initialQuery))
     val uiState = _state.asStateFlow()
 
-    private val queryFlow = MutableStateFlow("")
+    private val queryFlow = MutableStateFlow(initialQuery)
 
     init {
         observeSearch()
+        observeFavorites()
     }
 
     override fun onEvent(event: SearchEvent) {
         when (event) {
-            is SearchEvent.Load -> doSearch("")
+            is SearchEvent.Load -> doSearch(_state.value.query)
+
+            SearchEvent.DismissDialog -> dismissDialog()
+            is SearchEvent.ToggleFavorite -> toggleFavorite(event.foodId)
 
             is SearchEvent.QueryChanged -> {
                 _state.update { it.copy(query = event.query) }
@@ -67,6 +81,16 @@ class SearchViewModel @Inject constructor(
                 emitEffect(SearchEffect.NavigateToDetail(event.id))
             }
         }
+    }
+
+    private fun observeFavorites() {
+        observeIndependentDataFlow(
+            flow = getFavoriteFoodIdsUseCase(),
+            onSuccess = { ids ->
+                _state.update { it.copy(favoriteIds = ids.toSet()) }
+            },
+            onError = { showError(it) }
+        )
     }
 
     @OptIn(FlowPreview::class)
@@ -154,6 +178,28 @@ class SearchViewModel @Inject constructor(
 
     private fun SearchUiState.getDataOrEmpty(): List<SearchFood> {
         return (foods as? LoadState.Success)?.data ?: emptyList()
+    }
+
+    private fun toggleFavorite(foodId: String) {
+        val isFavorite = _state.value.favoriteIds.contains(foodId)
+        val flow = if (isFavorite) {
+            removeFavoriteFoodUseCase(foodId)
+        } else {
+            addFavoriteFoodUseCase(foodId)
+        }
+
+        observeDataFlow(
+            flow = flow,
+            onSuccess = {
+                _state.update { current ->
+                    val updated = current.favoriteIds.toMutableSet().apply {
+                        if (isFavorite) remove(foodId) else add(foodId)
+                    }
+                    current.copy(favoriteIds = updated)
+                }
+            },
+            onError = { showError(it) }
+        )
     }
 
     private fun showError(error: UiError) {

@@ -55,7 +55,7 @@ class ChatViewModelTest {
                 )
             )
         )
-        every { getChatMessageUseCase.invoke(null, false) } returns flowOf(
+        every { getChatMessageUseCase.invoke("conv-1", false) } returns flowOf(
             Resource.Success(
                 listOf(
                     ChatListItem(
@@ -70,6 +70,7 @@ class ChatViewModelTest {
                 )
             )
         )
+        every { getChatMessageUseCase.invoke(null, false) } returns flowOf(Resource.Success(emptyList()))
         every { markReadUseCase.invoke("conv-1", false) } returns flowOf(Resource.Success(Unit))
 
         val vm = ChatViewModel(
@@ -88,6 +89,7 @@ class ChatViewModelTest {
         assertEquals("conv-1", vm.uiState.value.activeChatId)
         assertEquals("Cafe Kopi Kita", vm.uiState.value.chatName)
         assertEquals("data:image/png;base64,CAFE", vm.uiState.value.chatAvatarBase64)
+        verify(exactly = 1) { markReadUseCase.invoke("conv-1", false) }
         verify(exactly = 1) { realtimeGateway.ensureConnected() }
     }
 }

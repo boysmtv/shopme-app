@@ -8,7 +8,10 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
@@ -28,7 +31,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerDashboardViewModel @Inject constructor(
@@ -36,11 +41,23 @@ class SellerDashboardViewModel @Inject constructor(
     private val getSellerOrdersUseCase: GetSellerOrdersUseCase,
     private val getSellerNotificationsUseCase: GetSellerNotificationsUseCase,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
-    private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase
+    private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway
 ) : BaseEventViewModel<SellerDashboardEvent, SellerDashboardEffect>() {
 
     private val _state = MutableStateFlow(SellerDashboardUiState())
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                if (event.type == ShopmeRealtimeEventType.NOTIFICATION_CREATED) {
+                    observeNotifications()
+                    refresh()
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: SellerDashboardEvent) {
         when (event) {
@@ -71,6 +88,7 @@ class SellerDashboardViewModel @Inject constructor(
     }
 
     private fun load() {
+        realtimeGateway.ensureConnected()
         observeProfile()
         observeNotifications()
         refresh()

@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
@@ -71,15 +72,19 @@ fun OrderDetailScreen(
         ) {
             val order = state.order
             if (order == null) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = if (state.isLoading) "Memuat detail pesanan..." else "Detail pesanan tidak tersedia",
-                        fontFamily = PoppinsFont,
-                        color = AppColor.Gray
-                    )
+                if (state.isLoading) {
+                    OrderDetailShimmer()
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Detail pesanan tidak tersedia",
+                            fontFamily = PoppinsFont,
+                            color = AppColor.Gray
+                        )
+                    }
                 }
             } else {
                 Column(
@@ -123,6 +128,53 @@ fun OrderDetailScreen(
                     ) {
                         Text("Buka Chat", fontFamily = PoppinsFont)
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrderDetailShimmer() {
+    val brush = shimmerBrush()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        repeat(4) {
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.45f)
+                            .height(16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(brush)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(14.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(brush)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(14.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(brush)
+                    )
                 }
             }
         }

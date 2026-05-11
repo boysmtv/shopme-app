@@ -12,6 +12,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,7 +38,6 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodUiState
 
@@ -92,10 +93,9 @@ fun SellerPaymentMethodScreen(
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
 
-                if (state.isLoading) {
-                    LinearProgressIndicator(
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                if (state.isLoading && state.bankNumber.isBlank() && state.ovoNumber.isBlank() && state.danaNumber.isBlank() && state.gopayNumber.isBlank()) {
+                    SellerPaymentMethodShimmer()
+                    Spacer(Modifier.height(20.dp))
                 }
 
                 PaymentMethodCard(
@@ -218,6 +218,29 @@ fun SellerPaymentMethodScreen(
                 ) {
                     Text("Save")
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SellerPaymentMethodShimmer() {
+    val brush = shimmerBrush()
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        repeat(4) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(22.dp)
+                        .background(brush, RoundedCornerShape(12.dp))
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .background(brush, RoundedCornerShape(16.dp))
+                )
             }
         }
     }

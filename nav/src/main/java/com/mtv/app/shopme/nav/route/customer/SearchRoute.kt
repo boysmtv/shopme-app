@@ -37,7 +37,7 @@ fun SearchRoute(nav: NavController) {
     ) {
         BaseScreen(
             baseUiState = baseUiState,
-            dismissDialog = { vm.onEvent(SearchEvent.BackClicked) }
+            dismissDialog = { vm.onEvent(SearchEvent.DismissDialog) }
         ) {
             SearchScreen(
                 state = uiState,

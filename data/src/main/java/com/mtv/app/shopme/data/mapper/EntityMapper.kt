@@ -38,7 +38,7 @@ fun FoodEntity.toDomain(): Food = Food(
     id = id,
     cafeId = EMPTY_STRING,
     name = name,
-    cafeName = EMPTY_STRING,
+    cafeName = cafeName,
     cafeAddress = EMPTY_STRING,
     description = EMPTY_STRING,
     price = BigDecimal.valueOf(price),
@@ -71,5 +71,6 @@ fun Food.toEntity(): FoodEntity = FoodEntity(
     name = name,
     price = price.toDouble(),
     image = images.firstOrNull().orEmpty(),
+    cafeName = cafeName,
     isActive = isActive
 )

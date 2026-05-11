@@ -14,13 +14,19 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.LocalMall
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SetMeal
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +46,8 @@ import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerHomeHeaderSkeleton
 import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerFoodSkeletonGrid
 import com.mtv.app.shopme.feature.customer.utils.*
 import com.mtv.based.core.network.utils.LoadState
+import java.math.BigDecimal
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @Composable
@@ -85,8 +93,10 @@ fun HomeScreen(
         HomeContent(
             state = state,
             onClickFood = { event(HomeEvent.ClickFood(it)) },
+            onToggleFavorite = { event(HomeEvent.ToggleFavorite(it)) },
             onClickSearch = { event(HomeEvent.ClickSearch) },
-            onCategoryClick = { event(HomeEvent.ClickCategory(it)) }
+            onCategoryClick = { event(HomeEvent.ClickCategory(it)) },
+            onLoadNextPage = { event(HomeEvent.LoadNextPage) }
         )
     }
 }
@@ -95,8 +105,10 @@ fun HomeScreen(
 private fun HomeContent(
     state: HomeUiState,
     onClickFood: (String) -> Unit,
+    onToggleFavorite: (String) -> Unit,
     onClickSearch: () -> Unit,
-    onCategoryClick: (String) -> Unit
+    onCategoryClick: (String) -> Unit,
+    onLoadNextPage: () -> Unit
 ) {
 
     val listState = rememberSaveable(saver = LazyListState.Saver) {
@@ -104,6 +116,19 @@ private fun HomeContent(
     }
 
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+        }
+            .distinctUntilChanged()
+            .collect { lastVisible ->
+                val total = listState.layoutInfo.totalItemsCount
+                if (lastVisible != null && lastVisible >= total - 2 && total > 0) {
+                    onLoadNextPage()
+                }
+            }
+    }
 
     LazyColumn(
         state = listState,
@@ -151,18 +176,85 @@ private fun HomeContent(
                     horizontalSpacing = 16.dp,
                     verticalSpacing = 16.dp
                 ) { item ->
-                    FoodCard(
+                    SearchFoodCard(
                         item = item,
-                        onClickDetail = { onClickFood(item.id) }
+                        isFavorite = state.favoriteIds.contains(item.id),
+                        onClickDetail = { onClickFood(item.id) },
+                        onToggleFavorite = { onToggleFavorite(item.id) }
                     )
                 }
 
                 if (foodsState.data.isEmpty()) {
                     item { EmptyState() }
                 }
+
+                if (state.isLoadingMore) {
+                    item {
+                        PaginationFoodShimmer()
+                    }
+                }
             }
 
             else -> Unit
+        }
+    }
+}
+
+@Composable
+private fun PaginationFoodShimmer() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        repeat(2) {
+            PaginationGridCardShimmer()
+        }
+    }
+}
+
+@Composable
+private fun PaginationGridCardShimmer() {
+    val brush = shimmerBrush()
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(6.dp)
+    ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+                    .background(brush)
+            )
+            Column(
+                modifier = Modifier.padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(16.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.45f)
+                        .height(14.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
+            }
         }
     }
 }
@@ -416,10 +508,17 @@ private fun HomeMenuBar(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(
-            listOf("Burger", "Sandwich", "Sushi", "Pizza", "Noodles", "Steak", "Coffee", "Dessert")
-        ) { title ->
+            listOf(
+                "Makanan" to Icons.Default.SetMeal,
+                "Minuman" to Icons.Default.LocalCafe,
+                "Cemilan" to Icons.Default.Fastfood,
+                "Produk" to Icons.Default.ShoppingBag,
+                "Lainnya" to Icons.Default.LocalMall
+            )
+        ) { (title, icon) ->
             CategoryItem(
                 title = title,
+                icon = icon,
                 onClick = { onCategoryClick(title) }
             )
         }
@@ -429,6 +528,7 @@ private fun HomeMenuBar(
 @Composable
 fun CategoryItem(
     title: String,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Column(
@@ -440,27 +540,23 @@ fun CategoryItem(
             .clickable { onClick() }
             .padding(12.dp)
     ) {
-        Icon(Icons.Default.Fastfood, contentDescription = null, tint = AppColor.Green)
+        Icon(icon, contentDescription = null, tint = AppColor.Green)
         Spacer(Modifier.height(6.dp))
         Text(title, fontFamily = PoppinsFont, fontSize = 11.sp)
     }
 }
 
 @Composable
-fun FoodCard(
-    item: Food,
-    onClickDetail: () -> Unit
+fun SearchFoodCard(
+    item: SearchFood,
+    isFavorite: Boolean,
+    onClickDetail: () -> Unit,
+    onToggleFavorite: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .then(
-                if (item.isActive) {
-                    Modifier.clickable { onClickDetail() }
-                } else {
-                    Modifier
-                }
-            ),
+            .clickable { onClickDetail() },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
@@ -468,7 +564,7 @@ fun FoodCard(
 
             Box {
                 SmartImage(
-                    model = item.images.first(),
+                    model = item.image,
                     contentDescription = item.name,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -476,27 +572,18 @@ fun FoodCard(
                     contentScale = ContentScale.Crop
                 )
 
-                if (!item.isActive) {
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-                            .background(Color.Black.copy(alpha = 0.5f))
-                    )
-
-                    Text(
-                        text = "Tidak Tersedia",
-                        color = Color.White,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = PoppinsFont,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .background(
-                                Color.Black.copy(alpha = 0.7f),
-                                RoundedCornerShape(8.dp)
-                            )
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = if (isFavorite) Color.Red else Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(22.dp)
+                        .background(Color.Black.copy(alpha = 0.35f), CircleShape)
+                        .clickable { onToggleFavorite() }
+                        .padding(4.dp)
+                )
             }
 
             Column(Modifier.padding(12.dp)) {
@@ -516,6 +603,17 @@ fun FoodCard(
                     fontWeight = FontWeight.Medium,
                     color = AppColor.Green
                 )
+
+                Spacer(Modifier.height(2.dp))
+
+                Text(
+                    text = item.cafeName,
+                    fontFamily = InterFont,
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
@@ -527,7 +625,12 @@ fun HomeScreenPreview() {
 
     val state = HomeUiState(
         customer = LoadState.Success(DataUiMock.customer()),
-        foods = LoadState.Success(DataUiMock.foods()),
+        foods = LoadState.Success(
+            listOf(
+                SearchFood("1", "Nasi Goreng Kampung", BigDecimal(24000), "", "Kopi Tugu Senja"),
+                SearchFood("2", "Es Kopi Susu Aren", BigDecimal(19000), "", "Kopi Tugu Senja")
+            )
+        ),
     )
 
     Scaffold(

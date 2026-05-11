@@ -8,7 +8,10 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
@@ -25,18 +28,31 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerOrderViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val getSellerOrdersUseCase: GetSellerOrdersUseCase,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
-    private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase
+    private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway
 ) : BaseEventViewModel<SellerOrderEvent, SellerOrderEffect>() {
 
     private val _state = MutableStateFlow(SellerOrderUiState())
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                if (event.type == ShopmeRealtimeEventType.NOTIFICATION_CREATED) {
+                    load()
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: SellerOrderEvent) {
         when (event) {
@@ -61,6 +77,7 @@ class SellerOrderViewModel @Inject constructor(
     }
 
     private fun load() {
+        realtimeGateway.ensureConnected()
         observeProfile()
         observeIndependentDataFlow(
             flow = getSellerOrdersUseCase(),

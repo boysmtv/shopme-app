@@ -37,7 +37,7 @@ fun DetailRoute(nav: NavController) {
     ) {
         BaseScreen(
             baseUiState = baseUiState,
-            dismissDialog = { vm.onEvent(DetailEvent.BackClicked) }
+            dismissDialog = { vm.onEvent(DetailEvent.DismissDialog) }
         ) {
             DetailScreen(
                 state = uiState,

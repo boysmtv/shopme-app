@@ -28,6 +28,12 @@ interface HomeDao {
     @Query("SELECT * FROM food")
     fun getFoods(): Flow<List<FoodEntity>>
 
+    @Query("SELECT * FROM food")
+    suspend fun getFoodsOnce(): List<FoodEntity>
+
+    @Query("DELETE FROM food")
+    suspend fun clearFoods()
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoods(data: List<FoodEntity>)
 }

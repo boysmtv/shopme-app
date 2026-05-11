@@ -55,7 +55,7 @@ private fun handleHomeEffect(
 ) {
     when (effect) {
         is HomeEffect.NavigateToDetail -> CustomerNavActions.toDetail(nav, effect.id)
-        is HomeEffect.NavigateToSearch -> CustomerNavActions.toSearch(nav)
+        is HomeEffect.NavigateToSearch -> CustomerNavActions.toSearch(nav, effect.query)
         is HomeEffect.NavigateToNotif -> CustomerNavActions.toNotif(nav)
     }
 }

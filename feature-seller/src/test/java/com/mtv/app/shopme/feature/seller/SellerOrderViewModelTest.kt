@@ -1,5 +1,6 @@
 package com.mtv.app.shopme.feature.seller
 
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.SellerProfile
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
@@ -24,6 +25,7 @@ class SellerOrderViewModelTest {
     private val getOrdersUseCase: GetSellerOrdersUseCase = mockk()
     private val getProfileUseCase: GetSellerProfileUseCase = mockk()
     private val updateAvailabilityUseCase: UpdateSellerAvailabilityUseCase = mockk()
+    private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
 
     @Test
     fun `load and toggle online should follow backend profile state`() = runTest {
@@ -59,7 +61,8 @@ class SellerOrderViewModelTest {
             sessionManager = sessionManager,
             getSellerOrdersUseCase = getOrdersUseCase,
             getSellerProfileUseCase = getProfileUseCase,
-            updateSellerAvailabilityUseCase = updateAvailabilityUseCase
+            updateSellerAvailabilityUseCase = updateAvailabilityUseCase,
+            realtimeGateway = realtimeGateway
         )
 
         vm.onEvent(SellerOrderEvent.Load)

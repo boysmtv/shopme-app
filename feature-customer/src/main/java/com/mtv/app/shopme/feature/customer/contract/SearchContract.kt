@@ -20,6 +20,7 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 data class SearchUiState(
     val query: String = "",
     val foods: LoadState<List<SearchFood>> = LoadState.Idle,
+    val favoriteIds: Set<String> = emptySet(),
     val isLoadingMore: Boolean = false,
     val isLastPage: Boolean = false,
     val page: Int = 0
@@ -29,6 +30,8 @@ sealed class SearchEvent {
     object Load : SearchEvent()
     object LoadNextPage : SearchEvent()
     object BackClicked : SearchEvent()
+    object DismissDialog : SearchEvent()
+    data class ToggleFavorite(val foodId: String) : SearchEvent()
 
     data class QueryChanged(val query: String) : SearchEvent()
     data class ClickFood(val id: String) : SearchEvent()
