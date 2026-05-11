@@ -1,5 +1,7 @@
 package com.mtv.app.shopme.feature.customer
 
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
@@ -11,6 +13,8 @@ import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -24,10 +28,13 @@ class ChatListViewModelTest {
 
     private val getChatListUseCase: GetChatListUseCase = mockk()
     private val clearChatListUseCase: ClearChatListUseCase = mockk()
+    private val realtimeEvents = MutableSharedFlow<ShopmeRealtimeEvent>(extraBufferCapacity = 4)
+    private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `clear should empty customer chat list state`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(
                 ChatList(
@@ -46,7 +53,7 @@ class ChatListViewModelTest {
         )
         every { clearChatListUseCase.invoke(false) } returns flowOf(Resource.Success(Unit))
 
-        val vm = ChatListViewModel(getChatListUseCase, clearChatListUseCase, sessionManager)
+        val vm = ChatListViewModel(getChatListUseCase, clearChatListUseCase, realtimeGateway, sessionManager)
         vm.onEvent(ChatListEvent.Load)
         advanceUntilIdle()
 
@@ -55,15 +62,17 @@ class ChatListViewModelTest {
 
         val state = vm.uiState.value.chatListState as LoadState.Success
         assertEquals(0, state.data.chatList.size)
+        verify(atLeast = 1) { realtimeGateway.ensureConnected() }
     }
 
     @Test
     fun `load should expose empty success state when backend has no chats`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(ChatList(chatList = emptyList()))
         )
 
-        val vm = ChatListViewModel(getChatListUseCase, clearChatListUseCase, sessionManager)
+        val vm = ChatListViewModel(getChatListUseCase, clearChatListUseCase, realtimeGateway, sessionManager)
         vm.onEvent(ChatListEvent.Load)
         advanceUntilIdle()
 

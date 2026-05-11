@@ -10,6 +10,8 @@ import com.mtv.app.shopme.data.repository.NotificationRepositoryImpl
 import com.mtv.app.shopme.data.repository.OrderRepositoryImpl
 import com.mtv.app.shopme.data.repository.ProfileRepositoryImpl
 import com.mtv.app.shopme.data.repository.SellerRepositoryImpl
+import com.mtv.app.shopme.data.realtime.ShopmeRealtimeGatewayImpl
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.repository.AppRepository
 import com.mtv.app.shopme.domain.repository.AuthRepository
 import com.mtv.app.shopme.domain.repository.CafeRepository
@@ -38,4 +40,5 @@ abstract class RepositoryModule {
     @Binds abstract fun bindOrderRepository(impl: OrderRepositoryImpl): OrderRepository
     @Binds abstract fun bindSellerRepository(impl: SellerRepositoryImpl): SellerRepository
     @Binds abstract fun bindNotificationRepository(impl: NotificationRepositoryImpl): NotificationRepository
+    @Binds abstract fun bindRealtimeGateway(impl: ShopmeRealtimeGatewayImpl): ShopmeRealtimeGateway
 }

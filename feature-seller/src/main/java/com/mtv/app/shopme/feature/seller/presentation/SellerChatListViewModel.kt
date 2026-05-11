@@ -8,7 +8,10 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEffect
@@ -26,17 +29,32 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerChatListViewModel @Inject constructor(
     private val getChatListUseCase: GetChatListUseCase,
     private val clearChatListUseCase: ClearChatListUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<SellerChatListEvent, SellerChatListEffect>() {
 
     private val _state = MutableStateFlow(SellerChatListUiState())
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                when (event.type) {
+                    ShopmeRealtimeEventType.CHAT_MESSAGE,
+                    ShopmeRealtimeEventType.CHAT_READ -> loadChats()
+                    else -> Unit
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: SellerChatListEvent) {
         when (event) {
@@ -55,6 +73,7 @@ class SellerChatListViewModel @Inject constructor(
     }
 
     private fun loadChats() {
+        realtimeGateway.ensureConnected()
         observeDataFlow(
             flow = getChatListUseCase(asSeller = true),
             onState = { state ->

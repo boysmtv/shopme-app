@@ -8,7 +8,10 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ClearNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetNotificationsUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotifDialog
@@ -25,16 +28,29 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class NotifViewModel @Inject constructor(
     private val getNotificationsUseCase: GetNotificationsUseCase,
     private val clearNotificationsUseCase: ClearNotificationsUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway,
 ) : BaseEventViewModel<NotifEvent, NotifEffect>() {
 
     private val _state = MutableStateFlow(NotifUiState())
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                if (event.type == ShopmeRealtimeEventType.NOTIFICATION_CREATED) {
+                    getNotifications()
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: NotifEvent) {
         when (event) {
@@ -47,6 +63,7 @@ class NotifViewModel @Inject constructor(
     }
 
     private fun getNotifications() {
+        realtimeGateway.ensureConnected()
         observeDataFlow(
             flow = getNotificationsUseCase(),
             onState = { state ->

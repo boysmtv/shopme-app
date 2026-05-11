@@ -1,6 +1,8 @@
 package com.mtv.app.shopme.feature.seller
 
 import androidx.lifecycle.SavedStateHandle
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
@@ -13,6 +15,8 @@ import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -28,10 +32,13 @@ class SellerChatDetailViewModelTest {
     private val getChatListUseCase: GetChatListUseCase = mockk()
     private val sendUseCase: CreateChatMessageSendUseCase = mockk(relaxed = true)
     private val markReadUseCase: ChatMessageMarkAsReadUseCase = mockk()
+    private val realtimeEvents = MutableSharedFlow<ShopmeRealtimeEvent>(extraBufferCapacity = 4)
+    private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should read seller conversation and map seller message state`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(true) } returns flowOf(
             Resource.Success(
                 ChatList(
@@ -72,6 +79,7 @@ class SellerChatDetailViewModelTest {
             getChatMessageUseCase = getChatMessageUseCase,
             sendChatMessageUseCase = sendUseCase,
             chatMessageMarkAsReadUseCase = markReadUseCase,
+            realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
 
@@ -83,5 +91,6 @@ class SellerChatDetailViewModelTest {
         assertEquals("data:image/png;base64,CUSTOMER", vm.uiState.value.chatAvatarBase64)
         assertEquals(1, vm.uiState.value.messages.size)
         assertTrue(vm.uiState.value.messages.first().isFromSeller)
+        verify(exactly = 1) { realtimeGateway.ensureConnected() }
     }
 }
