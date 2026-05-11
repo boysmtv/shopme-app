@@ -466,6 +466,7 @@ def verify_runtime(base_url: str) -> list[str]:
     failures.extend(assert_envelope(chat_list_payload, "GET /api/chat/list after order"))
 
     chat_list = chat_list_payload.get("data", {}).get("chatList")
+    conversation_id = None
     if isinstance(chat_list, list) and chat_list:
         conversation_id = chat_list[0].get("id") if isinstance(chat_list[0], dict) else None
         if isinstance(conversation_id, str) and conversation_id:
@@ -492,6 +493,68 @@ def verify_runtime(base_url: str) -> list[str]:
     )
     expect_status(failures, "POST /api/config as buyer", forbidden_status, {403})
     failures.extend(assert_envelope(forbidden_payload, "forbidden config"))
+
+    seller_payment_status, seller_payment_payload = request_json(
+        f"{base_url}/api/seller/payment-methods",
+        method="PUT",
+        token=seller_token,
+        body={
+            "cashEnabled": True,
+            "bankEnabled": True,
+            "bankNumber": "1234567890",
+            "ovoEnabled": False,
+            "ovoNumber": None,
+            "danaEnabled": True,
+            "danaNumber": "0811111111",
+            "gopayEnabled": False,
+            "gopayNumber": None,
+        },
+    )
+    expect_status(failures, "PUT /api/seller/payment-methods", seller_payment_status, {200})
+    failures.extend(assert_envelope(seller_payment_payload, "PUT /api/seller/payment-methods"))
+
+    seller_availability_status, seller_availability_payload = request_json(
+        f"{base_url}/api/seller/availability",
+        method="PUT",
+        token=seller_token,
+        body={"isOnline": True},
+    )
+    expect_status(failures, "PUT /api/seller/availability", seller_availability_status, {200})
+    failures.extend(assert_envelope(seller_availability_payload, "PUT /api/seller/availability"))
+
+    seller_order_detail_status, seller_order_detail_payload = request_json(
+        f"{base_url}/api/seller/orders/{order_id}",
+        method="GET",
+        token=seller_token,
+    )
+    expect_status(failures, f"GET /api/seller/orders/{order_id}", seller_order_detail_status, {200})
+    failures.extend(assert_envelope(seller_order_detail_payload, f"GET /api/seller/orders/{order_id}"))
+
+    seller_chat_list_status, seller_chat_list_payload = request_json(
+        f"{base_url}/api/chat/list?asSeller=true",
+        method="GET",
+        token=seller_token,
+    )
+    expect_status(failures, "GET /api/chat/list?asSeller=true", seller_chat_list_status, {200})
+    failures.extend(assert_envelope(seller_chat_list_payload, "GET /api/chat/list?asSeller=true"))
+
+    if isinstance(conversation_id, str) and conversation_id:
+        seller_chat_detail_status, seller_chat_detail_payload = request_json(
+            f"{base_url}/api/chat?id={conversation_id}&asSeller=true",
+            method="GET",
+            token=seller_token,
+        )
+        expect_status(failures, "GET /api/chat seller detail", seller_chat_detail_status, {200})
+        failures.extend(assert_envelope(seller_chat_detail_payload, "GET /api/chat seller detail"))
+
+        seller_mark_read_status, seller_mark_read_payload = request_json(
+            f"{base_url}/api/chat/read?asSeller=true",
+            method="POST",
+            token=seller_token,
+            body={"id": conversation_id, "message": ""},
+        )
+        expect_status(failures, "POST /api/chat/read?asSeller=true", seller_mark_read_status, {200})
+        failures.extend(assert_envelope(seller_mark_read_payload, "POST /api/chat/read?asSeller=true"))
 
     return failures
 
