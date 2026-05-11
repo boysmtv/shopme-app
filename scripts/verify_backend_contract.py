@@ -169,6 +169,25 @@ def assert_envelope(payload: dict, label: str) -> list[str]:
     return failures
 
 
+def first_list_item(payload: dict) -> dict | None:
+    data = payload.get("data")
+    if isinstance(data, list) and data:
+        first = data[0]
+        return first if isinstance(first, dict) else None
+    return None
+
+
+def expect_status(
+    failures: list[str],
+    label: str,
+    actual_status: int,
+    expected_statuses: set[int],
+) -> None:
+    if actual_status not in expected_statuses:
+        expected = "/".join(str(item) for item in sorted(expected_statuses))
+        failures.append(f"{label} returned {actual_status}, expected {expected}")
+
+
 def verify_runtime(base_url: str) -> list[str]:
     failures: list[str] = []
 
@@ -177,9 +196,15 @@ def verify_runtime(base_url: str) -> list[str]:
         method="POST",
         body={"email": "buyer.demo@shopme.local", "password": "wrong-password"},
     )
-    if invalid_status not in {400, 401}:
-        failures.append(f"login invalid credentials returned {invalid_status}, expected 400/401")
+    expect_status(failures, "login invalid credentials", invalid_status, {400, 401})
     failures.extend(assert_envelope(invalid_login, "invalid login"))
+
+    unauthorized_status, unauthorized_payload = request_json(
+        f"{base_url}/api/customer",
+        method="GET",
+    )
+    expect_status(failures, "GET /api/customer without token", unauthorized_status, {401})
+    failures.extend(assert_envelope(unauthorized_payload, "GET /api/customer without token"))
 
     buyer_status, buyer_login = request_json(
         f"{base_url}/api/auth/login",
@@ -210,6 +235,14 @@ def verify_runtime(base_url: str) -> list[str]:
         failures.append("seller login missing token")
         return failures
 
+    invalid_token_status, invalid_token_payload = request_json(
+        f"{base_url}/api/customer",
+        method="GET",
+        token="invalid-token",
+    )
+    expect_status(failures, "GET /api/customer with invalid token", invalid_token_status, {401})
+    failures.extend(assert_envelope(invalid_token_payload, "GET /api/customer with invalid token"))
+
     seller_profile_status, seller_profile_payload = request_json(
         f"{base_url}/api/seller/profile",
         method="GET",
@@ -226,9 +259,8 @@ def verify_runtime(base_url: str) -> list[str]:
         failures.append("seller profile missing cafeId")
         return failures
 
-    smoke_cases = [
+    read_cases = [
         ("POST", "/api/splash", None, {
-            "token": buyer_token,
             "body": {
                 "fcmToken": "demo-fcm-token",
                 "platform": "android",
@@ -276,7 +308,9 @@ def verify_runtime(base_url: str) -> list[str]:
         ("GET", "/api/seller/orders", None, {"token": seller_token}),
     ]
 
-    for method, path, _, options in smoke_cases:
+    captured_payloads: dict[str, dict] = {}
+
+    for method, path, _, options in read_cases:
         status, payload = request_json(
             f"{base_url}{path}",
             method=method,
@@ -286,6 +320,162 @@ def verify_runtime(base_url: str) -> list[str]:
         if status != 200:
             failures.append(f"{method} {path} returned {status}")
         failures.extend(assert_envelope(payload, f"{method} {path}"))
+        captured_payloads[path] = payload
+
+    foods_payload = captured_payloads.get("/api/foods", {})
+    food_item = first_list_item(foods_payload)
+    if not food_item:
+        failures.append("GET /api/foods returned no items for buyer runtime flow")
+        return failures
+
+    food_id = food_item.get("id")
+    if not isinstance(food_id, str) or not food_id:
+        failures.append("GET /api/foods first item missing id")
+        return failures
+
+    cart_clear_status, cart_clear_payload = request_json(
+        f"{base_url}/api/cart/clear",
+        method="DELETE",
+        token=buyer_token,
+    )
+    expect_status(failures, "DELETE /api/cart/clear", cart_clear_status, {200})
+    failures.extend(assert_envelope(cart_clear_payload, "DELETE /api/cart/clear"))
+
+    cart_add_status, cart_add_payload = request_json(
+        f"{base_url}/api/cart",
+        method="POST",
+        token=buyer_token,
+        body={
+            "foodId": food_id,
+            "variants": None,
+            "quantity": 1,
+            "note": "android buyer flow",
+        },
+    )
+    expect_status(failures, "POST /api/cart", cart_add_status, {201})
+    failures.extend(assert_envelope(cart_add_payload, "POST /api/cart"))
+
+    cart_list_status, cart_list_payload = request_json(
+        f"{base_url}/api/cart",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, "GET /api/cart after add", cart_list_status, {200})
+    failures.extend(assert_envelope(cart_list_payload, "GET /api/cart after add"))
+
+    cart_item = first_list_item(cart_list_payload)
+    if not cart_item:
+        failures.append("GET /api/cart after add returned no items")
+        return failures
+
+    cart_id = cart_item.get("id")
+    if not isinstance(cart_id, str) or not cart_id:
+        failures.append("GET /api/cart after add missing cart item id")
+        return failures
+
+    session_status, session_payload = request_json(
+        f"{base_url}/api/order/session",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, "GET /api/order/session", session_status, {200})
+    failures.extend(assert_envelope(session_payload, "GET /api/order/session"))
+
+    checkout_token = session_payload.get("data", {}).get("token")
+    if not isinstance(checkout_token, str) or not checkout_token:
+        failures.append("GET /api/order/session missing checkout token")
+        return failures
+
+    before_order_list_status, before_order_list_payload = request_json(
+        f"{base_url}/api/order",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, "GET /api/order before create", before_order_list_status, {200})
+    failures.extend(assert_envelope(before_order_list_payload, "GET /api/order before create"))
+    before_order_ids = {
+        item.get("id")
+        for item in before_order_list_payload.get("data", [])
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+
+    create_order_status, create_order_payload = request_json(
+        f"{base_url}/api/order",
+        method="POST",
+        token=buyer_token,
+        body={
+            "cartId": [cart_id],
+            "payment": "TRANSFER",
+            "token": checkout_token,
+        },
+    )
+    expect_status(failures, "POST /api/order", create_order_status, {201})
+    failures.extend(assert_envelope(create_order_payload, "POST /api/order"))
+
+    order_list_status, order_list_payload = request_json(
+        f"{base_url}/api/order",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, "GET /api/order after create", order_list_status, {200})
+    failures.extend(assert_envelope(order_list_payload, "GET /api/order after create"))
+
+    order_id = None
+    for item in order_list_payload.get("data", []):
+        if not isinstance(item, dict):
+            continue
+        candidate_id = item.get("id")
+        if isinstance(candidate_id, str) and candidate_id not in before_order_ids:
+            order_id = candidate_id
+            break
+
+    if not isinstance(order_id, str) or not order_id:
+        failures.append("GET /api/order after create missing newly created order id")
+        return failures
+
+    order_detail_status, order_detail_payload = request_json(
+        f"{base_url}/api/order/{order_id}",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, f"GET /api/order/{order_id}", order_detail_status, {200})
+    failures.extend(assert_envelope(order_detail_payload, f"GET /api/order/{order_id}"))
+
+    confirm_transfer_status, confirm_transfer_payload = request_json(
+        f"{base_url}/api/order/{order_id}/confirm-transfer",
+        method="POST",
+        token=buyer_token,
+    )
+    expect_status(failures, f"POST /api/order/{order_id}/confirm-transfer", confirm_transfer_status, {200})
+    failures.extend(assert_envelope(confirm_transfer_payload, f"POST /api/order/{order_id}/confirm-transfer"))
+
+    notifications_status, notifications_payload = request_json(
+        f"{base_url}/api/notifications",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, "GET /api/notifications after order", notifications_status, {200})
+    failures.extend(assert_envelope(notifications_payload, "GET /api/notifications after order"))
+
+    chat_list_status, chat_list_payload = request_json(
+        f"{base_url}/api/chat/list",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, "GET /api/chat/list after order", chat_list_status, {200})
+    failures.extend(assert_envelope(chat_list_payload, "GET /api/chat/list after order"))
+
+    chat_list = chat_list_payload.get("data", {}).get("chatList")
+    if isinstance(chat_list, list) and chat_list:
+        conversation_id = chat_list[0].get("id") if isinstance(chat_list[0], dict) else None
+        if isinstance(conversation_id, str) and conversation_id:
+            chat_detail_status, chat_detail_payload = request_json(
+                f"{base_url}/api/chat?id={conversation_id}",
+                method="GET",
+                token=buyer_token,
+            )
+            expect_status(failures, "GET /api/chat buyer detail", chat_detail_status, {200})
+            failures.extend(assert_envelope(chat_detail_payload, "GET /api/chat buyer detail"))
 
     forbidden_status, forbidden_payload = request_json(
         f"{base_url}/api/config",
@@ -300,8 +490,7 @@ def verify_runtime(base_url: str) -> list[str]:
         },
         token=buyer_token,
     )
-    if forbidden_status != 403:
-        failures.append(f"POST /api/config as buyer returned {forbidden_status}, expected 403")
+    expect_status(failures, "POST /api/config as buyer", forbidden_status, {403})
     failures.extend(assert_envelope(forbidden_payload, "forbidden config"))
 
     return failures
