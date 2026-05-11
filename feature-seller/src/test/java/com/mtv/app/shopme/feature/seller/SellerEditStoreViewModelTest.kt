@@ -13,6 +13,7 @@ import com.mtv.app.shopme.domain.usecase.UpdateCafeUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerEditStoreViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
@@ -32,6 +33,7 @@ class SellerEditStoreViewModelTest {
     private val updateCafeUseCase: UpdateCafeUseCase = mockk(relaxed = true)
     private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase = mockk(relaxed = true)
     private val getVillageUseCase: GetVillageUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should populate store from backend cafe data`() = runTest {
@@ -73,6 +75,7 @@ class SellerEditStoreViewModelTest {
         )
 
         val vm = SellerEditStoreViewModel(
+            sessionManager = sessionManager,
             getSellerProfileUseCase = getSellerProfileUseCase,
             getCafeUseCase = getCafeUseCase,
             getCafeAddressUseCase = getCafeAddressUseCase,

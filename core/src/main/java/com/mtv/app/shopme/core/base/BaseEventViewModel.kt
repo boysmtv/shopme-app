@@ -10,6 +10,8 @@ package com.mtv.app.shopme.core.base
 
 import androidx.lifecycle.viewModelScope
 import com.mtv.based.core.provider.based.BaseViewModel
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -31,5 +33,21 @@ abstract class BaseEventViewModel<EVENT, EFFECT> : BaseViewModel() {
         viewModelScope.launch {
             _effect.emit(effect)
         }
+    }
+
+    protected fun handleSessionError(
+        error: UiError,
+        sessionManager: SessionManager,
+        beforeLogout: (() -> Unit)? = null,
+        onOtherError: (UiError) -> Unit
+    ) {
+        if (error is UiError.Unauthorized) {
+            beforeLogout?.invoke()
+            viewModelScope.launch {
+                sessionManager.forceLogout()
+            }
+            return
+        }
+        onOtherError(error)
     }
 }

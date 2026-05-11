@@ -11,6 +11,7 @@ import com.mtv.app.shopme.domain.usecase.GetOrderDetailUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderDetailViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -26,6 +27,7 @@ class OrderDetailViewModelTest {
 
     private val getOrderDetailUseCase: GetOrderDetailUseCase = mockk()
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should expose backend order detail`() = runTest {
@@ -58,7 +60,8 @@ class OrderDetailViewModelTest {
         val vm = OrderDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
             getOrderDetailUseCase = getOrderDetailUseCase,
-            confirmOrderTransferUseCase = confirmOrderTransferUseCase
+            confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            sessionManager = sessionManager
         )
 
         vm.onEvent(OrderDetailEvent.Load)
@@ -88,7 +91,8 @@ class OrderDetailViewModelTest {
         val vm = OrderDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
             getOrderDetailUseCase = getOrderDetailUseCase,
-            confirmOrderTransferUseCase = confirmOrderTransferUseCase
+            confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            sessionManager = sessionManager
         )
 
         vm.onEvent(OrderDetailEvent.ConfirmTransfer)

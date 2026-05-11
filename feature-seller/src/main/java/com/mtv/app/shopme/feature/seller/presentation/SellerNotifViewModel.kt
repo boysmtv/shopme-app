@@ -14,6 +14,7 @@ import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ import kotlinx.coroutines.flow.update
 class SellerNotifViewModel @Inject constructor(
     private val getSellerNotificationsUseCase: GetSellerNotificationsUseCase,
     private val clearNotificationsUseCase: ClearNotificationsUseCase,
+    private val sessionManager: SessionManager,
 ) : BaseEventViewModel<SellerNotifEvent, SellerNotifEffect>() {
 
     private val _state = MutableStateFlow(SellerNotifUiState())
@@ -81,6 +83,21 @@ class SellerNotifViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        _state.update { it.copy(activeDialog = SellerNotifDialog.Error(error.message), notificationState = ResourceFirebase.Success("")) }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = {
+                _state.update {
+                    it.copy(notificationState = ResourceFirebase.Success(""), activeDialog = null)
+                }
+            }
+        ) { uiError ->
+            _state.update {
+                it.copy(
+                    activeDialog = SellerNotifDialog.Error(uiError.message),
+                    notificationState = ResourceFirebase.Success("")
+                )
+            }
+        }
     }
 }

@@ -15,6 +15,7 @@ import com.mtv.app.shopme.feature.customer.contract.OrderUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -27,7 +28,8 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class OrderViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
-    private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase
+    private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase,
+    private val sessionManager: SessionManager
 ) : BaseEventViewModel<OrderEvent, OrderEffect>() {
 
     private val _state = MutableStateFlow(OrderUiState())
@@ -78,15 +80,21 @@ class OrderViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

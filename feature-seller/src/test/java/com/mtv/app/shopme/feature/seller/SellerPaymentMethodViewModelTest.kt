@@ -7,6 +7,9 @@ import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerPaymentMethodEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerPaymentMethodViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.async
@@ -23,6 +26,7 @@ class SellerPaymentMethodViewModelTest {
 
     private val getSellerPaymentMethodsUseCase: GetSellerPaymentMethodsUseCase = mockk()
     private val updateSellerPaymentMethodsUseCase: UpdateSellerPaymentMethodsUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should populate seller payment methods from backend`() = runTest {
@@ -44,7 +48,8 @@ class SellerPaymentMethodViewModelTest {
 
         val vm = SellerPaymentMethodViewModel(
             getSellerPaymentMethodsUseCase = getSellerPaymentMethodsUseCase,
-            updateSellerPaymentMethodsUseCase = updateSellerPaymentMethodsUseCase
+            updateSellerPaymentMethodsUseCase = updateSellerPaymentMethodsUseCase,
+            sessionManager = sessionManager
         )
 
         vm.onEvent(SellerPaymentMethodEvent.Load)
@@ -75,7 +80,8 @@ class SellerPaymentMethodViewModelTest {
 
         val vm = SellerPaymentMethodViewModel(
             getSellerPaymentMethodsUseCase = getSellerPaymentMethodsUseCase,
-            updateSellerPaymentMethodsUseCase = updateSellerPaymentMethodsUseCase
+            updateSellerPaymentMethodsUseCase = updateSellerPaymentMethodsUseCase,
+            sessionManager = sessionManager
         )
         val effect = async { vm.effect.first() }
 
@@ -90,5 +96,24 @@ class SellerPaymentMethodViewModelTest {
         assertEquals(SellerPaymentMethodEffect.SaveSuccess, effect.await())
         assertEquals("1234567890", vm.uiState.value.bankNumber)
         assertEquals(true, vm.uiState.value.ovoEnabled)
+    }
+
+    @Test
+    fun `unauthorized seller payment load should force logout`() = runTest {
+        every { getSellerPaymentMethodsUseCase.invoke() } returns flowOf(
+            Resource.Error(UiError.Unauthorized("Session expired"))
+        )
+
+        val vm = SellerPaymentMethodViewModel(
+            getSellerPaymentMethodsUseCase = getSellerPaymentMethodsUseCase,
+            updateSellerPaymentMethodsUseCase = updateSellerPaymentMethodsUseCase,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(SellerPaymentMethodEvent.Load)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) { sessionManager.forceLogout() }
+        assertEquals(false, vm.uiState.value.isLoading)
     }
 }

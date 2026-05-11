@@ -19,6 +19,7 @@ import com.mtv.app.shopme.feature.customer.contract.SearchUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -34,7 +35,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
-    private val searchFoodUseCase: GetSearchFoodUseCase
+    private val searchFoodUseCase: GetSearchFoodUseCase,
+    private val sessionManager: SessionManager
 ) : BaseEventViewModel<SearchEvent, SearchEffect>() {
 
     private val _state = MutableStateFlow(SearchUiState())
@@ -155,17 +157,23 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = {
-                    dismissDialog()
-                }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { _state.update { it.copy(isLoadingMore = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = {
+                        dismissDialog()
+                    }
+                )
             )
-        )
+        }
     }
 }

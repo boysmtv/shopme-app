@@ -16,6 +16,7 @@ import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -27,7 +28,8 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
-    private val chatListUseCase: GetChatListUseCase
+    private val chatListUseCase: GetChatListUseCase,
+    private val sessionManager: SessionManager
 ) : BaseEventViewModel<ChatListEvent, ChatListEffect>() {
 
     private val _state = MutableStateFlow(ChatListUiState())
@@ -56,15 +58,21 @@ class ChatListViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { hideLoading() }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }

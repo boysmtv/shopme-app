@@ -105,15 +105,21 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        handleSessionError(
+            error = error,
+            sessionManager = sessionManager,
+            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+        ) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
             )
-        )
+        }
     }
 }
