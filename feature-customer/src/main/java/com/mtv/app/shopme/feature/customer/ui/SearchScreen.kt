@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -140,6 +141,15 @@ fun SearchScreen(
 
             isLoading && items.isEmpty() -> {
                 ShimmerSearchScreen()
+            }
+
+            state.foods is LoadState.Error && items.isEmpty() -> {
+                ContentErrorState(
+                    title = "Gagal memuat hasil pencarian",
+                    message = (state.foods as LoadState.Error).error.message,
+                    actionLabel = "Coba lagi",
+                    onRetry = { event(SearchEvent.Load) }
+                )
             }
 
             else -> {

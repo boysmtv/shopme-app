@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
 import com.mtv.app.shopme.common.shimmerBrush
@@ -111,6 +112,13 @@ fun SellerProductListScreen(
                         SellerProductShimmerItem()
                     }
                 }
+            } else if (!state.errorMessage.isNullOrBlank() && state.products.isEmpty()) {
+                ContentErrorState(
+                    title = "Gagal memuat produk",
+                    message = state.errorMessage,
+                    actionLabel = "Muat ulang",
+                    onRetry = { event(SellerProductListEvent.Load) }
+                )
             } else if (state.products.isEmpty()) {
                 EmptyProductState(
                     onAddClick = {

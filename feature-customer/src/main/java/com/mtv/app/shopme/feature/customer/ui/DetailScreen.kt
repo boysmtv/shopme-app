@@ -75,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -226,6 +227,15 @@ fun DetailScreen(
                         Spacer(Modifier.height(12.dp))
                     }
                 }
+            }
+
+            is LoadState.Error -> {
+                ContentErrorState(
+                    title = "Gagal memuat detail produk",
+                    message = state.food.error.message,
+                    actionLabel = "Muat ulang",
+                    onRetry = { event(DetailEvent.Load) }
+                )
             }
 
             else -> Unit

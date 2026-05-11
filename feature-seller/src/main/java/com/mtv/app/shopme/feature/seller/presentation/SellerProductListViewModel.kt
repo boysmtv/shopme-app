@@ -61,20 +61,24 @@ class SellerProductListViewModel @Inject constructor(
             flow = getSellerProfileUseCase(),
             onState = { state ->
                 when (state) {
-                    is LoadState.Loading -> _state.update { it.copy(isLoading = true) }
+                    is LoadState.Loading -> _state.update { it.copy(isLoading = true, errorMessage = null) }
                     is LoadState.Success -> {
                         val cafeId = state.data.cafeId
                         if (cafeId.isNullOrBlank()) {
-                            _state.update { it.copy(isLoading = false, products = emptyList()) }
+                            _state.update { it.copy(isLoading = false, products = emptyList(), errorMessage = null) }
                         } else {
                             loadProducts(cafeId)
                         }
                     }
-                    is LoadState.Error -> _state.update { it.copy(isLoading = false) }
+                    is LoadState.Error -> _state.update { it.copy(isLoading = false, errorMessage = state.error.message) }
                     else -> Unit
                 }
             },
-            onError = { _state.update { it.copy(isLoading = false) } }
+            onError = { error ->
+                _state.update { state ->
+                    state.copy(isLoading = false, errorMessage = error.message)
+                }
+            }
         )
     }
 
@@ -86,14 +90,22 @@ class SellerProductListViewModel @Inject constructor(
                     if (state is LoadState.Success) {
                         it.copy(
                             isLoading = false,
+                            errorMessage = null,
                             products = it.products.filterNot { product -> product.id == productId }
                         )
                     } else {
-                        it.copy(isLoading = state is LoadState.Loading)
+                        it.copy(
+                            isLoading = state is LoadState.Loading,
+                            errorMessage = if (state is LoadState.Loading) null else it.errorMessage
+                        )
                     }
                 }
             },
-            onError = { _state.update { it.copy(isLoading = false) } }
+            onError = { error ->
+                _state.update { state ->
+                    state.copy(isLoading = false, errorMessage = error.message)
+                }
+            }
         )
     }
 
@@ -105,14 +117,22 @@ class SellerProductListViewModel @Inject constructor(
                     if (state is LoadState.Success) {
                         it.copy(
                             isLoading = false,
+                            errorMessage = null,
                             products = state.data.map { food -> food.toProductItem() }
                         )
                     } else {
-                        it.copy(isLoading = state is LoadState.Loading)
+                        it.copy(
+                            isLoading = state is LoadState.Loading,
+                            errorMessage = if (state is LoadState.Loading) null else it.errorMessage
+                        )
                     }
                 }
             },
-            onError = { _state.update { it.copy(isLoading = false) } }
+            onError = { error ->
+                _state.update { state ->
+                    state.copy(isLoading = false, errorMessage = error.message)
+                }
+            }
         )
     }
 

@@ -12,6 +12,7 @@ import com.mtv.app.shopme.domain.model.ProductItem
 
 data class SellerProductListUiState(
     val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 
     val products: List<ProductItem> = emptyList()
 )

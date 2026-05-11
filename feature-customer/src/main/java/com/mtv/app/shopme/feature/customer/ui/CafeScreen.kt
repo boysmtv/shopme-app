@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -75,6 +76,18 @@ fun CafeScreen(
 
     val cafe = (state.cafe as? LoadState.Success)?.data
     val foods = (state.foods as? LoadState.Success)?.data ?: emptyList()
+    val cafeError = state.cafe as? LoadState.Error
+    val foodsError = state.foods as? LoadState.Error
+
+    if (cafeError != null || foodsError != null) {
+        ContentErrorState(
+            title = "Gagal memuat cafe",
+            message = cafeError?.error?.message ?: foodsError?.error?.message ?: "Please try again.",
+            actionLabel = "Muat ulang",
+            onRetry = { event(CafeEvent.Load) }
+        )
+        return
+    }
 
     Scaffold(
         topBar = {

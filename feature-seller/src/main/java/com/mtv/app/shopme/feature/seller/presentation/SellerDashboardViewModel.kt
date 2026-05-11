@@ -133,11 +133,20 @@ class SellerDashboardViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoading = result is LoadState.Loading,
-                        orders = if (result is LoadState.Success) result.data else it.orders
+                        orders = if (result is LoadState.Success) result.data else it.orders,
+                        errorMessage = when (result) {
+                            is LoadState.Success, is LoadState.Loading -> null
+                            else -> it.errorMessage
+                        }
                     )
                 }
             },
-            onError = ::showError
+            onError = {
+                _state.update { state ->
+                    state.copy(isLoading = false, errorMessage = it.message)
+                }
+                showError(it)
+            }
         )
     }
 

@@ -70,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -96,6 +97,16 @@ fun CartScreen(
 ) {
     if (state.cartItems is LoadState.Loading) {
         ShimmerCartScreen()
+        return
+    }
+
+    if (state.cartItems is LoadState.Error) {
+        ContentErrorState(
+            title = "Gagal memuat keranjang",
+            message = state.cartItems.error.message,
+            actionLabel = "Muat ulang",
+            onRetry = { event(CartEvent.Load) }
+        )
         return
     }
 

@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.base64ToBitmap
@@ -163,6 +163,15 @@ fun ChatListScreen(
                         }
                     }
                 }
+            }
+
+            is LoadState.Error -> {
+                ContentErrorState(
+                    title = "Gagal memuat chat",
+                    message = chatListState.error.message,
+                    actionLabel = "Muat ulang",
+                    onRetry = { event(ChatListEvent.Load) }
+                )
             }
 
             else -> {

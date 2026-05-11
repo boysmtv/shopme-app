@@ -96,7 +96,8 @@ fun HomeScreen(
             onToggleFavorite = { event(HomeEvent.ToggleFavorite(it)) },
             onClickSearch = { event(HomeEvent.ClickSearch) },
             onCategoryClick = { event(HomeEvent.ClickCategory(it)) },
-            onLoadNextPage = { event(HomeEvent.LoadNextPage) }
+            onLoadNextPage = { event(HomeEvent.LoadNextPage) },
+            onRetry = { event(HomeEvent.Load) }
         )
     }
 }
@@ -108,7 +109,8 @@ private fun HomeContent(
     onToggleFavorite: (String) -> Unit,
     onClickSearch: () -> Unit,
     onCategoryClick: (String) -> Unit,
-    onLoadNextPage: () -> Unit
+    onLoadNextPage: () -> Unit,
+    onRetry: () -> Unit
 ) {
 
     val listState = rememberSaveable(saver = LazyListState.Saver) {
@@ -192,6 +194,17 @@ private fun HomeContent(
                     item {
                         PaginationFoodShimmer()
                     }
+                }
+            }
+
+            is LoadState.Error -> {
+                item {
+                    ContentErrorState(
+                        title = "Gagal memuat menu",
+                        message = foodsState.error.message,
+                        actionLabel = "Muat ulang",
+                        onRetry = onRetry
+                    )
                 }
             }
 

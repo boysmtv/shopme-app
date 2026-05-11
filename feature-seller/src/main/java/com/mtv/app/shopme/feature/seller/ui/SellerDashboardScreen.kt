@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
@@ -116,6 +117,15 @@ fun SellerDashboardScreen(
 
             if (state.isLoading && orders.isEmpty()) {
                 item { SellerDashboardShimmer() }
+            } else if (!state.errorMessage.isNullOrBlank() && orders.isEmpty()) {
+                item {
+                    ContentErrorState(
+                        title = "Gagal memuat dashboard",
+                        message = state.errorMessage,
+                        actionLabel = "Muat ulang",
+                        onRetry = { event(SellerDashboardEvent.Load) }
+                    )
+                }
             } else {
                 item { WeeklySummaryCard(orders) }
 
