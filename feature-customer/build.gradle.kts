@@ -38,6 +38,9 @@ android {
             jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
         }
     }
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 dependencies {
@@ -146,6 +149,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
+    testImplementation("org.robolectric:robolectric:4.13")
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinx.coroutines.test)
 

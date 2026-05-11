@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.core.error
 
+import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.UiError
 import java.io.IOException
 import javax.inject.Inject
@@ -24,11 +25,17 @@ class DefaultErrorMapper @Inject constructor() : ErrorMapper {
                 message = "Request timeout"
             )
 
-            is ApiException.Unauthorized -> UiError.Unauthorized()
+            is ApiException.Unauthorized -> UiError.Unauthorized(
+                message = throwable.message ?: ErrorMessages.SESSION_EXPIRED
+            )
 
-            is ApiException.Forbidden -> UiError.Forbidden()
+            is ApiException.Forbidden -> UiError.Forbidden(
+                message = throwable.message ?: ErrorMessages.ACCESS_DENIED
+            )
 
-            is ApiException.ServerError -> UiError.Server()
+            is ApiException.ServerError -> UiError.Server(
+                message = throwable.message ?: ErrorMessages.SERVER_ERROR
+            )
 
             is ApiException.Validation -> UiError.Validation(
                 message = throwable.message ?: "Validation error"
@@ -38,7 +45,13 @@ class DefaultErrorMapper @Inject constructor() : ErrorMapper {
                 message = "Empty response from server"
             )
 
-            else -> UiError.Unknown()
+            is ApiException.Unknown -> UiError.Unknown(
+                message = throwable.message ?: ErrorMessages.GENERIC_ERROR
+            )
+
+            else -> UiError.Unknown(
+                message = throwable.message ?: ErrorMessages.GENERIC_ERROR
+            )
         }
     }
 }

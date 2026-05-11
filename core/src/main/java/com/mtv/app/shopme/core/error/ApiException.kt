@@ -9,19 +9,42 @@
 package com.mtv.app.shopme.core.error
 
 sealed class ApiException(
+    open val statusCode: Int? = null,
+    open val errorCode: String? = null,
     message: String? = null,
     cause: Throwable? = null
 ) : Exception(message, cause) {
 
-    class Unauthorized : ApiException("Unauthorized")
+    class Unauthorized(
+        override val statusCode: Int? = 401,
+        override val errorCode: String? = null,
+        message: String = "Unauthorized"
+    ) : ApiException(statusCode, errorCode, message)
 
-    class Forbidden : ApiException("Forbidden")
+    class Forbidden(
+        override val statusCode: Int? = 403,
+        override val errorCode: String? = null,
+        message: String = "Forbidden"
+    ) : ApiException(statusCode, errorCode, message)
 
-    class ServerError : ApiException("Server error")
+    class ServerError(
+        override val statusCode: Int? = 500,
+        override val errorCode: String? = null,
+        message: String = "Server error"
+    ) : ApiException(statusCode, errorCode, message)
 
-    class Validation(message: String) : ApiException(message)
+    class Validation(
+        message: String,
+        override val statusCode: Int? = null,
+        override val errorCode: String? = null
+    ) : ApiException(statusCode, errorCode, message)
 
-    class EmptyBody : ApiException("Response body is empty")
+    class EmptyBody : ApiException(message = "Response body is empty")
 
-    class Unknown(cause: Throwable? = null) : ApiException("Unknown error", cause)
+    class Unknown(
+        override val statusCode: Int? = null,
+        override val errorCode: String? = null,
+        message: String = "Unknown error",
+        cause: Throwable? = null
+    ) : ApiException(statusCode, errorCode, message, cause)
 }

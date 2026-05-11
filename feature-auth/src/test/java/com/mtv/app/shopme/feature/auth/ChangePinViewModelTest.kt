@@ -8,6 +8,7 @@ import com.mtv.based.core.network.utils.Resource
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -24,6 +25,7 @@ class ChangePinViewModelTest {
         vm.onEvent(ChangePinEvent.OnNewPinChange("222222"))
         vm.onEvent(ChangePinEvent.OnConfirmPinChange("222222"))
         vm.onEvent(ChangePinEvent.OnSubmit)
+        advanceUntilIdle()
         assertTrue(vm.uiState.value.changePin is com.mtv.based.core.network.utils.LoadState.Success)
     }
 }

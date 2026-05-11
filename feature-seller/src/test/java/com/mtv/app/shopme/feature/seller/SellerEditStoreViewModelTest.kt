@@ -50,7 +50,7 @@ class SellerEditStoreViewModelTest {
                 )
             )
         )
-        every { getCafeUseCase.invoke("cafe-1") } returns flowOf(
+        every { getCafeUseCase.invoke(any()) } returns flowOf(
             Resource.Success(
                 Cafe(
                     id = "cafe-1",
@@ -68,7 +68,7 @@ class SellerEditStoreViewModelTest {
                 )
             )
         )
-        every { getCafeAddressUseCase.invoke("cafe-1") } returns flowOf(
+        every { getCafeAddressUseCase.invoke(any()) } returns flowOf(
             Resource.Success(CafeAddress("addr-1", "Kemang", "A", "12", "01", "02"))
         )
 
@@ -82,6 +82,7 @@ class SellerEditStoreViewModelTest {
         )
 
         vm.onEvent(SellerEditStoreEvent.Load)
+        advanceUntilIdle()
         advanceUntilIdle()
 
         assertEquals("Shopme Cafe", vm.uiState.value.storeName)

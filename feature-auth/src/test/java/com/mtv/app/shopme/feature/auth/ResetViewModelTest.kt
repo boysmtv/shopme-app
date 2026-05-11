@@ -36,6 +36,7 @@ class ResetViewModelTest {
 
         vm.onEvent(ResetEvent.OnEmailChange("dedy@mail.com"))
         vm.onEvent(ResetEvent.OnResetClick)
+        advanceUntilIdle()
 
         assertEquals(ResetStage.OTP, vm.uiState.value.stage)
     }
@@ -48,26 +49,26 @@ class ResetViewModelTest {
 
         vm.onEvent(ResetEvent.OnEmailChange("dedy@mail.com"))
         vm.onEvent(ResetEvent.OnResetClick)
+        advanceUntilIdle()
         vm.onEvent(ResetEvent.OnOtpChange("123456"))
         vm.onEvent(ResetEvent.OnResetClick)
+        advanceUntilIdle()
 
         assertEquals(ResetStage.PASSWORD, vm.uiState.value.stage)
     }
 
     @Test
     fun `back should move between recovery stages before leaving screen`() = runTest {
+        every { forgotPasswordUseCase.invoke(ForgotPasswordParam("dedy@mail.com")) } returns flowOf(Resource.Success(Unit))
+        every { verifyOtpUseCase.invoke(VerifyOtpParam("dedy@mail.com", "123456")) } returns flowOf(Resource.Success(Unit))
         val vm = ResetViewModel(forgotPasswordUseCase, verifyOtpUseCase, resetPasswordUseCase)
 
         vm.onEvent(ResetEvent.OnEmailChange("dedy@mail.com"))
+        vm.onEvent(ResetEvent.OnResetClick)
+        advanceUntilIdle()
         vm.onEvent(ResetEvent.OnOtpChange("123456"))
-        vm.onEvent(ResetEvent.OnNewPasswordChange("newpass"))
-        vm.onEvent(ResetEvent.OnConfirmPasswordChange("newpass"))
-
-        // simulate state after OTP verification
-        every { forgotPasswordUseCase.invoke(ForgotPasswordParam("dedy@mail.com")) } returns flowOf(Resource.Success(Unit))
-        every { verifyOtpUseCase.invoke(VerifyOtpParam("dedy@mail.com", "123456")) } returns flowOf(Resource.Success(Unit))
         vm.onEvent(ResetEvent.OnResetClick)
-        vm.onEvent(ResetEvent.OnResetClick)
+        advanceUntilIdle()
         assertEquals(ResetStage.PASSWORD, vm.uiState.value.stage)
 
         vm.onEvent(ResetEvent.OnBackClick)
@@ -88,8 +89,10 @@ class ResetViewModelTest {
 
         vm.onEvent(ResetEvent.OnEmailChange("dedy@mail.com"))
         vm.onEvent(ResetEvent.OnResetClick)
+        advanceUntilIdle()
         vm.onEvent(ResetEvent.OnOtpChange("123456"))
         vm.onEvent(ResetEvent.OnResetClick)
+        advanceUntilIdle()
         vm.onEvent(ResetEvent.OnNewPasswordChange("newpass"))
         vm.onEvent(ResetEvent.OnConfirmPasswordChange("newpass"))
         vm.onEvent(ResetEvent.OnResetClick)

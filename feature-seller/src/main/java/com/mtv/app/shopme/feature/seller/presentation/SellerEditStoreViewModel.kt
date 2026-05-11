@@ -140,7 +140,6 @@ class SellerEditStoreViewModel @Inject constructor(
                     } else {
                         cafeId = sellerCafeId
                         loadCafeDetail(sellerCafeId)
-                        loadCafeAddress(sellerCafeId)
                     }
                 } else {
                     _state.update { it.copy(isLoading = profileState is LoadState.Loading) }
@@ -164,11 +163,19 @@ class SellerEditStoreViewModel @Inject constructor(
                             minOrder = state.data.minimalOrder.stripTrailingZeros().toPlainString(),
                             storeOpen = state.data.openTime,
                             description = state.data.description,
-                            storePhoto = state.data.image
+                            storePhoto = state.data.image,
+                            village = state.data.address.name,
+                            block = state.data.address.block,
+                            number = state.data.address.number,
+                            rt = state.data.address.rt,
+                            rw = state.data.address.rw
                         )
                     } else {
                         it.copy(isLoading = state is LoadState.Loading)
                     }
+                }
+                if (state is LoadState.Success) {
+                    loadCafeAddress(id)
                 }
             },
             onError = ::showError

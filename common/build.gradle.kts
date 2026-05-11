@@ -36,6 +36,16 @@ val releaseBaseUrl = resolveConfig(
     envKey = "SHOPME_RELEASE_BASE_URL",
     fallback = "https://api.prod.com/"
 )
+val firebaseProjectId = resolveConfig(
+    localKey = "shopme.firebaseProjectId",
+    envKey = "SHOPME_FIREBASE_PROJECT_ID",
+    fallback = "app-movie-e85f3"
+)
+val firebaseDefaultCollection = resolveConfig(
+    localKey = "shopme.firebaseDefaultCollection",
+    envKey = "SHOPME_FIREBASE_DEFAULT_COLLECTION",
+    fallback = "users"
+)
 
 android {
     namespace = "com.mtv.app.shopme.common"
@@ -48,6 +58,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        buildConfigField("String", "FIREBASE_PROJECT_ID", "\"$firebaseProjectId\"")
+        buildConfigField("String", "FIREBASE_DEFAULT_COLLECTION", "\"$firebaseDefaultCollection\"")
     }
 
     buildTypes {
@@ -63,9 +75,6 @@ android {
         debug {
             buildConfigField("String", "BASE_URL", "\"$debugBaseUrl\"")
             buildConfigField("Boolean", "USE_KTOR", "true")
-
-            buildConfigField("String", "FIREBASE_PROJECT_ID", "\"app-movie-e85f3\"")
-            buildConfigField("String", "FIREBASE_DEFAULT_COLLECTION", "\"users\"")
         }
     }
 
