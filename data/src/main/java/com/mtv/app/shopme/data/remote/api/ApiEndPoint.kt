@@ -162,7 +162,7 @@ object ApiEndPoint {
     object Chat {
         object GetList : IApiEndPoint { override val path = "$API/$CHAT/list"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Get : IApiEndPoint { override val path = "$API/$CHAT"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
-        object EnsureConversation : IApiEndPoint { override val path = "$API/$CHAT/conversation"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
+        class EnsureConversation(cafeId: String) : IApiEndPoint { override val path = "$API/$CHAT/conversation?cafeId=$cafeId"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object SendMessage : IApiEndPoint { override val path = "$API/$CHAT/message"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object MarkAllRead : IApiEndPoint { override val path = "$API/$CHAT/read"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object Clear : IApiEndPoint { override val path = "$API/$CHAT"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }

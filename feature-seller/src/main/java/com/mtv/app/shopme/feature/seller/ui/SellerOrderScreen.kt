@@ -50,6 +50,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.seller.contract.OrderSummary
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderUiState
@@ -135,13 +137,52 @@ private fun SellerOrderShimmer() {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         repeat(3) {
-            Box(
+            Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(118.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color.LightGray.copy(alpha = 0.25f))
-            )
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerLine(widthFraction = 0.32f, heightDp = 14)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.52f, heightDp = 12)
+                        }
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(74.dp)
+                                .height(22.dp),
+                            shape = RoundedCornerShape(50)
+                        )
+                    }
+                    ShimmerLine(widthFraction = 0.68f, heightDp = 12)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(88.dp)
+                                .height(18.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(96.dp)
+                                .height(18.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

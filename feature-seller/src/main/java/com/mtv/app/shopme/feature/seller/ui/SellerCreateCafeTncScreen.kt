@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncUiState
 
@@ -60,52 +62,56 @@ fun SellerCreateCafeTncScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp)
         ) {
+            if (state.isLoading && state.terms.isEmpty()) {
+                SellerCreateCafeTncShimmer()
+            } else {
 
-            Text(
-                text = state.title.ifBlank { "Create Your Cafe" },
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = PoppinsFont
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                text = state.description.ifBlank {
-                    "Before continuing to create your cafe profile, please read and agree to the following terms and conditions. These rules are designed to ensure that all cafes listed on the platform provide a safe, reliable, and trustworthy experience for customers."
-                },
-                fontSize = 14.sp,
-                color = Color.Gray,
-                fontFamily = PoppinsFont
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            state.terms.forEachIndexed { index, item ->
-                SellerTncCard(
-                    checked = item.checked,
-                    title = item.title,
-                    description = item.description,
-                    onCheckedChange = {
-                        event(SellerCreateCafeTncEvent.ToggleTerm(item.id, it))
-                    }
+                Text(
+                    text = state.title.ifBlank { "Create Your Cafe" },
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = PoppinsFont
                 )
 
-                if (index < state.terms.lastIndex) {
-                    Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = state.description.ifBlank {
+                        "Before continuing to create your cafe profile, please read and agree to the following terms and conditions. These rules are designed to ensure that all cafes listed on the platform provide a safe, reliable, and trustworthy experience for customers."
+                    },
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    fontFamily = PoppinsFont
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                state.terms.forEachIndexed { index, item ->
+                    SellerTncCard(
+                        checked = item.checked,
+                        title = item.title,
+                        description = item.description,
+                        onCheckedChange = {
+                            event(SellerCreateCafeTncEvent.ToggleTerm(item.id, it))
+                        }
+                    )
+
+                    if (index < state.terms.lastIndex) {
+                        Spacer(Modifier.height(16.dp))
+                    }
                 }
+
+                Spacer(Modifier.height(24.dp))
+
+                Text(
+                    text = state.footer.ifBlank {
+                        "By continuing, you acknowledge that you have read and agreed to the terms above. These agreements help maintain the quality of cafes on our platform and ensure a better experience for all users."
+                    },
+                    fontSize = 13.sp,
+                    color = Color.Gray,
+                    fontFamily = PoppinsFont
+                )
             }
-
-            Spacer(Modifier.height(24.dp))
-
-            Text(
-                text = state.footer.ifBlank {
-                    "By continuing, you acknowledge that you have read and agreed to the terms above. These agreements help maintain the quality of cafes on our platform and ensure a better experience for all users."
-                },
-                fontSize = 13.sp,
-                color = Color.Gray,
-                fontFamily = PoppinsFont
-            )
         }
 
         Button(
@@ -129,6 +135,53 @@ fun SellerCreateCafeTncScreen(
             )
         }
     }
+}
+
+@Composable
+private fun SellerCreateCafeTncShimmer() {
+    ShimmerLine(widthFraction = 0.46f, heightDp = 28)
+    Spacer(Modifier.height(10.dp))
+    ShimmerLine(widthFraction = 0.92f, heightDp = 14)
+    Spacer(Modifier.height(6.dp))
+    ShimmerLine(widthFraction = 0.88f, heightDp = 14)
+    Spacer(Modifier.height(24.dp))
+
+    repeat(3) { index ->
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F9FC))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                ShimmerBlock(
+                    modifier = Modifier
+                        .width(22.dp)
+                        .height(22.dp),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    ShimmerLine(widthFraction = 0.58f, heightDp = 14)
+                    Spacer(Modifier.height(8.dp))
+                    ShimmerLine(widthFraction = 0.94f, heightDp = 12)
+                    Spacer(Modifier.height(6.dp))
+                    ShimmerLine(widthFraction = 0.82f, heightDp = 12)
+                }
+            }
+        }
+        if (index < 2) {
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+
+    Spacer(Modifier.height(24.dp))
+    ShimmerLine(widthFraction = 0.9f, heightDp = 13)
+    Spacer(Modifier.height(6.dp))
+    ShimmerLine(widthFraction = 0.84f, heightDp = 13)
 }
 
 @Composable

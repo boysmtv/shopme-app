@@ -81,6 +81,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.contract.CartUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerCartScreen
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
@@ -93,6 +94,11 @@ fun CartScreen(
     event: (CartEvent) -> Unit,
     onNavigateToDetail: (String) -> Unit = {}
 ) {
+    if (state.cartItems is LoadState.Loading) {
+        ShimmerCartScreen()
+        return
+    }
+
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var showPinSheet by remember { mutableStateOf(false) }
     var selectedCartIds by remember { mutableStateOf<List<String>>(emptyList()) }

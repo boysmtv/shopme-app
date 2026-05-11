@@ -57,6 +57,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
@@ -191,28 +193,103 @@ private fun SellerDashboardShimmer() {
             .padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(140.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color.LightGray.copy(alpha = 0.25f))
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(Color.LightGray.copy(alpha = 0.2f))
-        )
-        repeat(2) {
-            Box(
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(104.dp)
-                    .clip(RoundedCornerShape(20.dp))
-                    .background(Color.LightGray.copy(alpha = 0.2f))
-            )
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ShimmerLine(widthFraction = 0.34f, heightDp = 16)
+                ShimmerLine(widthFraction = 0.22f, heightDp = 12)
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    repeat(2) {
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(72.dp),
+                            shape = RoundedCornerShape(18.dp)
+                        )
+                    }
+                }
+            }
+        }
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ShimmerLine(widthFraction = 0.4f, heightDp = 16)
+                repeat(3) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerLine(widthFraction = 0.58f, heightDp = 13)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.3f, heightDp = 11)
+                        }
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(70.dp)
+                                .height(20.dp),
+                            shape = RoundedCornerShape(50)
+                        )
+                    }
+                }
+            }
+        }
+        repeat(2) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerLine(widthFraction = 0.36f, heightDp = 14)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.58f, heightDp = 12)
+                        }
+                        ShimmerLine(widthFraction = 0.18f, heightDp = 14)
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(84.dp)
+                                .height(18.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(96.dp)
+                                .height(18.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

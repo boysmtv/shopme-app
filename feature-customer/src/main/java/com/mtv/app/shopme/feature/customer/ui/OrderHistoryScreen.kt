@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryUiState
@@ -451,11 +453,50 @@ fun ModernSkeleton() {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(90.dp)
                     .padding(bottom = 14.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft)
-            ) {}
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerLine(widthFraction = 0.42f, heightDp = 14)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.26f, heightDp = 11)
+                        }
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(76.dp)
+                                .height(22.dp),
+                            shape = RoundedCornerShape(50)
+                        )
+                    }
+                    ShimmerLine(widthFraction = 0.68f, heightDp = 12)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(84.dp)
+                                .height(20.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(96.dp)
+                                .height(20.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }

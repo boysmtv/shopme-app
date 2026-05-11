@@ -56,6 +56,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.customer.contract.HelpEvent
 import com.mtv.app.shopme.feature.customer.contract.HelpFaq
 import com.mtv.app.shopme.feature.customer.contract.HelpUiState
@@ -109,6 +111,30 @@ fun HelpScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
 
+                if (state.isLoading && state.faq.isEmpty()) {
+                    item {
+                        Text(
+                            "FAQ",
+                            fontFamily = PoppinsFont,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    items(4) {
+                        HelpFaqShimmer()
+                    }
+                    item {
+                        Spacer(Modifier.height(16.dp))
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(52.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                    }
+                    return@LazyColumn
+                }
+
                 item {
                     Text(
                         "FAQ",
@@ -138,6 +164,42 @@ fun HelpScreen(
                         Text("Hubungi Support", fontFamily = PoppinsFont)
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun HelpFaqShimmer() {
+    ElevatedCard(
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = AppColor.White)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ShimmerBlock(
+                    modifier = Modifier
+                        .width(24.dp)
+                        .height(24.dp),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    ShimmerLine(widthFraction = 0.7f, heightDp = 14)
+                    Spacer(Modifier.height(10.dp))
+                    ShimmerLine(widthFraction = 0.9f, heightDp = 12)
+                }
+                Spacer(Modifier.width(12.dp))
+                ShimmerBlock(
+                    modifier = Modifier
+                        .width(20.dp)
+                        .height(20.dp),
+                    shape = RoundedCornerShape(10.dp)
+                )
             }
         }
     }

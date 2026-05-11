@@ -38,7 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.common.shimmerBrush
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
@@ -136,14 +137,57 @@ fun OrderDetailScreen(
 
 @Composable
 private fun OrderDetailShimmer() {
-    val brush = shimmerBrush()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        repeat(4) {
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                ShimmerLine(widthFraction = 0.46f, heightDp = 20)
+                ShimmerLine(widthFraction = 0.34f, heightDp = 14)
+                HorizontalDivider(color = AppColor.Green.copy(alpha = 0.12f))
+                ShimmerLine(widthFraction = 0.58f, heightDp = 13)
+                ShimmerLine(widthFraction = 0.52f, heightDp = 13)
+            }
+        }
+
+        Card(
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                ShimmerLine(widthFraction = 0.34f, heightDp = 16)
+                repeat(2) { index ->
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        ShimmerLine(widthFraction = 0.5f, heightDp = 14)
+                        ShimmerLine(widthFraction = 0.3f, heightDp = 12)
+                        if (index == 0) {
+                            ShimmerLine(widthFraction = 0.62f, heightDp = 12)
+                        }
+                    }
+                    if (index == 0) {
+                        HorizontalDivider(color = AppColor.Green.copy(alpha = 0.12f))
+                    }
+                }
+            }
+        }
+
+        repeat(2) {
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
@@ -152,32 +196,20 @@ private fun OrderDetailShimmer() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.45f)
-                            .height(16.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(brush)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(14.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(brush)
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(14.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(brush)
-                    )
+                    ShimmerLine(widthFraction = 0.28f, heightDp = 16)
+                    ShimmerLine(widthFraction = 0.74f, heightDp = 13)
                 }
             }
         }
+
+        ShimmerBlock(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(44.dp),
+            shape = RoundedCornerShape(14.dp)
+        )
     }
 }
 

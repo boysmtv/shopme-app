@@ -170,9 +170,9 @@ fun ChangePinScreen(
 
                     if (isLoading) {
                         CircularProgressIndicator(
-                            color = Color.White,
-                            strokeWidth = 2.dp,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(22.dp),
+                            strokeWidth = 2.5.dp,
+                            color = Color.White
                         )
                     } else {
                         Text("Simpan PIN", color = Color.White)
