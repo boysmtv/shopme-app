@@ -54,12 +54,22 @@ import com.mtv.app.shopme.common.base.BaseSimpleFormField
 import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreUiState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 
 @Composable
 fun SellerEditStoreScreen(
     state: SellerEditStoreUiState,
     event: (SellerEditStoreEvent) -> Unit
 ){
+    if (state.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
+    }
 
     val selectedTab = state.selectedTab
     val context = LocalContext.current

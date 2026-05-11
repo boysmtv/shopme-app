@@ -87,7 +87,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.contract.DetailUiState
-import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerSearchScreen
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerDetailScreen
 import com.mtv.app.shopme.feature.customer.utils.StatItem
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
@@ -132,17 +132,19 @@ fun DetailScreen(
 
     Scaffold(
         bottomBar = {
-            AddToCartBar(
-                onChatClick = { event(DetailEvent.ChatClicked) },
-                onCartClick = { showSheet = true }
-            )
+            if (state.food is LoadState.Success) {
+                AddToCartBar(
+                    onChatClick = { event(DetailEvent.ChatClicked) },
+                    onCartClick = { showSheet = true }
+                )
+            }
         }
     ) { paddingValues ->
 
         when (state.food) {
 
             is LoadState.Loading -> {
-                ShimmerSearchScreen()
+                ShimmerDetailScreen()
             }
 
             is LoadState.Success -> {

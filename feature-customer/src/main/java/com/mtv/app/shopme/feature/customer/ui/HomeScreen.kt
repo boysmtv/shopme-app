@@ -42,8 +42,8 @@ import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.*
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerHomeContentSkeleton
 import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerHomeHeaderSkeleton
-import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerFoodSkeletonGrid
 import com.mtv.app.shopme.feature.customer.utils.*
 import com.mtv.based.core.network.utils.LoadState
 import java.math.BigDecimal
@@ -167,7 +167,7 @@ private fun HomeContent(
         when (val foodsState = state.foods) {
             is LoadState.Loading -> {
                 item {
-                    ShimmerFoodSkeletonGrid()
+                    ShimmerHomeContentSkeleton()
                 }
             }
 

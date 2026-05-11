@@ -66,6 +66,7 @@ import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.contract.CafeUiState
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
@@ -78,6 +79,20 @@ fun CafeScreen(
     val foods = (state.foods as? LoadState.Success)?.data ?: emptyList()
     val cafeError = state.cafe as? LoadState.Error
     val foodsError = state.foods as? LoadState.Error
+    val isInitialLoading =
+        (state.cafe is LoadState.Loading || state.foods is LoadState.Loading) &&
+                cafe == null &&
+                foods.isEmpty()
+
+    if (isInitialLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
+    }
 
     if (cafeError != null || foodsError != null) {
         ContentErrorState(

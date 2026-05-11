@@ -61,6 +61,8 @@ import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatUiState
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class ChatMessage(
@@ -76,6 +78,18 @@ fun ChatScreen(
     var userMessage by remember { mutableStateOf(EMPTY_STRING) }
 
     val messages = (state.chats as? LoadState.Success)?.data.orEmpty()
+    val isInitialLoading = state.chats is LoadState.Loading && messages.isEmpty()
+    val isSending = state.sendMessage is LoadState.Loading
+
+    if (isInitialLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -172,7 +186,7 @@ fun ChatScreen(
 
             IconButton(
                 onClick = {
-                    if (userMessage.isNotEmpty()) {
+                    if (userMessage.isNotEmpty() && !isSending) {
                         val targetId = state.activeChatId.ifBlank {
                             messages.firstOrNull()?.id.orEmpty()
                         }
@@ -196,11 +210,15 @@ fun ChatScreen(
                     .align(Alignment.Bottom)
                     .background(AppColor.Green, RoundedCornerShape(20.dp))
             ) {
-                Icon(
-                    Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send",
-                    tint = AppColor.White
-                )
+                if (isSending) {
+                    LoadingV1(modifier = Modifier.size(20.dp))
+                } else {
+                    Icon(
+                        Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "Send",
+                        tint = AppColor.White
+                    )
+                }
             }
         }
     }

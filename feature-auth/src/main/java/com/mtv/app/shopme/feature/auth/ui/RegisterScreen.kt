@@ -58,9 +58,11 @@ import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.feature.auth.contract.RegisterDialog
 import com.mtv.app.shopme.feature.auth.contract.RegisterEvent
 import com.mtv.app.shopme.feature.auth.contract.RegisterUiState
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.OK_STRING
 
 @Composable
@@ -220,13 +222,15 @@ fun RegisterScreen(
 
                     Button(
                         onClick = {
-                            event(
-                                RegisterEvent.OnRegisterClick(
-                                    state.name,
-                                    state.email,
-                                    state.password
+                            if (state.register !is LoadState.Loading) {
+                                event(
+                                    RegisterEvent.OnRegisterClick(
+                                        state.name,
+                                        state.email,
+                                        state.password
+                                    )
                                 )
-                            )
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -236,11 +240,15 @@ fun RegisterScreen(
                             containerColor = AppColor.Green
                         )
                     ) {
-                        Text(
-                            "Register",
-                            fontFamily = PoppinsFont,
-                            color = Color.White
-                        )
+                        if (state.register is LoadState.Loading) {
+                            LoadingV1()
+                        } else {
+                            Text(
+                                "Register",
+                                fontFamily = PoppinsFont,
+                                color = Color.White
+                            )
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))

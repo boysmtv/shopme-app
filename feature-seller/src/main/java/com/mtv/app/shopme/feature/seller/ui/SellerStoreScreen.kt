@@ -66,6 +66,7 @@ import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.domain.model.ProfileMenuItem
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreUiState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
@@ -73,6 +74,16 @@ fun SellerStoreScreen(
     state: SellerStoreUiState,
     event: (SellerStoreEvent) -> Unit
 ) {
+    if (state.isLoading && state.sellerName.isBlank() && state.storeName.isBlank()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
+    }
+
     val menuItems = listOf(
         ProfileMenuItem(
             title = "Order History",

@@ -202,28 +202,52 @@ private fun ChatListShimmerItem() {
         Column(modifier = Modifier.weight(1f)) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
+                    .fillMaxWidth(0.42f)
                     .height(16.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(brush)
             )
             Spacer(Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.72f)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(RoundedCornerShape(9.dp))
+                        .background(brush)
+                )
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.height(40.dp)
+        ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .width(40.dp)
                     .height(12.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(brush)
             )
+            Box(
+                modifier = Modifier
+                    .size(18.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(brush)
+            )
         }
-        Spacer(Modifier.width(12.dp))
-        Box(
-            modifier = Modifier
-                .width(40.dp)
-                .height(12.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(brush)
-        )
     }
 }
 

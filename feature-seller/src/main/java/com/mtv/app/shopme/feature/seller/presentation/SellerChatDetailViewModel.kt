@@ -89,6 +89,7 @@ class SellerChatDetailViewModel @Inject constructor(
     }
 
     private fun load() {
+        _state.update { it.copy(isLoading = true) }
         realtimeGateway.ensureConnected()
         observeChatMetadata()
     }
@@ -110,6 +111,7 @@ class SellerChatDetailViewModel @Inject constructor(
                     val activeChat = items.firstOrNull { item -> item.id == resolvedActiveId }
                         ?: items.firstOrNull()
                     it.copy(
+                        isLoading = false,
                         activeChatId = activeChat?.id.orEmpty(),
                         chatName = activeChat?.name.orEmpty(),
                         chatAvatarBase64 = activeChat?.avatarBase64
@@ -143,6 +145,7 @@ class SellerChatDetailViewModel @Inject constructor(
                         .orEmpty()
 
                     it.copy(
+                        isLoading = state is LoadState.Loading,
                         activeChatId = it.activeChatId.ifBlank { activeId },
                         messages = if (messages.isNotEmpty()) messages else it.messages
                     ).also { nextState ->
@@ -163,8 +166,11 @@ class SellerChatDetailViewModel @Inject constructor(
 
         observeDataFlow(
             flow = sendChatMessageUseCase(chatId, message, asSeller = true),
+            onState = { state ->
+                _state.update { it.copy(isSending = state is LoadState.Loading) }
+            },
             onSuccess = {
-                _state.update { it.copy(currentMessage = "") }
+                _state.update { it.copy(currentMessage = "", isSending = false) }
                 observeChatMetadata()
                 observeChat()
             },
@@ -187,6 +193,7 @@ class SellerChatDetailViewModel @Inject constructor(
 
     private fun showError(error: UiError) {
         handleSessionError(error, sessionManager) {
+            _state.update { it.copy(isLoading = false, isSending = false) }
             setDialog(
                 UiDialog.Center(
                     state = DialogStateV1(

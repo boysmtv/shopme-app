@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
@@ -74,6 +75,7 @@ import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerProfileScreen
 import com.mtv.based.core.network.utils.LoadState
 
 @Composable
@@ -91,151 +93,168 @@ fun ProfileScreen(
         OrderMenu("Selesai", Icons.Filled.CheckCircle, customer?.menuSummary?.completed ?: 0)
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        AppColor.Green,
-                        AppColor.GreenSoft
-                    )
-                )
-            )
-            .statusBarsPadding()
-            .padding(top = 24.dp)
-    ) {
-        HeaderProfile(customer)
+    when (val customerState = state.customer) {
+        is LoadState.Loading -> {
+            ShimmerProfileScreen()
+        }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        listOf(
-                            AppColor.WhiteSoft,
-                            AppColor.White
-                        )
-                    )
-                ),
-            shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.Transparent
+        is LoadState.Error -> {
+            ContentErrorState(
+                title = "Gagal memuat profil",
+                message = customerState.error.message,
+                actionLabel = "Muat ulang",
+                onRetry = { event(ProfileEvent.Load) }
             )
-        ) {
+        }
+
+        else -> {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 20.dp, end = 20.dp)
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(
+                                AppColor.Green,
+                                AppColor.GreenSoft
+                            )
+                        )
+                    )
+                    .statusBarsPadding()
+                    .padding(top = 24.dp)
             ) {
+                HeaderProfile(customer)
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    fontFamily = PoppinsFont,
-                    text = "Pesanan Saya",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Normal
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    AppColor.WhiteSoft,
+                                    AppColor.White
+                                )
+                            )
+                        ),
+                    shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Transparent
+                    )
                 ) {
-                    orderMenus.forEach { menu ->
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 20.dp, end = 20.dp)
+                    ) {
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            fontFamily = PoppinsFont,
+                            text = "Pesanan Saya",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            orderMenus.forEach { menu ->
+
+                                Column(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable { event(ProfileEvent.ClickOrder) },
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+
+                                    Box(
+                                        modifier = Modifier
+                                            .size(55.dp)
+                                            .background(AppColor.GreenSoft, RoundedCornerShape(16.dp)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+
+                                        Icon(
+                                            imageVector = menu.icon,
+                                            contentDescription = null,
+                                            tint = AppColor.Green,
+                                            modifier = Modifier.size(28.dp)
+                                        )
+
+                                        if (menu.count > 0) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .align(Alignment.TopEnd)
+                                                    .offset(x = 6.dp, y = (-6).dp)
+                                                    .background(Color.Red, RoundedCornerShape(50))
+                                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                                            ) {
+                                                Text(
+                                                    menu.count.toString(),
+                                                    color = Color.White,
+                                                    fontSize = 10.sp
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    Spacer(Modifier.height(8.dp))
+
+                                    Text(
+                                        menu.title,
+                                        fontSize = 12.sp,
+                                        fontFamily = PoppinsFont
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        HorizontalDivider(modifier = Modifier.height(1.dp))
 
                         Column(
                             modifier = Modifier
-                                .weight(1f)
-                                .clickable { event(ProfileEvent.ClickOrder) },
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .verticalScroll(scrollState)
                         ) {
-
-                            Box(
-                                modifier = Modifier
-                                    .size(55.dp)
-                                    .background(AppColor.GreenSoft, RoundedCornerShape(16.dp)),
-                                contentAlignment = Alignment.Center
-                            ) {
-
-                                Icon(
-                                    imageVector = menu.icon,
-                                    contentDescription = null,
-                                    tint = AppColor.Green,
-                                    modifier = Modifier.size(28.dp)
-                                )
-
-                                if (menu.count > 0) {
-                                    Box(
-                                        modifier = Modifier
-                                            .align(Alignment.TopEnd)
-                                            .offset(x = 6.dp, y = (-6).dp)
-                                            .background(Color.Red, RoundedCornerShape(50))
-                                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                                    ) {
-                                        Text(
-                                            menu.count.toString(),
-                                            color = Color.White,
-                                            fontSize = 10.sp
-                                        )
-                                    }
-                                }
-                            }
-
-                            Spacer(Modifier.height(8.dp))
-
-                            Text(
-                                menu.title,
-                                fontSize = 12.sp,
-                                fontFamily = PoppinsFont
+                            ProfileMenuItem(
+                                title = "Edit Account",
+                                icon = Icons.Default.Person,
+                                onClickMenu = { event(ProfileEvent.ClickEditProfile) }
+                            )
+                            ProfileMenuItem(
+                                title = "Riwayat Belanja",
+                                icon = Icons.Default.History,
+                                onClickMenu = { event(ProfileEvent.ClickOrderHistory) }
+                            )
+                            ProfileMenuItem(
+                                title = "Pengaturan Akun",
+                                icon = Icons.Default.Settings,
+                                onClickMenu = { event(ProfileEvent.ClickSettings) }
+                            )
+                            ProfileMenuItem(
+                                title = "Menjadi Penjual",
+                                icon = Icons.Default.CardTravel,
+                                onClickMenu = { event(ProfileEvent.ClickCheckTncCafe) }
+                            )
+                            ProfileMenuItem(
+                                title = "Bantuan",
+                                icon = Icons.AutoMirrored.Filled.Help,
+                                onClickMenu = { event(ProfileEvent.ClickHelpCenter) }
+                            )
+                            ProfileMenuItem(
+                                title = "Keluar",
+                                icon = Icons.Default.Map,
+                                isLogout = true,
+                                onClickMenu = { event(ProfileEvent.ClickLogout) }
                             )
                         }
                     }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                HorizontalDivider(modifier = Modifier.height(1.dp))
-
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(scrollState)
-                ) {
-                    ProfileMenuItem(
-                        title = "Edit Account",
-                        icon = Icons.Default.Person,
-                        onClickMenu = { event(ProfileEvent.ClickEditProfile) }
-                    )
-                    ProfileMenuItem(
-                        title = "Riwayat Belanja",
-                        icon = Icons.Default.History,
-                        onClickMenu = { event(ProfileEvent.ClickOrderHistory) }
-                    )
-                    ProfileMenuItem(
-                        title = "Pengaturan Akun",
-                        icon = Icons.Default.Settings,
-                        onClickMenu = { event(ProfileEvent.ClickSettings) }
-                    )
-                    ProfileMenuItem(
-                        title = "Menjadi Penjual",
-                        icon = Icons.Default.CardTravel,
-                        onClickMenu = { event(ProfileEvent.ClickCheckTncCafe) }
-                    )
-                    ProfileMenuItem(
-                        title = "Bantuan",
-                        icon = Icons.AutoMirrored.Filled.Help,
-                        onClickMenu = { event(ProfileEvent.ClickHelpCenter) }
-                    )
-                    ProfileMenuItem(
-                        title = "Keluar",
-                        icon = Icons.Default.Map,
-                        isLogout = true,
-                        onClickMenu = { event(ProfileEvent.ClickLogout) }
-                    )
                 }
             }
         }
