@@ -38,6 +38,42 @@ class FoodRepositoryImplTest {
     )
 
     @Test
+    fun `getFoods should emit cached foods first then refresh from backend`() = runTest {
+        coEvery { homeDao.getFoodsOnce() } returns listOf(
+            FoodEntity(
+                id = "cached-1",
+                name = "Cached Coffee",
+                price = 18000.0,
+                image = "cached-image",
+                cafeName = "Cached Cafe",
+                isActive = true
+            )
+        )
+        coEvery { remote.getFoods() } returns listOf(
+            foodResponse(
+                id = "remote-1",
+                name = "Remote Coffee",
+                cafeName = "Remote Cafe"
+            )
+        )
+
+        repository.getFoods().test {
+            assertEquals(Resource.Loading, awaitItem())
+
+            val cached = awaitItem() as Resource.Success
+            assertEquals("cached-1", cached.data.first().id)
+
+            val refreshed = awaitItem() as Resource.Success
+            assertEquals("remote-1", refreshed.data.first().id)
+
+            awaitComplete()
+        }
+
+        coVerify { homeDao.clearFoods() }
+        coVerify { homeDao.insertFoods(match { it.single().id == "remote-1" }) }
+    }
+
+    @Test
     fun `searchFoods should emit cached home feed first then refresh from backend`() = runTest {
         coEvery { homeDao.getFoodsOnce() } returns listOf(
             FoodEntity(

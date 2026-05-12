@@ -13,6 +13,7 @@ import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toCacheEntity
 import com.mtv.app.shopme.data.mapper.toDomain
+import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.mapper.toSearchDomain
 import com.mtv.app.shopme.data.remote.datasource.FoodRemoteDataSource
 import com.mtv.app.shopme.domain.model.PagedData
@@ -35,9 +36,25 @@ class FoodRepositoryImpl @Inject constructor(
 ) : FoodRepository {
 
     override fun getFoods() =
-        resultFlow.create {
-            remote.getFoods().map { it.toDomain() }
-        }
+        flow {
+            emit(Resource.Loading)
+            val cached = homeDao.getFoodsOnce().map { it.toDomain() }
+            if (cached.isNotEmpty()) {
+                emit(Resource.Success(cached))
+            }
+
+            try {
+                val remoteFoods = remote.getFoods()
+                val mapped = remoteFoods.map { it.toDomain() }
+                homeDao.clearFoods()
+                homeDao.insertFoods(mapped.map { it.toEntity() })
+                emit(Resource.Success(mapped))
+            } catch (throwable: Throwable) {
+                if (cached.isEmpty()) {
+                    emit(Resource.Error(errorMapper.map(throwable)))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun getFoodsByCafe(id: String) =
         resultFlow.create {

@@ -15,10 +15,11 @@ import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
 import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
+import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 
 @Database(
-    entities = [CustomerEntity::class, FoodEntity::class, ChatListCacheEntity::class, AppNotificationCacheEntity::class],
-    version = 4,
+    entities = [CustomerEntity::class, FoodEntity::class, ChatListCacheEntity::class, AppNotificationCacheEntity::class, PayloadCacheEntity::class],
+    version = 5,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

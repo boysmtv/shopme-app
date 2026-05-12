@@ -16,6 +16,7 @@ import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
 import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
+import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -59,4 +60,13 @@ interface HomeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertFoods(data: List<FoodEntity>)
+
+    @Query("SELECT * FROM payload_cache WHERE cacheKey = :cacheKey LIMIT 1")
+    suspend fun getPayloadOnce(cacheKey: String): PayloadCacheEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPayload(data: PayloadCacheEntity)
+
+    @Query("DELETE FROM payload_cache WHERE cacheKey = :cacheKey")
+    suspend fun clearPayload(cacheKey: String)
 }
