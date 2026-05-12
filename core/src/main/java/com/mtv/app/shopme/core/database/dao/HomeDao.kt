@@ -12,6 +12,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
+import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
 import kotlinx.coroutines.flow.Flow
@@ -27,6 +29,24 @@ interface HomeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCustomer(data: CustomerEntity)
+
+    @Query("SELECT * FROM chat_list_cache WHERE scope = :scope ORDER BY updatedAt DESC")
+    suspend fun getChatListOnce(scope: String): List<ChatListCacheEntity>
+
+    @Query("DELETE FROM chat_list_cache WHERE scope = :scope")
+    suspend fun clearChatList(scope: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertChatList(data: List<ChatListCacheEntity>)
+
+    @Query("SELECT * FROM app_notification_cache WHERE scope = :scope ORDER BY createdAt DESC")
+    suspend fun getNotificationsOnce(scope: String): List<AppNotificationCacheEntity>
+
+    @Query("DELETE FROM app_notification_cache WHERE scope = :scope")
+    suspend fun clearNotifications(scope: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertNotifications(data: List<AppNotificationCacheEntity>)
 
     @Query("SELECT * FROM food")
     fun getFoods(): Flow<List<FoodEntity>>

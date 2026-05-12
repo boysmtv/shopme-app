@@ -8,6 +8,8 @@
 
 package com.mtv.app.shopme.data.mapper
 
+import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
+import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
 import com.mtv.app.shopme.domain.model.Address
@@ -16,7 +18,10 @@ import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.MenuSummary
+import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.model.Stats
+import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
 import kotlin.text.ifEmpty
@@ -111,4 +116,67 @@ fun Food.toEntity(): FoodEntity = FoodEntity(
     image = images.firstOrNull().orEmpty(),
     cafeName = cafeName,
     isActive = isActive
+)
+
+fun ChatListItem.toEntity(scope: String): ChatListCacheEntity = ChatListCacheEntity(
+    cacheKey = "$scope:$id",
+    scope = scope,
+    conversationId = id,
+    name = name,
+    lastMessage = lastMessage,
+    time = time,
+    unreadCount = unreadCount,
+    avatarBase64 = avatarBase64,
+    updatedAt = System.currentTimeMillis()
+)
+
+fun ChatListCacheEntity.toDomain(): ChatListItem = ChatListItem(
+    id = conversationId,
+    name = name,
+    lastMessage = lastMessage,
+    time = time,
+    unreadCount = unreadCount,
+    avatarBase64 = avatarBase64
+)
+
+fun NotificationItem.toEntity(scope: String, notificationId: String): AppNotificationCacheEntity = AppNotificationCacheEntity(
+    cacheKey = "$scope:$notificationId",
+    scope = scope,
+    notificationId = notificationId,
+    title = title,
+    message = message,
+    createdAt = "${signatureDate}T${signatureTime}",
+    isRead = isRead,
+    updatedAt = System.currentTimeMillis()
+)
+
+fun SellerNotifItem.toEntity(scope: String): AppNotificationCacheEntity = AppNotificationCacheEntity(
+    cacheKey = "$scope:$orderId",
+    scope = scope,
+    notificationId = orderId,
+    title = title,
+    message = message,
+    createdAt = "${date}T${time}",
+    isRead = isRead,
+    updatedAt = System.currentTimeMillis()
+)
+
+fun AppNotificationCacheEntity.toCustomerNotification(): NotificationItem = NotificationItem(
+    title = title,
+    message = message,
+    photo = "",
+    signatureName = title,
+    signatureDate = createdAt.substringBefore("T"),
+    signatureTime = createdAt.substringAfter("T", "").substringBefore("."),
+    isRead = isRead
+)
+
+fun AppNotificationCacheEntity.toSellerNotification(): SellerNotifItem = SellerNotifItem(
+    title = title,
+    message = message,
+    orderId = notificationId,
+    buyerName = title,
+    date = createdAt.substringBefore("T"),
+    time = createdAt.substringAfter("T", "").substringBefore("."),
+    isRead = isRead
 )
