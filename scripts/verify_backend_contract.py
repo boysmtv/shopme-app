@@ -12,9 +12,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-BUYER_EMAIL = os.environ.get("BUYER_EMAIL", "buyer.demo@shopme.local")
+BUYER_EMAIL = os.environ.get("BUYER_EMAIL", "raka.pratama@shopme.local")
 BUYER_PASSWORD = os.environ.get("BUYER_PASSWORD", "Demo123!")
-SELLER_EMAIL = os.environ.get("SELLER_EMAIL", "seller.demo@shopme.local")
+SELLER_EMAIL = os.environ.get("SELLER_EMAIL", "ayu.lestari@shopme.local")
 SELLER_PASSWORD = os.environ.get("SELLER_PASSWORD", "Demo123!")
 
 
@@ -75,7 +75,8 @@ def collect_android_endpoints(api_endpoint_file: Path) -> list[Endpoint]:
 
 
 def normalize_path(path: str) -> str:
-    normalized = path if path.startswith("/") else f"/{path}"
+    path_without_query = path.split("?", 1)[0]
+    normalized = path_without_query if path_without_query.startswith("/") else f"/{path_without_query}"
     normalized = re.sub(r"/+", "/", normalized)
     return normalized.rstrip("/") or "/"
 
@@ -167,6 +168,15 @@ def request_json(url: str, method: str = "GET", body: dict | None = None, token:
         return error.code, json.loads(error.read().decode("utf-8"))
 
 
+def request_bytes(url: str, method: str = "GET", body: bytes | None = None, headers: dict[str, str] | None = None) -> tuple[int, bytes]:
+    request = urllib.request.Request(url, data=body, headers=headers or {}, method=method)
+    try:
+        with urllib.request.urlopen(request) as response:
+            return response.status, response.read()
+    except urllib.error.HTTPError as error:
+        return error.code, error.read()
+
+
 def assert_envelope(payload: dict, label: str) -> list[str]:
     failures: list[str] = []
     required = {"timestamp", "status", "code", "message", "traceId"}
@@ -195,8 +205,10 @@ def expect_status(
         failures.append(f"{label} returned {actual_status}, expected {expected}")
 
 
-def verify_runtime(base_url: str) -> list[str]:
+def verify_runtime(base_url: str, android_root: Path) -> list[str]:
     failures: list[str] = []
+    sample_image_path = android_root / "app/src/main/res/mipmap-mdpi/ic_launcher.webp"
+    sample_image_bytes = sample_image_path.read_bytes()
 
     invalid_status, invalid_login = request_json(
         f"{base_url}/api/auth/login",
@@ -265,6 +277,43 @@ def verify_runtime(base_url: str) -> list[str]:
     if not seller_cafe_id:
         failures.append("seller profile missing cafeId")
         return failures
+
+    media_ticket_status, media_ticket_payload = request_json(
+        f"{base_url}/api/media/presign-upload?scope=verifier-profile&contentType=image/webp",
+        method="POST",
+        token=buyer_token,
+    )
+    expect_status(failures, "POST /api/media/presign-upload", media_ticket_status, {201})
+    failures.extend(assert_envelope(media_ticket_payload, "POST /api/media/presign-upload"))
+    media_ticket_data = media_ticket_payload.get("data", {})
+    upload_url = media_ticket_data.get("uploadUrl") if isinstance(media_ticket_data, dict) else None
+    original_url = media_ticket_data.get("originalUrl") if isinstance(media_ticket_data, dict) else None
+    upload_method = media_ticket_data.get("uploadMethod") if isinstance(media_ticket_data, dict) else None
+    if not isinstance(upload_url, str) or not upload_url:
+        failures.append("POST /api/media/presign-upload missing uploadUrl")
+    if not isinstance(original_url, str) or not original_url:
+        failures.append("POST /api/media/presign-upload missing originalUrl")
+    if upload_method != "PUT":
+        failures.append(f"POST /api/media/presign-upload unexpected uploadMethod={upload_method!r}")
+
+    if isinstance(upload_url, str) and upload_url:
+        upload_status, upload_response = request_bytes(
+            upload_url,
+            method="PUT",
+            body=sample_image_bytes,
+            headers={"Content-Type": "image/webp"},
+        )
+        expect_status(failures, "PUT presigned media upload", upload_status, {200, 201, 204})
+        if upload_status not in {200, 201, 204} and upload_response:
+            failures.append(
+                f"PUT presigned media upload returned body {upload_response.decode('utf-8', errors='replace')[:200]}"
+            )
+
+    if isinstance(original_url, str) and original_url:
+        original_status, original_bytes = request_bytes(original_url, method="GET")
+        expect_status(failures, "GET uploaded media originalUrl", original_status, {200})
+        if original_status == 200 and len(original_bytes) == 0:
+            failures.append("GET uploaded media originalUrl returned empty body")
 
     read_cases = [
         ("POST", "/api/splash", None, {
@@ -781,6 +830,7 @@ def verify_dtos(android_root: Path, backend_root: Path) -> list[str]:
         DtoPair("SupportChatMessageRequest", "data/src/main/java/com/mtv/app/shopme/data/remote/request/SupportChatMessageRequest.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/request/SupportChatMessageRequest.kt"),
         DtoPair("SupportChatResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportChatResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportChatResponse.kt"),
         DtoPair("SupportChatMessageResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/SupportChatResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/SupportChatResponse.kt"),
+        DtoPair("MediaUploadResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/MediaUploadResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/MediaUploadResponse.kt"),
         DtoPair("AddressResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/AddressResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/AddressResponse.kt"),
         DtoPair("VillageResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/VillageResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/VillageResponse.kt"),
         DtoPair("AppConfigResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/AppConfigResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/AppConfigResponse.kt"),
@@ -819,7 +869,7 @@ def main() -> int:
     failures.extend(verify_dtos(android_root, backend_root))
     if not args.skip_runtime:
         base_url = args.openapi_url.removesuffix("/v3/api-docs")
-        failures.extend(verify_runtime(base_url))
+        failures.extend(verify_runtime(base_url, android_root))
 
     if failures:
         print("Contract verification failed:")
