@@ -17,6 +17,8 @@ import com.mtv.app.shopme.data.remote.datasource.CartRemoteDataSource
 import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
 import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
+import com.mtv.app.shopme.data.remote.response.CartItemVariantResponse
+import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
@@ -34,6 +36,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.builtins.ListSerializer
+import java.math.BigDecimal
 
 class CartRepositoryImpl @Inject constructor(
     private val remote: CartRemoteDataSource,
@@ -83,6 +86,7 @@ class CartRepositoryImpl @Inject constructor(
                     syncManager.enqueue(
                         PendingMutationAction.CartAdd(param.toRequest())
                     )
+                    patchCartAdd(param)
                     emit(Resource.Success(Unit))
                 } else {
                     emit(Resource.Error(errorMapper.map(throwable)))
@@ -189,6 +193,58 @@ class CartRepositoryImpl @Inject constructor(
         overwriteCartCache(cached.filterNot { it.cafeId == cafeId })
     }
 
+    private suspend fun patchCartAdd(param: CartAddParam) {
+        val cached = readCartCache()
+        val foodDetail = PayloadCacheStore.read(
+            homeDao = homeDao,
+            cacheKey = foodDetailCacheKey(param.foodId),
+            serializer = FoodResponse.serializer()
+        ) ?: return
+        val customerId = homeDao.getCustomerOnce()?.id.orEmpty()
+        val variantPayload = param.variants.orEmpty().mapNotNull { selected ->
+            val variant = foodDetail.variants.firstOrNull { it.id == selected.variantId } ?: return@mapNotNull null
+            val option = variant.options.firstOrNull { it.id == selected.optionId } ?: return@mapNotNull null
+            CartItemVariantResponse(
+                variantId = variant.id,
+                variantName = variant.name,
+                optionId = option.id,
+                optionName = option.name,
+                price = option.price
+            )
+        }
+        val normalizedVariants = variantPayload.sortedBy { "${it.variantId}:${it.optionId}" }
+        val existingIndex = cached.indexOfFirst {
+            it.foodId == param.foodId &&
+                it.notes.orEmpty() == param.note &&
+                it.variants.orEmpty()
+                    .sortedBy { item -> "${item.variantId}:${item.optionId}" } == normalizedVariants
+        }
+        val variantSurcharge = normalizedVariants.fold(BigDecimal.ZERO) { acc, item -> acc + item.price }
+
+        if (existingIndex >= 0) {
+            val updated = cached.toMutableList()
+            val current = updated[existingIndex]
+            updated[existingIndex] = current.copy(quantity = current.quantity + param.quantity)
+            overwriteCartCache(updated)
+            return
+        }
+
+        val optimisticItem = CartItemResponse(
+            id = "pending:${System.currentTimeMillis()}",
+            name = foodDetail.name,
+            image = foodDetail.images.firstOrNull(),
+            quantity = param.quantity,
+            notes = param.note.ifBlank { null },
+            cafeId = foodDetail.cafeId,
+            cafeName = foodDetail.cafeName.orEmpty(),
+            foodId = foodDetail.id,
+            customerId = customerId,
+            price = foodDetail.price + variantSurcharge,
+            variants = normalizedVariants.ifEmpty { null }
+        )
+        overwriteCartCache(cached + optimisticItem)
+    }
+
     private suspend fun readCartCache(): List<CartItemResponse> =
         PayloadCacheStore.read(
             homeDao = homeDao,
@@ -207,4 +263,6 @@ class CartRepositoryImpl @Inject constructor(
 
     private fun Throwable.isRetryableOfflineWrite(): Boolean =
         this is IOException || this is TimeoutCancellationException
+
+    private fun foodDetailCacheKey(id: String) = "food:detail:$id"
 }

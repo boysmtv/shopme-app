@@ -3,6 +3,7 @@ package com.mtv.app.shopme.data.di
 import android.content.Context
 import androidx.room.Room
 import com.mtv.app.shopme.core.database.AppDatabase
+import com.mtv.app.shopme.core.database.AppDatabaseMigrations
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import dagger.Module
 import dagger.Provides
@@ -22,7 +23,7 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "shopme.db"
-        ).fallbackToDestructiveMigration().build()
+        ).addMigrations(*AppDatabaseMigrations.ALL).build()
 
     @Provides
     @Singleton

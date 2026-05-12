@@ -16,6 +16,8 @@ import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.mapper.toSearchDomain
 import com.mtv.app.shopme.data.remote.datasource.FoodRemoteDataSource
+import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
@@ -62,9 +64,33 @@ class FoodRepositoryImpl @Inject constructor(
         }
 
     override fun getFoodDetail(id: String) =
-        resultFlow.create {
-            remote.getFoodDetail(id).toDomain()
-        }
+        flow {
+            emit(Resource.Loading)
+            val cacheKey = foodDetailCacheKey(id)
+            val cached = PayloadCacheStore.read(
+                homeDao = homeDao,
+                cacheKey = cacheKey,
+                serializer = FoodResponse.serializer()
+            )
+            if (cached != null) {
+                emit(Resource.Success(cached.toDomain()))
+            }
+
+            try {
+                val remoteFood = remote.getFoodDetail(id)
+                PayloadCacheStore.write(
+                    homeDao = homeDao,
+                    cacheKey = cacheKey,
+                    serializer = FoodResponse.serializer(),
+                    value = remoteFood
+                )
+                emit(Resource.Success(remoteFood.toDomain()))
+            } catch (throwable: Throwable) {
+                if (cached == null) {
+                    emit(Resource.Error(errorMapper.map(throwable)))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun getSimilarFoods(cafeId: String) =
         resultFlow.create {
@@ -124,5 +150,7 @@ class FoodRepositoryImpl @Inject constructor(
         resultFlow.create {
             remote.deleteFood(foodId)
         }
+
+    private fun foodDetailCacheKey(id: String) = "food:detail:$id"
 
 }
