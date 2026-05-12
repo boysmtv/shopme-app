@@ -16,13 +16,16 @@ import com.mtv.based.core.network.utils.LoadState
 data class DetailUiState(
     val food: LoadState<Food> = LoadState.Idle,
     val similarFoods: LoadState<List<Food>> = LoadState.Idle,
-    val addToCartState: LoadState<Unit> = LoadState.Idle
+    val addToCartState: LoadState<Unit> = LoadState.Idle,
+    val isFavorite: Boolean = false
 )
 
 sealed class DetailEvent {
     object Load : DetailEvent()
     object BackClicked : DetailEvent()
+    object DismissDialog : DetailEvent()
     object ChatClicked : DetailEvent()
+    object ToggleFavorite : DetailEvent()
     object OpenCart : DetailEvent()
 
     data class AddToCart(

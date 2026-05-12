@@ -70,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -81,6 +82,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.contract.CartUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerCartScreen
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
@@ -93,6 +95,21 @@ fun CartScreen(
     event: (CartEvent) -> Unit,
     onNavigateToDetail: (String) -> Unit = {}
 ) {
+    if (state.cartItems is LoadState.Loading) {
+        ShimmerCartScreen()
+        return
+    }
+
+    if (state.cartItems is LoadState.Error) {
+        ContentErrorState(
+            title = "Gagal memuat keranjang",
+            message = state.cartItems.error.message,
+            actionLabel = "Muat ulang",
+            onRetry = { event(CartEvent.Load) }
+        )
+        return
+    }
+
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var showPinSheet by remember { mutableStateOf(false) }
     var selectedCartIds by remember { mutableStateOf<List<String>>(emptyList()) }

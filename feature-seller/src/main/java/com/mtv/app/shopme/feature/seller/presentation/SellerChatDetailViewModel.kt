@@ -9,7 +9,10 @@
 package com.mtv.app.shopme.feature.seller.presentation
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
@@ -29,7 +32,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerChatDetailViewModel @Inject constructor(
@@ -38,6 +43,7 @@ class SellerChatDetailViewModel @Inject constructor(
     private val getChatMessageUseCase: GetChatMessageUseCase,
     private val sendChatMessageUseCase: CreateChatMessageSendUseCase,
     private val chatMessageMarkAsReadUseCase: ChatMessageMarkAsReadUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway,
     private val sessionManager: SessionManager,
 ) : BaseEventViewModel<SellerChatDetailEvent, SellerChatDetailEffect>() {
 
@@ -50,6 +56,21 @@ class SellerChatDetailViewModel @Inject constructor(
         )
     )
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                when (event.type) {
+                    ShopmeRealtimeEventType.CHAT_MESSAGE,
+                    ShopmeRealtimeEventType.CHAT_READ -> {
+                        observeChatMetadata()
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: SellerChatDetailEvent) {
         when (event) {
@@ -68,8 +89,9 @@ class SellerChatDetailViewModel @Inject constructor(
     }
 
     private fun load() {
+        _state.update { it.copy(isLoading = true) }
+        realtimeGateway.ensureConnected()
         observeChatMetadata()
-        observeChat()
     }
 
     private fun observeChatMetadata() {
@@ -81,23 +103,29 @@ class SellerChatDetailViewModel @Inject constructor(
                     ?.chatList
                     .orEmpty()
                 _state.update {
-                    val resolvedActiveId = it.activeChatId.ifBlank { items.firstOrNull()?.id.orEmpty() }
+                    val resolvedActiveId = when {
+                        it.activeChatId.isBlank() -> items.firstOrNull()?.id.orEmpty()
+                        items.any { item -> item.id == it.activeChatId } -> it.activeChatId
+                        else -> items.firstOrNull()?.id.orEmpty()
+                    }
                     val activeChat = items.firstOrNull { item -> item.id == resolvedActiveId }
                         ?: items.firstOrNull()
                     it.copy(
-                        activeChatId = resolvedActiveId,
+                        isLoading = false,
+                        activeChatId = activeChat?.id.orEmpty(),
                         chatName = activeChat?.name.orEmpty(),
                         chatAvatarBase64 = activeChat?.avatarBase64
                     )
                 }
+                observeChat(_state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null })
             },
             onError = ::showError
         )
     }
 
-    private fun observeChat() {
+    private fun observeChat(chatId: String? = _state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null }) {
         observeDataFlow(
-            flow = getChatMessageUseCase(routeChatId.ifBlank { null }, asSeller = true),
+            flow = getChatMessageUseCase(chatId, asSeller = true),
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {
@@ -117,6 +145,7 @@ class SellerChatDetailViewModel @Inject constructor(
                         .orEmpty()
 
                     it.copy(
+                        isLoading = state is LoadState.Loading,
                         activeChatId = it.activeChatId.ifBlank { activeId },
                         messages = if (messages.isNotEmpty()) messages else it.messages
                     ).also { nextState ->
@@ -137,8 +166,11 @@ class SellerChatDetailViewModel @Inject constructor(
 
         observeDataFlow(
             flow = sendChatMessageUseCase(chatId, message, asSeller = true),
+            onState = { state ->
+                _state.update { it.copy(isSending = state is LoadState.Loading) }
+            },
             onSuccess = {
-                _state.update { it.copy(currentMessage = "") }
+                _state.update { it.copy(currentMessage = "", isSending = false) }
                 observeChatMetadata()
                 observeChat()
             },
@@ -161,6 +193,7 @@ class SellerChatDetailViewModel @Inject constructor(
 
     private fun showError(error: UiError) {
         handleSessionError(error, sessionManager) {
+            _state.update { it.copy(isLoading = false, isSending = false) }
             setDialog(
                 UiDialog.Center(
                     state = DialogStateV1(

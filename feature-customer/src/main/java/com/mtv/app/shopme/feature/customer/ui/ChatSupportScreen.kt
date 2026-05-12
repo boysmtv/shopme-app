@@ -30,7 +30,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.ShimmerLine
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportUiState
 import com.mtv.app.shopme.feature.customer.contract.SupportMessage
@@ -105,15 +106,8 @@ fun ChatSupportScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             if (state.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 48.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = AppColor.Green)
-                    }
+                items(4) {
+                    SupportBubbleShimmer()
                 }
             } else if (state.messages.isEmpty()) {
                 item {
@@ -182,6 +176,34 @@ fun ChatSupportScreen(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SupportBubbleShimmer() {
+    val brush = shimmerBrush()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Column(horizontalAlignment = Alignment.Start) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .height(54.dp)
+                    .background(
+                        brush,
+                        RoundedCornerShape(
+                            topStart = 18.dp,
+                            topEnd = 18.dp,
+                            bottomStart = 4.dp,
+                            bottomEnd = 18.dp
+                        )
+                    )
+            )
+            Spacer(Modifier.height(4.dp))
+            ShimmerLine(widthFraction = 0.14f, heightDp = 10)
         }
     }
 }

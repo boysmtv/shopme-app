@@ -75,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -86,6 +87,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.contract.DetailUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerDetailScreen
 import com.mtv.app.shopme.feature.customer.utils.StatItem
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
@@ -130,17 +132,19 @@ fun DetailScreen(
 
     Scaffold(
         bottomBar = {
-            AddToCartBar(
-                onChatClick = { event(DetailEvent.ChatClicked) },
-                onCartClick = { showSheet = true }
-            )
+            if (state.food is LoadState.Success) {
+                AddToCartBar(
+                    onChatClick = { event(DetailEvent.ChatClicked) },
+                    onCartClick = { showSheet = true }
+                )
+            }
         }
     ) { paddingValues ->
 
         when (state.food) {
 
             is LoadState.Loading -> {
-                // pakai shimmer kamu
+                ShimmerDetailScreen()
             }
 
             is LoadState.Success -> {
@@ -158,7 +162,9 @@ fun DetailScreen(
 
                     item {
                         DetailHeader(
-                            onBack = { event(DetailEvent.BackClicked) }
+                            isFavorite = state.isFavorite,
+                            onBack = { event(DetailEvent.BackClicked) },
+                            onToggleFavorite = { event(DetailEvent.ToggleFavorite) }
                         )
                     }
 
@@ -223,6 +229,15 @@ fun DetailScreen(
                         Spacer(Modifier.height(12.dp))
                     }
                 }
+            }
+
+            is LoadState.Error -> {
+                ContentErrorState(
+                    title = "Gagal memuat detail produk",
+                    message = state.food.error.message,
+                    actionLabel = "Muat ulang",
+                    onRetry = { event(DetailEvent.Load) }
+                )
             }
 
             else -> Unit
@@ -298,7 +313,9 @@ fun AddToCartBar(
 
 @Composable
 fun DetailHeader(
-    onBack: () -> Unit
+    isFavorite: Boolean,
+    onBack: () -> Unit,
+    onToggleFavorite: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -337,8 +354,9 @@ fun DetailHeader(
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Color.White)
+                .clickable { onToggleFavorite() }
                 .padding(12.dp),
-            tint = Color.Red
+            tint = if (isFavorite) Color.Red else Color.Gray
         )
     }
 }

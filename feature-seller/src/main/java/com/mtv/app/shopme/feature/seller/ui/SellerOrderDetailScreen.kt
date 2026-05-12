@@ -32,7 +32,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailUiState
@@ -85,21 +86,107 @@ fun SellerOrderDetailScreen(
             )
 
             if (state.isLoading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                SellerOrderDetailShimmer()
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .background(AppColor.WhiteSoft)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    item { OrderTimeline(state.currentStatus) }
+                    item { OrderItemSection(state.items) }
+                    item { CustomerSection(state.customerName, state.customerAddress) }
+                    item { PaymentSection(state.total, state.paymentMethod) }
+                }
             }
+        }
+    }
+}
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .background(AppColor.WhiteSoft)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+@Composable
+private fun SellerOrderDetailShimmer() {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxSize()
+            .background(AppColor.WhiteSoft)
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        item {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                item { OrderTimeline(state.currentStatus) }
-                item { OrderItemSection(state.items) }
-                item { CustomerSection(state.customerName, state.customerAddress) }
-                item { PaymentSection(state.total, state.paymentMethod) }
+                ShimmerLine(widthFraction = 0.3f, heightDp = 16)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(4) { index ->
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            ShimmerBlock(
+                                modifier = Modifier.size(28.dp),
+                                shape = CircleShape
+                            )
+                            Spacer(Modifier.height(6.dp))
+                            ShimmerLine(widthFraction = 0.16f, heightDp = 10)
+                        }
+                        if (index < 3) {
+                            ShimmerBlock(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(4.dp),
+                                shape = RoundedCornerShape(2.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                ShimmerLine(widthFraction = 0.26f, heightDp = 16)
+                repeat(2) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerLine(widthFraction = 0.42f, heightDp = 14)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.2f, heightDp = 12)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.56f, heightDp = 12)
+                        }
+                        Spacer(Modifier.width(12.dp))
+                        ShimmerLine(widthFraction = 0.18f, heightDp = 14)
+                    }
+                }
+            }
+        }
+        item {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                ShimmerLine(widthFraction = 0.28f, heightDp = 16)
+                repeat(2) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        ShimmerLine(widthFraction = 0.2f, heightDp = 13)
+                        ShimmerLine(widthFraction = 0.34f, heightDp = 13)
+                    }
+                }
             }
         }
     }

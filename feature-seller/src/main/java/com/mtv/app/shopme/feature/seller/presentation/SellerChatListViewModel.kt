@@ -8,7 +8,10 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEffect
@@ -26,17 +29,40 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerChatListViewModel @Inject constructor(
     private val getChatListUseCase: GetChatListUseCase,
     private val clearChatListUseCase: ClearChatListUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<SellerChatListEvent, SellerChatListEffect>() {
 
     private val _state = MutableStateFlow(SellerChatListUiState())
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                when (event.type) {
+                    ShopmeRealtimeEventType.CHAT_MESSAGE -> {
+                        if (!applyMessageDelta(event.conversationId, event.message, event.occurredAt)) {
+                            loadChats()
+                        }
+                    }
+                    ShopmeRealtimeEventType.CHAT_READ -> {
+                        if (!applyReadDelta(event.conversationId)) {
+                            loadChats()
+                        }
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: SellerChatListEvent) {
         when (event) {
@@ -55,6 +81,7 @@ class SellerChatListViewModel @Inject constructor(
     }
 
     private fun loadChats() {
+        realtimeGateway.ensureConnected()
         observeDataFlow(
             flow = getChatListUseCase(asSeller = true),
             onState = { state ->
@@ -96,6 +123,46 @@ class SellerChatListViewModel @Inject constructor(
             }
         )
     }
+
+    private fun applyMessageDelta(
+        conversationId: String?,
+        message: String?,
+        occurredAt: String?
+    ): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val current = _state.value.chatList
+        val existing = current.firstOrNull { it.id == targetId } ?: return false
+        val updated = existing.copy(
+            lastMessage = message.orEmpty().ifBlank { existing.lastMessage },
+            time = occurredAt.toRealtimeChatTime(existing.time)
+        )
+
+        _state.update {
+            it.copy(chatList = listOf(updated) + current.filterNot { item -> item.id == targetId })
+        }
+        return true
+    }
+
+    private fun applyReadDelta(conversationId: String?): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val current = _state.value.chatList
+        if (current.none { it.id == targetId }) return false
+
+        _state.update {
+            it.copy(
+                chatList = current.map { item ->
+                    if (item.id == targetId) item.copy(unreadCount = 0) else item
+                }
+            )
+        }
+        return true
+    }
+
+    private fun String?.toRealtimeChatTime(fallback: String): String =
+        this?.substringAfter("T", "")
+            ?.take(5)
+            ?.takeIf { it.length == 5 }
+            ?: fallback
 
     private fun showError(error: UiError) {
         handleSessionError(

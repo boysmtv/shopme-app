@@ -20,21 +20,27 @@ import com.mtv.app.shopme.domain.usecase.GetAddressUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetVillageUseCase
+import com.mtv.app.shopme.domain.usecase.UploadMediaUseCase
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDialog
 import com.mtv.app.shopme.feature.customer.contract.EditProfileEffect
 import com.mtv.app.shopme.feature.customer.contract.EditProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.EditProfileUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class EditProfileViewModel @Inject constructor(
@@ -46,6 +52,7 @@ class EditProfileViewModel @Inject constructor(
     private val addressDeleteUseCase: DeleteAddressUseCase,
     private val addressDefaultUseCase: UpdateAddressDefaultUseCase,
     private val villageUseCase: GetVillageUseCase,
+    private val uploadMediaUseCase: UploadMediaUseCase
 ) : BaseEventViewModel<EditProfileEvent, EditProfileEffect>() {
 
     private val _state = MutableStateFlow(EditProfileUiState())
@@ -101,25 +108,49 @@ class EditProfileViewModel @Inject constructor(
     }
 
     private fun updateProfile(event: EditProfileEvent.UpdateProfile) {
-        observeDataFlow(
-            flow = customerUpdateUseCase(
-                CustomerUpdateParam(
-                    name = event.name,
-                    phone = event.phone,
-                    photo = event.photo,
-                    fcmToken = null
-                )
-            ),
-            onState = { state ->
-                _state.update { it.copy(updateProfile = state) }
-            },
-            onError = { showError(it) },
-            onSuccess = {
-                _state.update {
-                    it.copy(activeDialog = EditProfileDialog.SuccessUpdateProfile)
-                }
+        viewModelScope.launch {
+            _state.update { it.copy(updateProfile = LoadState.Loading) }
+            val resolvedPhoto = runCatching {
+                resolveUploadedReference(event.photo, "customer-profile")
+            }.getOrElse { throwable ->
+                val uploadError = UiError.Validation(message = throwable.message ?: "Failed uploading image")
+                _state.update { state -> state.copy(updateProfile = LoadState.Error(uploadError)) }
+                showError(uploadError)
+                return@launch
             }
-        )
+
+            observeDataFlow(
+                flow = customerUpdateUseCase(
+                    CustomerUpdateParam(
+                        name = event.name,
+                        phone = event.phone,
+                        photo = resolvedPhoto,
+                        fcmToken = null
+                    )
+                ),
+                onState = { state ->
+                    _state.update { it.copy(updateProfile = state) }
+                },
+                onError = { showError(it) },
+                onSuccess = {
+                    _state.update {
+                        it.copy(activeDialog = EditProfileDialog.SuccessUpdateProfile)
+                    }
+                }
+            )
+        }
+    }
+
+    private suspend fun resolveUploadedReference(reference: String, scope: String): String {
+        if (!reference.startsWith("content://")) {
+            return reference
+        }
+
+        return when (val result = uploadMediaUseCase(reference, scope).first { it !is Resource.Loading }) {
+            is Resource.Success -> result.data.originalUrl
+            is Resource.Error -> throw IllegalStateException(result.error.message)
+            else -> reference
+        }
     }
 
     private fun addAddress(event: EditProfileEvent.AddAddress) {

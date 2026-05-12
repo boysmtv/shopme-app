@@ -1,6 +1,8 @@
 package com.mtv.app.shopme.feature.customer
 
 import androidx.lifecycle.SavedStateHandle
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
@@ -13,6 +15,8 @@ import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -27,10 +31,13 @@ class ChatViewModelTest {
     private val getChatListUseCase: GetChatListUseCase = mockk()
     private val sendUseCase: CreateChatMessageSendUseCase = mockk(relaxed = true)
     private val markReadUseCase: ChatMessageMarkAsReadUseCase = mockk(relaxed = true)
+    private val realtimeEvents = MutableSharedFlow<ShopmeRealtimeEvent>(extraBufferCapacity = 4)
+    private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `load should infer active chat and mark it as read`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(
                 ChatList(
@@ -48,7 +55,7 @@ class ChatViewModelTest {
                 )
             )
         )
-        every { getChatMessageUseCase.invoke(null, false) } returns flowOf(
+        every { getChatMessageUseCase.invoke("conv-1", false) } returns flowOf(
             Resource.Success(
                 listOf(
                     ChatListItem(
@@ -63,6 +70,7 @@ class ChatViewModelTest {
                 )
             )
         )
+        every { getChatMessageUseCase.invoke(null, false) } returns flowOf(Resource.Success(emptyList()))
         every { markReadUseCase.invoke("conv-1", false) } returns flowOf(Resource.Success(Unit))
 
         val vm = ChatViewModel(
@@ -71,6 +79,7 @@ class ChatViewModelTest {
             chatMessageUseCase = getChatMessageUseCase,
             chatSendMessageUseCase = sendUseCase,
             chatMessageMarkAsReadUseCase = markReadUseCase,
+            realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
 
@@ -80,5 +89,7 @@ class ChatViewModelTest {
         assertEquals("conv-1", vm.uiState.value.activeChatId)
         assertEquals("Cafe Kopi Kita", vm.uiState.value.chatName)
         assertEquals("data:image/png;base64,CAFE", vm.uiState.value.chatAvatarBase64)
+        verify(exactly = 1) { markReadUseCase.invoke("conv-1", false) }
+        verify(exactly = 1) { realtimeGateway.ensureConnected() }
     }
 }

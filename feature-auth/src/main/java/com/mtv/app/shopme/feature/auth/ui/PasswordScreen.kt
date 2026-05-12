@@ -55,6 +55,7 @@ import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.feature.auth.contract.PasswordEvent
 import com.mtv.app.shopme.feature.auth.contract.PasswordUiState
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
 
 @Composable
 fun PasswordScreen(
@@ -160,11 +161,15 @@ fun PasswordScreen(
                             containerColor = AppColor.Green
                         )
                     ) {
-                        Text(
-                            "Update Password",
-                            fontFamily = PoppinsFont,
-                            color = Color.White
-                        )
+                        if (isLoading) {
+                            LoadingV1()
+                        } else {
+                            Text(
+                                "Update Password",
+                                fontFamily = PoppinsFont,
+                                color = Color.White
+                            )
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))

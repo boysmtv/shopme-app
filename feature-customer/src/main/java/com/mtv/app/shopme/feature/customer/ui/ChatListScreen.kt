@@ -34,16 +34,13 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,9 +51,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.common.base64ToBitmap
+import com.mtv.app.shopme.common.SmartImage
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.ChatList
@@ -124,13 +123,15 @@ fun ChatListScreen(
 
         when (val chatListState = state.chatListState) {
             is LoadState.Loading -> {
-                Box(
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 40.dp),
-                    contentAlignment = Alignment.Center
+                        .weight(1f)
+                        .padding(start = 20.dp, end = 20.dp)
                 ) {
-                    CircularProgressIndicator(color = AppColor.Green)
+                    items(5) {
+                        ChatListShimmerItem()
+                    }
                 }
             }
 
@@ -152,7 +153,9 @@ fun ChatListScreen(
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.padding(start = 20.dp, end = 20.dp)
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 20.dp, end = 20.dp)
                     ) {
                         items(chats) { item ->
                             ListChatItem(
@@ -164,9 +167,88 @@ fun ChatListScreen(
                 }
             }
 
+            is LoadState.Error -> {
+                ContentErrorState(
+                    title = "Gagal memuat chat",
+                    message = chatListState.error.message,
+                    actionLabel = "Muat ulang",
+                    onRetry = { event(ChatListEvent.Load) }
+                )
+            }
+
             else -> {
                 Unit
             }
+        }
+    }
+}
+
+@Composable
+private fun ChatListShimmerItem() {
+    val brush = shimmerBrush()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min)
+            .background(AppColor.WhiteSoft, RoundedCornerShape(12.dp))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(brush)
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.42f)
+                    .height(16.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+            Spacer(Modifier.height(10.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.72f)
+                        .height(12.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(RoundedCornerShape(9.dp))
+                        .background(brush)
+                )
+            }
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.height(40.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(40.dp)
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+            Box(
+                modifier = Modifier
+                    .size(18.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(brush)
+            )
         }
     }
 }
@@ -249,44 +331,30 @@ fun ChatAvatar(
     placeholderRes: Int,
     modifier: Modifier = Modifier
 ) {
-    val bitmap = remember(base64Image) {
-        base64Image
-            ?.takeIf { it.isNotBlank() }
-            ?.let { base64ToBitmap(it) }
-    }
-
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(AppColor.Green)
     ) {
-        if (bitmap != null) {
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            val imageRes = when (placeholderRes) {
-                0 -> R.drawable.image_burger
-                1 -> R.drawable.image_pizza
-                2 -> R.drawable.image_platbread
-                3 -> R.drawable.image_cheese_burger
-                4 -> R.drawable.image_bakso
-                5 -> R.drawable.image_pempek
-                6 -> R.drawable.image_padang
-                7 -> R.drawable.image_sate
-                else -> R.drawable.image_burger
-            }
-
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+        val imageRes = when (placeholderRes) {
+            0 -> R.drawable.image_burger
+            1 -> R.drawable.image_pizza
+            2 -> R.drawable.image_platbread
+            3 -> R.drawable.image_cheese_burger
+            4 -> R.drawable.image_bakso
+            5 -> R.drawable.image_pempek
+            6 -> R.drawable.image_padang
+            7 -> R.drawable.image_sate
+            else -> R.drawable.image_burger
         }
+
+        SmartImage(
+            model = base64Image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(imageRes)
+        )
     }
 }
 

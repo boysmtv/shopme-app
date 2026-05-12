@@ -14,19 +14,32 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.util.Base64
+import android.util.LruCache
 import androidx.exifinterface.media.ExifInterface
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import java.io.File
 import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
 import kotlin.apply
 import kotlin.io.use
 import kotlin.text.replace
 import kotlin.text.substringAfter
 
+private object Base64BitmapCache {
+    private val cache = LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 1024 / 16).toInt())
+
+    fun get(key: String): Bitmap? = cache.get(key)
+
+    fun put(key: String, bitmap: Bitmap) {
+        cache.put(key, bitmap)
+    }
+}
+
 fun uriToBase64(
     context: Context,
     uri: Uri,
-    maxSize: Int = 512,
-    quality: Int = 70
+    maxSize: Int = 1280,
+    quality: Int = 82
 ): String {
     val boundsOptions = BitmapFactory.Options().apply {
         inJustDecodeBounds = true
@@ -65,14 +78,60 @@ fun uriToBase64(
     )
 }
 
+fun uriToCompressedJpegFile(
+    context: Context,
+    uri: Uri,
+    maxSize: Int = 1280,
+    quality: Int = 82
+): File? {
+    val boundsOptions = BitmapFactory.Options().apply {
+        inJustDecodeBounds = true
+    }
+
+    context.contentResolver.openInputStream(uri)?.use {
+        BitmapFactory.decodeStream(it, null, boundsOptions)
+    }
+
+    var sampleSize = 1
+    while (
+        boundsOptions.outWidth / sampleSize > maxSize ||
+        boundsOptions.outHeight / sampleSize > maxSize
+    ) {
+        sampleSize *= 2
+    }
+
+    val bitmapOptions = BitmapFactory.Options().apply {
+        inSampleSize = sampleSize
+    }
+
+    val decodedBitmap = context.contentResolver
+        .openInputStream(uri)
+        ?.use {
+            BitmapFactory.decodeStream(it, null, bitmapOptions)
+        } ?: return null
+
+    val fixedBitmap = fixBitmapOrientation(context, uri, decodedBitmap)
+    val tempFile = File.createTempFile("shopme-media-", ".jpg", context.cacheDir)
+
+    FileOutputStream(tempFile).use { output ->
+        fixedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, output)
+    }
+
+    return tempFile
+}
+
 fun base64ToBitmap(base64: String): Bitmap? {
     return try {
         val cleanBase64 = base64
             .substringAfter("base64,", base64)
             .replace("\n", EMPTY_STRING)
 
+        Base64BitmapCache.get(cleanBase64)?.let { return it }
+
         val decoded = Base64.decode(cleanBase64, Base64.DEFAULT)
-        BitmapFactory.decodeByteArray(decoded, 0, decoded.size)
+        BitmapFactory.decodeByteArray(decoded, 0, decoded.size)?.also {
+            Base64BitmapCache.put(cleanBase64, it)
+        }
     } catch (e: Exception) {
         e.printStackTrace()
         null
@@ -98,4 +157,3 @@ fun fixBitmapOrientation(context: Context, uri: Uri, bitmap: Bitmap): Bitmap {
     }
     return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 }
-

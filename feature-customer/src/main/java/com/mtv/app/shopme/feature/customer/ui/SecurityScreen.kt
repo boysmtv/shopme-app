@@ -52,14 +52,14 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.feature.customer.contract.SecurityEvent
 import com.mtv.app.shopme.feature.customer.contract.SecurityUiState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
 
 @Composable
 fun SecurityScreen(
     state: SecurityUiState,
     event: (SecurityEvent) -> Unit
 ) {
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -69,79 +69,92 @@ fun SecurityScreen(
             )
     ) {
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { event(SecurityEvent.ClickBack) }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { event(SecurityEvent.ClickBack) }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+                }
+
+                Text(
+                    "Keamanan Akun",
+                    fontFamily = PoppinsFont,
+                    fontSize = 20.sp,
+                    color = Color.White
+                )
             }
 
-            Text(
-                "Keamanan Akun",
-                fontFamily = PoppinsFont,
-                fontSize = 20.sp,
-                color = Color.White
-            )
-        }
-
-        Card(
-            modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
 
-                ModernSettingItem(
-                    "Ubah Password",
-                    "Perbarui password akun",
-                    Icons.Default.Lock,
-                    onClick = { event(SecurityEvent.ClickChangePassword) }
-                )
-
-                ModernSettingItem(
-                    title = "Ubah PIN",
-                    subtitle = "PIN keamanan transaksi",
-                    icon = Icons.Default.Password,
-                    onClick = { event(SecurityEvent.ClickChangePin) }
-                )
-
-                ModernSwitchItem(
-                    title = "Biometric / Fingerprint",
-                    subtitle = "Login lebih cepat & aman",
-                    icon = Icons.Default.Fingerprint,
-                    checked = state.biometricEnabled,
-                    onCheckedChange = { event(SecurityEvent.ToggleBiometric(it)) }
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                Text("Danger Zone", color = Color.Red)
-
-                Spacer(Modifier.height(10.dp))
-
-                OutlinedButton(
-                    onClick = { event(SecurityEvent.LogoutAllDevice) },
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    Text("Logout semua perangkat")
-                }
+                    ModernSettingItem(
+                        "Ubah Password",
+                        "Perbarui password akun",
+                        Icons.Default.Lock,
+                        onClick = { event(SecurityEvent.ClickChangePassword) }
+                    )
 
-                Button(
-                    onClick = { event(SecurityEvent.DeleteAccount) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(Color.Red)
-                ) {
-                    Text("Hapus Akun", color = Color.White)
+                    ModernSettingItem(
+                        title = "Ubah PIN",
+                        subtitle = "PIN keamanan transaksi",
+                        icon = Icons.Default.Password,
+                        onClick = { event(SecurityEvent.ClickChangePin) }
+                    )
+
+                    ModernSwitchItem(
+                        title = "Biometric / Fingerprint",
+                        subtitle = "Login lebih cepat & aman",
+                        icon = Icons.Default.Fingerprint,
+                        checked = state.biometricEnabled,
+                        onCheckedChange = { event(SecurityEvent.ToggleBiometric(it)) }
+                    )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    Text("Danger Zone", color = Color.Red)
+
+                    Spacer(Modifier.height(10.dp))
+
+                    OutlinedButton(
+                        onClick = { if (!state.loading) event(SecurityEvent.LogoutAllDevice) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Logout semua perangkat")
+                    }
+
+                    Button(
+                        onClick = { if (!state.loading) event(SecurityEvent.DeleteAccount) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(Color.Red)
+                    ) {
+                        if (state.loading) {
+                            LoadingV1(modifier = Modifier.size(20.dp))
+                        } else {
+                            Text("Hapus Akun", color = Color.White)
+                        }
+                    }
                 }
             }
+        }
+
+        if (state.loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.12f))
+            )
         }
     }
 }

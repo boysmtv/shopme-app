@@ -90,7 +90,6 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
-import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.data.mock.DataUiMock.addresses
 import com.mtv.app.shopme.data.mock.DataUiMock.customer
@@ -104,6 +103,7 @@ import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.OK_STRING
 import kotlinx.coroutines.CoroutineScope
@@ -118,20 +118,22 @@ fun EditProfileScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAddAddress by remember { mutableStateOf(false) }
     val sheetController = rememberSheetController()
-    val context = LocalContext.current
 
     val customer = (state.customer as? LoadState.Success)?.data
     val addresses = (state.addresses as? LoadState.Success)?.data.orEmpty()
     val villages = (state.villages as? LoadState.Success)?.data.orEmpty()
+    val isInitialLoading =
+        ((state.customer is LoadState.Loading && customer == null) ||
+                (state.addresses is LoadState.Loading && addresses.isEmpty()) ||
+                (state.villages is LoadState.Loading && villages.isEmpty()))
 
     var name by remember { mutableStateOf(EMPTY_STRING) }
     var phone by remember { mutableStateOf(EMPTY_STRING) }
     var email by remember { mutableStateOf(EMPTY_STRING) }
     var photo by remember { mutableStateOf(EMPTY_STRING) }
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        val encoded = uri?.let { uriToBase64(context, it) }
-        if (!encoded.isNullOrBlank()) {
-            photo = "data:image/jpeg;base64,$encoded"
+        if (uri != null) {
+            photo = uri.toString()
         }
     }
 
@@ -157,6 +159,16 @@ fun EditProfileScreen(
             ),
             onDismiss = { event(EditProfileEvent.DismissActiveDialog) }
         )
+    }
+
+    if (isInitialLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
     }
 
     Column(
@@ -516,7 +528,8 @@ fun AddAddressSheet(
             controller.expand()
         }
 
-        var selectedVillage by rememberSaveable { mutableStateOf<Village?>(null) }
+        var selectedVillageId by rememberSaveable { mutableStateOf<String?>(null) }
+        val selectedVillage = villages.firstOrNull { it.id == selectedVillageId }
 
         var block by rememberSaveable { mutableStateOf(EMPTY_STRING) }
         var number by rememberSaveable { mutableStateOf(EMPTY_STRING) }
@@ -542,7 +555,7 @@ fun AddAddressSheet(
             VillageDropdown(
                 villages = villages,
                 selectedVillage = selectedVillage,
-                onSelected = { selectedVillage = it }
+                onSelected = { selectedVillageId = it.id }
             )
 
             Spacer(Modifier.height(16.dp))

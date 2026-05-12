@@ -12,14 +12,23 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
+import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.CreateFoodToCartUseCase
+import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodSimilarUseCase
+import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.DetailEffect
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.contract.DetailUiState
+import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +41,10 @@ class DetailViewModel @Inject constructor(
     private val foodDetailUseCase: GetFoodDetailUseCase,
     private val foodSimilarUseCase: GetFoodSimilarUseCase,
     private val foodAddToCartUseCase: CreateFoodToCartUseCase,
+    private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase,
+    private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase,
+    private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase,
+    private val sessionManager: SessionManager,
     savedStateHandle: SavedStateHandle
 ) : BaseEventViewModel<DetailEvent, DetailEffect>() {
 
@@ -44,7 +57,9 @@ class DetailViewModel @Inject constructor(
         when (event) {
             is DetailEvent.Load -> loadDetail()
             is DetailEvent.BackClicked -> emitEffect(DetailEffect.NavigateBack)
+            is DetailEvent.DismissDialog -> dismissDialog()
             is DetailEvent.ChatClicked -> openChat()
+            is DetailEvent.ToggleFavorite -> toggleFavorite()
             is DetailEvent.OpenCart -> emitEffect(DetailEffect.NavigateToCart)
             is DetailEvent.ClickCafe -> emitEffect(DetailEffect.NavigateToCafe(event.cafeId))
             is DetailEvent.ClickSimilarFood -> emitEffect(DetailEffect.NavigateToDetail(event.foodId))
@@ -63,6 +78,7 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun loadDetail() {
+        observeFavorites()
         observeDataFlow(
             flow = foodDetailUseCase(foodId),
             onState = { state ->
@@ -73,6 +89,16 @@ class DetailViewModel @Inject constructor(
                     loadSimilar(food.cafeId)
                 }
             }
+        )
+    }
+
+    private fun observeFavorites() {
+        observeIndependentDataFlow(
+            flow = getFavoriteFoodIdsUseCase(),
+            onSuccess = { ids ->
+                _state.update { it.copy(isFavorite = ids.contains(foodId)) }
+            },
+            onError = { showError(it) }
         )
     }
 
@@ -108,5 +134,37 @@ class DetailViewModel @Inject constructor(
                 }
             }
         )
+    }
+
+    private fun toggleFavorite() {
+        val isFavorite = _state.value.isFavorite
+        val flow = if (isFavorite) {
+            removeFavoriteFoodUseCase(foodId)
+        } else {
+            addFavoriteFoodUseCase(foodId)
+        }
+
+        observeDataFlow(
+            flow = flow,
+            onSuccess = {
+                _state.update { it.copy(isFavorite = !isFavorite) }
+            },
+            onError = { showError(it) }
+        )
+    }
+
+    private fun showError(error: UiError) {
+        handleSessionError(error, sessionManager) {
+            setDialog(
+                UiDialog.Center(
+                    state = DialogStateV1(
+                        type = DialogType.ERROR,
+                        title = ErrorMessages.GENERIC_ERROR,
+                        message = it.message
+                    ),
+                    onPrimary = { dismissDialog() }
+                )
+            )
+        }
     }
 }

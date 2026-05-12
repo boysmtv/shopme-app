@@ -5,6 +5,7 @@ import com.mtv.app.shopme.domain.model.Village
 import com.mtv.app.shopme.domain.usecase.CreateCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetVillageUseCase
+import com.mtv.app.shopme.domain.usecase.UploadMediaUseCase
 import com.mtv.app.shopme.domain.usecase.UpsertCafeAddressUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
@@ -31,6 +32,7 @@ class SellerCreateCafeViewModelTest {
     private val getSellerProfileUseCase: GetSellerProfileUseCase = mockk()
     private val getVillageUseCase: GetVillageUseCase = mockk()
     private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase = mockk()
+    private val uploadMediaUseCase: UploadMediaUseCase = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -58,6 +60,7 @@ class SellerCreateCafeViewModelTest {
             getSellerProfileUseCase = getSellerProfileUseCase,
             getVillageUseCase = getVillageUseCase,
             upsertCafeAddressUseCase = upsertCafeAddressUseCase,
+            uploadMediaUseCase = uploadMediaUseCase,
             sessionManager = sessionManager
         )
         val effect = async { vm.effect.first() }
@@ -84,6 +87,7 @@ class SellerCreateCafeViewModelTest {
             getSellerProfileUseCase = getSellerProfileUseCase,
             getVillageUseCase = getVillageUseCase,
             upsertCafeAddressUseCase = upsertCafeAddressUseCase,
+            uploadMediaUseCase = uploadMediaUseCase,
             sessionManager = sessionManager
         )
 

@@ -4,14 +4,18 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.CreateFoodToCartUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
+import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodSimilarUseCase
+import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.DetailEffect
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.presentation.DetailViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
 import java.math.BigDecimal
@@ -32,6 +36,10 @@ class DetailViewModelTest {
     private val foodDetailUseCase: GetFoodDetailUseCase = mockk()
     private val foodSimilarUseCase: GetFoodSimilarUseCase = mockk()
     private val foodAddToCartUseCase: CreateFoodToCartUseCase = mockk()
+    private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase = mockk()
+    private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase = mockk()
+    private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase = mockk()
+    private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
     fun `chat clicked should ensure conversation from loaded cafe`() = runTest {
@@ -58,12 +66,17 @@ class DetailViewModelTest {
         )
         every { foodSimilarUseCase.invoke("cafe-1") } returns flowOf(Resource.Success(emptyList()))
         every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
+        every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = DetailViewModel(
             ensureChatConversationUseCase = ensureChatConversationUseCase,
             foodDetailUseCase = foodDetailUseCase,
             foodSimilarUseCase = foodSimilarUseCase,
             foodAddToCartUseCase = foodAddToCartUseCase,
+            getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
+            addFavoriteFoodUseCase = addFavoriteFoodUseCase,
+            removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
+            sessionManager = sessionManager,
             savedStateHandle = SavedStateHandle(mapOf("foodId" to "food-1"))
         )
         val effect = async { vm.effect.first() }
@@ -74,5 +87,27 @@ class DetailViewModelTest {
         advanceUntilIdle()
 
         assertEquals(DetailEffect.NavigateToChat("conv-1"), effect.await())
+    }
+
+    @Test
+    fun `toggle favorite should update detail favorite state`() = runTest {
+        every { addFavoriteFoodUseCase.invoke("food-1") } returns flowOf(Resource.Success(Unit))
+
+        val vm = DetailViewModel(
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            foodDetailUseCase = foodDetailUseCase,
+            foodSimilarUseCase = foodSimilarUseCase,
+            foodAddToCartUseCase = foodAddToCartUseCase,
+            getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
+            addFavoriteFoodUseCase = addFavoriteFoodUseCase,
+            removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
+            sessionManager = sessionManager,
+            savedStateHandle = SavedStateHandle(mapOf("foodId" to "food-1"))
+        )
+
+        vm.onEvent(DetailEvent.ToggleFavorite)
+        advanceUntilIdle()
+
+        assertEquals(true, vm.uiState.value.isFavorite)
     }
 }

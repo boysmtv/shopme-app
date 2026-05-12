@@ -34,16 +34,13 @@ import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,8 +52,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
-import com.mtv.app.shopme.common.base64ToBitmap
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListUiState
@@ -99,13 +97,15 @@ fun SellerChatListScreen(
 
         when {
             state.isLoading && state.chatList.isEmpty() -> {
-                Box(
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 40.dp),
-                    contentAlignment = Alignment.Center
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
                 ) {
-                    CircularProgressIndicator(color = AppColor.Blue)
+                    items(5) {
+                        SellerChatListShimmerItem()
+                    }
                 }
             }
 
@@ -128,7 +128,9 @@ fun SellerChatListScreen(
             else -> {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 20.dp)
                 ) {
                     items(state.chatList) { item ->
                         SellerListChatItem(
@@ -139,6 +141,51 @@ fun SellerChatListScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SellerChatListShimmerItem() {
+    val brush = shimmerBrush()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFF7F7F7), RoundedCornerShape(12.dp))
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(brush)
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .height(16.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+            Spacer(Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(brush)
+            )
+        }
+        Spacer(Modifier.width(12.dp))
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .height(12.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(brush)
+        )
     }
 }
 
@@ -217,36 +264,27 @@ fun ChatAvatar(
             .clip(CircleShape)
             .background(AppColor.Blue)
     ) {
-        if (!base64Image.isNullOrBlank()) {
-            val bitmap = remember(base64Image) { base64ToBitmap(base64Image) }
-            bitmap?.let {
-                Image(
-                    bitmap = it.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
+        val placeholder = painterResource(
+            id = when (placeholderRes) {
+                0 -> com.mtv.app.shopme.common.R.drawable.image_burger
+                1 -> com.mtv.app.shopme.common.R.drawable.image_pizza
+                2 -> com.mtv.app.shopme.common.R.drawable.image_platbread
+                3 -> com.mtv.app.shopme.common.R.drawable.image_cheese_burger
+                4 -> com.mtv.app.shopme.common.R.drawable.image_bakso
+                5 -> com.mtv.app.shopme.common.R.drawable.image_pempek
+                6 -> com.mtv.app.shopme.common.R.drawable.image_padang
+                7 -> com.mtv.app.shopme.common.R.drawable.image_sate
+                else -> com.mtv.app.shopme.common.R.drawable.image_burger
             }
-        } else {
-            Image(
-                painter = painterResource(
-                    id = when (placeholderRes) {
-                        0 -> com.mtv.app.shopme.common.R.drawable.image_burger
-                        1 -> com.mtv.app.shopme.common.R.drawable.image_pizza
-                        2 -> com.mtv.app.shopme.common.R.drawable.image_platbread
-                        3 -> com.mtv.app.shopme.common.R.drawable.image_cheese_burger
-                        4 -> com.mtv.app.shopme.common.R.drawable.image_bakso
-                        5 -> com.mtv.app.shopme.common.R.drawable.image_pempek
-                        6 -> com.mtv.app.shopme.common.R.drawable.image_padang
-                        7 -> com.mtv.app.shopme.common.R.drawable.image_sate
-                        else -> com.mtv.app.shopme.common.R.drawable.image_burger
-                    }
-                ),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
+        )
+
+        SmartImage(
+            model = base64Image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            placeholder = placeholder
+        )
     }
 }
 

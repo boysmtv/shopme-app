@@ -54,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderItem
 import com.mtv.app.shopme.domain.model.OrderStatus
@@ -115,7 +117,9 @@ fun OrderScreen(
                     onChange = { selectedFilter = it }
                 )
 
-                if (filteredOrders.isEmpty()) {
+                if (state.isLoading && state.orders.isEmpty()) {
+                    OrderListShimmer()
+                } else if (filteredOrders.isEmpty()) {
                     ModernEmptyOrder()
                 } else {
                     LazyColumn(
@@ -135,6 +139,64 @@ fun OrderScreen(
                                 }
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrderListShimmer() {
+    LazyColumn(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        items(4) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(4.dp),
+                colors = CardDefaults.cardColors(containerColor = AppColor.White)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerLine(widthFraction = 0.34f, heightDp = 14)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.54f, heightDp = 12)
+                        }
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(78.dp)
+                                .height(22.dp),
+                            shape = RoundedCornerShape(50)
+                        )
+                    }
+                    HorizontalDivider(color = AppColor.Green.copy(alpha = 0.1f))
+                    ShimmerLine(widthFraction = 0.64f, heightDp = 12)
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(88.dp)
+                                .height(18.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                        ShimmerBlock(
+                            modifier = Modifier
+                                .width(96.dp)
+                                .height(18.dp),
+                            shape = RoundedCornerShape(10.dp)
+                        )
                     }
                 }
             }

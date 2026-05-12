@@ -96,6 +96,15 @@ fun NavGraphBuilder.homeGraph(nav: NavHostController) {
         composable(CustomerBottomNavItem.Search.route) {
             SearchRoute(nav)
         }
+        composable(
+            route = CustomerDestinations.SEARCH_WITH_QUERY,
+            arguments = listOf(navArgument("query") {
+                type = NavType.StringType
+                defaultValue = ""
+            })
+        ) {
+            SearchRoute(nav)
+        }
         composable(CustomerBottomNavItem.Chat.route) {
             ChatListRoute(nav)
         }

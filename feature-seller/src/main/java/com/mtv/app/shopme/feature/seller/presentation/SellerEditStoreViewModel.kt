@@ -17,12 +17,14 @@ import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetVillageUseCase
 import com.mtv.app.shopme.domain.usecase.UpsertCafeAddressUseCase
+import com.mtv.app.shopme.domain.usecase.UploadMediaUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateCafeUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -30,9 +32,12 @@ import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerEditStoreViewModel @Inject constructor(
@@ -42,7 +47,8 @@ class SellerEditStoreViewModel @Inject constructor(
     private val getCafeAddressUseCase: GetCafeAddressUseCase,
     private val updateCafeUseCase: UpdateCafeUseCase,
     private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase,
-    private val getVillageUseCase: GetVillageUseCase
+    private val getVillageUseCase: GetVillageUseCase,
+    private val uploadMediaUseCase: UploadMediaUseCase
 ) : BaseEventViewModel<SellerEditStoreEvent, SellerEditStoreEffect>() {
 
     private val _state = MutableStateFlow(SellerEditStoreUiState())
@@ -227,28 +233,51 @@ class SellerEditStoreViewModel @Inject constructor(
             return
         }
 
-        observeDataFlow(
-            flow = updateCafeUseCase(
-                currentCafeId,
-                CafeAddParam(
-                    name = state.storeName,
-                    phone = state.phone,
-                    description = state.description,
-                    minimalOrder = state.minOrder,
-                    openTime = state.storeOpen,
-                    closeTime = closeTime.ifBlank { state.storeOpen },
-                    image = state.storePhoto.orEmpty(),
-                    isActive = true
-                )
-            ),
-            onState = { updateState ->
-                _state.update { it.copy(isLoading = updateState is LoadState.Loading) }
-                if (updateState is LoadState.Success) {
-                    saveAddress(currentCafeId, villageId)
-                }
-            },
-            onError = ::showError
-        )
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            val imageReference = runCatching {
+                resolveUploadedReference(state.storePhoto, "cafes")
+            }.getOrElse {
+                _state.update { it.copy(isLoading = false) }
+                showError(UiError.Validation(message = it.message ?: "Failed uploading image"))
+                return@launch
+            }
+
+            observeDataFlow(
+                flow = updateCafeUseCase(
+                    currentCafeId,
+                    CafeAddParam(
+                        name = state.storeName,
+                        phone = state.phone,
+                        description = state.description,
+                        minimalOrder = state.minOrder,
+                        openTime = state.storeOpen,
+                        closeTime = closeTime.ifBlank { state.storeOpen },
+                        image = imageReference.orEmpty(),
+                        isActive = true
+                    )
+                ),
+                onState = { updateState ->
+                    _state.update { it.copy(isLoading = updateState is LoadState.Loading) }
+                    if (updateState is LoadState.Success) {
+                        saveAddress(currentCafeId, villageId)
+                    }
+                },
+                onError = ::showError
+            )
+        }
+    }
+
+    private suspend fun resolveUploadedReference(reference: String?, scope: String): String? {
+        if (reference.isNullOrBlank() || !reference.startsWith("content://")) {
+            return reference
+        }
+
+        return when (val result = uploadMediaUseCase(reference, scope).first { it !is Resource.Loading }) {
+            is Resource.Success -> result.data.originalUrl
+            is Resource.Error -> throw IllegalStateException(result.error.message)
+            else -> reference
+        }
     }
 
     private fun saveAddress(cafeId: String, villageId: String) {

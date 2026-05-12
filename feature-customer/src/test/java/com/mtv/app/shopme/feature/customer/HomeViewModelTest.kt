@@ -2,11 +2,14 @@ package com.mtv.app.shopme.feature.customer
 
 import app.cash.turbine.test
 import com.mtv.app.shopme.domain.model.Customer
-import com.mtv.app.shopme.domain.model.Food
-import com.mtv.app.shopme.domain.model.FoodCategory
-import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.domain.model.PagedData
+import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.param.SearchParam
+import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
-import com.mtv.app.shopme.domain.usecase.GetFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
+import com.mtv.app.shopme.domain.usecase.GetSearchFoodUseCase
+import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.presentation.HomeViewModel
@@ -25,7 +28,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.threeten.bp.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
@@ -34,7 +36,10 @@ class HomeViewModelTest {
     val dispatcherRule = MainDispatcherRule()
 
     private val customerUseCase: GetCustomerUseCase = mockk()
-    private val homeFoodUseCase: GetFoodUseCase = mockk()
+    private val homeFoodUseCase: GetSearchFoodUseCase = mockk()
+    private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase = mockk()
+    private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase = mockk()
+    private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase = mockk()
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     private lateinit var viewModel: HomeViewModel
@@ -44,6 +49,9 @@ class HomeViewModelTest {
         viewModel = HomeViewModel(
             customerUseCase = customerUseCase,
             homeFoodUseCase = homeFoodUseCase,
+            getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
+            addFavoriteFoodUseCase = addFavoriteFoodUseCase,
+            removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
             sessionManager = sessionManager
         )
     }
@@ -53,7 +61,8 @@ class HomeViewModelTest {
         val foods = listOf(fakeFood())
 
         coEvery { customerUseCase() } returns flowOf(Resource.Error(mockk(relaxed = true)))
-        coEvery { homeFoodUseCase() } returns flowOf(Resource.Success(foods))
+        coEvery { homeFoodUseCase(any()) } returns flowOf(Resource.Success(PagedData(foods, page = 0, last = true)))
+        coEvery { getFavoriteFoodIdsUseCase() } returns flowOf(Resource.Success(emptyList()))
 
         viewModel.onEvent(HomeEvent.Load)
         advanceUntilIdle()
@@ -72,6 +81,65 @@ class HomeViewModelTest {
         }
     }
 
+    @Test
+    fun `toggle favorite should update favorite ids`() = runTest {
+        coEvery { addFavoriteFoodUseCase("1") } returns flowOf(Resource.Success(Unit))
+
+        viewModel.onEvent(HomeEvent.ToggleFavorite("1"))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.favoriteIds.contains("1"))
+    }
+
+    @Test
+    fun `load next page should append foods and update pagination state`() = runTest {
+        coEvery { customerUseCase() } returns flowOf(Resource.Success(fakeCustomer()))
+        coEvery { getFavoriteFoodIdsUseCase() } returns flowOf(Resource.Success(emptyList()))
+        coEvery { homeFoodUseCase(any()) } answers {
+            val request = firstArg<SearchParam>()
+            when (request.page) {
+                0 -> flowOf(
+                    Resource.Success(
+                        PagedData(
+                            content = listOf(fakeFood()),
+                            page = 0,
+                            last = false
+                        )
+                    )
+                )
+                else -> flowOf(
+                    Resource.Success(
+                        PagedData(
+                            content = listOf(
+                                SearchFood(
+                                    id = "2",
+                                    name = "Tea",
+                                    price = BigDecimal(12000),
+                                    image = "",
+                                    cafeName = "Cafe"
+                                )
+                            ),
+                            page = 1,
+                            last = true
+                        )
+                    )
+                )
+            }
+        }
+
+        viewModel.onEvent(HomeEvent.Load)
+        advanceUntilIdle()
+        viewModel.onEvent(HomeEvent.LoadNextPage)
+        advanceUntilIdle()
+
+        val foods = (viewModel.uiState.value.foods as LoadState.Success).data
+        assertEquals(2, foods.size)
+        assertEquals("1", foods[0].id)
+        assertEquals("2", foods[1].id)
+        assertEquals(1, viewModel.uiState.value.page)
+        assertTrue(viewModel.uiState.value.isLastPage)
+    }
+
 }
 
 private fun fakeCustomer() = Customer(
@@ -85,20 +153,10 @@ private fun fakeCustomer() = Customer(
     menuSummary = null
 )
 
-private fun fakeFood() = Food(
+private fun fakeFood() = SearchFood(
     id = "1",
-    cafeId = "c1",
     name = "Coffee",
-    cafeName = "Cafe",
-    cafeAddress = "Address",
-    description = "Good",
     price = BigDecimal(10000),
-    category = FoodCategory.DRINK,
-    status = FoodStatus.READY,
-    quantity = 10,
-    estimate = "10 min",
-    isActive = true,
-    createdAt = LocalDateTime.parse("2026-01-01T10:00:00"),
-    images = emptyList(),
-    variants = emptyList()
+    image = "",
+    cafeName = "Cafe"
 )

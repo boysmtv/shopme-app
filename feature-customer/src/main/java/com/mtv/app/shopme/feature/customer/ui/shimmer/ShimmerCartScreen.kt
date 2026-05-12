@@ -117,17 +117,17 @@ fun ShimmerCartScreen() {
                 Spacer(Modifier.height(8.dp))
                 Box(
                     modifier = Modifier
-                        .width(160.dp)
-                        .height(24.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .width(140.dp)
+                        .height(22.dp)
+                        .clip(RoundedCornerShape(8.dp))
                         .background(brush)
                 )
             }
 
             Box(
                 modifier = Modifier
-                    .width(110.dp)
-                    .height(42.dp)
+                    .width(118.dp)
+                    .height(46.dp)
                     .clip(RoundedCornerShape(18.dp))
                     .background(brush)
             )
@@ -143,9 +143,9 @@ fun ShimmerCafeGroupCard(brush: Brush) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
-            .padding(vertical = 8.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(AppColor.WhiteSoft)
+            .padding(12.dp)
     ) {
 
         // Cafe name + delete icon
@@ -158,7 +158,7 @@ fun ShimmerCafeGroupCard(brush: Brush) {
         ) {
             Box(
                 modifier = Modifier
-                    .width(120.dp)
+                    .width(132.dp)
                     .height(14.dp)
                     .clip(RoundedCornerShape(4.dp))
                     .background(brush)
@@ -171,9 +171,38 @@ fun ShimmerCafeGroupCard(brush: Brush) {
             )
         }
 
+        Spacer(Modifier.height(8.dp))
+
         // 2 item rows per cafe
         repeat(2) {
             ShimmerCartItemRow(brush = brush)
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp))
+                .background(AppColor.GreenSoft.copy(alpha = 0.9f))
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(92.dp)
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
+            Box(
+                modifier = Modifier
+                    .width(84.dp)
+                    .height(14.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(brush)
+            )
         }
     }
 }

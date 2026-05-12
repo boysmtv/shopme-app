@@ -37,8 +37,13 @@ object CustomerNavActions {
         nav.navigate(AuthDestinations.RESET_GRAPH)
     }
 
-    fun toSearch(nav: NavController) {
-        nav.navigate(CustomerBottomNavItem.Search.route) {
+    fun toSearch(nav: NavController, query: String? = null) {
+        nav.navigate(
+            query
+                ?.takeIf { it.isNotBlank() }
+                ?.let { CustomerDestinations.navigateToSearch(it) }
+                ?: CustomerBottomNavItem.Search.route
+        ) {
             launchSingleTop = true
             restoreState = true
             popUpTo(nav.graph.startDestinationId) {

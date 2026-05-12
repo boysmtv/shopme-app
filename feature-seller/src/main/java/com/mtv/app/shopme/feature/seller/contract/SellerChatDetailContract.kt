@@ -9,6 +9,8 @@
 package com.mtv.app.shopme.feature.seller.contract
 
 data class SellerChatDetailUiState(
+    val isLoading: Boolean = false,
+    val isSending: Boolean = false,
     val messages: List<SellerChatDetailMessage> = emptyList(),
     val currentMessage: String = "",
     val activeChatId: String = "",

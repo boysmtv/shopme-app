@@ -9,6 +9,7 @@ object CustomerDestinations {
     const val PROFILE = "PROFILE"
     const val HOME_GRAPH = "HOME_GRAPH"
     const val RESET_GRAPH = "FORGOT_GRAPH"
+    const val SEARCH_WITH_QUERY = "SEARCH/{query}"
     const val DETAIL_GRAPH = "DETAIL_GRAPH"
     const val DETAIL_GRAPH_WITH_ID = "DETAIL_GRAPH_WITH_ID/{foodId}"
     const val PROFILE_GRAPH = "PROFILE_GRAPH"
@@ -36,5 +37,7 @@ object CustomerDestinations {
     fun navigateToChat(chatId: String) = "CHAT_GRAPH/$chatId"
 
     fun navigateToOrderDetail(orderId: String) = "ORDER_DETAIL_GRAPH/$orderId"
+
+    fun navigateToSearch(query: String) = "SEARCH/$query"
 
 }

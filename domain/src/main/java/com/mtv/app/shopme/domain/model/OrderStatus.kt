@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class OrderStatus(val value: String) {
     UNPAID("UNPAID"),
     ORDERED("ORDERED"),

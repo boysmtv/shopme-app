@@ -193,9 +193,9 @@ fun SplashScreen(
                 ) {
                     if (state.splash is LoadState.Loading) {
                         CircularProgressIndicator(
-                            color = Color.White,
-                            strokeWidth = 2.dp,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(28.dp),
+                            strokeWidth = 3.dp,
+                            color = Color.White
                         )
                     } else {
                         Text(

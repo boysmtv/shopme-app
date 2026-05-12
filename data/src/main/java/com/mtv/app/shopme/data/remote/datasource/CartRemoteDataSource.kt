@@ -4,6 +4,8 @@ import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
+import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.app.shopme.data.remote.response.VerifyPinResponse
@@ -32,10 +34,22 @@ class CartRemoteDataSource @Inject constructor(
             body = param.toRequest()
         ).requireData()
 
+    suspend fun addCart(body: FoodAddToCartRequest) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Cart.Add,
+            body = body
+        ).requireData()
+
     suspend fun updateQuantity(param: CartQuantityParam) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Cart.Quantity(param.cartId),
             body = param.toRequest()
+        )
+
+    suspend fun updateQuantity(cartId: String, body: CartQuantityRequest) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Cart.Quantity(cartId),
+            body = body
         )
 
     suspend fun clearCart() =
@@ -46,6 +60,11 @@ class CartRemoteDataSource @Inject constructor(
     suspend fun clearCartByCafe(param: CartClearByCafeParam) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Cart.DeleteByCafeId(param.cafeId)
+        )
+
+    suspend fun clearCartByCafe(cafeId: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Cart.DeleteByCafeId(cafeId)
         )
 
     suspend fun createOrder(param: CreateOrderParam) =

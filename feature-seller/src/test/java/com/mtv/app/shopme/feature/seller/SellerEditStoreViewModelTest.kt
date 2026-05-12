@@ -8,6 +8,7 @@ import com.mtv.app.shopme.domain.usecase.GetCafeAddressUseCase
 import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetVillageUseCase
+import com.mtv.app.shopme.domain.usecase.UploadMediaUseCase
 import com.mtv.app.shopme.domain.usecase.UpsertCafeAddressUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateCafeUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
@@ -33,6 +34,7 @@ class SellerEditStoreViewModelTest {
     private val updateCafeUseCase: UpdateCafeUseCase = mockk(relaxed = true)
     private val upsertCafeAddressUseCase: UpsertCafeAddressUseCase = mockk(relaxed = true)
     private val getVillageUseCase: GetVillageUseCase = mockk()
+    private val uploadMediaUseCase: UploadMediaUseCase = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -81,7 +83,8 @@ class SellerEditStoreViewModelTest {
             getCafeAddressUseCase = getCafeAddressUseCase,
             updateCafeUseCase = updateCafeUseCase,
             upsertCafeAddressUseCase = upsertCafeAddressUseCase,
-            getVillageUseCase = getVillageUseCase
+            getVillageUseCase = getVillageUseCase,
+            uploadMediaUseCase = uploadMediaUseCase
         )
 
         vm.onEvent(SellerEditStoreEvent.Load)

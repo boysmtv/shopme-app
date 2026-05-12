@@ -15,7 +15,22 @@ import androidx.room.PrimaryKey
 data class CustomerEntity(
     @PrimaryKey val id: String,
     val name: String,
-    val address: String,
+    val phone: String,
+    val email: String,
+    val addressVillage: String,
+    val addressBlock: String,
+    val addressNumber: String,
+    val addressRt: String,
+    val addressRw: String,
     val photo: String,
+    val verified: Boolean,
+    val totalOrders: Int,
+    val activeOrders: Int,
+    val membership: String,
+    val ordered: Int,
+    val cooking: Int,
+    val shipping: Int,
+    val completed: Int,
+    val cancelled: Int,
     val updatedAt: Long
 )

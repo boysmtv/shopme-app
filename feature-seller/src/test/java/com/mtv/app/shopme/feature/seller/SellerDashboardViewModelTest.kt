@@ -1,5 +1,8 @@
 package com.mtv.app.shopme.feature.seller
 
+import app.cash.turbine.test
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect
 import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.model.SellerProfile
@@ -28,6 +31,7 @@ class SellerDashboardViewModelTest {
     private val getSellerNotificationsUseCase: GetSellerNotificationsUseCase = mockk()
     private val getSellerProfileUseCase: GetSellerProfileUseCase = mockk()
     private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase = mockk(relaxed = true)
+    private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
 
     @Test
     fun `load should reflect backend profile orders and unread notification count`() = runTest {
@@ -92,7 +96,8 @@ class SellerDashboardViewModelTest {
             getSellerOrdersUseCase = getSellerOrdersUseCase,
             getSellerNotificationsUseCase = getSellerNotificationsUseCase,
             getSellerProfileUseCase = getSellerProfileUseCase,
-            updateSellerAvailabilityUseCase = updateSellerAvailabilityUseCase
+            updateSellerAvailabilityUseCase = updateSellerAvailabilityUseCase,
+            realtimeGateway = realtimeGateway
         )
 
         vm.onEvent(SellerDashboardEvent.Load)
@@ -103,4 +108,59 @@ class SellerDashboardViewModelTest {
         assertEquals(1, vm.uiState.value.orders.size)
         assertEquals(1, vm.uiState.value.notificationCount)
     }
+
+    @Test
+    fun `click order detail should emit navigation effect with order id`() = runTest {
+        every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
+        every { getSellerOrdersUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { getSellerNotificationsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+
+        val vm = SellerDashboardViewModel(
+            sessionManager = sessionManager,
+            getSellerOrdersUseCase = getSellerOrdersUseCase,
+            getSellerNotificationsUseCase = getSellerNotificationsUseCase,
+            getSellerProfileUseCase = getSellerProfileUseCase,
+            updateSellerAvailabilityUseCase = updateSellerAvailabilityUseCase,
+            realtimeGateway = realtimeGateway
+        )
+
+        vm.effect.test {
+            vm.onEvent(SellerDashboardEvent.ClickOrderDetail("order-77"))
+            assertEquals(SellerDashboardEffect.NavigateToOrderDetail("order-77"), awaitItem())
+        }
+    }
+
+    @Test
+    fun `change filter and sort should update dashboard ui state`() = runTest {
+        every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
+        every { getSellerOrdersUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { getSellerNotificationsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+
+        val vm = SellerDashboardViewModel(
+            sessionManager = sessionManager,
+            getSellerOrdersUseCase = getSellerOrdersUseCase,
+            getSellerNotificationsUseCase = getSellerNotificationsUseCase,
+            getSellerProfileUseCase = getSellerProfileUseCase,
+            updateSellerAvailabilityUseCase = updateSellerAvailabilityUseCase,
+            realtimeGateway = realtimeGateway
+        )
+
+        vm.onEvent(SellerDashboardEvent.ChangeFilter("DELIVERING"))
+        vm.onEvent(SellerDashboardEvent.ChangeSort("Desc"))
+        advanceUntilIdle()
+
+        assertEquals("DELIVERING", vm.uiState.value.selectedFilter)
+        assertEquals("Desc", vm.uiState.value.selectedSort)
+    }
+
+    private fun defaultProfile() = SellerProfile(
+        cafeId = "cafe-1",
+        sellerName = "Seller",
+        email = "seller@example.com",
+        phone = "0812",
+        storeName = "Cafe Backend",
+        storeAddress = "Kemang - Blok A1",
+        isOnline = true,
+        hasCafe = true
+    )
 }

@@ -14,6 +14,7 @@ import com.mtv.based.core.network.utils.ResourceFirebase
 data class SellerDashboardUiState(
     val isLoading: Boolean = false,
     val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
+    val errorMessage: String? = null,
 
     val orders: List<SellerOrderItem> = emptyList(),
 

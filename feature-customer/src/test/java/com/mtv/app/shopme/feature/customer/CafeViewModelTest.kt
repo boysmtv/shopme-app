@@ -3,9 +3,12 @@ package com.mtv.app.shopme.feature.customer
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
+import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
+import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
+import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.CafeEffect
 import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.presentation.CafeViewModel
@@ -29,6 +32,9 @@ class CafeViewModelTest {
     private val getCafeUseCase: GetCafeUseCase = mockk()
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase = mockk()
     private val ensureChatConversationUseCase: EnsureChatConversationUseCase = mockk()
+    private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase = mockk()
+    private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase = mockk()
+    private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase = mockk()
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -59,11 +65,15 @@ class CafeViewModelTest {
             )
         )
         every { getFoodsByCafeUseCase.invoke("cafe-1") } returns flowOf(Resource.Success(emptyList()))
+        every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = CafeViewModel(
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
+            addFavoriteFoodUseCase = addFavoriteFoodUseCase,
+            removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
             sessionManager = sessionManager,
             savedStateHandle = SavedStateHandle(mapOf("cafeId" to "cafe-1"))
         )
@@ -82,6 +92,9 @@ class CafeViewModelTest {
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
+            addFavoriteFoodUseCase = addFavoriteFoodUseCase,
+            removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
             sessionManager = sessionManager,
             savedStateHandle = SavedStateHandle(mapOf("cafeId" to "cafe-1"))
         )
@@ -95,11 +108,15 @@ class CafeViewModelTest {
     @Test
     fun `click chat should ensure scoped conversation then navigate to that chat`() = runTest {
         every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
+        every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = CafeViewModel(
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
+            addFavoriteFoodUseCase = addFavoriteFoodUseCase,
+            removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
             sessionManager = sessionManager,
             savedStateHandle = SavedStateHandle(mapOf("cafeId" to "cafe-1"))
         )

@@ -41,4 +41,10 @@ interface ProfileRepository {
     fun deleteAddress(param: AddressDeleteParam): Flow<Resource<Unit>>
 
     fun setDefaultAddress(param: AddressDefaultParam): Flow<Resource<Unit>>
+
+    fun getFavoriteFoodIds(): Flow<Resource<List<String>>>
+
+    fun addFavoriteFood(foodId: String): Flow<Resource<Unit>>
+
+    fun removeFavoriteFood(foodId: String): Flow<Resource<Unit>>
 }

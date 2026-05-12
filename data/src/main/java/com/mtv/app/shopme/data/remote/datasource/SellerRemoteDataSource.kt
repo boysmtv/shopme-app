@@ -5,6 +5,7 @@ import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.SellerAvailabilityRequest
+import com.mtv.app.shopme.data.remote.request.SellerPaymentMethodRequest
 import com.mtv.app.shopme.data.remote.response.OrderResponse
 import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
 import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
@@ -50,9 +51,21 @@ class SellerRemoteDataSource @Inject constructor(
             body = SellerAvailabilityRequest(isOnline)
         ).requireData()
 
+    suspend fun updateAvailability(body: SellerAvailabilityRequest) =
+        request<ApiResponse<SellerProfileResponse>>(
+            endpoint = ApiEndPoint.Seller.Availability,
+            body = body
+        ).requireData()
+
     suspend fun updatePaymentMethods(param: SellerPaymentMethodParam) =
         request<ApiResponse<SellerPaymentMethodResponse>>(
             endpoint = ApiEndPoint.Seller.UpdatePaymentMethods,
             body = param.toRequest()
+        ).requireData()
+
+    suspend fun updatePaymentMethods(body: SellerPaymentMethodRequest) =
+        request<ApiResponse<SellerPaymentMethodResponse>>(
+            endpoint = ApiEndPoint.Seller.UpdatePaymentMethods,
+            body = body
         ).requireData()
 }

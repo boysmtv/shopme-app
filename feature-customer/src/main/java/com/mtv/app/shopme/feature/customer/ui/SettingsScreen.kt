@@ -8,14 +8,9 @@
 
 package com.mtv.app.shopme.feature.customer.ui
 
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -70,6 +66,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.customer.contract.SettingsEvent
 import com.mtv.app.shopme.feature.customer.contract.SettingsUiState
 
@@ -327,31 +325,62 @@ private fun LogoutButton(onClick: () -> Unit) {
 
 @Composable
 fun SettingsSkeleton() {
-
-    val shimmer = rememberInfiniteTransition()
-    val alpha by shimmer.animateFloat(
-        initialValue = 0.3f,
-        targetValue = 0.8f,
-        animationSpec = infiniteRepeatable(
-            tween(800),
-            RepeatMode.Reverse
-        )
-    )
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        repeat(4) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.Gray.copy(alpha = alpha))
-            )
+        SettingsSkeletonGroup(itemCount = 1)
+        SettingsSkeletonGroup(itemCount = 2)
+        SettingsSkeletonGroup(itemCount = 1)
+        ShimmerBlock(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(54.dp),
+            shape = RoundedCornerShape(14.dp)
+        )
+    }
+}
+
+@Composable
+private fun SettingsSkeletonGroup(itemCount: Int) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        ShimmerLine(widthFraction = 0.28f, heightDp = 12)
+        ElevatedCard(
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft),
+        ) {
+            Column(modifier = Modifier.padding(vertical = 6.dp)) {
+                repeat(itemCount) { index ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ShimmerBlock(
+                            modifier = Modifier.size(22.dp),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        Spacer(Modifier.width(14.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            ShimmerLine(widthFraction = 0.42f, heightDp = 14)
+                            Spacer(Modifier.height(8.dp))
+                            ShimmerLine(widthFraction = 0.72f, heightDp = 11)
+                        }
+                        if (itemCount > 1 && index == itemCount - 1) {
+                            Spacer(Modifier.width(12.dp))
+                            ShimmerBlock(
+                                modifier = Modifier
+                                    .width(44.dp)
+                                    .height(24.dp),
+                                shape = RoundedCornerShape(50)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

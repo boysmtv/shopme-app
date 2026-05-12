@@ -54,6 +54,8 @@ import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailUiState
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 
 @Composable
 fun SellerChatScreen(
@@ -62,6 +64,16 @@ fun SellerChatScreen(
 ) {
     val messages = state.messages
     val messageInput = state.currentMessage
+
+    if (state.isLoading && messages.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -142,7 +154,7 @@ fun SellerChatScreen(
 
             IconButton(
                 onClick = {
-                    if (messageInput.isNotBlank()) {
+                    if (messageInput.isNotBlank() && !state.isSending) {
                         event(SellerChatDetailEvent.SendMessage)
                     }
                 },
@@ -151,7 +163,11 @@ fun SellerChatScreen(
                     .width(64.dp)
                     .background(AppColor.Blue, RoundedCornerShape(20.dp))
             ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = Color.White)
+                if (state.isSending) {
+                    LoadingV1(modifier = Modifier.size(20.dp))
+                } else {
+                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = Color.White)
+                }
             }
         }
     }

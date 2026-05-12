@@ -8,31 +8,76 @@
 
 package com.mtv.app.shopme.data.repository
 
+import com.mtv.app.shopme.core.database.dao.HomeDao
+import com.mtv.app.shopme.core.database.entity.CustomerEntity
+import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
+import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.mapper.toDomain
+import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.remote.datasource.ProfileRemoteDataSource
+import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
+import com.mtv.app.shopme.data.sync.PendingMutationAction
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
 import com.mtv.app.shopme.domain.param.AddressDeleteParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
 import com.mtv.app.shopme.domain.repository.ProfileRepository
+import com.mtv.based.core.network.utils.Resource
+import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.TimeoutCancellationException
 
 class ProfileRepositoryImpl @Inject constructor(
     private val remote: ProfileRemoteDataSource,
-    private val resultFlow: ResultFlowFactory
+    private val resultFlow: ResultFlowFactory,
+    private val homeDao: HomeDao,
+    private val errorMapper: ErrorMapper,
+    private val syncManager: OfflineMutationSyncManager
 ) : ProfileRepository {
 
     override fun getCustomer() =
-        resultFlow.create {
-            remote.getCustomer().toDomain()
-        }
+        flow {
+            emit(Resource.Loading)
+            val cached = homeDao.getCustomerOnce()?.toDomain()
+            if (cached != null) {
+                emit(Resource.Success(cached))
+            }
+
+            try {
+                val remoteCustomer = remote.getCustomer().toDomain()
+                homeDao.insertCustomer(remoteCustomer.toEntity())
+                emit(Resource.Success(remoteCustomer))
+            } catch (throwable: Throwable) {
+                if (cached == null) {
+                    emit(Resource.Error(errorMapper.map(throwable)))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun updateProfile(param: CustomerUpdateParam) =
-        resultFlow.create {
-            remote.updateProfile(param)
-        }
+        flow {
+            emit(Resource.Loading)
+            try {
+                remote.updateProfile(param)
+                patchCustomerCache(param)
+                emit(Resource.Success(Unit))
+            } catch (throwable: Throwable) {
+                if (throwable.isRetryableOfflineWrite()) {
+                    syncManager.enqueue(
+                        PendingMutationAction.ProfileUpdate(param.toRequest())
+                    )
+                    patchCustomerCache(param)
+                    emit(Resource.Success(Unit))
+                } else {
+                    emit(Resource.Error(errorMapper.map(throwable)))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun deleteAccount() =
         resultFlow.create {
@@ -73,4 +118,35 @@ class ProfileRepositoryImpl @Inject constructor(
         resultFlow.create {
             remote.setDefaultAddress(param)
         }
+
+    override fun getFavoriteFoodIds() =
+        resultFlow.create {
+            remote.getFavoriteFoodIds()
+        }
+
+    override fun addFavoriteFood(foodId: String) =
+        resultFlow.create {
+            remote.addFavoriteFood(foodId)
+        }
+
+    override fun removeFavoriteFood(foodId: String) =
+        resultFlow.create {
+            remote.removeFavoriteFood(foodId)
+        }
+
+    private suspend fun patchCustomerCache(param: CustomerUpdateParam) {
+        homeDao.getCustomerOnce()?.let { cached ->
+            homeDao.insertCustomer(
+                cached.copy(
+                    name = param.name,
+                    phone = param.phone,
+                    photo = param.photo ?: cached.photo,
+                    updatedAt = System.currentTimeMillis()
+                )
+            )
+        }
+    }
+
+    private fun Throwable.isRetryableOfflineWrite(): Boolean =
+        this is IOException || this is TimeoutCancellationException
 }

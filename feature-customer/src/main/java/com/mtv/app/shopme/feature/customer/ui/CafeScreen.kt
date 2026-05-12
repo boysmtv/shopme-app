@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -65,6 +66,7 @@ import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.contract.CafeUiState
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 @Composable
@@ -75,6 +77,32 @@ fun CafeScreen(
 
     val cafe = (state.cafe as? LoadState.Success)?.data
     val foods = (state.foods as? LoadState.Success)?.data ?: emptyList()
+    val cafeError = state.cafe as? LoadState.Error
+    val foodsError = state.foods as? LoadState.Error
+    val isInitialLoading =
+        (state.cafe is LoadState.Loading || state.foods is LoadState.Loading) &&
+                cafe == null &&
+                foods.isEmpty()
+
+    if (isInitialLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
+    }
+
+    if (cafeError != null || foodsError != null) {
+        ContentErrorState(
+            title = "Gagal memuat cafe",
+            message = cafeError?.error?.message ?: foodsError?.error?.message ?: "Please try again.",
+            actionLabel = "Muat ulang",
+            onRetry = { event(CafeEvent.Load) }
+        )
+        return
+    }
 
     Scaffold(
         topBar = {
@@ -130,7 +158,9 @@ fun CafeScreen(
             ) { item ->
                 CafeFoodItem(
                     item = item,
-                    onClickDetail = { event(CafeEvent.ClickFood(it)) }
+                    isFavorite = state.favoriteIds.contains(item.id),
+                    onClickDetail = { event(CafeEvent.ClickFood(it)) },
+                    onToggleFavorite = { event(CafeEvent.ToggleFavorite(item.id)) }
                 )
             }
         }
@@ -354,7 +384,9 @@ fun ActionButton(
 @Composable
 fun CafeFoodItem(
     item: Food,
-    onClickDetail: (String) -> Unit
+    isFavorite: Boolean,
+    onClickDetail: (String) -> Unit,
+    onToggleFavorite: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(18.dp),
@@ -408,7 +440,7 @@ fun CafeFoodItem(
                 Icon(
                     imageVector = Icons.Default.Favorite,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = if (isFavorite) Color.Red else Color.White,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
@@ -417,6 +449,7 @@ fun CafeFoodItem(
                             Color.Black.copy(alpha = 0.4f),
                             CircleShape
                         )
+                        .clickable { onToggleFavorite() }
                         .padding(4.dp)
                 )
             }
@@ -447,8 +480,10 @@ fun CafeFoodItem(
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
-                        tint = AppColor.Green,
-                        modifier = Modifier.size(18.dp)
+                        tint = if (isFavorite) Color.Red else AppColor.Green,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .clickable { onToggleFavorite() }
                     )
                 }
             }

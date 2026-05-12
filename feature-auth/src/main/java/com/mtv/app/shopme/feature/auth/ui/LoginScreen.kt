@@ -65,6 +65,7 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.feature.auth.contract.LoginEvent
 import com.mtv.app.shopme.feature.auth.contract.LoginUiState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
 import com.mtv.based.core.network.utils.LoadState
 
 @Composable
@@ -262,11 +263,15 @@ fun LoginScreen(
                             containerColor = AppColor.Green
                         )
                     ) {
-                        Text(
-                            "Sign In",
-                            fontFamily = PoppinsFont,
-                            color = Color.White
-                        )
+                        if (isLoading) {
+                            LoadingV1()
+                        } else {
+                            Text(
+                                "Sign In",
+                                fontFamily = PoppinsFont,
+                                color = Color.White
+                            )
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))

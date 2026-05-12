@@ -70,6 +70,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.feature.customer.contract.SupportEvent
 import com.mtv.app.shopme.feature.customer.contract.SupportUiState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 
 @Composable
 fun SupportScreen(
@@ -77,6 +78,16 @@ fun SupportScreen(
     event: (SupportEvent) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+
+    if (state.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
+        }
+        return
+    }
 
     Box(
         modifier = Modifier

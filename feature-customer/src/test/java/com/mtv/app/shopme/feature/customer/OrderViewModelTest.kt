@@ -1,5 +1,6 @@
 package com.mtv.app.shopme.feature.customer
 
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
@@ -32,6 +33,7 @@ class OrderViewModelTest {
     private val getOrdersUseCase: GetOrdersUseCase = mockk()
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase = mockk()
     private val ensureChatConversationUseCase: EnsureChatConversationUseCase = mockk()
+    private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -54,6 +56,7 @@ class OrderViewModelTest {
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
 
@@ -77,6 +80,7 @@ class OrderViewModelTest {
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
 
@@ -95,6 +99,7 @@ class OrderViewModelTest {
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
         val effect = async { vm.effect.first() }

@@ -10,9 +10,12 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
+import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
+import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.CafeEffect
 import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.contract.CafeUiState
@@ -33,6 +36,9 @@ class CafeViewModel @Inject constructor(
     private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
     private val getCafeUseCase: GetCafeUseCase,
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase,
+    private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase,
+    private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase,
+    private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase,
     private val sessionManager: SessionManager,
     savedStateHandle: SavedStateHandle
 ) : BaseEventViewModel<CafeEvent, CafeEffect>() {
@@ -51,6 +57,7 @@ class CafeViewModel @Inject constructor(
             is CafeEvent.ClickChat -> openChat()
             is CafeEvent.ClickWhatsapp -> openWhatsapp()
             is CafeEvent.ClickSearch -> emitEffect(CafeEffect.NavigateToSearch)
+            is CafeEvent.ToggleFavorite -> toggleFavorite(event.foodId)
         }
     }
 
@@ -85,6 +92,17 @@ class CafeViewModel @Inject constructor(
     private fun load() {
         observeCafe()
         observeFoods()
+        observeFavorites()
+    }
+
+    private fun observeFavorites() {
+        observeIndependentDataFlow(
+            flow = getFavoriteFoodIdsUseCase(),
+            onSuccess = { ids ->
+                _state.update { it.copy(favoriteIds = ids.toSet()) }
+            },
+            onError = { showError(it) }
+        )
     }
 
     private fun observeCafe() {
@@ -128,5 +146,27 @@ class CafeViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun toggleFavorite(foodId: String) {
+        val isFavorite = _state.value.favoriteIds.contains(foodId)
+        val flow = if (isFavorite) {
+            removeFavoriteFoodUseCase(foodId)
+        } else {
+            addFavoriteFoodUseCase(foodId)
+        }
+
+        observeDataFlow(
+            flow = flow,
+            onSuccess = {
+                _state.update { current ->
+                    val updated = current.favoriteIds.toMutableSet().apply {
+                        if (isFavorite) remove(foodId) else add(foodId)
+                    }
+                    current.copy(favoriteIds = updated)
+                }
+            },
+            onError = { showError(it) }
+        )
     }
 }

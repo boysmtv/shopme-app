@@ -53,8 +53,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListUiState
@@ -101,7 +103,23 @@ fun SellerProductListScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            if (state.products.isEmpty()) {
+            if (state.isLoading && state.products.isEmpty()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(horizontal = 20.dp)
+                ) {
+                    items(5) {
+                        SellerProductShimmerItem()
+                    }
+                }
+            } else if (!state.errorMessage.isNullOrBlank() && state.products.isEmpty()) {
+                ContentErrorState(
+                    title = "Gagal memuat produk",
+                    message = state.errorMessage,
+                    actionLabel = "Muat ulang",
+                    onRetry = { event(SellerProductListEvent.Load) }
+                )
+            } else if (state.products.isEmpty()) {
                 EmptyProductState(
                     onAddClick = {
                         event(SellerProductListEvent.ClickAdd)
@@ -124,6 +142,57 @@ fun SellerProductListScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SellerProductShimmerItem() {
+    val brush = shimmerBrush()
+    Card(
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(84.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(brush)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.6f)
+                        .height(18.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
+                Spacer(Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.35f)
+                        .height(14.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
+                Spacer(Modifier.height(12.dp))
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(0.45f)
+                        .height(14.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(brush)
+                )
             }
         }
     }

@@ -136,11 +136,11 @@ fun CartItemResponse.toDomain(): Cart = Cart(
     cafeId = cafeId,
     cafeName = cafeName,
     name = name,
-    image = image,
+    image = image.orEmpty(),
     price = price,
     quantity = quantity,
-    notes = notes,
-    variants = variants.map {
+    notes = notes.orEmpty(),
+    variants = variants.orEmpty().map {
         CartVariant(
             variantId = it.variantId,
             variantName = it.variantName,

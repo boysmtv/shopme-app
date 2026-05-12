@@ -20,6 +20,7 @@ object ApiEndPoint {
     private const val SELLER = "seller"
     private const val NOTIFICATIONS = "notifications"
     private const val SUPPORT = "support"
+    private const val MEDIA = "media"
 
     object Auth {
 
@@ -103,6 +104,24 @@ object ApiEndPoint {
             override val method = HttpMethod.Put
             override val type = EndpointType.Json
         }
+
+        object Favorites : IApiEndPoint {
+            override val path = "$API/$CUSTOMER/favorites"
+            override val method = HttpMethod.Get
+            override val type = EndpointType.Json
+        }
+
+        class AddFavorite(foodId: String) : IApiEndPoint {
+            override val path = "$API/$CUSTOMER/favorites/$foodId"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Json
+        }
+
+        class RemoveFavorite(foodId: String) : IApiEndPoint {
+            override val path = "$API/$CUSTOMER/favorites/$foodId"
+            override val method = HttpMethod.Delete
+            override val type = EndpointType.Json
+        }
     }
 
     object Foods {
@@ -144,7 +163,7 @@ object ApiEndPoint {
     object Chat {
         object GetList : IApiEndPoint { override val path = "$API/$CHAT/list"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Get : IApiEndPoint { override val path = "$API/$CHAT"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
-        object EnsureConversation : IApiEndPoint { override val path = "$API/$CHAT/conversation"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
+        class EnsureConversation(cafeId: String) : IApiEndPoint { override val path = "$API/$CHAT/conversation?cafeId=$cafeId"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object SendMessage : IApiEndPoint { override val path = "$API/$CHAT/message"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object MarkAllRead : IApiEndPoint { override val path = "$API/$CHAT/read"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object Clear : IApiEndPoint { override val path = "$API/$CHAT"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
@@ -162,6 +181,20 @@ object ApiEndPoint {
     object Notifications {
         object Get : IApiEndPoint { override val path = "$API/$NOTIFICATIONS"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object ReadAll : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/read-all"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
+    }
+
+    object Media {
+        class PresignUpload(scope: String, contentType: String) : IApiEndPoint {
+            override val path = "$API/$MEDIA/presign-upload?scope=$scope&contentType=$contentType"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Json
+        }
+
+        object Upload : IApiEndPoint {
+            override val path = "$API/$MEDIA/upload"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Multipart
+        }
     }
 
     object Address {

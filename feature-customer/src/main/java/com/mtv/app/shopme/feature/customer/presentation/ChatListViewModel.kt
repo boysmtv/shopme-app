@@ -8,7 +8,10 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
@@ -27,17 +30,40 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ChatListViewModel @Inject constructor(
     private val chatListUseCase: GetChatListUseCase,
     private val clearChatListUseCase: ClearChatListUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<ChatListEvent, ChatListEffect>() {
 
     private val _state = MutableStateFlow(ChatListUiState())
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                when (event.type) {
+                    ShopmeRealtimeEventType.CHAT_MESSAGE -> {
+                        if (!applyMessageDelta(event.conversationId, event.message, event.occurredAt)) {
+                            observeChatList()
+                        }
+                    }
+                    ShopmeRealtimeEventType.CHAT_READ -> {
+                        if (!applyReadDelta(event.conversationId)) {
+                            observeChatList()
+                        }
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: ChatListEvent) {
         when (event) {
@@ -50,6 +76,7 @@ class ChatListViewModel @Inject constructor(
     }
 
     private fun observeChatList() {
+        realtimeGateway.ensureConnected()
         observeDataFlow(
             flow = chatListUseCase(),
             onLoad = ::showLoading,
@@ -82,6 +109,58 @@ class ChatListViewModel @Inject constructor(
             }
         )
     }
+
+    private fun applyMessageDelta(
+        conversationId: String?,
+        message: String?,
+        occurredAt: String?
+    ): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val currentState = _state.value.chatListState as? LoadState.Success ?: return false
+        val current = currentState.data.chatList
+        val existing = current.firstOrNull { it.id == targetId } ?: return false
+        val updated = existing.copy(
+            lastMessage = message.orEmpty().ifBlank { existing.lastMessage },
+            time = occurredAt.toRealtimeChatTime(existing.time)
+        )
+
+        _state.update {
+            it.copy(
+                chatListState = LoadState.Success(
+                    ChatList(
+                        chatList = listOf(updated) + current.filterNot { item -> item.id == targetId }
+                    )
+                )
+            )
+        }
+        return true
+    }
+
+    private fun applyReadDelta(conversationId: String?): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val currentState = _state.value.chatListState as? LoadState.Success ?: return false
+        val current = currentState.data.chatList
+        if (current.none { it.id == targetId }) return false
+
+        _state.update {
+            it.copy(
+                chatListState = LoadState.Success(
+                    ChatList(
+                        chatList = current.map { item ->
+                            if (item.id == targetId) item.copy(unreadCount = 0) else item
+                        }
+                    )
+                )
+            )
+        }
+        return true
+    }
+
+    private fun String?.toRealtimeChatTime(fallback: String): String =
+        this?.substringAfter("T", "")
+            ?.take(5)
+            ?.takeIf { it.length == 5 }
+            ?: fallback
 
     private fun showError(error: UiError) {
         handleSessionError(

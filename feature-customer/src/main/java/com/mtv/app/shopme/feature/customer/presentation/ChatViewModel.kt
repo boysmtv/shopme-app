@@ -9,7 +9,10 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
@@ -27,7 +30,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -36,6 +41,7 @@ class ChatViewModel @Inject constructor(
     private val chatMessageUseCase: GetChatMessageUseCase,
     private val chatSendMessageUseCase: CreateChatMessageSendUseCase,
     private val chatMessageMarkAsReadUseCase: ChatMessageMarkAsReadUseCase,
+    private val realtimeGateway: ShopmeRealtimeGateway,
     private val sessionManager: SessionManager,
 ) : BaseEventViewModel<ChatEvent, ChatEffect>() {
 
@@ -46,6 +52,21 @@ class ChatViewModel @Inject constructor(
         ChatUiState(activeChatId = routeChatId)
     )
     val uiState = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            realtimeGateway.events.collectLatest { event ->
+                when (event.type) {
+                    ShopmeRealtimeEventType.CHAT_MESSAGE,
+                    ShopmeRealtimeEventType.CHAT_READ -> {
+                        observeChatMetadata()
+                    }
+
+                    else -> Unit
+                }
+            }
+        }
+    }
 
     override fun onEvent(event: ChatEvent) {
         when (event) {
@@ -58,6 +79,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun load() {
+        realtimeGateway.ensureConnected()
         observeChatMetadata()
         observeChat()
     }
@@ -71,23 +93,28 @@ class ChatViewModel @Inject constructor(
                     ?.chatList
                     .orEmpty()
                 _state.update {
-                    val resolvedActiveId = it.activeChatId.ifBlank { items.firstOrNull()?.id.orEmpty() }
+                    val resolvedActiveId = when {
+                        it.activeChatId.isBlank() -> items.firstOrNull()?.id.orEmpty()
+                        items.any { item -> item.id == it.activeChatId } -> it.activeChatId
+                        else -> items.firstOrNull()?.id.orEmpty()
+                    }
                     val activeChat = items.firstOrNull { item -> item.id == resolvedActiveId }
                         ?: items.firstOrNull()
                     it.copy(
-                        activeChatId = resolvedActiveId,
+                        activeChatId = activeChat?.id.orEmpty(),
                         chatName = activeChat?.name.orEmpty(),
                         chatAvatarBase64 = activeChat?.avatarBase64
                     )
                 }
+                observeChat(_state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null })
             },
             onError = { showError(it) }
         )
     }
 
-    private fun observeChat() {
+    private fun observeChat(chatId: String? = _state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null }) {
         observeDataFlow(
-            flow = chatMessageUseCase(routeChatId.ifBlank { null }),
+            flow = chatMessageUseCase(chatId),
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {
@@ -111,8 +138,10 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun sendMessage(event: ChatEvent.SendMessage) {
+        val activeChatId = _state.value.activeChatId.ifBlank { event.id }
+        if (activeChatId.isBlank()) return
         observeDataFlow(
-            flow = chatSendMessageUseCase(event.id, event.message),
+            flow = chatSendMessageUseCase(activeChatId, event.message),
             onState = { state ->
                 _state.update {
                     it.copy(sendMessage = state)

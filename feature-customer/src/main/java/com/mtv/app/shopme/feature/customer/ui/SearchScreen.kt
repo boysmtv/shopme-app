@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
+import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
@@ -70,6 +71,7 @@ import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.feature.customer.contract.SearchEvent
 import com.mtv.app.shopme.feature.customer.contract.SearchUiState
+import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerSearchItem
 import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerSearchScreen
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
@@ -141,6 +143,15 @@ fun SearchScreen(
                 ShimmerSearchScreen()
             }
 
+            state.foods is LoadState.Error && items.isEmpty() -> {
+                ContentErrorState(
+                    title = "Gagal memuat hasil pencarian",
+                    message = (state.foods as LoadState.Error).error.message,
+                    actionLabel = "Coba lagi",
+                    onRetry = { event(SearchEvent.Load) }
+                )
+            }
+
             else -> {
                 LazyColumn(
                     state = listState,
@@ -148,36 +159,40 @@ fun SearchScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     itemsIndexed(
-                        items = items,
-                        key = { _, item -> item.id }
-                    ) { index, food ->
-                        SearchItem(
-                            food = food,
-                            onClickItem = { event(SearchEvent.ClickFood(it)) },
-                            previewDrawable = getPreviewDrawable(index)
-                        )
-                    }
+                    items = items,
+                    key = { _, item -> item.id }
+                ) { index, food ->
+                    SearchItem(
+                        food = food,
+                        isFavorite = state.favoriteIds.contains(food.id),
+                        onClickItem = { event(SearchEvent.ClickFood(it)) },
+                        onToggleFavorite = { event(SearchEvent.ToggleFavorite(food.id)) },
+                        previewDrawable = getPreviewDrawable(index)
+                    )
+                }
 
                     // Loading more indicator
                     if (state.isLoadingMore) {
                         item {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 12.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "Loading more...",
-                                    fontFamily = PoppinsFont,
-                                    fontSize = 12.sp,
-                                    color = Color.Gray
-                                )
-                            }
+                            SearchPaginationShimmer()
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SearchPaginationShimmer() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        repeat(2) {
+            ShimmerSearchItem()
         }
     }
 }
@@ -279,7 +294,9 @@ fun SearchHeader(
 @Composable
 fun SearchItem(
     food: SearchFood,
+    isFavorite: Boolean,
     onClickItem: (String) -> Unit,
+    onToggleFavorite: () -> Unit,
     previewDrawable: Int? = null
 ) {
     Column(
@@ -302,14 +319,29 @@ fun SearchItem(
                     shape = RoundedCornerShape(8.dp)
                 )
 
-            SmartImage(
-                model = food.image,
-                contentDescription = null,
-                modifier = imageModifier,
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(previewDrawable ?: R.drawable.no_image),
-                error = painterResource(previewDrawable ?: R.drawable.no_image)
-            )
+            Box {
+                SmartImage(
+                    model = food.image,
+                    contentDescription = null,
+                    modifier = imageModifier,
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(previewDrawable ?: R.drawable.no_image),
+                    error = painterResource(previewDrawable ?: R.drawable.no_image)
+                )
+
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = if (isFavorite) Color.Red else Color.White,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                        .size(22.dp)
+                        .background(Color.Black.copy(alpha = 0.35f), CircleShape)
+                        .clickable { onToggleFavorite() }
+                        .padding(4.dp)
+                )
+            }
 
             Spacer(Modifier.width(12.dp))
 

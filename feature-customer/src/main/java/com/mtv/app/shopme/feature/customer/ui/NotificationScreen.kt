@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.customer.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -49,14 +50,14 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.feature.customer.contract.NotificationEvent
 import com.mtv.app.shopme.feature.customer.contract.NotificationUiState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
 
 @Composable
 fun NotificationScreen(
     state: NotificationUiState,
     event: (NotificationEvent) -> Unit
 ) {
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -66,91 +67,106 @@ fun NotificationScreen(
             )
     ) {
 
-        // ===== HEADER =====
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
-            IconButton(onClick = { event(NotificationEvent.ClickBack) }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+
+            // ===== HEADER =====
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = { event(NotificationEvent.ClickBack) }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+                }
+
+                Text(
+                    "Notifikasi",
+                    fontFamily = PoppinsFont,
+                    fontSize = 20.sp,
+                    color = Color.White
+                )
             }
 
-            Text(
-                "Notifikasi",
-                fontFamily = PoppinsFont,
-                fontSize = 20.sp,
-                color = Color.White
-            )
-        }
-
-        Card(
-            modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .padding(20.dp)
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
 
-                SectionHeader("Aktivitas Notifikasi")
-                Spacer(Modifier.height(8.dp))
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(20.dp)
+                ) {
+                    SectionHeader("Aktivitas Notifikasi")
+                    Spacer(Modifier.height(8.dp))
 
-                SettingCard {
-                    SwitchSettingItem(
-                        icon = Icons.Default.LocalShipping,
-                        title = "Status Pesanan",
-                        subtitle = "Update pengiriman & perubahan status",
-                        checked = state.orderNotification,
-                        onToggle = { event(NotificationEvent.ToggleOrder(it)) }
-                    )
+                    SettingCard {
+                        SwitchSettingItem(
+                            icon = Icons.Default.LocalShipping,
+                            title = "Status Pesanan",
+                            subtitle = "Update pengiriman & perubahan status",
+                            checked = state.orderNotification,
+                            onToggle = { event(NotificationEvent.ToggleOrder(it)) }
+                        )
 
-                    SwitchSettingItem(
-                        icon = Icons.Default.Campaign,
-                        title = "Promo & Diskon",
-                        subtitle = "Voucher, promo & flash sale",
-                        checked = state.promoNotification,
-                        onToggle = { event(NotificationEvent.TogglePromo(it)) }
-                    )
+                        SwitchSettingItem(
+                            icon = Icons.Default.Campaign,
+                            title = "Promo & Diskon",
+                            subtitle = "Voucher, promo & flash sale",
+                            checked = state.promoNotification,
+                            onToggle = { event(NotificationEvent.TogglePromo(it)) }
+                        )
 
-                    SwitchSettingItem(
-                        icon = Icons.AutoMirrored.Filled.Chat,
-                        title = "Chat & Pesan",
-                        subtitle = "Pesan dari penjual & sistem",
-                        checked = state.chatNotification,
-                        onToggle = { event(NotificationEvent.ToggleChat(it)) }
-                    )
+                        SwitchSettingItem(
+                            icon = Icons.AutoMirrored.Filled.Chat,
+                            title = "Chat & Pesan",
+                            subtitle = "Pesan dari penjual & sistem",
+                            checked = state.chatNotification,
+                            onToggle = { event(NotificationEvent.ToggleChat(it)) }
+                        )
+                    }
+
+                    Spacer(Modifier.height(20.dp))
+
+                    SectionHeader("Metode Notifikasi")
+
+                    Spacer(Modifier.height(8.dp))
+
+                    SettingCard {
+                        SwitchSettingItem(
+                            icon = Icons.Default.PhoneIphone,
+                            title = "Push Notification",
+                            subtitle = "Notifikasi langsung ke perangkat",
+                            checked = state.pushEnabled,
+                            onToggle = { event(NotificationEvent.TogglePush(it)) }
+                        )
+
+                        SwitchSettingItem(
+                            icon = Icons.Default.Email,
+                            title = "Email Notification",
+                            subtitle = "Dikirim ke email terdaftar",
+                            checked = state.emailEnabled,
+                            onToggle = { event(NotificationEvent.ToggleEmail(it)) }
+                        )
+                    }
+
+                    Spacer(Modifier.height(20.dp))
                 }
+            }
+        }
 
-                Spacer(Modifier.height(20.dp))
-
-                SectionHeader("Metode Notifikasi")
-
-                Spacer(Modifier.height(8.dp))
-
-                SettingCard {
-                    SwitchSettingItem(
-                        icon = Icons.Default.PhoneIphone,
-                        title = "Push Notification",
-                        subtitle = "Notifikasi langsung ke perangkat",
-                        checked = state.pushEnabled,
-                        onToggle = { event(NotificationEvent.TogglePush(it)) }
-                    )
-
-                    SwitchSettingItem(
-                        icon = Icons.Default.Email,
-                        title = "Email Notification",
-                        subtitle = "Dikirim ke email terdaftar",
-                        checked = state.emailEnabled,
-                        onToggle = { event(NotificationEvent.ToggleEmail(it)) }
-                    )
-                }
-
-                Spacer(Modifier.height(20.dp))
+        if (state.loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.35f)),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingV1()
             }
         }
     }

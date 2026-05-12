@@ -9,12 +9,17 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.param.SearchParam
+import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
-import com.mtv.app.shopme.domain.usecase.GetFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
+import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetSearchFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
 import com.mtv.based.core.network.utils.ErrorMessages
+import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -29,7 +34,10 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val customerUseCase: GetCustomerUseCase,
-    private val homeFoodUseCase: GetFoodUseCase,
+    private val homeFoodUseCase: GetSearchFoodUseCase,
+    private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase,
+    private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase,
+    private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase,
     private val sessionManager: SessionManager,
 ) : BaseEventViewModel<HomeEvent, HomeEffect>() {
 
@@ -39,9 +47,11 @@ class HomeViewModel @Inject constructor(
         when (event) {
             is HomeEvent.Load -> load()
             is HomeEvent.DismissDialog -> dismissDialog()
+            HomeEvent.LoadNextPage -> loadNextPage()
+            is HomeEvent.ToggleFavorite -> toggleFavorite(event.foodId)
             is HomeEvent.ClickFood -> emitEffect(HomeEffect.NavigateToDetail(event.id))
-            is HomeEvent.ClickSearch -> emitEffect(HomeEffect.NavigateToSearch)
-            is HomeEvent.ClickCategory -> emitEffect(HomeEffect.NavigateToSearch)
+            is HomeEvent.ClickSearch -> emitEffect(HomeEffect.NavigateToSearch())
+            is HomeEvent.ClickCategory -> emitEffect(HomeEffect.NavigateToSearch(event.value))
             is HomeEvent.ClickNotif -> emitEffect(HomeEffect.NavigateToNotif)
         }
     }
@@ -49,19 +59,67 @@ class HomeViewModel @Inject constructor(
     fun load() {
         observeCustomer()
         observeFoods()
+        observeFavorites()
+    }
+
+    private fun observeFavorites() {
+        observeIndependentDataFlow(
+            flow = getFavoriteFoodIdsUseCase(),
+            onSuccess = { ids ->
+                _state.update { it.copy(favoriteIds = ids.toSet()) }
+            },
+            onError = { showError(it) }
+        )
     }
 
     private fun observeFoods() {
         observeIndependentDataFlow(
-            flow = homeFoodUseCase(),
+            flow = homeFoodUseCase(SearchParam(name = "", page = 0)),
             onState = { state ->
-                _state.update {
-                    it.copy(foods = state)
+                when (state) {
+                    is LoadState.Loading -> _state.update { it.copy(foods = LoadState.Loading, isLoadingMore = false) }
+                    is LoadState.Success -> _state.update {
+                        it.copy(
+                            foods = LoadState.Success(state.data.content),
+                            page = state.data.page,
+                            isLastPage = state.data.last,
+                            isLoadingMore = false
+                        )
+                    }
+                    is LoadState.Error -> _state.update { it.copy(foods = LoadState.Error(state.error), isLoadingMore = false) }
+                    else -> Unit
                 }
             },
             onError = {
                 showError(it)
             }
+        )
+    }
+
+    private fun loadNextPage() {
+        val state = _state.value
+        if (state.isLastPage || state.isLoadingMore || state.foods is LoadState.Loading) return
+        observeIndependentDataFlow(
+            flow = homeFoodUseCase(SearchParam(name = "", page = state.page + 1)),
+            onState = { result ->
+                when (result) {
+                    is LoadState.Loading -> _state.update { it.copy(isLoadingMore = true) }
+                    is LoadState.Success -> {
+                        val current = (state.foods as? LoadState.Success)?.data.orEmpty()
+                        _state.update {
+                            it.copy(
+                                foods = LoadState.Success(current + result.data.content),
+                                page = result.data.page,
+                                isLastPage = result.data.last,
+                                isLoadingMore = false
+                            )
+                        }
+                    }
+                    is LoadState.Error -> _state.update { it.copy(isLoadingMore = false) }
+                    else -> Unit
+                }
+            },
+            onError = { showError(it) }
         )
     }
 
@@ -76,6 +134,28 @@ class HomeViewModel @Inject constructor(
             onError = {
                 showError(it)
             }
+        )
+    }
+
+    private fun toggleFavorite(foodId: String) {
+        val isFavorite = _state.value.favoriteIds.contains(foodId)
+        val flow = if (isFavorite) {
+            removeFavoriteFoodUseCase(foodId)
+        } else {
+            addFavoriteFoodUseCase(foodId)
+        }
+
+        observeDataFlow(
+            flow = flow,
+            onSuccess = {
+                _state.update { current ->
+                    val updated = current.favoriteIds.toMutableSet().apply {
+                        if (isFavorite) remove(foodId) else add(foodId)
+                    }
+                    current.copy(favoriteIds = updated)
+                }
+            },
+            onError = { showError(it) }
         )
     }
 

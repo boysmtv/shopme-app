@@ -49,6 +49,7 @@ import com.mtv.app.shopme.feature.auth.contract.ResetEvent
 import com.mtv.app.shopme.feature.auth.contract.ResetStage
 import com.mtv.app.shopme.feature.auth.contract.ResetUiState
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV1
 
 @Composable
 fun ResetScreen(
@@ -180,15 +181,19 @@ fun ResetScreen(
                             containerColor = AppColor.Green
                         )
                     ) {
-                        Text(
-                            when (state.stage) {
-                                ResetStage.EMAIL -> "Send OTP"
-                                ResetStage.OTP -> "Verify OTP"
-                                ResetStage.PASSWORD -> "Update Password"
-                            },
-                            fontFamily = PoppinsFont,
-                            color = Color.White
-                        )
+                        if (isLoading) {
+                            LoadingV1()
+                        } else {
+                            Text(
+                                when (state.stage) {
+                                    ResetStage.EMAIL -> "Send OTP"
+                                    ResetStage.OTP -> "Verify OTP"
+                                    ResetStage.PASSWORD -> "Update Password"
+                                },
+                                fontFamily = PoppinsFont,
+                                color = Color.White
+                            )
+                        }
                     }
 
                     Spacer(Modifier.height(16.dp))

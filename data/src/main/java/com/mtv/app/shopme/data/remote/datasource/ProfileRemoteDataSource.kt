@@ -12,6 +12,7 @@ import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.NotificationPreferencesResponse
@@ -37,6 +38,12 @@ class ProfileRemoteDataSource @Inject constructor(
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Customer.Update,
             body = param.toRequest()
+        ).requireData()
+
+    suspend fun updateProfile(body: CustomerUpdateRequest) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Customer.Update,
+            body = body
         ).requireData()
 
     suspend fun deleteAccount() =
@@ -78,6 +85,21 @@ class ProfileRemoteDataSource @Inject constructor(
     suspend fun setDefaultAddress(param: AddressDefaultParam) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Address.SetDefault(param.id)
+        ).requireData()
+
+    suspend fun getFavoriteFoodIds() =
+        request<ApiResponse<List<String>>>(
+            endpoint = ApiEndPoint.Customer.Favorites
+        ).requireData()
+
+    suspend fun addFavoriteFood(foodId: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Customer.AddFavorite(foodId)
+        ).requireData()
+
+    suspend fun removeFavoriteFood(foodId: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Customer.RemoveFavorite(foodId)
         ).requireData()
 
 }
