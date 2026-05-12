@@ -17,6 +17,10 @@ object AppDatabaseMigrations {
 
     private fun migrationTo8(fromVersion: Int) = object : Migration(fromVersion, 8) {
         override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `chat_list_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `app_notification_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `payload_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `pending_mutation`")
             db.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS `chat_list_cache` (
