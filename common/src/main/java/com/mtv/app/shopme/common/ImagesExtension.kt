@@ -14,6 +14,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import android.util.Base64
+import android.util.LruCache
 import androidx.exifinterface.media.ExifInterface
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.io.ByteArrayOutputStream
@@ -21,6 +22,16 @@ import kotlin.apply
 import kotlin.io.use
 import kotlin.text.replace
 import kotlin.text.substringAfter
+
+private object Base64BitmapCache {
+    private val cache = LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 1024 / 16).toInt())
+
+    fun get(key: String): Bitmap? = cache.get(key)
+
+    fun put(key: String, bitmap: Bitmap) {
+        cache.put(key, bitmap)
+    }
+}
 
 fun uriToBase64(
     context: Context,
@@ -71,8 +82,12 @@ fun base64ToBitmap(base64: String): Bitmap? {
             .substringAfter("base64,", base64)
             .replace("\n", EMPTY_STRING)
 
+        Base64BitmapCache.get(cleanBase64)?.let { return it }
+
         val decoded = Base64.decode(cleanBase64, Base64.DEFAULT)
-        BitmapFactory.decodeByteArray(decoded, 0, decoded.size)
+        BitmapFactory.decodeByteArray(decoded, 0, decoded.size)?.also {
+            Base64BitmapCache.put(cleanBase64, it)
+        }
     } catch (e: Exception) {
         e.printStackTrace()
         null
@@ -98,4 +113,3 @@ fun fixBitmapOrientation(context: Context, uri: Uri, bitmap: Bitmap): Bitmap {
     }
     return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 }
-

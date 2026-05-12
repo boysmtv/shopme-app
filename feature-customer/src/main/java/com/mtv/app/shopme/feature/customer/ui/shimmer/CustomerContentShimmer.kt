@@ -2,8 +2,11 @@ package com.mtv.app.shopme.feature.customer.ui.shimmer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,23 +70,37 @@ fun ShimmerHomeContentSkeleton() {
             ShimmerLine(widthFraction = 0.35f, heightDp = 18)
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            repeat(3) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    repeat(2) {
-                        ShimmerHomeFoodCard(modifier = Modifier.weight(1f))
-                    }
-                }
+        ShimmerHomeFoodFlow()
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ShimmerHomeFoodFlow() {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val cardWidth = (maxWidth - 16.dp) / 2
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            maxItemsInEachRow = 2
+        ) {
+            repeat(6) { index ->
+                ShimmerHomeFoodCard(
+                    modifier = Modifier.width(cardWidth),
+                    imageHeight = if (index % 3 == 0) 112.dp else 100.dp
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ShimmerHomeFoodCard(modifier: Modifier = Modifier) {
+private fun ShimmerHomeFoodCard(
+    modifier: Modifier = Modifier,
+    imageHeight: androidx.compose.ui.unit.Dp = 100.dp
+) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -94,7 +111,7 @@ private fun ShimmerHomeFoodCard(modifier: Modifier = Modifier) {
                 ShimmerBlock(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp),
+                        .height(imageHeight),
                     shape = RoundedCornerShape(0.dp)
                 )
                 ShimmerBlock(

@@ -37,12 +37,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +54,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
-import com.mtv.app.shopme.common.base64ToBitmap
+import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.data.mock.DataUiMock
@@ -333,44 +331,30 @@ fun ChatAvatar(
     placeholderRes: Int,
     modifier: Modifier = Modifier
 ) {
-    val bitmap = remember(base64Image) {
-        base64Image
-            ?.takeIf { it.isNotBlank() }
-            ?.let { base64ToBitmap(it) }
-    }
-
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(50))
             .background(AppColor.Green)
     ) {
-        if (bitmap != null) {
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            val imageRes = when (placeholderRes) {
-                0 -> R.drawable.image_burger
-                1 -> R.drawable.image_pizza
-                2 -> R.drawable.image_platbread
-                3 -> R.drawable.image_cheese_burger
-                4 -> R.drawable.image_bakso
-                5 -> R.drawable.image_pempek
-                6 -> R.drawable.image_padang
-                7 -> R.drawable.image_sate
-                else -> R.drawable.image_burger
-            }
-
-            Image(
-                painter = painterResource(imageRes),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+        val imageRes = when (placeholderRes) {
+            0 -> R.drawable.image_burger
+            1 -> R.drawable.image_pizza
+            2 -> R.drawable.image_platbread
+            3 -> R.drawable.image_cheese_burger
+            4 -> R.drawable.image_bakso
+            5 -> R.drawable.image_pempek
+            6 -> R.drawable.image_padang
+            7 -> R.drawable.image_sate
+            else -> R.drawable.image_burger
         }
+
+        SmartImage(
+            model = base64Image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(imageRes)
+        )
     }
 }
 
