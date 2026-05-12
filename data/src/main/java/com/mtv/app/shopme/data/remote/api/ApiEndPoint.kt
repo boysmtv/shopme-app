@@ -180,6 +180,7 @@ object ApiEndPoint {
 
     object Notifications {
         object Get : IApiEndPoint { override val path = "$API/$NOTIFICATIONS"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object UnreadCount : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/unread-count"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object ReadAll : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/read-all"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
     }
 

@@ -2,14 +2,13 @@ package com.mtv.app.shopme.feature.seller
 
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
-import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect
-import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.model.SellerProfile
-import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
+import com.mtv.app.shopme.domain.usecase.GetUnreadNotificationCountUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
+import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerDashboardViewModel
 import com.mtv.based.core.network.utils.Resource
@@ -28,8 +27,8 @@ class SellerDashboardViewModelTest {
 
     private val sessionManager: SessionManager = mockk(relaxed = true)
     private val getSellerOrdersUseCase: GetSellerOrdersUseCase = mockk()
-    private val getSellerNotificationsUseCase: GetSellerNotificationsUseCase = mockk()
     private val getSellerProfileUseCase: GetSellerProfileUseCase = mockk()
+    private val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase = mockk()
     private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase = mockk(relaxed = true)
     private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
 
@@ -66,36 +65,13 @@ class SellerDashboardViewModelTest {
                 )
             )
         )
-        every { getSellerNotificationsUseCase.invoke() } returns flowOf(
-            Resource.Success(
-                listOf(
-                    SellerNotifItem(
-                        title = "Order baru",
-                        message = "Ada order baru",
-                        orderId = "order-1",
-                        buyerName = "Buyer",
-                        date = "11 May 2026",
-                        time = "10:00",
-                        isRead = false
-                    ),
-                    SellerNotifItem(
-                        title = "Order dibaca",
-                        message = "Sudah dibaca",
-                        orderId = "order-2",
-                        buyerName = "Buyer",
-                        date = "11 May 2026",
-                        time = "11:00",
-                        isRead = true
-                    )
-                )
-            )
-        )
+        every { getUnreadNotificationCountUseCase.invoke() } returns flowOf(Resource.Success(1))
 
         val vm = SellerDashboardViewModel(
             sessionManager = sessionManager,
             getSellerOrdersUseCase = getSellerOrdersUseCase,
-            getSellerNotificationsUseCase = getSellerNotificationsUseCase,
             getSellerProfileUseCase = getSellerProfileUseCase,
+            getUnreadNotificationCountUseCase = getUnreadNotificationCountUseCase,
             updateSellerAvailabilityUseCase = updateSellerAvailabilityUseCase,
             realtimeGateway = realtimeGateway
         )
@@ -113,13 +89,13 @@ class SellerDashboardViewModelTest {
     fun `click order detail should emit navigation effect with order id`() = runTest {
         every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
         every { getSellerOrdersUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
-        every { getSellerNotificationsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { getUnreadNotificationCountUseCase.invoke() } returns flowOf(Resource.Success(0))
 
         val vm = SellerDashboardViewModel(
             sessionManager = sessionManager,
             getSellerOrdersUseCase = getSellerOrdersUseCase,
-            getSellerNotificationsUseCase = getSellerNotificationsUseCase,
             getSellerProfileUseCase = getSellerProfileUseCase,
+            getUnreadNotificationCountUseCase = getUnreadNotificationCountUseCase,
             updateSellerAvailabilityUseCase = updateSellerAvailabilityUseCase,
             realtimeGateway = realtimeGateway
         )
@@ -134,13 +110,13 @@ class SellerDashboardViewModelTest {
     fun `change filter and sort should update dashboard ui state`() = runTest {
         every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
         every { getSellerOrdersUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
-        every { getSellerNotificationsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { getUnreadNotificationCountUseCase.invoke() } returns flowOf(Resource.Success(0))
 
         val vm = SellerDashboardViewModel(
             sessionManager = sessionManager,
             getSellerOrdersUseCase = getSellerOrdersUseCase,
-            getSellerNotificationsUseCase = getSellerNotificationsUseCase,
             getSellerProfileUseCase = getSellerProfileUseCase,
+            getUnreadNotificationCountUseCase = getUnreadNotificationCountUseCase,
             updateSellerAvailabilityUseCase = updateSellerAvailabilityUseCase,
             realtimeGateway = realtimeGateway
         )

@@ -8,5 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface NotificationRepository {
     fun getCustomerNotifications(): Flow<Resource<List<NotificationItem>>>
     fun getSellerNotifications(): Flow<Resource<List<SellerNotifItem>>>
+    fun getUnreadCount(): Flow<Resource<Int>>
     fun clearNotifications(): Flow<Resource<Unit>>
 }

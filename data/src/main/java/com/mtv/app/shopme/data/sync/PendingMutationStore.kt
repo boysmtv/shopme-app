@@ -45,6 +45,30 @@ class PendingMutationStore(
         if (actionTypes.isNotEmpty()) {
             homeDao.deletePendingMutationsByActionTypes(actionTypes)
         }
+
+        when (action) {
+            is PendingMutationAction.CartQuantity -> {
+                homeDao.getPendingMutations()
+                    .filter { entity ->
+                        entity.actionType == "CartQuantity" &&
+                            decodeAction(entity.payload) is PendingMutationAction.CartQuantity &&
+                            (decodeAction(entity.payload) as PendingMutationAction.CartQuantity).cartId == action.cartId
+                    }
+                    .forEach { homeDao.deletePendingMutation(it.id) }
+            }
+
+            is PendingMutationAction.CartClearByCafe -> {
+                homeDao.getPendingMutations()
+                    .filter { entity ->
+                        entity.actionType == "CartClearByCafe" &&
+                            decodeAction(entity.payload) is PendingMutationAction.CartClearByCafe &&
+                            (decodeAction(entity.payload) as PendingMutationAction.CartClearByCafe).cafeId == action.cafeId
+                    }
+                    .forEach { homeDao.deletePendingMutation(it.id) }
+            }
+
+            else -> Unit
+        }
     }
 
     suspend fun list(): List<PendingMutationRecord> = homeDao.getPendingMutations().map { entity ->
@@ -66,6 +90,9 @@ class PendingMutationStore(
             lastError = lastError
         )
     }
+
+    private fun decodeAction(payload: String): PendingMutationAction =
+        json.decodeFromString(PendingMutationAction.serializer(), payload)
 }
 
 data class PendingMutationRecord(

@@ -101,4 +101,16 @@ class NotificationRepositoryImplTest {
         coVerify { homeDao.clearNotifications("customer") }
         coVerify { homeDao.clearNotifications("seller") }
     }
+
+    @Test
+    fun `getUnreadCount should emit count from lightweight endpoint`() = runTest {
+        coEvery { remote.getUnreadCount() } returns 7
+
+        repository.getUnreadCount().test {
+            assertEquals(Resource.Loading, awaitItem())
+            val success = awaitItem() as Resource.Success
+            assertEquals(7, success.data)
+            awaitComplete()
+        }
+    }
 }
