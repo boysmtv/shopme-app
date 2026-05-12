@@ -21,6 +21,7 @@ import java.math.BigDecimal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.decodeFromString
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -66,6 +67,39 @@ class OrderRepositoryImplTest {
         }
 
         coVerify { homeDao.insertPayload(match { it.cacheKey == "orders:list:customer" }) }
+    }
+
+    @Test
+    fun `order summary cache should decode legacy payload without itemCount`() {
+        val legacyPayload = """
+            [
+              {
+                "id": "order-1",
+                "cafeId": "cafe-1",
+                "cafeName": "Kopi Senja",
+                "deliveryAddress": "Jl. Kenanga",
+                "totalPrice": "42000",
+                "status": "ORDERED",
+                "paymentMethod": "TRANSFER",
+                "paymentStatus": "UNPAID",
+                "createdAt": "2026-05-12T10:00:00",
+                "items": [
+                  {
+                    "foodName": "Latte",
+                    "quantity": 1
+                  }
+                ]
+              }
+            ]
+        """.trimIndent()
+
+        val decoded = PayloadCacheStore.json.decodeFromString(
+            ListSerializer(OrderSummaryResponse.serializer()),
+            legacyPayload
+        )
+
+        assertEquals(0, decoded.first().itemCount)
+        assertEquals("order-1", decoded.first().id)
     }
 
     private fun orderSummaryResponse(id: String, status: OrderStatus) = OrderSummaryResponse(

@@ -19,8 +19,8 @@ data class OrderSummaryResponse(
     val paymentMethod: PaymentMethod,
     val paymentStatus: PaymentStatus,
     val createdAt: String? = null,
-    val itemCount: Int,
-    val items: List<OrderSummaryItemResponse>
+    val itemCount: Int = 0,
+    val items: List<OrderSummaryItemResponse> = emptyList()
 )
 
 @Serializable
