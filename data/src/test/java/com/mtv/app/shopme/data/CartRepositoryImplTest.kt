@@ -9,6 +9,7 @@ import com.mtv.app.shopme.data.remote.datasource.CartRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.data.remote.response.CartItemVariantResponse
 import com.mtv.app.shopme.data.repository.CartRepositoryImpl
+import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.based.core.network.utils.Resource
 import io.mockk.coEvery
@@ -27,12 +28,14 @@ class CartRepositoryImplTest {
     private val remote: CartRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
     private val errorMapper: ErrorMapper = mockk(relaxed = true)
+    private val syncManager: OfflineMutationSyncManager = mockk(relaxed = true)
 
     private val repository = CartRepositoryImpl(
         remote = remote,
         resultFlow = ResultFlowFactory(errorMapper),
         homeDao = homeDao,
-        errorMapper = errorMapper
+        errorMapper = errorMapper,
+        syncManager = syncManager
     )
 
     @Test

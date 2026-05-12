@@ -8,6 +8,7 @@ import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.SellerRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
 import com.mtv.app.shopme.data.repository.SellerRepositoryImpl
+import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.based.core.network.utils.Resource
 import io.mockk.coEvery
@@ -24,12 +25,14 @@ class SellerRepositoryImplTest {
     private val remote: SellerRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
     private val errorMapper: ErrorMapper = mockk(relaxed = true)
+    private val syncManager: OfflineMutationSyncManager = mockk(relaxed = true)
 
     private val repository = SellerRepositoryImpl(
         remote = remote,
         resultFlow = ResultFlowFactory(errorMapper),
         homeDao = homeDao,
-        errorMapper = errorMapper
+        errorMapper = errorMapper,
+        syncManager = syncManager
     )
 
     @Test

@@ -11,6 +11,7 @@ import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.data.repository.ProfileRepositoryImpl
+import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
@@ -29,12 +30,14 @@ class ProfileRepositoryImplTest {
     private val remote: ProfileRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
     private val errorMapper: ErrorMapper = mockk()
+    private val syncManager: OfflineMutationSyncManager = mockk(relaxed = true)
 
     private val repository = ProfileRepositoryImpl(
         remote = remote,
         resultFlow = ResultFlowFactory(errorMapper),
         homeDao = homeDao,
-        errorMapper = errorMapper
+        errorMapper = errorMapper,
+        syncManager = syncManager
     )
 
     @Test
@@ -76,7 +79,7 @@ class ProfileRepositoryImplTest {
 
     @Test
     fun `updateProfile should patch cached customer`() = runTest {
-        coEvery { remote.updateProfile(any()) } returns Unit
+        coEvery { remote.updateProfile(any<CustomerUpdateParam>()) } returns Unit
         coEvery { homeDao.getCustomerOnce() } returns cachedCustomer()
 
         repository.updateProfile(

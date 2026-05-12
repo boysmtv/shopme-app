@@ -12,6 +12,7 @@ import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.NotificationPreferencesResponse
@@ -37,6 +38,12 @@ class ProfileRemoteDataSource @Inject constructor(
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Customer.Update,
             body = param.toRequest()
+        ).requireData()
+
+    suspend fun updateProfile(body: CustomerUpdateRequest) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Customer.Update,
+            body = body
         ).requireData()
 
     suspend fun deleteAccount() =

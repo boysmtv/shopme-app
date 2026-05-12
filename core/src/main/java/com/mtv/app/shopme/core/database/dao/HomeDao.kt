@@ -16,6 +16,7 @@ import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
 import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
+import com.mtv.app.shopme.core.database.entity.PendingMutationEntity
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -69,4 +70,16 @@ interface HomeDao {
 
     @Query("DELETE FROM payload_cache WHERE cacheKey = :cacheKey")
     suspend fun clearPayload(cacheKey: String)
+
+    @Query("SELECT * FROM pending_mutation ORDER BY createdAt ASC")
+    suspend fun getPendingMutations(): List<PendingMutationEntity>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPendingMutation(data: PendingMutationEntity): Long
+
+    @Query("DELETE FROM pending_mutation WHERE id = :id")
+    suspend fun deletePendingMutation(id: Long)
+
+    @Query("UPDATE pending_mutation SET updatedAt = :updatedAt, attemptCount = :attemptCount, lastError = :lastError WHERE id = :id")
+    suspend fun updatePendingMutationState(id: Long, updatedAt: Long, attemptCount: Int, lastError: String?)
 }
