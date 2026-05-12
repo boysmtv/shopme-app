@@ -10,10 +10,13 @@ package com.mtv.app.shopme.data.mapper
 
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
+import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.domain.model.MenuSummary
+import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
 import kotlin.text.ifEmpty
@@ -25,13 +28,35 @@ import org.threeten.bp.LocalDateTime
 
 fun CustomerEntity.toDomain(): Customer = Customer(
     name = name,
-    phone = EMPTY_STRING,
-    email = EMPTY_STRING,
-    address = null,
+    phone = phone,
+    email = email,
+    address = if (addressVillage.isBlank()) {
+        null
+    } else {
+        Address(
+            id = "cached-address",
+            village = addressVillage,
+            block = addressBlock,
+            number = addressNumber,
+            rt = addressRt,
+            rw = addressRw,
+            isDefault = true
+        )
+    },
     photo = photo,
-    verified = true,
-    stats = null,
-    menuSummary = null
+    verified = verified,
+    stats = Stats(
+        totalOrders = totalOrders,
+        activeOrders = activeOrders,
+        membership = membership
+    ),
+    menuSummary = MenuSummary(
+        ordered = ordered,
+        cooking = cooking,
+        shipping = shipping,
+        completed = completed,
+        cancelled = cancelled
+    )
 )
 
 fun FoodEntity.toDomain(): Food = Food(
@@ -57,13 +82,26 @@ fun FoodEntity.toDomain(): Food = Food(
  * ========================================================= */
 
 fun Customer.toEntity(): CustomerEntity = CustomerEntity(
-    id = phone.ifEmpty { name },
+    id = email.ifEmpty { "self" },
     name = name,
-    address = address?.let {
-        "${it.village} Blok ${it.block} No ${it.number}"
-    }.orEmpty(),
+    phone = phone,
+    email = email,
+    addressVillage = address?.village.orEmpty(),
+    addressBlock = address?.block.orEmpty(),
+    addressNumber = address?.number.orEmpty(),
+    addressRt = address?.rt.orEmpty(),
+    addressRw = address?.rw.orEmpty(),
     photo = photo,
-    updatedAt = 0L
+    verified = verified,
+    totalOrders = stats?.totalOrders ?: 0,
+    activeOrders = stats?.activeOrders ?: 0,
+    membership = stats?.membership.orEmpty(),
+    ordered = menuSummary?.ordered ?: 0,
+    cooking = menuSummary?.cooking ?: 0,
+    shipping = menuSummary?.shipping ?: 0,
+    completed = menuSummary?.completed ?: 0,
+    cancelled = menuSummary?.cancelled ?: 0,
+    updatedAt = System.currentTimeMillis()
 )
 
 fun Food.toEntity(): FoodEntity = FoodEntity(

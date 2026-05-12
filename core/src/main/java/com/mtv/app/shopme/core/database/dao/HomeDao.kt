@@ -22,6 +22,9 @@ interface HomeDao {
     @Query("SELECT * FROM customer LIMIT 1")
     fun getCustomer(): Flow<CustomerEntity?>
 
+    @Query("SELECT * FROM customer LIMIT 1")
+    suspend fun getCustomerOnce(): CustomerEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCustomer(data: CustomerEntity)
 

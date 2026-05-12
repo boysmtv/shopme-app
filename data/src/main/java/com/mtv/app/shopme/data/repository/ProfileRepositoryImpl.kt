@@ -8,8 +8,12 @@
 
 package com.mtv.app.shopme.data.repository
 
+import com.mtv.app.shopme.core.database.dao.HomeDao
+import com.mtv.app.shopme.core.database.entity.CustomerEntity
+import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
+import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.remote.datasource.ProfileRemoteDataSource
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
@@ -17,21 +21,52 @@ import com.mtv.app.shopme.domain.param.AddressDeleteParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
 import com.mtv.app.shopme.domain.repository.ProfileRepository
+import com.mtv.based.core.network.utils.Resource
 import javax.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class ProfileRepositoryImpl @Inject constructor(
     private val remote: ProfileRemoteDataSource,
-    private val resultFlow: ResultFlowFactory
+    private val resultFlow: ResultFlowFactory,
+    private val homeDao: HomeDao,
+    private val errorMapper: ErrorMapper
 ) : ProfileRepository {
 
     override fun getCustomer() =
-        resultFlow.create {
-            remote.getCustomer().toDomain()
-        }
+        flow {
+            emit(Resource.Loading)
+            val cached = homeDao.getCustomerOnce()?.toDomain()
+            if (cached != null) {
+                emit(Resource.Success(cached))
+            }
+
+            try {
+                val remoteCustomer = remote.getCustomer().toDomain()
+                homeDao.insertCustomer(remoteCustomer.toEntity())
+                emit(Resource.Success(remoteCustomer))
+            } catch (throwable: Throwable) {
+                if (cached == null) {
+                    emit(Resource.Error(errorMapper.map(throwable)))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun updateProfile(param: CustomerUpdateParam) =
         resultFlow.create {
             remote.updateProfile(param)
+            homeDao.getCustomerOnce()?.let { cached ->
+                homeDao.insertCustomer(
+                    cached.copy(
+                        name = param.name,
+                        phone = param.phone,
+                        photo = param.photo ?: cached.photo,
+                        updatedAt = System.currentTimeMillis()
+                    )
+                )
+            }
+            Unit
         }
 
     override fun deleteAccount() =

@@ -16,7 +16,7 @@ import com.mtv.app.shopme.core.database.entity.FoodEntity
 
 @Database(
     entities = [CustomerEntity::class, FoodEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
