@@ -36,8 +36,8 @@ private object Base64BitmapCache {
 fun uriToBase64(
     context: Context,
     uri: Uri,
-    maxSize: Int = 512,
-    quality: Int = 70
+    maxSize: Int = 1280,
+    quality: Int = 82
 ): String {
     val boundsOptions = BitmapFactory.Options().apply {
         inJustDecodeBounds = true
