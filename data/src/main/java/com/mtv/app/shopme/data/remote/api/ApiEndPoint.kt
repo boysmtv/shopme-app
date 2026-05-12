@@ -20,6 +20,7 @@ object ApiEndPoint {
     private const val SELLER = "seller"
     private const val NOTIFICATIONS = "notifications"
     private const val SUPPORT = "support"
+    private const val MEDIA = "media"
 
     object Auth {
 
@@ -180,6 +181,14 @@ object ApiEndPoint {
     object Notifications {
         object Get : IApiEndPoint { override val path = "$API/$NOTIFICATIONS"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object ReadAll : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/read-all"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
+    }
+
+    object Media {
+        object Upload : IApiEndPoint {
+            override val path = "$API/$MEDIA/upload"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Multipart
+        }
     }
 
     object Address {

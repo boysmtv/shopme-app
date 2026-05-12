@@ -36,7 +36,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,7 +50,6 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
-import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreUiState
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
@@ -72,15 +70,11 @@ fun SellerEditStoreScreen(
     }
 
     val selectedTab = state.selectedTab
-    val context = LocalContext.current
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        val encoded = uriToBase64(context, uri)
-        if (encoded.isNotBlank()) {
-            event(SellerEditStoreEvent.PhotoSelected("data:image/jpeg;base64,$encoded"))
-        }
+        event(SellerEditStoreEvent.PhotoSelected(uri.toString()))
     }
 
     Column(

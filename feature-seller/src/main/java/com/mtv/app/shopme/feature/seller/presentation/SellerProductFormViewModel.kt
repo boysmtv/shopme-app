@@ -23,12 +23,14 @@ import com.mtv.app.shopme.domain.usecase.CreateFoodUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
+import com.mtv.app.shopme.domain.usecase.UploadMediaUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateFoodUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.app.shopme.feature.seller.ui.ProductStep
 import com.mtv.app.shopme.feature.seller.ui.Availability
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -36,9 +38,12 @@ import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 @HiltViewModel
@@ -49,6 +54,7 @@ class SellerProductFormViewModel @Inject constructor(
     private val createFoodUseCase: CreateFoodUseCase,
     private val updateFoodUseCase: UpdateFoodUseCase,
     private val deleteFoodUseCase: DeleteFoodUseCase,
+    private val uploadMediaUseCase: UploadMediaUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseEventViewModel<SellerProductFormEvent, SellerProductFormEffect>() {
 
@@ -260,28 +266,40 @@ class SellerProductFormViewModel @Inject constructor(
             return
         }
 
-        val request = runCatching { buildUpsertParam(currentCafeId) }
-            .getOrElse {
-                showError(UiError.Validation(message = it.message ?: "Data produk tidak valid"))
-                return
+        viewModelScope.launch {
+            _state.update { it.copy(isSaving = true) }
+            val resolvedImages = runCatching {
+                resolveUploadedReferences(_state.value.images.filterNotNull(), "products")
+            }.getOrElse {
+                _state.update { it.copy(isSaving = false) }
+                showError(UiError.Validation(message = it.message ?: "Failed uploading image"))
+                return@launch
             }
 
-        val flow = if (productId.isNullOrBlank()) {
-            createFoodUseCase(request)
-        } else {
-            updateFoodUseCase(productId, request)
-        }
-
-        observeDataFlow(
-            flow = flow,
-            onState = { state ->
-                _state.update { it.copy(isSaving = state is LoadState.Loading) }
-                if (state is LoadState.Success) {
-                    emitEffect(SellerProductFormEffect.SaveSuccess)
+            val request = runCatching { buildUpsertParam(currentCafeId, resolvedImages) }
+                .getOrElse {
+                    _state.update { it.copy(isSaving = false) }
+                    showError(UiError.Validation(message = it.message ?: "Data produk tidak valid"))
+                    return@launch
                 }
-            },
-            onError = ::showError
-        )
+
+            val flow = if (productId.isNullOrBlank()) {
+                createFoodUseCase(request)
+            } else {
+                updateFoodUseCase(productId, request)
+            }
+
+            observeDataFlow(
+                flow = flow,
+                onState = { state ->
+                    _state.update { it.copy(isSaving = state is LoadState.Loading) }
+                    if (state is LoadState.Success) {
+                        emitEffect(SellerProductFormEffect.SaveSuccess)
+                    }
+                },
+                onError = ::showError
+            )
+        }
     }
 
     private fun delete() {
@@ -318,7 +336,7 @@ class SellerProductFormViewModel @Inject constructor(
         )
     }
 
-    private fun buildUpsertParam(currentCafeId: String): FoodUpsertParam {
+    private fun buildUpsertParam(currentCafeId: String, resolvedImages: List<String>): FoodUpsertParam {
         val state = _state.value
         val price = state.product.price.toBigDecimal()
         val status = when (state.availability) {
@@ -334,8 +352,8 @@ class SellerProductFormViewModel @Inject constructor(
 
         return FoodUpsertParam(
             cafeId = currentCafeId,
-            images = state.images.filterNotNull().filter {
-                it.startsWith("http://") || it.startsWith("https://") || it.startsWith("data:image")
+            images = resolvedImages.filter {
+                it.startsWith("http://") || it.startsWith("https://")
             },
             name = state.product.name.trim(),
             description = state.product.description.trim(),
@@ -362,6 +380,19 @@ class SellerProductFormViewModel @Inject constructor(
                 }
         )
     }
+
+    private suspend fun resolveUploadedReferences(references: List<String>, scope: String): List<String> =
+        references.map { reference ->
+            if (!reference.startsWith("content://")) {
+                reference
+            } else {
+                when (val result = uploadMediaUseCase(reference, scope).first { it !is Resource.Loading }) {
+                    is Resource.Success -> result.data.originalUrl
+                    is Resource.Error -> throw IllegalStateException(result.error.message)
+                    else -> reference
+                }
+            }
+        }
 
     private fun Food.toUiState(): SellerProductFormUiState {
         this@SellerProductFormViewModel.cafeId = this.cafeId

@@ -54,7 +54,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,7 +62,6 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.SmartImage
-import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeUiState
 
@@ -74,17 +72,13 @@ fun SellerCreateCafeScreen(
     state: SellerCreateCafeUiState,
     event: (SellerCreateCafeEvent) -> Unit
 ) {
-    val context = LocalContext.current
     val currentStep = CafeStep.entries.getOrElse(state.step - 1) { CafeStep.BASIC }
     val photo = state.cafePhoto
     val imagePicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri ?: return@rememberLauncherForActivityResult
-        val encoded = uriToBase64(context, uri)
-        if (encoded.isNotBlank()) {
-            event(SellerCreateCafeEvent.ImageSelected("data:image/jpeg;base64,$encoded"))
-        }
+        event(SellerCreateCafeEvent.ImageSelected(uri.toString()))
     }
 
     Column(

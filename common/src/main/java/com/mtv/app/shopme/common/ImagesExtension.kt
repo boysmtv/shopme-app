@@ -17,7 +17,9 @@ import android.util.Base64
 import android.util.LruCache
 import androidx.exifinterface.media.ExifInterface
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
+import java.io.File
 import java.io.ByteArrayOutputStream
+import java.io.FileOutputStream
 import kotlin.apply
 import kotlin.io.use
 import kotlin.text.replace
@@ -74,6 +76,48 @@ fun uriToBase64(
         output.toByteArray(),
         Base64.NO_WRAP
     )
+}
+
+fun uriToCompressedJpegFile(
+    context: Context,
+    uri: Uri,
+    maxSize: Int = 1280,
+    quality: Int = 82
+): File? {
+    val boundsOptions = BitmapFactory.Options().apply {
+        inJustDecodeBounds = true
+    }
+
+    context.contentResolver.openInputStream(uri)?.use {
+        BitmapFactory.decodeStream(it, null, boundsOptions)
+    }
+
+    var sampleSize = 1
+    while (
+        boundsOptions.outWidth / sampleSize > maxSize ||
+        boundsOptions.outHeight / sampleSize > maxSize
+    ) {
+        sampleSize *= 2
+    }
+
+    val bitmapOptions = BitmapFactory.Options().apply {
+        inSampleSize = sampleSize
+    }
+
+    val decodedBitmap = context.contentResolver
+        .openInputStream(uri)
+        ?.use {
+            BitmapFactory.decodeStream(it, null, bitmapOptions)
+        } ?: return null
+
+    val fixedBitmap = fixBitmapOrientation(context, uri, decodedBitmap)
+    val tempFile = File.createTempFile("shopme-media-", ".jpg", context.cacheDir)
+
+    FileOutputStream(tempFile).use { output ->
+        fixedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, output)
+    }
+
+    return tempFile
 }
 
 fun base64ToBitmap(base64: String): Bitmap? {

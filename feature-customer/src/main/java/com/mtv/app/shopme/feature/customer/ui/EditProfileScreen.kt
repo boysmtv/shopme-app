@@ -90,7 +90,6 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
-import com.mtv.app.shopme.common.uriToBase64
 import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.data.mock.DataUiMock.addresses
 import com.mtv.app.shopme.data.mock.DataUiMock.customer
@@ -119,7 +118,6 @@ fun EditProfileScreen(
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAddAddress by remember { mutableStateOf(false) }
     val sheetController = rememberSheetController()
-    val context = LocalContext.current
 
     val customer = (state.customer as? LoadState.Success)?.data
     val addresses = (state.addresses as? LoadState.Success)?.data.orEmpty()
@@ -134,9 +132,8 @@ fun EditProfileScreen(
     var email by remember { mutableStateOf(EMPTY_STRING) }
     var photo by remember { mutableStateOf(EMPTY_STRING) }
     val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        val encoded = uri?.let { uriToBase64(context, it) }
-        if (!encoded.isNullOrBlank()) {
-            photo = "data:image/jpeg;base64,$encoded"
+        if (uri != null) {
+            photo = uri.toString()
         }
     }
 
