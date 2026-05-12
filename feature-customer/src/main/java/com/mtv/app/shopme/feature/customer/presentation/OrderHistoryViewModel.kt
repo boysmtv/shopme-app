@@ -76,7 +76,7 @@ class OrderHistoryViewModel @Inject constructor(
             OrderStatus.CANCELLED -> "BATAL"
             else -> "DIPROSES"
         },
-        totalItems = order.items.sumOf { it.quantity },
+        totalItems = order.itemCount.takeIf { it > 0 } ?: order.items.sumOf { it.quantity },
         paymentMethod = order.paymentMethod.name,
         deliveryType = "Delivery"
     )

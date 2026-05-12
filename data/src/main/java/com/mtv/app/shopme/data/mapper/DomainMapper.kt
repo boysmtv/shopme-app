@@ -66,6 +66,7 @@ import com.mtv.app.shopme.domain.model.SupportSellerTerm
 import com.mtv.app.shopme.domain.model.User
 import com.mtv.app.shopme.data.remote.response.OrderItemResponse
 import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.data.remote.response.OrderSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
 import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
@@ -87,6 +88,31 @@ fun OrderResponse.toDomain(): Order = Order(
     cafeId = cafeId,
     cafeName = cafeName.orEmpty(),
     items = items.map { it.toDomain() },
+    itemCount = items.sumOf { it.quantity },
+    totalPrice = totalPrice.toDouble(),
+    status = status,
+    paymentStatus = paymentStatus,
+    paymentMethod = paymentMethod,
+    createdAt = createdAt.orEmpty(),
+    deliveryAddress = deliveryAddress.orEmpty()
+)
+
+fun OrderSummaryResponse.toDomain(): Order = Order(
+    id = id,
+    cafeId = cafeId,
+    cafeName = cafeName.orEmpty(),
+    items = items.map {
+        OrderItem(
+            id = "",
+            foodId = "",
+            foodName = it.foodName.orEmpty(),
+            quantity = it.quantity,
+            price = 0.0,
+            notes = null,
+            status = com.mtv.app.shopme.domain.model.OrderItemStatus.AVAILABLE
+        )
+    },
+    itemCount = itemCount,
     totalPrice = totalPrice.toDouble(),
     status = status,
     paymentStatus = paymentStatus,
@@ -248,7 +274,7 @@ fun ChatListItemResponse.toDomain(): ChatListItem {
         lastMessage = lastMessage,
         time = time,
         unreadCount = unreadCount,
-        avatarBase64 = avatarBase64
+        avatarBase64 = avatar
     )
 }
 

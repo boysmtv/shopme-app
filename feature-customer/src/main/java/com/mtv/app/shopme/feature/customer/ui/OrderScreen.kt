@@ -352,7 +352,7 @@ fun ModernOrderCard(
                         fontSize = 15.sp
                     )
                     Text(
-                        "${order.items.sumOf { it.quantity }} item",
+                        "${order.itemCount.takeIf { it > 0 } ?: order.items.sumOf { it.quantity }} item",
                         fontSize = 11.sp,
                         color = AppColor.Gray
                     )

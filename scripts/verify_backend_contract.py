@@ -874,6 +874,8 @@ def verify_dtos(android_root: Path, backend_root: Path) -> list[str]:
         DtoPair("AppConfigResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/AppConfigResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/AppConfigResponse.kt"),
         DtoPair("CafeAddressResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/CafeAddressResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/CafeAddressResponse.kt"),
         DtoPair("FoodResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/FoodResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/FoodResponse.kt"),
+        DtoPair("ChatListItemResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/ChatListItemResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/ChatResponse.kt"),
+        DtoPair("OrderSummaryResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/OrderResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/OrderResponse.kt"),
         DtoPair("OrderResponse", "data/src/main/java/com/mtv/app/shopme/data/remote/response/OrderResponse.kt", "shopme-common/src/main/kotlin/com/mtv/be/common/dto/response/OrderResponse.kt"),
     ]
     failures: list[str] = []

@@ -8,6 +8,28 @@ import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 
 @Serializable
+data class OrderSummaryResponse(
+    val id: String,
+    val cafeId: String,
+    val cafeName: String? = null,
+    val deliveryAddress: String? = null,
+    @Serializable(with = BigDecimalSerializer::class)
+    val totalPrice: BigDecimal,
+    val status: OrderStatus,
+    val paymentMethod: PaymentMethod,
+    val paymentStatus: PaymentStatus,
+    val createdAt: String? = null,
+    val itemCount: Int,
+    val items: List<OrderSummaryItemResponse>
+)
+
+@Serializable
+data class OrderSummaryItemResponse(
+    val foodName: String? = null,
+    val quantity: Int
+)
+
+@Serializable
 data class OrderResponse(
     val id: String,
     val customerId: String,

@@ -57,9 +57,9 @@ class ChatRepositoryImplTest {
                     lastMessage = "Remote message",
                     time = "10:00",
                     unreadCount = 2,
-                    avatarBase64 = "remote-avatar"
-                )
+                avatar = "remote-avatar"
             )
+        )
         )
 
         repository.getChatList(false).test {
