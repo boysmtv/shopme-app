@@ -77,6 +77,9 @@ interface HomeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPendingMutation(data: PendingMutationEntity): Long
 
+    @Query("DELETE FROM pending_mutation WHERE actionType IN (:actionTypes)")
+    suspend fun deletePendingMutationsByActionTypes(actionTypes: List<String>)
+
     @Query("DELETE FROM pending_mutation WHERE id = :id")
     suspend fun deletePendingMutation(id: Long)
 

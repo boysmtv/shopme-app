@@ -16,6 +16,7 @@ class PendingMutationStore(
 
     suspend fun enqueue(action: PendingMutationAction) {
         val now = System.currentTimeMillis()
+        dedupe(action)
         homeDao.insertPendingMutation(
             PendingMutationEntity(
                 actionType = action::class.simpleName.orEmpty(),
@@ -26,6 +27,24 @@ class PendingMutationStore(
                 lastError = null
             )
         )
+    }
+
+    private suspend fun dedupe(action: PendingMutationAction) {
+        val actionTypes = when (action) {
+            is PendingMutationAction.ProfileUpdate -> listOf("ProfileUpdate")
+            is PendingMutationAction.SellerAvailability -> listOf("SellerAvailability")
+            is PendingMutationAction.SellerPaymentMethods -> listOf("SellerPaymentMethods")
+            PendingMutationAction.CartClear -> listOf(
+                "CartAdd",
+                "CartQuantity",
+                "CartClear",
+                "CartClearByCafe"
+            )
+            else -> emptyList()
+        }
+        if (actionTypes.isNotEmpty()) {
+            homeDao.deletePendingMutationsByActionTypes(actionTypes)
+        }
     }
 
     suspend fun list(): List<PendingMutationRecord> = homeDao.getPendingMutations().map { entity ->

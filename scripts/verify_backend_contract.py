@@ -315,6 +315,44 @@ def verify_runtime(base_url: str, android_root: Path) -> list[str]:
         if original_status == 200 and len(original_bytes) == 0:
             failures.append("GET uploaded media originalUrl returned empty body")
 
+    buyer_profile_status, buyer_profile_payload = request_json(
+        f"{base_url}/api/customer",
+        method="GET",
+        token=buyer_token,
+    )
+    if buyer_profile_status != 200:
+        failures.append(f"GET /api/customer returned {buyer_profile_status}")
+        failures.extend(assert_envelope(buyer_profile_payload, "GET /api/customer"))
+        return failures
+    failures.extend(assert_envelope(buyer_profile_payload, "GET /api/customer"))
+
+    buyer_profile_data = buyer_profile_payload.get("data", {})
+    if isinstance(original_url, str) and original_url and isinstance(buyer_profile_data, dict):
+        profile_update_status, profile_update_payload = request_json(
+            f"{base_url}/api/customer",
+            method="PUT",
+            token=buyer_token,
+            body={
+                "name": buyer_profile_data.get("name", "Verifier Buyer"),
+                "phone": buyer_profile_data.get("phone") or "08123456789",
+                "photo": original_url,
+                "fcmToken": "demo-fcm-token",
+            },
+        )
+        expect_status(failures, "PUT /api/customer with uploaded media", profile_update_status, {200})
+        failures.extend(assert_envelope(profile_update_payload, "PUT /api/customer with uploaded media"))
+
+        updated_profile_status, updated_profile_payload = request_json(
+            f"{base_url}/api/customer",
+            method="GET",
+            token=buyer_token,
+        )
+        expect_status(failures, "GET /api/customer after media profile update", updated_profile_status, {200})
+        failures.extend(assert_envelope(updated_profile_payload, "GET /api/customer after media profile update"))
+        updated_photo = updated_profile_payload.get("data", {}).get("photo")
+        if not isinstance(updated_photo, str) or "/api/media/medium?key=" not in updated_photo:
+            failures.append(f"updated customer profile photo is not a managed medium media URL: {updated_photo!r}")
+
     read_cases = [
         ("POST", "/api/splash", None, {
             "body": {
