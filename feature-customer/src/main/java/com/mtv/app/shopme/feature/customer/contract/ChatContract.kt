@@ -14,7 +14,7 @@ import com.mtv.based.core.network.utils.LoadState
 data class ChatUiState(
     val activeChatId: String = "",
     val chatName: String = "",
-    val chatAvatarBase64: String? = null,
+    val chatAvatarUrl: String? = null,
     val chats: LoadState<List<ChatListItem>> = LoadState.Idle,
     val sendMessage: LoadState<Unit> = LoadState.Idle,
     val readAll: LoadState<Unit> = LoadState.Idle

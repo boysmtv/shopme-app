@@ -110,7 +110,7 @@ fun ChatScreen(
             }
 
             SmartImage(
-                model = state.chatAvatarBase64,
+                model = state.chatAvatarUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)

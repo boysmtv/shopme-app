@@ -34,5 +34,5 @@ data class SellerChatListItem(
     val lastMessage: String,
     val time: String,
     val unreadCount: Int,
-    val avatarBase64: String? = null
+    val avatarUrl: String? = null
 )

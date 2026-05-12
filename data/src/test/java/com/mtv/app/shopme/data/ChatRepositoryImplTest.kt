@@ -45,7 +45,7 @@ class ChatRepositoryImplTest {
                 lastMessage = "Cached message",
                 time = "09:00",
                 unreadCount = 1,
-                avatarBase64 = "cached-avatar",
+                avatarUrl = "https://media.shopme.test/chat/cached-avatar.jpg",
                 updatedAt = 1L
             )
         )

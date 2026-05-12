@@ -96,7 +96,7 @@ class SellerChatListViewModel @Inject constructor(
                                     lastMessage = item.lastMessage,
                                     time = item.time,
                                     unreadCount = item.unreadCount,
-                                    avatarBase64 = item.avatarBase64
+                                    avatarUrl = item.avatarUrl
                                 )
                             }
                         )

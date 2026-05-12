@@ -45,7 +45,7 @@ class ChatListViewModelTest {
                             lastMessage = "Halo buyer",
                             time = "10:30",
                             unreadCount = 1,
-                            avatarBase64 = null
+                            avatarUrl = null
                         )
                     )
                 )
@@ -93,7 +93,7 @@ class ChatListViewModelTest {
                             lastMessage = "Halo buyer",
                             time = "10:30",
                             unreadCount = 1,
-                            avatarBase64 = null
+                            avatarUrl = null
                         )
                     )
                 )
@@ -133,7 +133,7 @@ class ChatListViewModelTest {
                             lastMessage = "Halo buyer",
                             time = "10:30",
                             unreadCount = 3,
-                            avatarBase64 = null
+                            avatarUrl = null
                         )
                     )
                 )

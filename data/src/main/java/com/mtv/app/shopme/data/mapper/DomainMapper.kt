@@ -274,7 +274,7 @@ fun ChatListItemResponse.toDomain(): ChatListItem {
         lastMessage = lastMessage,
         time = time,
         unreadCount = unreadCount,
-        avatarBase64 = avatar
+        avatarUrl = avatar
     )
 }
 
@@ -289,7 +289,7 @@ fun ChatItem.toDomain(): ChatListItem {
         lastMessage = message,
         time = "",
         unreadCount = 0,
-        avatarBase64 = null,
+        avatarUrl = null,
         isFromUser = isFromUser
     )
 }

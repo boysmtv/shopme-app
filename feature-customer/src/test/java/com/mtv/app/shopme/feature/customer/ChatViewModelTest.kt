@@ -48,7 +48,7 @@ class ChatViewModelTest {
                             lastMessage = "Pesanan sedang diproses",
                             time = "10:30",
                             unreadCount = 1,
-                            avatarBase64 = "data:image/png;base64,CAFE",
+                            avatarUrl = "https://media.shopme.test/cafes/cafe-1/thumb.jpg",
                             isFromUser = false
                         )
                     )
@@ -64,7 +64,7 @@ class ChatViewModelTest {
                         lastMessage = "Pesanan sedang diproses",
                         time = "10:30",
                         unreadCount = 1,
-                        avatarBase64 = null,
+                        avatarUrl = null,
                         isFromUser = false
                     )
                 )
@@ -88,7 +88,7 @@ class ChatViewModelTest {
 
         assertEquals("conv-1", vm.uiState.value.activeChatId)
         assertEquals("Cafe Kopi Kita", vm.uiState.value.chatName)
-        assertEquals("data:image/png;base64,CAFE", vm.uiState.value.chatAvatarBase64)
+        assertEquals("https://media.shopme.test/cafes/cafe-1/thumb.jpg", vm.uiState.value.chatAvatarUrl)
         verify(exactly = 1) { markReadUseCase.invoke("conv-1", false) }
         verify(exactly = 1) { realtimeGateway.ensureConnected() }
     }

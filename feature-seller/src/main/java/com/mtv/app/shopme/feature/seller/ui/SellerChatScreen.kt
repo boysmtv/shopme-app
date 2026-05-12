@@ -95,7 +95,7 @@ fun SellerChatScreen(
 
             Spacer(Modifier.width(12.dp))
             SmartImage(
-                model = state.chatAvatarBase64,
+                model = state.chatAvatarUrl,
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)

@@ -13,70 +13,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
-import android.util.Base64
-import android.util.LruCache
 import androidx.exifinterface.media.ExifInterface
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.io.File
-import java.io.ByteArrayOutputStream
 import java.io.FileOutputStream
 import kotlin.apply
 import kotlin.io.use
-import kotlin.text.replace
-import kotlin.text.substringAfter
-
-private object Base64BitmapCache {
-    private val cache = LruCache<String, Bitmap>((Runtime.getRuntime().maxMemory() / 1024 / 16).toInt())
-
-    fun get(key: String): Bitmap? = cache.get(key)
-
-    fun put(key: String, bitmap: Bitmap) {
-        cache.put(key, bitmap)
-    }
-}
-
-fun uriToBase64(
-    context: Context,
-    uri: Uri,
-    maxSize: Int = 1280,
-    quality: Int = 82
-): String {
-    val boundsOptions = BitmapFactory.Options().apply {
-        inJustDecodeBounds = true
-    }
-
-    context.contentResolver.openInputStream(uri)?.use {
-        BitmapFactory.decodeStream(it, null, boundsOptions)
-    }
-
-    var sampleSize = 1
-    while (
-        boundsOptions.outWidth / sampleSize > maxSize ||
-        boundsOptions.outHeight / sampleSize > maxSize
-    ) {
-        sampleSize *= 2
-    }
-
-    val bitmapOptions = BitmapFactory.Options().apply {
-        inSampleSize = sampleSize
-    }
-
-    val decodedBitmap = context.contentResolver
-        .openInputStream(uri)
-        ?.use {
-            BitmapFactory.decodeStream(it, null, bitmapOptions)
-        } ?: return EMPTY_STRING
-
-    val fixedBitmap = fixBitmapOrientation(context, uri, decodedBitmap)
-
-    val output = ByteArrayOutputStream()
-    fixedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, output)
-
-    return Base64.encodeToString(
-        output.toByteArray(),
-        Base64.NO_WRAP
-    )
-}
 
 fun uriToCompressedJpegFile(
     context: Context,
@@ -119,25 +60,6 @@ fun uriToCompressedJpegFile(
 
     return tempFile
 }
-
-fun base64ToBitmap(base64: String): Bitmap? {
-    return try {
-        val cleanBase64 = base64
-            .substringAfter("base64,", base64)
-            .replace("\n", EMPTY_STRING)
-
-        Base64BitmapCache.get(cleanBase64)?.let { return it }
-
-        val decoded = Base64.decode(cleanBase64, Base64.DEFAULT)
-        BitmapFactory.decodeByteArray(decoded, 0, decoded.size)?.also {
-            Base64BitmapCache.put(cleanBase64, it)
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        null
-    }
-}
-
 fun fixBitmapOrientation(context: Context, uri: Uri, bitmap: Bitmap): Bitmap {
     val matrix = Matrix()
     context.contentResolver.openInputStream(uri)?.use { inputStream ->

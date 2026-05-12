@@ -268,7 +268,7 @@ fun ListChatItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         ChatAvatar(
-            base64Image = data.avatarBase64,
+            avatarUrl = data.avatarUrl,
             placeholderRes = data.id.hashCode().mod(8).let { if (it < 0) it + 8 else it },
             modifier = Modifier.size(48.dp)
         )
@@ -327,7 +327,7 @@ fun ListChatItem(
 
 @Composable
 fun ChatAvatar(
-    base64Image: String?,
+    avatarUrl: String?,
     placeholderRes: Int,
     modifier: Modifier = Modifier
 ) {
@@ -349,7 +349,7 @@ fun ChatAvatar(
         }
 
         SmartImage(
-            model = base64Image,
+            model = avatarUrl,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
