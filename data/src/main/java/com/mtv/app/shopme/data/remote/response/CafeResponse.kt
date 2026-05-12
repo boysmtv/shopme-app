@@ -15,7 +15,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CafeResponse(
     val id: String,
-    val customerId: String,
     val name: String,
     val phone: String,
     val description: String,
@@ -27,6 +26,5 @@ data class CafeResponse(
     val closeTime: String,
     val image: String,
     val isActive: Boolean,
-    val createdAt: String,
     val address: CafeAddressResponse
 )

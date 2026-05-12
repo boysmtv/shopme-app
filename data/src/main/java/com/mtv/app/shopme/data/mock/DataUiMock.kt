@@ -118,7 +118,6 @@ object DataUiMock {
 
     fun cafe() = Cafe(
         id = "1",
-        customerId = "1",
         name = "Cafe Santuy",
         phone = "08123456789",
         description = "Cafe enak buat nongkrong santai",
@@ -127,7 +126,6 @@ object DataUiMock {
         closeTime = "22:00",
         image = "",
         isActive = true,
-        createdAt = "",
         address = CafeAddress(
             id = "1",
             name = "Bekasi Timur",

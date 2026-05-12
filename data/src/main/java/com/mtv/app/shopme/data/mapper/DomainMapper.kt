@@ -133,7 +133,6 @@ fun OrderItemResponse.toDomain(): OrderItem = OrderItem(
 
 fun CafeResponse.toDomain(): Cafe = Cafe(
     id = id,
-    customerId = customerId,
     name = name,
     phone = phone,
     description = description,
@@ -142,7 +141,6 @@ fun CafeResponse.toDomain(): Cafe = Cafe(
     closeTime = closeTime,
     image = image,
     isActive = isActive,
-    createdAt = createdAt,
     address = address.toDomain()
 )
 
