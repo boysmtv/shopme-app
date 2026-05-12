@@ -7,5 +7,7 @@ fun MediaUploadResponse.toDomain() = UploadedMedia(
     key = key,
     originalUrl = originalUrl,
     mediumUrl = mediumUrl,
-    thumbnailUrl = thumbnailUrl
+    thumbnailUrl = thumbnailUrl,
+    uploadUrl = uploadUrl,
+    uploadMethod = uploadMethod
 )

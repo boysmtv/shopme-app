@@ -7,5 +7,7 @@ data class MediaUploadResponse(
     val key: String,
     val originalUrl: String,
     val mediumUrl: String,
-    val thumbnailUrl: String
+    val thumbnailUrl: String,
+    val uploadUrl: String? = null,
+    val uploadMethod: String? = null
 )

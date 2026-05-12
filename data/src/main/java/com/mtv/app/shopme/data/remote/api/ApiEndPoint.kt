@@ -184,6 +184,12 @@ object ApiEndPoint {
     }
 
     object Media {
+        class PresignUpload(scope: String, contentType: String) : IApiEndPoint {
+            override val path = "$API/$MEDIA/presign-upload?scope=$scope&contentType=$contentType"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Json
+        }
+
         object Upload : IApiEndPoint {
             override val path = "$API/$MEDIA/upload"
             override val method = HttpMethod.Post

@@ -21,7 +21,18 @@ class MediaRepositoryImpl @Inject constructor(
         resultFlow.create {
             val file = prepareUploadFile(localUri)
             try {
-                remote.uploadImage(file, scope).toDomain()
+                val ticket = remote.createUploadTicket(
+                    scope = scope,
+                    contentType = JPEG_CONTENT_TYPE
+                )
+                val uploadUrl = ticket.uploadUrl
+                    ?: throw IllegalStateException("Upload URL is missing")
+                remote.uploadToPresignedUrl(
+                    uploadUrl = uploadUrl,
+                    file = file,
+                    contentType = JPEG_CONTENT_TYPE
+                )
+                ticket.toDomain()
             } finally {
                 file.delete()
             }
@@ -31,5 +42,9 @@ class MediaRepositoryImpl @Inject constructor(
         val uri = Uri.parse(localUri)
         return uriToCompressedJpegFile(context, uri)
             ?: throw IllegalArgumentException("Unable to prepare image upload")
+    }
+
+    private companion object {
+        private const val JPEG_CONTENT_TYPE = "image/jpeg"
     }
 }
