@@ -67,6 +67,7 @@ import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.feature.customer.contract.SearchEvent
@@ -361,7 +362,7 @@ fun SearchItem(
                 )
 
                 Text(
-                    text = "Rp ${food.price.toPlainString()}",
+                    text = food.price.toRupiah(),
                     fontFamily = PoppinsFont,
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp,

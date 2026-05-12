@@ -60,11 +60,11 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardUiState
-import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -623,7 +623,7 @@ private fun parseCurrencyAmount(total: String): Long =
     total.replace(Regex("[^0-9]"), "").toLongOrNull() ?: 0L
 
 private fun formatRupiah(amount: Long): String =
-    "Rp ${NumberFormat.getNumberInstance(Locale.US).format(amount)}"
+    amount.toRupiah()
 
 private fun buildWeeklyOrderCounts(orders: List<SellerOrderItem>): List<Pair<String, Int>> {
     val formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH)
