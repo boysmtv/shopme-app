@@ -13,6 +13,7 @@ import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
 import com.mtv.app.shopme.domain.param.VerifyPinParam
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetCartUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateCartQuantityUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteCartByCafeIdUseCase
@@ -23,6 +24,7 @@ import com.mtv.app.shopme.domain.usecase.GetVerifyPinUseCase
 import com.mtv.app.shopme.feature.customer.contract.CartEffect
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.contract.CartUiState
+import com.mtv.app.shopme.feature.customer.utils.purchaseRequirementsMessage
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
@@ -39,6 +41,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class CartViewModel @Inject constructor(
     private val cartItemUseCase: GetCartUseCase,
+    private val customerUseCase: GetCustomerUseCase,
     private val getSessionTokenUseCase: GetSessionTokenUseCase,
     private val verifyPinUseCase: GetVerifyPinUseCase,
     private val createOrderUseCase: CreateOrderUseCase,
@@ -85,6 +88,12 @@ class CartViewModel @Inject constructor(
     }
 
     private fun getSession() {
+        ensureCustomerReadyForPurchase {
+            performGetSession()
+        }
+    }
+
+    private fun performGetSession() {
         observeDataFlow(
             flow = getSessionTokenUseCase(),
             onLoad = { showLoading() },
@@ -95,6 +104,28 @@ class CartViewModel @Inject constructor(
                 }
             },
             onError = {
+                showError(it)
+            }
+        )
+    }
+
+    private fun ensureCustomerReadyForPurchase(onReady: () -> Unit) {
+        var handled = false
+        observeIndependentDataFlow(
+            flow = customerUseCase(),
+            onSuccess = { customer ->
+                if (handled) return@observeIndependentDataFlow
+                handled = true
+                val message = customer.purchaseRequirementsMessage()
+                if (message == null) {
+                    onReady()
+                } else {
+                    showPurchaseRequirementsDialog(message)
+                }
+            },
+            onError = {
+                if (handled) return@observeIndependentDataFlow
+                handled = true
                 showError(it)
             }
         )
@@ -232,5 +263,21 @@ class CartViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun showPurchaseRequirementsDialog(message: String) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = "Lengkapi profil dulu",
+                    message = message
+                ),
+                onPrimary = {
+                    dismissDialog()
+                    emitEffect(CartEffect.NavigateToEditProfile)
+                }
+            )
+        )
     }
 }

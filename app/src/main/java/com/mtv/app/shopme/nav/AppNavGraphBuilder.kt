@@ -26,6 +26,7 @@ import com.mtv.app.shopme.nav.route.customer.CartRoute
 import com.mtv.app.shopme.nav.route.customer.ChatRoute
 import com.mtv.app.shopme.nav.route.customer.DetailRoute
 import com.mtv.app.shopme.nav.route.customer.EditProfileRoute
+import com.mtv.app.shopme.nav.route.customer.FavoriteRoute
 import com.mtv.app.shopme.nav.route.customer.HomeRoute
 import com.mtv.app.shopme.nav.route.customer.ChatListRoute
 import com.mtv.app.shopme.nav.route.customer.ChatSupportRoute
@@ -159,6 +160,9 @@ fun NavGraphBuilder.profileGraph(nav: NavHostController) {
     }
     composable(CustomerDestinations.ORDER_HISTORY_GRAPH) {
         OrderHistoryRoute(nav)
+    }
+    composable(CustomerDestinations.FAVORITES_GRAPH) {
+        FavoriteRoute(nav)
     }
     composable(CustomerDestinations.SETTINGS_GRAPH) {
         SettingsRoute(nav)

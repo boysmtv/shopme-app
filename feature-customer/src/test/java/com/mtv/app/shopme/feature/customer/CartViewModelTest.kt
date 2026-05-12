@@ -4,6 +4,7 @@ import com.mtv.app.shopme.domain.usecase.CreateOrderUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteCartByCafeIdUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteCartUseCase
 import com.mtv.app.shopme.domain.usecase.GetCartUseCase
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetSessionTokenUseCase
 import com.mtv.app.shopme.domain.usecase.GetVerifyPinUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateCartQuantityUseCase
@@ -27,6 +28,7 @@ class CartViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
     private val cartItemUseCase: GetCartUseCase = mockk(relaxed = true)
+    private val customerUseCase: GetCustomerUseCase = mockk(relaxed = true)
     private val getSessionTokenUseCase: GetSessionTokenUseCase = mockk(relaxed = true)
     private val verifyPinUseCase: GetVerifyPinUseCase = mockk()
     private val createOrderUseCase: CreateOrderUseCase = mockk(relaxed = true)
@@ -43,6 +45,7 @@ class CartViewModelTest {
 
         val vm = CartViewModel(
             cartItemUseCase = cartItemUseCase,
+            customerUseCase = customerUseCase,
             getSessionTokenUseCase = getSessionTokenUseCase,
             verifyPinUseCase = verifyPinUseCase,
             createOrderUseCase = createOrderUseCase,

@@ -33,6 +33,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.CardTravel
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.LocalShipping
@@ -232,6 +233,11 @@ fun ProfileScreen(
                                 title = "Riwayat Belanja",
                                 icon = Icons.Default.History,
                                 onClickMenu = { event(ProfileEvent.ClickOrderHistory) }
+                            )
+                            ProfileMenuItem(
+                                title = "Favorit Saya",
+                                icon = Icons.Default.Favorite,
+                                onClickMenu = { event(ProfileEvent.ClickFavorites) }
                             )
                             ProfileMenuItem(
                                 title = "Pengaturan Akun",

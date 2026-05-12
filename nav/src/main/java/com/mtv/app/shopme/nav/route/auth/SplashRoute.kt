@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.nav.route.auth
 
+import android.app.Activity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,5 +56,6 @@ private fun handleEffect(
     when (effect) {
         SplashEffect.NavigateToHome -> CustomerNavActions.toHome(nav)
         SplashEffect.NavigateToLogin -> CustomerNavActions.toLogin(nav)
+        SplashEffect.ExitApp -> (nav.context as? Activity)?.finishAffinity()
     }
 }

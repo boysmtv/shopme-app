@@ -349,7 +349,12 @@ def verify_runtime(base_url: str, android_root: Path) -> list[str]:
         )
         expect_status(failures, "GET /api/customer after media profile update", updated_profile_status, {200})
         failures.extend(assert_envelope(updated_profile_payload, "GET /api/customer after media profile update"))
-        updated_photo = updated_profile_payload.get("data", {}).get("photo")
+        updated_profile_data = updated_profile_payload.get("data")
+        if not isinstance(updated_profile_data, dict):
+            failures.append("GET /api/customer after media profile update missing data object")
+            updated_photo = None
+        else:
+            updated_photo = updated_profile_data.get("photo")
         if not isinstance(updated_photo, str) or "/api/media/medium?key=" not in updated_photo:
             failures.append(f"updated customer profile photo is not a managed medium media URL: {updated_photo!r}")
 
@@ -491,6 +496,32 @@ def verify_runtime(base_url: str, android_root: Path) -> list[str]:
         failures.append("GET /api/foods first item missing id")
         return failures
 
+    food_detail_status, food_detail_payload = request_json(
+        f"{base_url}/api/foods/{food_id}",
+        method="GET",
+        token=buyer_token,
+    )
+    expect_status(failures, f"GET /api/foods/{food_id}", food_detail_status, {200})
+    failures.extend(assert_envelope(food_detail_payload, f"GET /api/foods/{food_id}"))
+
+    variant_payload = []
+    food_detail_data = food_detail_payload.get("data", {})
+    if isinstance(food_detail_data, dict):
+        variants = food_detail_data.get("variants")
+        if isinstance(variants, list):
+            for variant in variants:
+                if not isinstance(variant, dict):
+                    continue
+                options = variant.get("options")
+                option = options[0] if isinstance(options, list) and options else None
+                variant_id = variant.get("id")
+                option_id = option.get("id") if isinstance(option, dict) else None
+                if isinstance(variant_id, str) and variant_id and isinstance(option_id, str) and option_id:
+                    variant_payload.append({
+                        "variantId": variant_id,
+                        "optionId": option_id,
+                    })
+
     cart_clear_status, cart_clear_payload = request_json(
         f"{base_url}/api/cart/clear",
         method="DELETE",
@@ -505,7 +536,7 @@ def verify_runtime(base_url: str, android_root: Path) -> list[str]:
         token=buyer_token,
         body={
             "foodId": food_id,
-            "variants": None,
+            "variants": variant_payload,
             "quantity": 1,
             "note": "android buyer flow",
         },
@@ -578,8 +609,13 @@ def verify_runtime(base_url: str, android_root: Path) -> list[str]:
     expect_status(failures, "GET /api/order after create", order_list_status, {200})
     failures.extend(assert_envelope(order_list_payload, "GET /api/order after create"))
 
+    order_items = order_list_payload.get("data")
+    if not isinstance(order_items, list):
+        failures.append("GET /api/order after create missing order list data")
+        return failures
+
     order_id = None
-    for item in order_list_payload.get("data", []):
+    for item in order_items:
         if not isinstance(item, dict):
             continue
         candidate_id = item.get("id")

@@ -21,6 +21,7 @@ sealed class ProfileEvent {
 
     object ClickEditProfile : ProfileEvent()
     object ClickOrderHistory : ProfileEvent()
+    object ClickFavorites : ProfileEvent()
     object ClickSettings : ProfileEvent()
     object ClickHelpCenter : ProfileEvent()
     object ClickOrder : ProfileEvent()
@@ -32,6 +33,7 @@ sealed class ProfileEvent {
 sealed class ProfileEffect {
     object NavigateToEditProfile : ProfileEffect()
     object NavigateToOrderHistory : ProfileEffect()
+    object NavigateToFavorites : ProfileEffect()
     object NavigateToSettings : ProfileEffect()
     object NavigateToHelpCenter : ProfileEffect()
     object NavigateToOrder : ProfileEffect()

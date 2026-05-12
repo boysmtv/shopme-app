@@ -45,6 +45,7 @@ class ProfileViewModel @Inject constructor(
             is ProfileEvent.DismissDialog -> dismissDialog()
             is ProfileEvent.ClickEditProfile -> emitEffect(ProfileEffect.NavigateToEditProfile)
             is ProfileEvent.ClickOrderHistory -> emitEffect(ProfileEffect.NavigateToOrderHistory)
+            is ProfileEvent.ClickFavorites -> emitEffect(ProfileEffect.NavigateToFavorites)
             is ProfileEvent.ClickSettings -> emitEffect(ProfileEffect.NavigateToSettings)
             is ProfileEvent.ClickHelpCenter -> emitEffect(ProfileEffect.NavigateToHelpCenter)
             is ProfileEvent.ClickOrder -> emitEffect(ProfileEffect.NavigateToOrder)

@@ -183,12 +183,12 @@ fun SplashScreen(
                 }
 
                 Button(
-                    onClick = { state.blockingState?.let { event(SplashEvent.Load) } },
+                    onClick = { event(SplashEvent.Load) },
                     shape = CircleShape,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AppColor.Green.copy(alpha = 0.8f)
                     ),
-                    enabled = state.blockingState != null,
+                    enabled = state.splash !is LoadState.Loading,
                     modifier = Modifier.size(70.dp)
                 ) {
                     if (state.splash is LoadState.Loading) {
@@ -212,7 +212,13 @@ fun SplashScreen(
         state.blockingState?.let { blockingState ->
             SplashBlockingCard(
                 blockingState = blockingState,
-                onRetry = { event(SplashEvent.Load) }
+                onPrimaryAction = {
+                    when (blockingState) {
+                        is SplashBlockingState.Fatal -> event(SplashEvent.CloseApp)
+                        SplashBlockingState.ForceUpdate -> event(SplashEvent.CloseApp)
+                        is SplashBlockingState.Maintenance -> event(SplashEvent.Load)
+                    }
+                }
             )
         }
     }
@@ -221,15 +227,22 @@ fun SplashScreen(
 @Composable
 private fun SplashBlockingCard(
     blockingState: SplashBlockingState,
-    onRetry: () -> Unit
+    onPrimaryAction: () -> Unit
 ) {
     val title = when (blockingState) {
         is SplashBlockingState.Maintenance -> "Under Maintenance"
         SplashBlockingState.ForceUpdate -> "Update Required"
+        is SplashBlockingState.Fatal -> "Startup Failed"
     }
     val message = when (blockingState) {
         is SplashBlockingState.Maintenance -> blockingState.message ?: "Shopme sedang maintenance. Coba beberapa saat lagi."
         SplashBlockingState.ForceUpdate -> "Versi aplikasi ini sudah tidak didukung. Update aplikasi untuk lanjut."
+        is SplashBlockingState.Fatal -> blockingState.message
+    }
+    val actionLabel = when (blockingState) {
+        is SplashBlockingState.Maintenance -> "Check Again"
+        SplashBlockingState.ForceUpdate -> "Close App"
+        is SplashBlockingState.Fatal -> "Close App"
     }
 
     Box(
@@ -267,12 +280,12 @@ private fun SplashBlockingCard(
                     color = Color.Black.copy(alpha = 0.68f)
                 )
                 Button(
-                    onClick = onRetry,
+                    onClick = onPrimaryAction,
                     colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green),
                     shape = RoundedCornerShape(18.dp)
                 ) {
                     Text(
-                        text = if (blockingState is SplashBlockingState.Maintenance) "Check Again" else "Retry Check",
+                        text = actionLabel,
                         fontFamily = PoppinsFont,
                         fontWeight = FontWeight.SemiBold
                     )

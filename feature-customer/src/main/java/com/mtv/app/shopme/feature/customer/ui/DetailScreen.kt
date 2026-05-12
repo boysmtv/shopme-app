@@ -171,9 +171,7 @@ fun DetailScreen(
                     item { Spacer(Modifier.height(16.dp)) }
 
                     item {
-                        if (!food?.images.isNullOrEmpty()) {
-                            DetailImage(food.images)
-                        }
+                        DetailImage(food?.images.orEmpty())
                     }
 
                     item { Spacer(Modifier.height(16.dp)) }
@@ -366,11 +364,10 @@ fun DetailHeader(
 fun DetailImage(
     images: List<String>
 ) {
-
-    if (images.isEmpty()) return
+    val displayImages = images.ifEmpty { listOf(EMPTY_STRING) }
 
     val pagerState = rememberPagerState(
-        pageCount = { images.size }
+        pageCount = { displayImages.size }
     )
 
     Box(
@@ -385,7 +382,7 @@ fun DetailImage(
         ) { page ->
 
             SmartImage(
-                model = images[page],
+                model = displayImages[page],
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
@@ -403,7 +400,7 @@ fun DetailImage(
             horizontalArrangement = Arrangement.Center
         ) {
 
-            repeat(images.size) { index ->
+            repeat(displayImages.size) { index ->
 
                 val isSelected = pagerState.currentPage == index
 
@@ -533,12 +530,14 @@ fun SimilarItemRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         SmartImage(
-            model = Food.images.first(),
+            model = Food.images.firstOrNull().orEmpty(),
             contentDescription = Food.name,
             modifier = Modifier
                 .size(42.dp)
                 .clip(RoundedCornerShape(4.dp)),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(R.drawable.no_image),
+            error = painterResource(R.drawable.no_image)
         )
 
         Column(
@@ -581,11 +580,14 @@ fun VariantBottomSheetContent(
 
     var quantity by remember { mutableIntStateOf(1) }
     var note by remember { mutableStateOf(EMPTY_STRING) }
+    var validationMessage by remember { mutableStateOf<String?>(null) }
 
     val selectedOptions = remember {
         mutableStateMapOf<String, FoodOption>()
     }
 
+    val hasVariants = food.variants.isNotEmpty()
+    val hasSelectedAllVariants = food.variants.all { selectedOptions.containsKey(it.id) }
     val variantPrice = selectedOptions.values.sumOf { it.price }
     val singlePrice = food.price + variantPrice
     val totalPrice = singlePrice * BigDecimal(quantity)
@@ -603,7 +605,7 @@ fun VariantBottomSheetContent(
         ) {
 
             Text(
-                text = "Pilih Varian",
+                text = if (hasVariants) "Pilih Varian" else "Tambah ke Keranjang",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = PoppinsFont
@@ -639,6 +641,16 @@ fun VariantBottomSheetContent(
             )
 
             Spacer(Modifier.height(16.dp))
+        }
+
+        if (validationMessage != null) {
+            Text(
+                text = validationMessage.orEmpty(),
+                color = Color.Red,
+                fontSize = 13.sp,
+                fontFamily = PoppinsFont
+            )
+            Spacer(Modifier.height(12.dp))
         }
 
         Text(
@@ -712,6 +724,11 @@ fun VariantBottomSheetContent(
 
         Button(
             onClick = {
+                if (hasVariants && !hasSelectedAllVariants) {
+                    validationMessage = "Pilih semua varian produk sebelum melanjutkan."
+                    return@Button
+                }
+                validationMessage = null
                 val variantRequests = selectedOptions.map { (variantId, option) ->
                     CartAddVariantParam(
                         variantId = variantId,

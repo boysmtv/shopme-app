@@ -92,6 +92,10 @@ object CustomerNavActions {
         nav.navigate(CustomerDestinations.ORDER_HISTORY_GRAPH)
     }
 
+    fun toFavorites(nav: NavController) {
+        nav.navigate(CustomerDestinations.FAVORITES_GRAPH)
+    }
+
     fun toSettings(nav: NavController) {
         nav.navigate(CustomerDestinations.SETTINGS_GRAPH)
     }

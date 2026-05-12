@@ -49,5 +49,6 @@ sealed class CartEvent {
 sealed class CartEffect {
     object OpenPinSheet : CartEffect()
     object NavigateToOrder : CartEffect()
+    object NavigateToEditProfile : CartEffect()
     object ShowSuccessDialog : CartEffect()
 }

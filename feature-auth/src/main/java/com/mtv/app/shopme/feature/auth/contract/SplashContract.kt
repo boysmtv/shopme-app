@@ -18,14 +18,17 @@ data class SplashUiState(
 
 sealed class SplashEvent {
     data object Load : SplashEvent()
+    data object CloseApp : SplashEvent()
 }
 
 sealed class SplashBlockingState {
     data class Maintenance(val message: String?) : SplashBlockingState()
     data object ForceUpdate : SplashBlockingState()
+    data class Fatal(val message: String) : SplashBlockingState()
 }
 
 sealed class SplashEffect {
     data object NavigateToHome : SplashEffect()
     data object NavigateToLogin : SplashEffect()
+    data object ExitApp : SplashEffect()
 }
