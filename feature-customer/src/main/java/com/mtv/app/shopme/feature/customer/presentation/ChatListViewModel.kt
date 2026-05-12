@@ -49,8 +49,16 @@ class ChatListViewModel @Inject constructor(
         viewModelScope.launch {
             realtimeGateway.events.collectLatest { event ->
                 when (event.type) {
-                    ShopmeRealtimeEventType.CHAT_MESSAGE,
-                    ShopmeRealtimeEventType.CHAT_READ -> observeChatList()
+                    ShopmeRealtimeEventType.CHAT_MESSAGE -> {
+                        if (!applyMessageDelta(event.conversationId, event.message, event.occurredAt)) {
+                            observeChatList()
+                        }
+                    }
+                    ShopmeRealtimeEventType.CHAT_READ -> {
+                        if (!applyReadDelta(event.conversationId)) {
+                            observeChatList()
+                        }
+                    }
                     else -> Unit
                 }
             }
@@ -101,6 +109,58 @@ class ChatListViewModel @Inject constructor(
             }
         )
     }
+
+    private fun applyMessageDelta(
+        conversationId: String?,
+        message: String?,
+        occurredAt: String?
+    ): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val currentState = _state.value.chatListState as? LoadState.Success ?: return false
+        val current = currentState.data.chatList
+        val existing = current.firstOrNull { it.id == targetId } ?: return false
+        val updated = existing.copy(
+            lastMessage = message.orEmpty().ifBlank { existing.lastMessage },
+            time = occurredAt.toRealtimeChatTime(existing.time)
+        )
+
+        _state.update {
+            it.copy(
+                chatListState = LoadState.Success(
+                    ChatList(
+                        chatList = listOf(updated) + current.filterNot { item -> item.id == targetId }
+                    )
+                )
+            )
+        }
+        return true
+    }
+
+    private fun applyReadDelta(conversationId: String?): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val currentState = _state.value.chatListState as? LoadState.Success ?: return false
+        val current = currentState.data.chatList
+        if (current.none { it.id == targetId }) return false
+
+        _state.update {
+            it.copy(
+                chatListState = LoadState.Success(
+                    ChatList(
+                        chatList = current.map { item ->
+                            if (item.id == targetId) item.copy(unreadCount = 0) else item
+                        }
+                    )
+                )
+            )
+        }
+        return true
+    }
+
+    private fun String?.toRealtimeChatTime(fallback: String): String =
+        this?.substringAfter("T", "")
+            ?.take(5)
+            ?.takeIf { it.length == 5 }
+            ?: fallback
 
     private fun showError(error: UiError) {
         handleSessionError(

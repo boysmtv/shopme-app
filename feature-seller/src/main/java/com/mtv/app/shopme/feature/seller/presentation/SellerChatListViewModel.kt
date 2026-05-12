@@ -48,8 +48,16 @@ class SellerChatListViewModel @Inject constructor(
         viewModelScope.launch {
             realtimeGateway.events.collectLatest { event ->
                 when (event.type) {
-                    ShopmeRealtimeEventType.CHAT_MESSAGE,
-                    ShopmeRealtimeEventType.CHAT_READ -> loadChats()
+                    ShopmeRealtimeEventType.CHAT_MESSAGE -> {
+                        if (!applyMessageDelta(event.conversationId, event.message, event.occurredAt)) {
+                            loadChats()
+                        }
+                    }
+                    ShopmeRealtimeEventType.CHAT_READ -> {
+                        if (!applyReadDelta(event.conversationId)) {
+                            loadChats()
+                        }
+                    }
                     else -> Unit
                 }
             }
@@ -115,6 +123,46 @@ class SellerChatListViewModel @Inject constructor(
             }
         )
     }
+
+    private fun applyMessageDelta(
+        conversationId: String?,
+        message: String?,
+        occurredAt: String?
+    ): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val current = _state.value.chatList
+        val existing = current.firstOrNull { it.id == targetId } ?: return false
+        val updated = existing.copy(
+            lastMessage = message.orEmpty().ifBlank { existing.lastMessage },
+            time = occurredAt.toRealtimeChatTime(existing.time)
+        )
+
+        _state.update {
+            it.copy(chatList = listOf(updated) + current.filterNot { item -> item.id == targetId })
+        }
+        return true
+    }
+
+    private fun applyReadDelta(conversationId: String?): Boolean {
+        val targetId = conversationId?.takeIf { it.isNotBlank() } ?: return false
+        val current = _state.value.chatList
+        if (current.none { it.id == targetId }) return false
+
+        _state.update {
+            it.copy(
+                chatList = current.map { item ->
+                    if (item.id == targetId) item.copy(unreadCount = 0) else item
+                }
+            )
+        }
+        return true
+    }
+
+    private fun String?.toRealtimeChatTime(fallback: String): String =
+        this?.substringAfter("T", "")
+            ?.take(5)
+            ?.takeIf { it.length == 5 }
+            ?: fallback
 
     private fun showError(error: UiError) {
         handleSessionError(

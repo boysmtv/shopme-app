@@ -5,11 +5,13 @@ import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.SellerProfile
+import com.mtv.app.shopme.domain.model.UploadedMedia
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.usecase.CreateFoodUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
+import com.mtv.app.shopme.domain.usecase.UploadMediaUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateFoodUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEvent
@@ -39,6 +41,7 @@ class SellerProductFormViewModelTest {
     private val createFoodUseCase: CreateFoodUseCase = mockk()
     private val updateFoodUseCase: UpdateFoodUseCase = mockk()
     private val deleteFoodUseCase: DeleteFoodUseCase = mockk()
+    private val uploadMediaUseCase: UploadMediaUseCase = mockk(relaxed = true)
 
     @Test
     fun `load edit product should map backend detail to form state`() = runTest {
@@ -85,6 +88,7 @@ class SellerProductFormViewModelTest {
             createFoodUseCase = createFoodUseCase,
             updateFoodUseCase = updateFoodUseCase,
             deleteFoodUseCase = deleteFoodUseCase,
+            uploadMediaUseCase = uploadMediaUseCase,
             savedStateHandle = SavedStateHandle(mapOf("productId" to "food-1"))
         )
 
@@ -114,6 +118,16 @@ class SellerProductFormViewModelTest {
             )
         )
         every { createFoodUseCase.invoke(capture(requestSlot)) } returns flowOf(Resource.Success(Unit))
+        every { uploadMediaUseCase.invoke("content://picked-image", "products") } returns flowOf(
+            Resource.Success(
+                UploadedMedia(
+                    key = "products/uploaded-1/original.jpg",
+                    originalUrl = "http://localhost:8080/api/media/original?key=products/uploaded-1/original.jpg",
+                    mediumUrl = "http://localhost:8080/api/media/medium?key=products/uploaded-1/original.jpg",
+                    thumbnailUrl = "http://localhost:8080/api/media/thumbnail?key=products/uploaded-1/original.jpg"
+                )
+            )
+        )
 
         val vm = SellerProductFormViewModel(
             sessionManager = sessionManager,
@@ -122,6 +136,7 @@ class SellerProductFormViewModelTest {
             createFoodUseCase = createFoodUseCase,
             updateFoodUseCase = updateFoodUseCase,
             deleteFoodUseCase = deleteFoodUseCase,
+            uploadMediaUseCase = uploadMediaUseCase,
             savedStateHandle = SavedStateHandle()
         )
         val effect = async { vm.effect.first() }
@@ -132,11 +147,14 @@ class SellerProductFormViewModelTest {
         vm.onEvent(SellerProductFormEvent.ChangeDescription("Hot coffee"))
         vm.onEvent(SellerProductFormEvent.ChangePrice("25000"))
         vm.onEvent(SellerProductFormEvent.ChangeStock(10))
-        vm.onEvent(SellerProductFormEvent.AddImage("data:image/jpeg;base64,abc123"))
+        vm.onEvent(SellerProductFormEvent.AddImage("content://picked-image"))
         vm.onEvent(SellerProductFormEvent.Save)
         advanceUntilIdle()
 
-        assertEquals(listOf("data:image/jpeg;base64,abc123"), requestSlot.captured.images)
+        assertEquals(
+            listOf("http://localhost:8080/api/media/original?key=products/uploaded-1/original.jpg"),
+            requestSlot.captured.images
+        )
         assertEquals(SellerProductFormEffect.SaveSuccess, effect.await())
     }
 
@@ -149,6 +167,7 @@ class SellerProductFormViewModelTest {
             createFoodUseCase = createFoodUseCase,
             updateFoodUseCase = updateFoodUseCase,
             deleteFoodUseCase = deleteFoodUseCase,
+            uploadMediaUseCase = uploadMediaUseCase,
             savedStateHandle = SavedStateHandle()
         )
         val effect = async { vm.effect.first() }

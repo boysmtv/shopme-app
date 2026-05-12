@@ -105,4 +105,79 @@ class SellerChatListViewModelTest {
         assertTrue(vm.uiState.value.chatList.isEmpty())
         assertEquals(false, vm.uiState.value.isLoading)
     }
+
+    @Test
+    fun `seller realtime message should update existing conversation without refetch`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
+        every { useCase.invoke(true) } returns flowOf(
+            Resource.Success(
+                ChatList(
+                    chatList = listOf(
+                        ChatListItem(
+                            id = "conv-1",
+                            name = "Dedy",
+                            lastMessage = "Pesanan siap",
+                            time = "10:30",
+                            unreadCount = 2,
+                            avatarBase64 = null
+                        )
+                    )
+                )
+            )
+        )
+
+        val vm = SellerChatListViewModel(useCase, clearChatListUseCase, realtimeGateway, sessionManager)
+        vm.onEvent(SellerChatListEvent.Load)
+        advanceUntilIdle()
+
+        realtimeEvents.emit(
+            ShopmeRealtimeEvent(
+                type = com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType.CHAT_MESSAGE,
+                conversationId = "conv-1",
+                message = "Buyer balas",
+                occurredAt = "2026-05-12T18:45:00Z"
+            )
+        )
+        advanceUntilIdle()
+
+        assertEquals("Buyer balas", vm.uiState.value.chatList.first().lastMessage)
+        assertEquals("18:45", vm.uiState.value.chatList.first().time)
+        verify(exactly = 1) { useCase.invoke(true) }
+    }
+
+    @Test
+    fun `seller realtime read should clear unread count locally`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
+        every { useCase.invoke(true) } returns flowOf(
+            Resource.Success(
+                ChatList(
+                    chatList = listOf(
+                        ChatListItem(
+                            id = "conv-1",
+                            name = "Dedy",
+                            lastMessage = "Pesanan siap",
+                            time = "10:30",
+                            unreadCount = 2,
+                            avatarBase64 = null
+                        )
+                    )
+                )
+            )
+        )
+
+        val vm = SellerChatListViewModel(useCase, clearChatListUseCase, realtimeGateway, sessionManager)
+        vm.onEvent(SellerChatListEvent.Load)
+        advanceUntilIdle()
+
+        realtimeEvents.emit(
+            ShopmeRealtimeEvent(
+                type = com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType.CHAT_READ,
+                conversationId = "conv-1"
+            )
+        )
+        advanceUntilIdle()
+
+        assertEquals(0, vm.uiState.value.chatList.first().unreadCount)
+        verify(exactly = 1) { useCase.invoke(true) }
+    }
 }

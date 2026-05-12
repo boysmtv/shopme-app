@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.app.shopme.domain.usecase.ClearNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
@@ -41,7 +42,9 @@ class SellerNotifViewModel @Inject constructor(
         viewModelScope.launch {
             realtimeGateway.events.collectLatest { event ->
                 if (event.type == ShopmeRealtimeEventType.NOTIFICATION_CREATED) {
-                    getNotifications()
+                    if (!applyNotificationDelta(event.title, event.message, event.notificationId, event.occurredAt)) {
+                        getNotifications()
+                    }
                 }
             }
         }
@@ -97,6 +100,42 @@ class SellerNotifViewModel @Inject constructor(
             },
             onError = ::showError
         )
+    }
+
+    private fun applyNotificationDelta(
+        title: String?,
+        message: String?,
+        notificationId: String?,
+        occurredAt: String?
+    ): Boolean {
+        val current = _state.value.notifications
+        if (current.isEmpty()) return false
+
+        val (date, time) = occurredAt.toDateTimeParts()
+        _state.update {
+            it.copy(
+                notifications = listOf(
+                    SellerNotifItem(
+                        title = title.orEmpty().ifBlank { "Notifikasi Baru" },
+                        message = message.orEmpty(),
+                        orderId = notificationId.orEmpty(),
+                        buyerName = title.orEmpty().ifBlank { "Notifikasi Baru" },
+                        date = date,
+                        time = time,
+                        isRead = false
+                    )
+                ) + current,
+                notificationState = ResourceFirebase.Success("")
+            )
+        }
+        return true
+    }
+
+    private fun String?.toDateTimeParts(): Pair<String, String> {
+        val raw = this.orEmpty()
+        val date = raw.substringBefore("T", "").ifBlank { "now" }
+        val time = raw.substringAfter("T", "").take(8).ifBlank { "now" }
+        return date to time
     }
 
     private fun showError(error: UiError) {

@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.usecase.ClearNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetNotificationsUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotifDialog
@@ -46,7 +47,9 @@ class NotifViewModel @Inject constructor(
         viewModelScope.launch {
             realtimeGateway.events.collectLatest { event ->
                 if (event.type == ShopmeRealtimeEventType.NOTIFICATION_CREATED) {
-                    getNotifications()
+                    if (!applyNotificationDelta(event.title, event.message, event.occurredAt)) {
+                        getNotifications()
+                    }
                 }
             }
         }
@@ -94,6 +97,41 @@ class NotifViewModel @Inject constructor(
                 _state.update { it.copy(activeDialog = NotifDialog.Error(error.message)) }
             }
         )
+    }
+
+    private fun applyNotificationDelta(
+        title: String?,
+        message: String?,
+        occurredAt: String?
+    ): Boolean {
+        val current = _state.value.localNotification
+        if (current.isEmpty()) return false
+
+        val (date, time) = occurredAt.toDateTimeParts()
+        _state.update {
+            it.copy(
+                localNotification = listOf(
+                    NotificationItem(
+                        title = title.orEmpty().ifBlank { "Notifikasi Baru" },
+                        message = message.orEmpty(),
+                        photo = "",
+                        signatureName = title.orEmpty().ifBlank { "Notifikasi Baru" },
+                        signatureDate = date,
+                        signatureTime = time,
+                        isRead = false
+                    )
+                ) + current,
+                notificationState = LoadState.Success("")
+            )
+        }
+        return true
+    }
+
+    private fun String?.toDateTimeParts(): Pair<String, String> {
+        val raw = this.orEmpty()
+        val date = raw.substringBefore("T", "").ifBlank { "now" }
+        val time = raw.substringAfter("T", "").take(8).ifBlank { "now" }
+        return date to time
     }
 
     private fun <T> LoadState<T>.transform(): LoadState<String> = when (this) {
