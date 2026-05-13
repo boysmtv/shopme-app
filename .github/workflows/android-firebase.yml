@@ -21,7 +21,8 @@ jobs:
     env:
       GITHUB_ACTOR: ${{ github.actor }}
       GITHUB_TOKEN: ${{ github.token }}
-      GITHUB_PACKAGES_TOKEN: ${{ secrets.GITHUB_PACKAGES_TOKEN }}
+      PACKAGES_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+      PACKAGES_USER: ${{ secrets.PACKAGES_USER }}
 
     steps:
       - name: Checkout

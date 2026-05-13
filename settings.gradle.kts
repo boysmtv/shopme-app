@@ -15,18 +15,18 @@ pluginManagement {
         maven {
             url = uri("https://maven.pkg.github.com/boysmtv/android-mtv-based-uicomponent")
             credentials {
-                username = System.getenv("GITHUB_PACKAGES_USER")
+                username = System.getenv("PACKAGES_USER")
                     ?: System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_PACKAGES_TOKEN")
+                password = System.getenv("PACKAGES_TOKEN")
                     ?: System.getenv("GITHUB_TOKEN")
             }
         }
         maven {
             url = uri("https://maven.pkg.github.com/boysmtv/android-mtv-based-core")
             credentials {
-                username = System.getenv("GITHUB_PACKAGES_USER")
+                username = System.getenv("PACKAGES_USER")
                     ?: System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_PACKAGES_TOKEN")
+                password = System.getenv("PACKAGES_TOKEN")
                     ?: System.getenv("GITHUB_TOKEN")
             }
         }
