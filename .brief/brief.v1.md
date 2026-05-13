@@ -8,8 +8,8 @@ Pastikan aplikasi Android `shopme` benar-benar sinkron dengan backend `shopme` y
 
 Project ini adalah client Android untuk backend:
 
-- Android repo: `/Users/dedywijaya/Work/Google/learn/project/android-mtv-based-app-shopme`
-- Backend repo: `/Users/dedywijaya/Work/Google/learn/project/backend-mtv-shopme`
+- Android repo: `D:\Boys\Android\shopme-app`
+- Backend repo: `D:\Boys\Backend\shopme-backend`
 
 Brief ini fokus pada validasi integrasi Android terhadap backend yang hidup di Docker, bukan sekadar validasi UI lokal atau preview Compose.
 
@@ -148,7 +148,7 @@ Flow berikut harus valid terhadap backend Docker:
 
 Android harus kompatibel dengan demo data backend berikut:
 
-- script backend: `/Users/dedywijaya/Work/Google/learn/project/backend-mtv-shopme/seed-demo-data.sh`
+- script backend: `D:\Boys\Backend\shopme-backend\seed-demo-data.sh`
 - buyer demo: `buyer.demo@shopme.local / Demo123!`
 - seller demo: `seller.demo@shopme.local / Demo123!`
 

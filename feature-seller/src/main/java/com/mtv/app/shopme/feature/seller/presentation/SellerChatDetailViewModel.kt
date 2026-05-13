@@ -95,7 +95,7 @@ class SellerChatDetailViewModel @Inject constructor(
     }
 
     private fun observeChatMetadata() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getChatListUseCase(asSeller = true),
             onState = { state ->
                 val items = (state as? LoadState.Success)
@@ -124,7 +124,7 @@ class SellerChatDetailViewModel @Inject constructor(
     }
 
     private fun observeChat(chatId: String? = _state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null }) {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = getChatMessageUseCase(chatId, asSeller = true),
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
@@ -164,7 +164,7 @@ class SellerChatDetailViewModel @Inject constructor(
         val chatId = _state.value.activeChatId
         if (chatId.isBlank()) return
 
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = sendChatMessageUseCase(chatId, message, asSeller = true),
             onState = { state ->
                 _state.update { it.copy(isSending = state is LoadState.Loading) }
@@ -179,7 +179,7 @@ class SellerChatDetailViewModel @Inject constructor(
     }
 
     private fun readAll(chatId: String) {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = chatMessageMarkAsReadUseCase(chatId, asSeller = true),
             onError = ::showError
         )

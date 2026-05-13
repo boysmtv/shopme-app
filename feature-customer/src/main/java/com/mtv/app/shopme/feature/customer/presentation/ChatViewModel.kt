@@ -85,7 +85,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun observeChatMetadata() {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = chatListUseCase(),
             onState = { state ->
                 val items = (state as? com.mtv.based.core.network.utils.LoadState.Success)
@@ -113,7 +113,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun observeChat(chatId: String? = _state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null }) {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = chatMessageUseCase(chatId),
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
@@ -140,7 +140,7 @@ class ChatViewModel @Inject constructor(
     private fun sendMessage(event: ChatEvent.SendMessage) {
         val activeChatId = _state.value.activeChatId.ifBlank { event.id }
         if (activeChatId.isBlank()) return
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = chatSendMessageUseCase(activeChatId, event.message),
             onState = { state ->
                 _state.update {
@@ -156,7 +156,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun readAll(event: ChatEvent.ReadAllMessage) {
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = chatMessageMarkAsReadUseCase(event.id),
             onState = { state ->
                 _state.update {
@@ -170,7 +170,7 @@ class ChatViewModel @Inject constructor(
     private fun markAsReadIfNeeded(chatId: String) {
         if (chatId.isBlank() || lastReadChatId == chatId) return
         lastReadChatId = chatId
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = chatMessageMarkAsReadUseCase(chatId),
             onError = { showError(it) }
         )

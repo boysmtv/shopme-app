@@ -234,7 +234,13 @@ Known test locations:
 - Contract verifier: `scripts/verify_backend_contract.py`.
 - Integration gate: `verify-backend-integration.sh`.
 
-Latest Windows runtime/build status after this memory refresh: not rerun. Record build/test/smoke evidence here after running it.
+Latest Windows runtime/build status:
+
+- 2026-05-14: `.\gradlew.bat testDebugUnitTest` ran on Windows with Android Studio JBR. Result: failed. 34 tests completed, 1 failed in `:feature-customer:testDebugUnitTest`.
+- Failing test: `com.mtv.app.shopme.feature.customer.ChatViewModelTest.load should infer active chat and mark it as read`.
+- Failure detail: expected active conversation id `conv-1`, actual empty string. Report path: `feature-customer/build/reports/tests/testDebugUnitTest/index.html`.
+- 2026-05-14: Fixed buyer and seller chat detail state collection by using `observeIndependentDataFlow` for flows whose `onState` expects `LoadState`. Focused `:feature-customer:testDebugUnitTest --tests com.mtv.app.shopme.feature.customer.ChatViewModelTest` passed.
+- 2026-05-14: Full Android `.\gradlew.bat testDebugUnitTest` passed on Windows with Android Studio JBR.
 
 ## CI/CD Memory
 
@@ -256,6 +262,6 @@ Latest Windows runtime/build status after this memory refresh: not rerun. Record
 
 ## Open Gaps
 
-- Need rerun Android tests/build on Windows.
+- Need run Android assemble/build gate after unit-test-only changes if release/debug APK verification is required.
 - Need rerun backend Docker smoke and Android contract verifier on Windows.
 - Need inspect mappers (`DomainMapper`, `RequestMapper`, `ResponseMapper`, `EntityMapper`) before any DTO-changing work.
