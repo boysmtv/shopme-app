@@ -1,0 +1,50 @@
+default_platform(:android)
+
+require "fileutils"
+require "tmpdir"
+
+def required_env!(name)
+  value = ENV[name]
+  UI.user_error!("Missing required environment variable: #{name}") if value.to_s.strip.empty?
+  value
+end
+
+def firebase_service_credentials_file!
+  existing_file = ENV["FIREBASE_SERVICE_ACCOUNT_FILE"]
+  return existing_file if existing_file.to_s.strip.length.positive?
+
+  json = required_env!("FIREBASE_SERVICE_ACCOUNT_JSON")
+  output_dir = File.join(Dir.tmpdir, "shopme-fastlane-firebase")
+  FileUtils.mkdir_p(output_dir)
+  output_file = File.join(output_dir, "firebase-service-account.json")
+  File.write(output_file, json)
+  output_file
+end
+
+platform :android do
+  desc "Build release APK and upload it to Firebase App Distribution"
+  lane :firebase do |options|
+    app_id = required_env!("FIREBASE_APP_ID")
+    service_credentials_file = firebase_service_credentials_file!
+    groups = options[:groups] || ENV["FIREBASE_APP_DISTRIBUTION_GROUPS"] || "internal-testers"
+    release_notes = options[:notes] || ENV["FIREBASE_RELEASE_NOTES"] || "Shopme Android Fastlane release"
+
+    gradle(
+      task: ":app:assembleRelease"
+    )
+
+    firebase_app_distribution(
+      app: app_id,
+      service_credentials_file: service_credentials_file,
+      groups: groups,
+      release_notes: release_notes,
+      android_artifact_type: "APK",
+      android_artifact_path: "app/build/outputs/apk/release/app-release.apk"
+    )
+  end
+
+  desc "Alias for firebase deployment"
+  lane :deploy do |options|
+    firebase(options)
+  end
+end
