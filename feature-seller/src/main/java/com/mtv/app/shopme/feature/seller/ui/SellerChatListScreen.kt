@@ -204,7 +204,7 @@ fun SellerListChatItem(
     ) {
         ChatAvatar(
             modifier = Modifier.size(48.dp),
-            base64Image = data.avatarBase64,
+            avatarUrl = data.avatarUrl,
             placeholderRes = data.id.toIntOrNull() ?: 0,
         )
         Spacer(Modifier.width(12.dp))
@@ -256,7 +256,7 @@ fun SellerListChatItem(
 @Composable
 fun ChatAvatar(
     modifier: Modifier = Modifier,
-    base64Image: String?,
+    avatarUrl: String?,
     placeholderRes: Int = 0
 ) {
     Box(
@@ -279,7 +279,7 @@ fun ChatAvatar(
         )
 
         SmartImage(
-            model = base64Image,
+            model = avatarUrl,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,

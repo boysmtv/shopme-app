@@ -50,6 +50,7 @@ class SplashViewModel @Inject constructor(
     override fun onEvent(event: SplashEvent) {
         when (event) {
             SplashEvent.Load -> doSplash()
+            SplashEvent.CloseApp -> emitEffect(SplashEffect.ExitApp)
         }
     }
 
@@ -112,16 +113,14 @@ class SplashViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
+        _state.update {
+            it.copy(
+                splash = LoadState.Error(error),
+                blockingState = SplashBlockingState.Fatal(
+                    message = error.message.ifBlank { ErrorMessages.GENERIC_ERROR }
+                )
             )
-        )
+        }
     }
 
 }

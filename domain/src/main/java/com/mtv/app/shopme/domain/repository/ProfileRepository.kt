@@ -11,6 +11,7 @@ package com.mtv.app.shopme.domain.repository
 import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.NotificationPreferences
+import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.model.Village
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
@@ -43,6 +44,8 @@ interface ProfileRepository {
     fun setDefaultAddress(param: AddressDefaultParam): Flow<Resource<Unit>>
 
     fun getFavoriteFoodIds(): Flow<Resource<List<String>>>
+
+    fun getFavoriteFoods(): Flow<Resource<List<SearchFood>>>
 
     fun addFavoriteFood(foodId: String): Flow<Resource<Unit>>
 

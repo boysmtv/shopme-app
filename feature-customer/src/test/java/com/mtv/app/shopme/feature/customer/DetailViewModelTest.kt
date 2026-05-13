@@ -7,6 +7,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.CreateFoodToCartUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodSimilarUseCase
@@ -33,6 +34,7 @@ class DetailViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
     private val ensureChatConversationUseCase: EnsureChatConversationUseCase = mockk()
+    private val customerUseCase: GetCustomerUseCase = mockk(relaxed = true)
     private val foodDetailUseCase: GetFoodDetailUseCase = mockk()
     private val foodSimilarUseCase: GetFoodSimilarUseCase = mockk()
     private val foodAddToCartUseCase: CreateFoodToCartUseCase = mockk()
@@ -70,6 +72,7 @@ class DetailViewModelTest {
 
         val vm = DetailViewModel(
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            customerUseCase = customerUseCase,
             foodDetailUseCase = foodDetailUseCase,
             foodSimilarUseCase = foodSimilarUseCase,
             foodAddToCartUseCase = foodAddToCartUseCase,
@@ -95,6 +98,7 @@ class DetailViewModelTest {
 
         val vm = DetailViewModel(
             ensureChatConversationUseCase = ensureChatConversationUseCase,
+            customerUseCase = customerUseCase,
             foodDetailUseCase = foodDetailUseCase,
             foodSimilarUseCase = foodSimilarUseCase,
             foodAddToCartUseCase = foodAddToCartUseCase,

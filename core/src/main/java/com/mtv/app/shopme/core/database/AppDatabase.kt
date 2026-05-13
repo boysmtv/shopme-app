@@ -20,7 +20,7 @@ import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 
 @Database(
     entities = [CustomerEntity::class, FoodEntity::class, ChatListCacheEntity::class, AppNotificationCacheEntity::class, PayloadCacheEntity::class, PendingMutationEntity::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

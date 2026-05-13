@@ -15,7 +15,7 @@ data class SellerChatDetailUiState(
     val currentMessage: String = "",
     val activeChatId: String = "",
     val chatName: String = "",
-    val chatAvatarBase64: String? = null
+    val chatAvatarUrl: String? = null
 )
 
 sealed class SellerChatDetailEvent {

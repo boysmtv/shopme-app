@@ -17,6 +17,11 @@ class NotificationRemoteDataSource @Inject constructor(
             endpoint = ApiEndPoint.Notifications.Get
         ).requireData()
 
+    suspend fun getUnreadCount() =
+        request<ApiResponse<Long>>(
+            endpoint = ApiEndPoint.Notifications.UnreadCount
+        ).requireData().toInt()
+
     suspend fun clearNotifications() =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Notifications.ReadAll

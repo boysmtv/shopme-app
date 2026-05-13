@@ -58,7 +58,6 @@ class SellerEditStoreViewModelTest {
             Resource.Success(
                 Cafe(
                     id = "cafe-1",
-                    customerId = "seller-1",
                     name = "Shopme Cafe",
                     phone = "0812",
                     description = "Best shop",
@@ -67,7 +66,6 @@ class SellerEditStoreViewModelTest {
                     closeTime = "22:00",
                     image = "content://image",
                     isActive = true,
-                    createdAt = "2026-05-10",
                     address = CafeAddress("addr-1", "Kemang", "A", "12", "01", "02")
                 )
             )

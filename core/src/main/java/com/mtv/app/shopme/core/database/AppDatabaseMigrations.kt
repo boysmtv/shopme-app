@@ -6,16 +6,21 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 object AppDatabaseMigrations {
 
     val ALL = arrayOf(
-        migrationTo7(1),
-        migrationTo7(2),
-        migrationTo7(3),
-        migrationTo7(4),
-        migrationTo7(5),
-        migrationTo7(6)
+        migrationTo8(1),
+        migrationTo8(2),
+        migrationTo8(3),
+        migrationTo8(4),
+        migrationTo8(5),
+        migrationTo8(6),
+        migration7To8()
     )
 
-    private fun migrationTo7(fromVersion: Int) = object : Migration(fromVersion, 7) {
+    private fun migrationTo8(fromVersion: Int) = object : Migration(fromVersion, 8) {
         override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `chat_list_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `app_notification_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `payload_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `pending_mutation`")
             db.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS `chat_list_cache` (
@@ -26,7 +31,7 @@ object AppDatabaseMigrations {
                     `lastMessage` TEXT NOT NULL,
                     `time` TEXT NOT NULL,
                     `unreadCount` INTEGER NOT NULL,
-                    `avatarBase64` TEXT,
+                    `avatarUrl` TEXT,
                     `updatedAt` INTEGER NOT NULL,
                     PRIMARY KEY(`cacheKey`)
                 )
@@ -67,6 +72,28 @@ object AppDatabaseMigrations {
                     `updatedAt` INTEGER NOT NULL,
                     `attemptCount` INTEGER NOT NULL,
                     `lastError` TEXT
+                )
+                """.trimIndent()
+            )
+        }
+    }
+
+    private fun migration7To8() = object : Migration(7, 8) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("DROP TABLE IF EXISTS `chat_list_cache`")
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `chat_list_cache` (
+                    `cacheKey` TEXT NOT NULL,
+                    `scope` TEXT NOT NULL,
+                    `conversationId` TEXT NOT NULL,
+                    `name` TEXT NOT NULL,
+                    `lastMessage` TEXT NOT NULL,
+                    `time` TEXT NOT NULL,
+                    `unreadCount` INTEGER NOT NULL,
+                    `avatarUrl` TEXT,
+                    `updatedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`cacheKey`)
                 )
                 """.trimIndent()
             )

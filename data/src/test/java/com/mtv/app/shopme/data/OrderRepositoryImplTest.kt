@@ -6,11 +6,10 @@ import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.OrderRemoteDataSource
-import com.mtv.app.shopme.data.remote.response.OrderItemResponse
-import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.data.remote.response.OrderSummaryItemResponse
+import com.mtv.app.shopme.data.remote.response.OrderSummaryResponse
 import com.mtv.app.shopme.data.repository.OrderRepositoryImpl
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
-import com.mtv.app.shopme.domain.model.OrderItemStatus
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
@@ -22,6 +21,7 @@ import java.math.BigDecimal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.decodeFromString
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -41,13 +41,13 @@ class OrderRepositoryImplTest {
 
     @Test
     fun `getOrders should emit cached orders first then refresh from backend`() = runTest {
-        val cachedResponse = listOf(orderResponse(id = "order-1", status = OrderStatus.ORDERED))
-        val remoteResponse = listOf(orderResponse(id = "order-2", status = OrderStatus.DELIVERING))
+        val cachedResponse = listOf(orderSummaryResponse(id = "order-1", status = OrderStatus.ORDERED))
+        val remoteResponse = listOf(orderSummaryResponse(id = "order-2", status = OrderStatus.DELIVERING))
 
         coEvery { homeDao.getPayloadOnce("orders:list:customer") } returns PayloadCacheEntity(
             cacheKey = "orders:list:customer",
             payload = PayloadCacheStore.json.encodeToString(
-                ListSerializer(OrderResponse.serializer()),
+                ListSerializer(OrderSummaryResponse.serializer()),
                 cachedResponse
             ),
             updatedAt = 1L
@@ -69,10 +69,41 @@ class OrderRepositoryImplTest {
         coVerify { homeDao.insertPayload(match { it.cacheKey == "orders:list:customer" }) }
     }
 
-    private fun orderResponse(id: String, status: OrderStatus) = OrderResponse(
+    @Test
+    fun `order summary cache should decode legacy payload without itemCount`() {
+        val legacyPayload = """
+            [
+              {
+                "id": "order-1",
+                "cafeId": "cafe-1",
+                "cafeName": "Kopi Senja",
+                "deliveryAddress": "Jl. Kenanga",
+                "totalPrice": "42000",
+                "status": "ORDERED",
+                "paymentMethod": "TRANSFER",
+                "paymentStatus": "UNPAID",
+                "createdAt": "2026-05-12T10:00:00",
+                "items": [
+                  {
+                    "foodName": "Latte",
+                    "quantity": 1
+                  }
+                ]
+              }
+            ]
+        """.trimIndent()
+
+        val decoded = PayloadCacheStore.json.decodeFromString(
+            ListSerializer(OrderSummaryResponse.serializer()),
+            legacyPayload
+        )
+
+        assertEquals(0, decoded.first().itemCount)
+        assertEquals("order-1", decoded.first().id)
+    }
+
+    private fun orderSummaryResponse(id: String, status: OrderStatus) = OrderSummaryResponse(
         id = id,
-        customerId = "customer-1",
-        customerName = "Raka",
         cafeId = "cafe-1",
         cafeName = "Kopi Senja",
         deliveryAddress = "Jl. Kenanga",
@@ -81,15 +112,11 @@ class OrderRepositoryImplTest {
         paymentMethod = PaymentMethod.TRANSFER,
         paymentStatus = PaymentStatus.UNPAID,
         createdAt = "2026-05-12T10:00:00",
+        itemCount = 3,
         items = listOf(
-            OrderItemResponse(
-                id = "item-1",
-                foodId = "food-1",
+            OrderSummaryItemResponse(
                 foodName = "Latte",
-                quantity = 1,
-                price = BigDecimal(42000),
-                notes = "",
-                status = OrderItemStatus.AVAILABLE
+                quantity = 1
             )
         )
     )

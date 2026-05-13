@@ -23,6 +23,7 @@ object CustomerDestinations {
     const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
     const val ORDER_DETAIL_GRAPH_WITH_ID = "ORDER_DETAIL_GRAPH/{orderId}"
     const val ORDER_HISTORY_GRAPH = "ORDER_HISTORY_GRAPH"
+    const val FAVORITES_GRAPH = "FAVORITES_GRAPH"
     const val SETTINGS_GRAPH = "SETTINGS_GRAPH"
     const val SUPPORT_GRAPH = "SUPPORT_GRAPH"
     const val HELP_GRAPH = "HELP_GRAPH"

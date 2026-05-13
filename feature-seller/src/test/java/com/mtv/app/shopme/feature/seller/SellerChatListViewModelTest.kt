@@ -43,7 +43,7 @@ class SellerChatListViewModelTest {
                             lastMessage = "Pesanan siap",
                             time = "10:30",
                             unreadCount = 2,
-                            avatarBase64 = null
+                            avatarUrl = null
                         )
                     )
                 )
@@ -73,7 +73,7 @@ class SellerChatListViewModelTest {
                             lastMessage = "Pesanan siap",
                             time = "10:30",
                             unreadCount = 2,
-                            avatarBase64 = null
+                            avatarUrl = null
                         )
                     )
                 )
@@ -119,7 +119,7 @@ class SellerChatListViewModelTest {
                             lastMessage = "Pesanan siap",
                             time = "10:30",
                             unreadCount = 2,
-                            avatarBase64 = null
+                            avatarUrl = null
                         )
                     )
                 )
@@ -158,7 +158,7 @@ class SellerChatListViewModelTest {
                             lastMessage = "Pesanan siap",
                             time = "10:30",
                             unreadCount = 2,
-                            avatarBase64 = null
+                            avatarUrl = null
                         )
                     )
                 )

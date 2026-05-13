@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.seller.presentation
 
 import androidx.lifecycle.SavedStateHandle
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.usecase.GetSellerOrderDetailUseCase
@@ -74,12 +75,12 @@ class SellerOrderDetailViewModel @Inject constructor(
         customerName = customerName.ifBlank { customerId },
         customerAddress = deliveryAddress.ifBlank { cafeName },
         paymentMethod = paymentMethod.name,
-        total = "Rp ${totalPrice.toInt()}",
+        total = totalPrice.toRupiah(),
         items = items.map {
             SellerOrderLineItem(
                 title = it.foodName.ifBlank { it.foodId },
                 qty = it.quantity,
-                price = "Rp ${it.price.toInt()}",
+                price = it.price.toRupiah(),
                 notes = it.notes.orEmpty()
             )
         }

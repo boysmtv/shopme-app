@@ -126,7 +126,7 @@ fun ChatListItem.toEntity(scope: String): ChatListCacheEntity = ChatListCacheEnt
     lastMessage = lastMessage,
     time = time,
     unreadCount = unreadCount,
-    avatarBase64 = avatarBase64,
+    avatarUrl = avatarUrl,
     updatedAt = System.currentTimeMillis()
 )
 
@@ -136,7 +136,7 @@ fun ChatListCacheEntity.toDomain(): ChatListItem = ChatListItem(
     lastMessage = lastMessage,
     time = time,
     unreadCount = unreadCount,
-    avatarBase64 = avatarBase64
+    avatarUrl = avatarUrl
 )
 
 fun NotificationItem.toEntity(scope: String, notificationId: String): AppNotificationCacheEntity = AppNotificationCacheEntity(

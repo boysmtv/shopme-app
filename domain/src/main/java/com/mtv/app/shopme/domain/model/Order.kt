@@ -17,6 +17,7 @@ data class Order(
     val cafeId: String = EMPTY_STRING,
     val cafeName: String = EMPTY_STRING,
     val items: List<OrderItem> = emptyList(),
+    val itemCount: Int = 0,
     val totalPrice: Double = 0.0,
     val status: OrderStatus = OrderStatus.ORDERED,
     val paymentStatus: PaymentStatus = PaymentStatus.UNPAID,

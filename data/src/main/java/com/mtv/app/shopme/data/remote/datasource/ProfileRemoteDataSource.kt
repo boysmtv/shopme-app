@@ -15,6 +15,7 @@ import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
 import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.NotificationPreferencesResponse
 import com.mtv.app.shopme.data.remote.response.VillageResponse
 import com.mtv.app.shopme.data.utils.requireData
@@ -90,6 +91,11 @@ class ProfileRemoteDataSource @Inject constructor(
     suspend fun getFavoriteFoodIds() =
         request<ApiResponse<List<String>>>(
             endpoint = ApiEndPoint.Customer.Favorites
+        ).requireData()
+
+    suspend fun getFavoriteFoods() =
+        request<ApiResponse<List<FoodResponse>>>(
+            endpoint = ApiEndPoint.Customer.FavoriteItems
         ).requireData()
 
     suspend fun addFavoriteFood(foodId: String) =

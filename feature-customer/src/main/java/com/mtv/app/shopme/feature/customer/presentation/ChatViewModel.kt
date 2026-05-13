@@ -103,7 +103,7 @@ class ChatViewModel @Inject constructor(
                     it.copy(
                         activeChatId = activeChat?.id.orEmpty(),
                         chatName = activeChat?.name.orEmpty(),
-                        chatAvatarBase64 = activeChat?.avatarBase64
+                        chatAvatarUrl = activeChat?.avatarUrl
                     )
                 }
                 observeChat(_state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null })

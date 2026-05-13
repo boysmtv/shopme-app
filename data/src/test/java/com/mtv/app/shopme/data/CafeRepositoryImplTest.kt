@@ -63,7 +63,6 @@ class CafeRepositoryImplTest {
 
     private fun cafeResponse(id: String, name: String) = CafeResponse(
         id = id,
-        customerId = "seller-1",
         name = name,
         phone = "08123",
         description = "Cafe desc",
@@ -72,7 +71,6 @@ class CafeRepositoryImplTest {
         closeTime = "22:00",
         image = "https://cdn.local/$id.jpg",
         isActive = true,
-        createdAt = "2026-05-12T10:00:00",
         address = CafeAddressResponse(
             id = "addr-1",
             name = "Melati",

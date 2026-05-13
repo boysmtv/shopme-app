@@ -6,6 +6,7 @@ import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.remote.datasource.OrderRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.data.remote.response.OrderSummaryResponse
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.repository.OrderRepository
 import com.mtv.based.core.network.utils.Resource
@@ -28,7 +29,7 @@ class OrderRepositoryImpl @Inject constructor(
             val cached = PayloadCacheStore.read(
                 homeDao = homeDao,
                 cacheKey = CUSTOMER_ORDERS_CACHE_KEY,
-                serializer = ListSerializer(OrderResponse.serializer())
+                serializer = ListSerializer(OrderSummaryResponse.serializer())
             ).orEmpty()
             if (cached.isNotEmpty()) {
                 emit(Resource.Success(cached.map { it.toDomain() }))
@@ -39,7 +40,7 @@ class OrderRepositoryImpl @Inject constructor(
                 PayloadCacheStore.write(
                     homeDao = homeDao,
                     cacheKey = CUSTOMER_ORDERS_CACHE_KEY,
-                    serializer = ListSerializer(OrderResponse.serializer()),
+                    serializer = ListSerializer(OrderSummaryResponse.serializer()),
                     value = remoteOrders
                 )
                 emit(Resource.Success(remoteOrders.map { it.toDomain() }))

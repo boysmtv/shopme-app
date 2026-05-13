@@ -29,11 +29,11 @@ class SellerProfileViewModelTest {
             Resource.Success(
                 SellerProfile(
                     sellerName = "Seller",
-                    sellerPhoto = "data:image/jpeg;base64,seller",
+                    sellerPhoto = "https://media.shopme.test/users/seller-1/medium.jpg",
                     email = "seller@mail.com",
                     phone = "0812",
                     storeName = "Shopme Cafe",
-                    storePhoto = "data:image/jpeg;base64,store",
+                    storePhoto = "https://media.shopme.test/cafes/cafe-1/medium.jpg",
                     storeAddress = "Kemang",
                     isOnline = true,
                     hasCafe = true
@@ -44,11 +44,11 @@ class SellerProfileViewModelTest {
             Resource.Success(
                 SellerProfile(
                     sellerName = "Seller",
-                    sellerPhoto = "data:image/jpeg;base64,seller",
+                    sellerPhoto = "https://media.shopme.test/users/seller-1/medium.jpg",
                     email = "seller@mail.com",
                     phone = "0812",
                     storeName = "Shopme Cafe",
-                    storePhoto = "data:image/jpeg;base64,store",
+                    storePhoto = "https://media.shopme.test/cafes/cafe-1/medium.jpg",
                     storeAddress = "Kemang",
                     isOnline = false,
                     hasCafe = true
@@ -68,6 +68,6 @@ class SellerProfileViewModelTest {
         advanceUntilIdle()
 
         assertEquals(false, vm.uiState.value.isOnline)
-        assertEquals("data:image/jpeg;base64,store", vm.uiState.value.storePhoto)
+        assertEquals("https://media.shopme.test/cafes/cafe-1/medium.jpg", vm.uiState.value.storePhoto)
     }
 }

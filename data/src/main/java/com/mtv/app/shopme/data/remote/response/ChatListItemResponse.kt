@@ -9,5 +9,5 @@ data class ChatListItemResponse(
     val lastMessage: String,
     val time: String,
     val unreadCount: Int = 0,
-    val avatarBase64: String? = null
+    val avatar: String? = null
 )

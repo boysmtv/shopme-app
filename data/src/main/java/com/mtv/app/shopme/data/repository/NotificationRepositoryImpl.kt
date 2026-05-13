@@ -67,6 +67,11 @@ class NotificationRepositoryImpl @Inject constructor(
             }
         }.flowOn(Dispatchers.IO)
 
+    override fun getUnreadCount() =
+        resultFlow.create {
+            remote.getUnreadCount()
+        }
+
     override fun clearNotifications() =
         resultFlow.create {
             remote.clearNotifications()

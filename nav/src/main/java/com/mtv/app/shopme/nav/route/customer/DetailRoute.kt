@@ -52,6 +52,7 @@ private fun handleDetailEffect(nav: NavController, effect: DetailEffect) {
         is DetailEffect.NavigateBack -> nav.popBackStack()
         is DetailEffect.NavigateToChat -> CustomerNavActions.toChat(nav, effect.chatId)
         is DetailEffect.NavigateToCart -> CustomerNavActions.toCart(nav)
+        is DetailEffect.NavigateToEditProfile -> CustomerNavActions.toEditProfile(nav)
         is DetailEffect.NavigateToCafe -> CustomerNavActions.toCafe(nav, effect.cafeId)
         is DetailEffect.NavigateToDetail -> CustomerNavActions.toDetail(nav, effect.foodId)
     }

@@ -118,7 +118,6 @@ object DataUiMock {
 
     fun cafe() = Cafe(
         id = "1",
-        customerId = "1",
         name = "Cafe Santuy",
         phone = "08123456789",
         description = "Cafe enak buat nongkrong santai",
@@ -127,7 +126,6 @@ object DataUiMock {
         closeTime = "22:00",
         image = "",
         isActive = true,
-        createdAt = "",
         address = CafeAddress(
             id = "1",
             name = "Bekasi Timur",
@@ -280,7 +278,7 @@ object DataUiMock {
                     lastMessage = "Pesanan kamu sedang diproses ya 🍔",
                     time = "10:30",
                     unreadCount = 2,
-                    avatarBase64 = null
+                    avatarUrl = null
                 ),
                 ChatListItem(
                     id = "1",
@@ -288,7 +286,7 @@ object DataUiMock {
                     lastMessage = "Siap dikirim 🚀",
                     time = "09:15",
                     unreadCount = 0,
-                    avatarBase64 = null
+                    avatarUrl = null
                 ),
                 ChatListItem(
                     id = "2",
@@ -296,7 +294,7 @@ object DataUiMock {
                     lastMessage = "Tambah topping lagi kak?",
                     time = "Kemarin",
                     unreadCount = 1,
-                    avatarBase64 = null
+                    avatarUrl = null
                 ),
                 ChatListItem(
                     id = "3",
@@ -304,7 +302,7 @@ object DataUiMock {
                     lastMessage = "Promo hari ini buy 1 get 1 ☕",
                     time = "08:45",
                     unreadCount = 0,
-                    avatarBase64 = null
+                    avatarUrl = null
                 ),
                 ChatListItem(
                     id = "4",
@@ -312,7 +310,7 @@ object DataUiMock {
                     lastMessage = "Pesanan sudah selesai 🙌",
                     time = "Kemarin",
                     unreadCount = 3,
-                    avatarBase64 = null
+                    avatarUrl = null
                 ),
                 ChatListItem(
                     id = "5",
@@ -320,7 +318,7 @@ object DataUiMock {
                     lastMessage = "Siap diambil ya 🔥",
                     time = "07:20",
                     unreadCount = 0,
-                    avatarBase64 = null
+                    avatarUrl = null
                 ),
                 ChatListItem(
                     id = "6",
@@ -328,7 +326,7 @@ object DataUiMock {
                     lastMessage = "Extra sambal ya?",
                     time = "Senin",
                     unreadCount = 5,
-                    avatarBase64 = null
+                    avatarUrl = null
                 )
             )
         )
@@ -342,7 +340,7 @@ object DataUiMock {
                 lastMessage = "Halo kak 👋",
                 time = "10:00",
                 unreadCount = 0,
-                avatarBase64 = null,
+                avatarUrl = null,
                 isFromUser = false
             ),
             ChatListItem(
@@ -351,7 +349,7 @@ object DataUiMock {
                 lastMessage = "Pesanan kamu sedang diproses ya 🍔",
                 time = "10:01",
                 unreadCount = 0,
-                avatarBase64 = null,
+                avatarUrl = null,
                 isFromUser = false
             ),
             ChatListItem(
@@ -360,7 +358,7 @@ object DataUiMock {
                 lastMessage = "Oke kak, ditunggu ya 🙌",
                 time = "10:02",
                 unreadCount = 0,
-                avatarBase64 = null,
+                avatarUrl = null,
                 isFromUser = true
             ),
             ChatListItem(
@@ -369,7 +367,7 @@ object DataUiMock {
                 lastMessage = "Siap kak 👍",
                 time = "10:03",
                 unreadCount = 0,
-                avatarBase64 = null,
+                avatarUrl = null,
                 isFromUser = false
             ),
             ChatListItem(
@@ -378,7 +376,7 @@ object DataUiMock {
                 lastMessage = "Pesanan sudah selesai kak?",
                 time = "10:04",
                 unreadCount = 0,
-                avatarBase64 = null,
+                avatarUrl = null,
                 isFromUser = true
             ),
             ChatListItem(
@@ -387,7 +385,7 @@ object DataUiMock {
                 lastMessage = "Sudah siap diambil ya 🎉",
                 time = "10:05",
                 unreadCount = 0,
-                avatarBase64 = null,
+                avatarUrl = null,
                 isFromUser = false
             ),
             ChatListItem(
@@ -396,7 +394,7 @@ object DataUiMock {
                 lastMessage = "Otw 🚀",
                 time = "10:06",
                 unreadCount = 0,
-                avatarBase64 = null,
+                avatarUrl = null,
                 isFromUser = true
             )
         )

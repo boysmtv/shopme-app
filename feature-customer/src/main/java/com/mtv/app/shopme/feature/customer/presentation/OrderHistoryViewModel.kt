@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.customer.presentation
 
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
@@ -70,13 +71,13 @@ class OrderHistoryViewModel @Inject constructor(
         storeName = order.cafeName.ifBlank { order.cafeId },
         title = order.items.firstOrNull()?.foodName?.ifBlank { order.items.firstOrNull()?.foodId.orEmpty() }.orEmpty().ifBlank { "Order ${order.id}" },
         date = order.createdAt.substringBefore("T").ifBlank { "-" },
-        price = "Rp ${order.totalPrice.toInt()}",
+        price = order.totalPrice.toRupiah(),
         status = when (order.status) {
             OrderStatus.COMPLETED -> "SELESAI"
             OrderStatus.CANCELLED -> "BATAL"
             else -> "DIPROSES"
         },
-        totalItems = order.items.sumOf { it.quantity },
+        totalItems = order.itemCount.takeIf { it > 0 } ?: order.items.sumOf { it.quantity },
         paymentMethod = order.paymentMethod.name,
         deliveryType = "Delivery"
     )

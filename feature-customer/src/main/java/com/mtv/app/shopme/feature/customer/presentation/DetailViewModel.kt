@@ -15,6 +15,7 @@ import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.CreateFoodToCartUseCase
+import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodDetailUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodSimilarUseCase
@@ -22,6 +23,7 @@ import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.DetailEffect
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.contract.DetailUiState
+import com.mtv.app.shopme.feature.customer.utils.purchaseRequirementsMessage
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
@@ -38,6 +40,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
+    private val customerUseCase: GetCustomerUseCase,
     private val foodDetailUseCase: GetFoodDetailUseCase,
     private val foodSimilarUseCase: GetFoodSimilarUseCase,
     private val foodAddToCartUseCase: CreateFoodToCartUseCase,
@@ -112,6 +115,12 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun doAddToCart(event: DetailEvent.AddToCart) {
+        ensureCustomerReadyForPurchase {
+            performAddToCart(event)
+        }
+    }
+
+    private fun performAddToCart(event: DetailEvent.AddToCart) {
         val param = CartAddParam(
             foodId = event.foodId,
             quantity = event.quantity,
@@ -132,6 +141,28 @@ class DetailViewModel @Inject constructor(
                 if (state is LoadState.Success) {
                     emitEffect(DetailEffect.NavigateToCart)
                 }
+            }
+        )
+    }
+
+    private fun ensureCustomerReadyForPurchase(onReady: () -> Unit) {
+        var handled = false
+        observeIndependentDataFlow(
+            flow = customerUseCase(),
+            onSuccess = { customer ->
+                if (handled) return@observeIndependentDataFlow
+                handled = true
+                val message = customer.purchaseRequirementsMessage()
+                if (message == null) {
+                    onReady()
+                } else {
+                    showPurchaseRequirementsDialog(message)
+                }
+            },
+            onError = {
+                if (handled) return@observeIndependentDataFlow
+                handled = true
+                showError(it)
             }
         )
     }
@@ -166,5 +197,21 @@ class DetailViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun showPurchaseRequirementsDialog(message: String) {
+        setDialog(
+            UiDialog.Center(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = "Lengkapi profil dulu",
+                    message = message
+                ),
+                onPrimary = {
+                    dismissDialog()
+                    emitEffect(DetailEffect.NavigateToEditProfile)
+                }
+            )
+        )
     }
 }

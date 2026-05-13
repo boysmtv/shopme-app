@@ -12,5 +12,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class VerifyPinResponse(
-    var trxId: String,
+    val verified: Boolean,
 )

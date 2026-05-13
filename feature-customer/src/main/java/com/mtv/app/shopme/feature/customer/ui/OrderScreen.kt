@@ -56,6 +56,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderItem
 import com.mtv.app.shopme.domain.model.OrderStatus
@@ -352,7 +353,7 @@ fun ModernOrderCard(
                         fontSize = 15.sp
                     )
                     Text(
-                        "${order.items.sumOf { it.quantity }} item",
+                        "${order.itemCount.takeIf { it > 0 } ?: order.items.sumOf { it.quantity }} item",
                         fontSize = 11.sp,
                         color = AppColor.Gray
                     )
@@ -385,7 +386,7 @@ fun ModernOrderCard(
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
-                    "Rp ${order.totalPrice.toInt()}",
+                    order.totalPrice.toRupiah(),
                     fontFamily = PoppinsFont,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,

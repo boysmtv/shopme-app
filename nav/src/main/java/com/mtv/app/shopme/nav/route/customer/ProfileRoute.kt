@@ -55,6 +55,7 @@ private fun handleProfileEffect(
     when (effect) {
         ProfileEffect.NavigateToEditProfile -> CustomerNavActions.toEditProfile(nav)
         ProfileEffect.NavigateToOrderHistory -> CustomerNavActions.toOrderHistory(nav)
+        ProfileEffect.NavigateToFavorites -> CustomerNavActions.toFavorites(nav)
         ProfileEffect.NavigateToSettings -> CustomerNavActions.toSettings(nav)
         ProfileEffect.NavigateToHelpCenter -> CustomerNavActions.toHelpCenter(nav)
         ProfileEffect.NavigateToOrder -> CustomerNavActions.toOrder(nav)

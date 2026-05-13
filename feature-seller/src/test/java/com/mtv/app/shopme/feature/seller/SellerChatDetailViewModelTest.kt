@@ -49,7 +49,7 @@ class SellerChatDetailViewModelTest {
                             lastMessage = "Pesanan siap dikirim",
                             time = "10:31",
                             unreadCount = 0,
-                            avatarBase64 = "data:image/png;base64,CUSTOMER",
+                            avatarUrl = "https://media.shopme.test/users/cust-1/thumb.jpg",
                             isFromUser = false
                         )
                     )
@@ -65,7 +65,7 @@ class SellerChatDetailViewModelTest {
                         lastMessage = "Pesanan siap dikirim",
                         time = "",
                         unreadCount = 0,
-                        avatarBase64 = null,
+                        avatarUrl = null,
                         isFromUser = false
                     )
                 )
@@ -88,7 +88,7 @@ class SellerChatDetailViewModelTest {
 
         assertEquals("conv-1", vm.uiState.value.activeChatId)
         assertEquals("Raka Pratama", vm.uiState.value.chatName)
-        assertEquals("data:image/png;base64,CUSTOMER", vm.uiState.value.chatAvatarBase64)
+        assertEquals("https://media.shopme.test/users/cust-1/thumb.jpg", vm.uiState.value.chatAvatarUrl)
         assertEquals(1, vm.uiState.value.messages.size)
         assertTrue(vm.uiState.value.messages.first().isFromSeller)
         verify(exactly = 1) { realtimeGateway.ensureConnected() }
@@ -107,7 +107,7 @@ class SellerChatDetailViewModelTest {
                             lastMessage = "Halo seller",
                             time = "10:31",
                             unreadCount = 1,
-                            avatarBase64 = null,
+                            avatarUrl = null,
                             isFromUser = true
                         )
                     )
@@ -123,7 +123,7 @@ class SellerChatDetailViewModelTest {
                         lastMessage = "Halo seller",
                         time = "",
                         unreadCount = 0,
-                        avatarBase64 = null,
+                        avatarUrl = null,
                         isFromUser = true
                     )
                 )

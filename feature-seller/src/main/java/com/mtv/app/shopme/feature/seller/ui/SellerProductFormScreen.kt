@@ -76,6 +76,7 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.SmartImage
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.domain.model.VariantGroup
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEvent
@@ -796,8 +797,8 @@ fun VariantGroupCard(
 }
 
 fun formatRupiah(value: String): String {
-    if (value.isEmpty()) return "Rp 0"
-    return "Rp %,d".format(value.toLong()).replace(',', '.')
+    if (value.isEmpty()) return 0.toRupiah()
+    return value.toLongOrNull()?.toRupiah() ?: 0.toRupiah()
 }
 
 @Composable

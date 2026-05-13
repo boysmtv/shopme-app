@@ -40,6 +40,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
+import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
@@ -107,7 +108,7 @@ fun OrderDetailScreen(
                     )
                     OrderDetailSection(
                         title = "Total",
-                        value = "Rp ${order.totalPrice.toInt()}"
+                        value = order.totalPrice.toRupiah()
                     )
 
                     if (order.canConfirmTransfer()) {
@@ -311,7 +312,7 @@ private fun OrderDetailItems(order: Order) {
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "${item.quantity}x • Rp ${item.price.toInt()}",
+                        text = "${item.quantity}x • ${item.price.toRupiah()}",
                         color = AppColor.Gray,
                         fontSize = 13.sp
                     )

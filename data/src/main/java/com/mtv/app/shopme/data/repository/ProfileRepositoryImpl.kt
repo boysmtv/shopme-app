@@ -13,6 +13,7 @@ import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toRequest
+import com.mtv.app.shopme.data.mapper.toSearchDomain
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.remote.datasource.ProfileRemoteDataSource
@@ -122,6 +123,11 @@ class ProfileRepositoryImpl @Inject constructor(
     override fun getFavoriteFoodIds() =
         resultFlow.create {
             remote.getFavoriteFoodIds()
+        }
+
+    override fun getFavoriteFoods() =
+        resultFlow.create {
+            remote.getFavoriteFoods().map { it.toSearchDomain() }
         }
 
     override fun addFavoriteFood(foodId: String) =

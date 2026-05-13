@@ -12,9 +12,9 @@ import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
-import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
+import com.mtv.app.shopme.domain.usecase.GetUnreadNotificationCountUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEffect.*
@@ -39,8 +39,8 @@ import kotlinx.coroutines.launch
 class SellerDashboardViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val getSellerOrdersUseCase: GetSellerOrdersUseCase,
-    private val getSellerNotificationsUseCase: GetSellerNotificationsUseCase,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
+    private val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase,
     private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase,
     private val realtimeGateway: ShopmeRealtimeGateway
 ) : BaseEventViewModel<SellerDashboardEvent, SellerDashboardEffect>() {
@@ -113,12 +113,11 @@ class SellerDashboardViewModel @Inject constructor(
 
     private fun observeNotifications() {
         observeIndependentDataFlow(
-            flow = getSellerNotificationsUseCase(),
+            flow = getUnreadNotificationCountUseCase(),
             onState = { result ->
                 _state.update {
-                    val notifications = (result as? LoadState.Success)?.data.orEmpty()
                     it.copy(
-                        notificationCount = notifications.count { item -> !item.isRead }
+                        notificationCount = (result as? LoadState.Success)?.data ?: it.notificationCount
                     )
                 }
             },

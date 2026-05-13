@@ -12,7 +12,6 @@ import java.math.BigDecimal
 
 data class Cafe(
     val id: String,
-    val customerId: String,
     val name: String,
     val phone: String,
     val description: String,
@@ -21,6 +20,5 @@ data class Cafe(
     val closeTime: String,
     val image: String,
     val isActive: Boolean,
-    val createdAt: String,
     val address: CafeAddress
 )

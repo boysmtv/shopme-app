@@ -43,7 +43,6 @@ class CafeViewModelTest {
             Resource.Success(
                 Cafe(
                     id = "cafe-1",
-                    customerId = "seller-1",
                     name = "Kopi Kita",
                     phone = "+62 812-3456-7890",
                     description = "Cafe enak",
@@ -52,7 +51,6 @@ class CafeViewModelTest {
                     closeTime = "22:00",
                     image = "",
                     isActive = true,
-                    createdAt = "2026-05-11T08:00:00Z",
                     address = CafeAddress(
                         id = "addr-1",
                         name = "Kemang",
