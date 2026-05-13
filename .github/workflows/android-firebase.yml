@@ -12,29 +12,19 @@ on:
 
 permissions:
   contents: read
+  packages: read
 
 jobs:
   android:
     name: Build, Test, and Distribute
     runs-on: ubuntu-latest
+    env:
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ github.token }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Checkout MTV core library
-        uses: actions/checkout@v4
-        with:
-          repository: boysmtv/android-mtv-based-core
-          path: .ci/android-mtv-based-core
-          token: ${{ secrets.SHOPME_CI_GITHUB_TOKEN || github.token }}
-
-      - name: Checkout MTV UI component library
-        uses: actions/checkout@v4
-        with:
-          repository: boysmtv/android-mtv-based-uicomponent
-          path: .ci/android-mtv-based-uicomponent
-          token: ${{ secrets.SHOPME_CI_GITHUB_TOKEN || github.token }}
 
       - name: Set up JDK
         uses: actions/setup-java@v5
@@ -48,18 +38,6 @@ jobs:
 
       - name: Make Gradle executable
         run: chmod +x ./gradlew
-
-      - name: Publish MTV UI component library to Maven local
-        working-directory: .ci/android-mtv-based-uicomponent
-        run: |
-          chmod +x ./gradlew
-          ./gradlew publishAllModulesToMavenLocal
-
-      - name: Publish MTV core library to Maven local
-        working-directory: .ci/android-mtv-based-core
-        run: |
-          chmod +x ./gradlew
-          ./gradlew publishAllModulesToMavenLocal
 
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest

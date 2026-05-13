@@ -12,6 +12,24 @@ pluginManagement {
         google()
 
         mavenLocal()
+        maven {
+            url = uri("https://maven.pkg.github.com/boysmtv/android-mtv-based-uicomponent")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                    ?: System.getenv("GITHUB_PACKAGES_USER")
+                password = System.getenv("GITHUB_TOKEN")
+                    ?: System.getenv("GITHUB_PACKAGES_TOKEN")
+            }
+        }
+        maven {
+            url = uri("https://maven.pkg.github.com/boysmtv/android-mtv-based-core")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                    ?: System.getenv("GITHUB_PACKAGES_USER")
+                password = System.getenv("GITHUB_TOKEN")
+                    ?: System.getenv("GITHUB_PACKAGES_TOKEN")
+            }
+        }
         //maven("https://jitpack.io")
     }
 }
