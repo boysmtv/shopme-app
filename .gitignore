@@ -16,6 +16,3 @@
 local.properties
 __pycache__/
 *.pyc
-
-# ai-agent generated archives
-.ai-agent/snapshots/
