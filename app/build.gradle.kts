@@ -1,3 +1,5 @@
+import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
     id("com.google.gms.google-services")
+    alias(libs.plugins.firebase.appdistribution)
 }
 
 android {
@@ -24,10 +27,43 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    val ciKeystorePath = System.getenv("SHOPME_KEYSTORE_PATH")
+    val ciKeystorePassword = System.getenv("SHOPME_KEYSTORE_PASSWORD")
+    val ciKeyAlias = System.getenv("SHOPME_KEY_ALIAS")
+    val ciKeyPassword = System.getenv("SHOPME_KEY_PASSWORD")
+    val hasCiSigning = listOf(ciKeystorePath, ciKeystorePassword, ciKeyAlias, ciKeyPassword)
+        .all { !it.isNullOrBlank() }
+
+    signingConfigs {
+        if (hasCiSigning) {
+            create("ciRelease") {
+                storeFile = file(ciKeystorePath!!)
+                storePassword = ciKeystorePassword
+                keyAlias = ciKeyAlias
+                keyPassword = ciKeyPassword
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            if (hasCiSigning) {
+                signingConfig = signingConfigs.getByName("ciRelease")
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+            firebaseAppDistribution {
+                artifactType = "APK"
+                System.getenv("FIREBASE_APP_ID")
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { appId = it }
+                System.getenv("FIREBASE_SERVICE_ACCOUNT_FILE")
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { serviceCredentialsFile = it }
+                groups = System.getenv("FIREBASE_APP_DISTRIBUTION_GROUPS") ?: "internal-testers"
+                releaseNotes = System.getenv("FIREBASE_RELEASE_NOTES") ?: "Shopme Android CI release"
+            }
         }
     }
     compileOptions {

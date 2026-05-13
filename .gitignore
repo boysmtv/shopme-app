@@ -16,3 +16,8 @@
 local.properties
 __pycache__/
 *.pyc
+*.jks
+*.keystore
+keystore/
+firebase-service-account*.json
+service-account*.json
