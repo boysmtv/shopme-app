@@ -1,0 +1,52 @@
+{
+  "flows": [
+    {
+      "name": "login",
+      "entrypoints": [
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/LoginRequest.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/LoginRequest.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/response/LoginResponse.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/response/LoginResponse.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/Login.kt"
+      ],
+      "domain_functions": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/AuthRepository.kt:login",
+        "feature-auth/src/main/java/com/mtv/app/shopme/feature/auth/ui/LoginScreen.kt:LoginScreen",
+        "feature-auth/src/main/java/com/mtv/app/shopme/feature/auth/ui/LoginScreen.kt:LoginPreview",
+        "nav/src/main/java/com/mtv/app/shopme/nav/customer/CustomerNavActions.kt:toLogin",
+        "nav/src/main/java/com/mtv/app/shopme/nav/route/auth/LoginRoute.kt:LoginRoute"
+      ],
+      "tests": [],
+      "docs": [
+        ".ai-agent/memory/api_contracts.json",
+        ".ai-agent/memory/architecture_map.json",
+        ".ai-agent/memory/change_log.json",
+        ".ai-agent/memory/engineering_guidance.json",
+        ".ai-agent/memory/feature_catalog.json",
+        ".ai-agent/memory/flow_map.json"
+      ],
+      "notes": []
+    },
+    {
+      "name": "start",
+      "entrypoints": [
+        "data/src/main/java/com/mtv/app/shopme/data/sync/OfflineMutationSyncManager.kt"
+      ],
+      "domain_functions": [
+        "data/src/main/java/com/mtv/app/shopme/data/sync/OfflineMutationSyncManager.kt:start"
+      ],
+      "tests": [],
+      "docs": [
+        ".ai-agent/memory/api_contracts.json",
+        ".ai-agent/memory/architecture_map.json",
+        ".ai-agent/memory/change_log.json",
+        ".ai-agent/memory/engineering_guidance.json",
+        ".ai-agent/memory/feature_catalog.json",
+        ".ai-agent/memory/flow_map.json"
+      ],
+      "notes": []
+    }
+  ],
+  "updated_at": "2026-05-14T04:22:32.899226+00:00"
+}

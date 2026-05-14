@@ -1,0 +1,40 @@
+{
+  "changes": [
+    {
+      "run_id": "bootstrap::shopme-app",
+      "final_status": "registered",
+      "summary": "Bootstrapped AI_AGENT_CORE memory from existing project registration (shopme_runtime_gate_green_2026_05_14).",
+      "changed_artifacts": [
+        "app/src/androidTest/java/com/mtv/app/shopme/ExampleInstrumentedTest.kt",
+        "app/src/main/java/com/mtv/app/shopme/app/BaseApplication.kt",
+        "app/src/main/java/com/mtv/app/shopme/config/AppAdditionalHeaderProvider.kt",
+        "app/src/main/java/com/mtv/app/shopme/config/AppFirebaseConfigProvider.kt",
+        "app/src/main/java/com/mtv/app/shopme/config/AppInfoProviderImpl.kt",
+        "app/src/main/java/com/mtv/app/shopme/config/AppNetworkConfigProvider.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/AppAdditionalHeaderModule.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/AppFirebaseConfigModule.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/AppInfoModule.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/AppNetworkConfigModule.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/FirebaseInitModule.kt",
+        "app/src/main/java/com/mtv/app/shopme/MainActivity.kt",
+        "app/src/main/java/com/mtv/app/shopme/nav/AppNavGraph.kt",
+        "app/src/main/java/com/mtv/app/shopme/nav/AppNavGraphBuilder.kt",
+        "app/src/main/java/com/mtv/app/shopme/nav/AppNavigation.kt",
+        "app/src/main/java/com/mtv/app/shopme/preview/AllPreview.kt",
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "common/src/androidTest/java/com/mtv/app/shopme/common/ExampleInstrumentedTest.kt",
+        "common/src/main/java/com/mtv/app/shopme/common/AppColor.kt",
+        "common/src/main/java/com/mtv/app/shopme/common/base/BaseRoute.kt",
+        "common/src/main/java/com/mtv/app/shopme/common/base/BaseScreen.kt",
+        "common/src/main/java/com/mtv/app/shopme/common/base/BaseSimpleDropdownField.kt",
+        "common/src/main/java/com/mtv/app/shopme/common/base/BaseSimpleFormField.kt",
+        "common/src/main/java/com/mtv/app/shopme/common/config/AppInfoProvider.kt"
+      ],
+      "features": [
+        "login",
+        "start"
+      ],
+      "recorded_at": "2026-05-14T04:22:33.014179+00:00"
+    }
+  ]
+}
