@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Logout
@@ -37,6 +38,9 @@ import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -69,6 +73,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerStoreUiState
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SellerStoreScreen(
     state: SellerStoreUiState,
@@ -83,6 +88,10 @@ fun SellerStoreScreen(
         }
         return
     }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(SellerStoreEvent.Load) }
+    )
 
     val menuItems = listOf(
         ProfileMenuItem(
@@ -108,20 +117,16 @@ fun SellerStoreScreen(
             subtitle = "Update your password",
             icon = Icons.Default.Lock,
             onClick = { event(SellerStoreEvent.ClickChangePassword) }
-        ),
-        ProfileMenuItem(
-            title = "Back to Customer",
-            subtitle = "Back to customer for buy something",
-            icon = Icons.Default.Lock,
-            onClick = { event(SellerStoreEvent.ClickBackToCustomer) }
         )
     )
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(Color.White)
     ) {
+    Column(modifier = Modifier.fillMaxSize()) {
         Spacer(Modifier.height(16.dp))
         Row(
             modifier = Modifier
@@ -162,6 +167,12 @@ fun SellerStoreScreen(
                 )
             }
         }
+    }
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 

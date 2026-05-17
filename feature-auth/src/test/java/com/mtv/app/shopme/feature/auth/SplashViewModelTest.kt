@@ -1,6 +1,7 @@
 package com.mtv.app.shopme.feature.auth
 
 import com.mtv.app.shopme.common.config.AppInfoProvider
+import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
 import com.mtv.app.shopme.domain.model.AppConfig
 import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.app.shopme.domain.param.SplashParam
@@ -107,9 +108,35 @@ class SplashViewModelTest {
         assertEquals(SplashEffect.NavigateToHome, effect.await())
     }
 
-    private fun viewModel(splash: Splash): SplashViewModel {
+    @Test
+    fun `load should navigate seller dashboard when saved role is seller`() = runTest {
+        val vm = viewModel(
+            splash = Splash(
+                isAuthenticated = true,
+                versionStatus = "OK",
+                user = null,
+                config = AppConfig(
+                    minVersion = 1,
+                    latestVersion = 1,
+                    forceUpdate = false,
+                    maintenanceMode = false,
+                    maintenanceMessage = null
+                )
+            ),
+            savedRole = "SELLER"
+        )
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(SplashEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals(SplashEffect.NavigateToSellerDashboard, effect.await())
+    }
+
+    private fun viewModel(splash: Splash, savedRole: String = ""): SplashViewModel {
         every { installationIdProvider.getInstallationId() } returns "install-1"
         every { securePrefs.getString(any()) } returns ""
+        every { securePrefs.getString(USER_ROLE) } returns savedRole
         every { appInfoProvider.versionName } returns "1.0.0"
         every { appInfoProvider.versionCode } returns 1
         every { deviceInfoProvider.getAllDeviceInfo() } returns DeviceInfo(

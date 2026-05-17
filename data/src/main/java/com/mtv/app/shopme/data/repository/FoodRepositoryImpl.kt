@@ -19,6 +19,8 @@ import com.mtv.app.shopme.data.remote.datasource.FoodRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.PagedData
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
@@ -63,6 +65,33 @@ class FoodRepositoryImpl @Inject constructor(
             remote.getFoodsByCafe(id).map { it.toDomain() }
         }
 
+    override fun getFoodsByCafe(
+        id: String,
+        page: Int,
+        size: Int,
+        query: String,
+        category: FoodCategory?,
+        status: FoodStatus?,
+        active: Boolean?
+    ): Flow<Resource<PagedData<com.mtv.app.shopme.domain.model.Food>>> =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val response = remote.getFoodsByCafe(id, page, size, query, category, status, active)
+                emit(
+                    Resource.Success(
+                        PagedData(
+                            content = response.content.map { it.toDomain() },
+                            page = response.page,
+                            last = response.last
+                        )
+                    )
+                )
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
+
     override fun getFoodDetail(id: String) =
         flow {
             emit(Resource.Loading)
@@ -100,7 +129,7 @@ class FoodRepositoryImpl @Inject constructor(
     override fun searchFoods(request: SearchParam): Flow<Resource<PagedData<SearchFood>>> =
         flow {
             emit(Resource.Loading)
-            val useHomeCache = request.name.isBlank() && request.page == 0
+            val useHomeCache = request.name.isBlank() && request.page == 0 && request.sort != "random"
             val cached = if (useHomeCache) {
                 homeDao.getFoodsOnce().map { it.toSearchDomain() }
             } else {

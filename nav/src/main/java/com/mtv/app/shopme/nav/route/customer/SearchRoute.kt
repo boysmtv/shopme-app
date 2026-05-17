@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.nav.route.customer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +29,15 @@ fun SearchRoute(nav: NavController) {
 
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+    val refreshTick by nav.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("refreshTick", 0L)
+        ?.collectAsStateWithLifecycle()
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableLongStateOf(0L) }
+
+    LaunchedEffect(refreshTick) {
+        if (refreshTick > 0L) vm.onEvent(SearchEvent.Load)
+    }
 
     BaseRoute(
         viewModel = vm,
@@ -53,6 +63,9 @@ private fun handleSearchEffect(
 ) {
     when (effect) {
         is SearchEffect.NavigateBack -> nav.popBackStack()
+        SearchEffect.NavigateToFavorites -> {
+            CustomerNavActions.toFavorites(nav)
+        }
         is SearchEffect.NavigateToDetail -> {
             CustomerNavActions.toDetail(nav, effect.id)
         }

@@ -25,10 +25,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -73,12 +77,24 @@ enum class OrderFilter {
     COMPLETED
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OrderScreen(
     state: OrderUiState,
-    event: (OrderEvent) -> Unit
+    event: (OrderEvent) -> Unit,
+    initialFilter: String = ""
 ) {
-    var selectedFilter by remember { mutableStateOf(OrderFilter.SEMUA) }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isLoading,
+        onRefresh = { event(OrderEvent.Reload) }
+    )
+
+    var selectedFilter by remember(initialFilter) {
+        mutableStateOf(
+            OrderFilter.entries.firstOrNull { it.name == initialFilter.uppercase() }
+                ?: OrderFilter.SEMUA
+        )
+    }
 
     val filteredOrders = state.orders.filter {
         when (selectedFilter) {
@@ -90,9 +106,10 @@ fun OrderScreen(
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(
                 Brush.verticalGradient(
                     listOf(AppColor.Green, AppColor.GreenSoft)
@@ -100,50 +117,58 @@ fun OrderScreen(
             )
             .statusBarsPadding()
     ) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-        ModernOrderTopBar(
-            onBack = { event(OrderEvent.ClickBack) },
-            onChat = { event(OrderEvent.ClickChatList) }
-        )
-        Card(
-            modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft)
-        ) {
+            ModernOrderTopBar(
+                onBack = { event(OrderEvent.ClickBack) },
+                onChat = { event(OrderEvent.ClickChatList) }
+            )
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft)
+            ) {
 
-            Column {
+                Column {
 
-                ModernOrderFilter(
-                    selected = selectedFilter,
-                    onChange = { selectedFilter = it }
-                )
+                    ModernOrderFilter(
+                        selected = selectedFilter,
+                        onChange = { selectedFilter = it }
+                    )
 
-                if (state.isLoading && state.orders.isEmpty()) {
-                    OrderListShimmer()
-                } else if (filteredOrders.isEmpty()) {
-                    ModernEmptyOrder()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    ) {
-                        items(filteredOrders) { order ->
-                            ModernOrderCard(
-                                order = order,
-                                onClick = {
-                                    event(OrderEvent.ClickOrder(order.id))
-                                },
-                                onConfirmTransferClick = { orderId ->
-                                    event(OrderEvent.ConfirmTransfer(orderId))
-                                },
-                                onChatClick = {
-                                    event(OrderEvent.ClickChat(order.cafeId))
-                                }
-                            )
+                    if (state.isLoading && state.orders.isEmpty()) {
+                        OrderListShimmer()
+                    } else if (filteredOrders.isEmpty()) {
+                        ModernEmptyOrder()
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        ) {
+                            items(filteredOrders) { order ->
+                                ModernOrderCard(
+                                    order = order,
+                                    onClick = {
+                                        event(OrderEvent.ClickOrder(order.id))
+                                    },
+                                    onConfirmTransferClick = { orderId ->
+                                        event(OrderEvent.ConfirmTransfer(orderId))
+                                    },
+                                    onChatClick = {
+                                        event(OrderEvent.ClickChat(order.id))
+                                    }
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
+        PullRefreshIndicator(
+            refreshing = state.isLoading,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -325,7 +350,7 @@ fun ModernOrderCard(
         Column(Modifier.padding(16.dp)) {
 
             Text(
-                "Cafe ID: ${order.cafeId}",
+                order.cafeName.ifBlank { "Toko" },
                 fontFamily = PoppinsFont,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
@@ -347,7 +372,7 @@ fun ModernOrderCard(
 
                 Column(Modifier.weight(1f)) {
                     Text(
-                        "Order • ${order.id}",
+                        order.items.firstOrNull()?.foodName?.ifBlank { "Pesanan" } ?: "Pesanan",
                         fontFamily = PoppinsFont,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 15.sp
@@ -359,7 +384,7 @@ fun ModernOrderCard(
                     )
                 }
 
-                ModernStatusBadge(order.status.value, statusColor)
+                ModernStatusBadge(order.status.displayLabel(), statusColor)
             }
 
             Spacer(Modifier.height(10.dp))
@@ -368,10 +393,23 @@ fun ModernOrderCard(
 
             order.items.take(2).forEach {
                 Text(
-                    "• Produk ID ${it.foodId} x${it.quantity}",
+                    "${it.foodName.ifBlank { "Produk" }} x${it.quantity}",
                     fontSize = 12.sp
                 )
             }
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                "Pemesan: ${order.customerName.ifBlank { "Customer" }}",
+                fontSize = 12.sp,
+                color = AppColor.Gray
+            )
+            Text(
+                "Alamat: ${order.deliveryAddress.ifBlank { "-" }}",
+                fontSize = 12.sp,
+                color = AppColor.Gray
+            )
 
             Spacer(Modifier.height(12.dp))
 
@@ -394,10 +432,23 @@ fun ModernOrderCard(
                 )
             }
 
+            Spacer(Modifier.height(8.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Status Pembayaran",
+                    fontSize = 12.sp,
+                    color = AppColor.Gray
+                )
+                Spacer(Modifier.weight(1f))
+                PaymentStatusBadge(order.paymentStatus.displayLabel())
+            }
+
             Spacer(Modifier.height(14.dp))
 
             val needsTransferConfirmation = order.paymentMethod == PaymentMethod.TRANSFER &&
-                    order.paymentStatus in setOf(PaymentStatus.WAITING_UPLOAD, PaymentStatus.FAILED)
+                    order.paymentStatus in setOf(PaymentStatus.WAITING_UPLOAD, PaymentStatus.FAILED) &&
+                    order.status in setOf(OrderStatus.COOKING, OrderStatus.DELIVERING)
             val isCompleted = order.status == OrderStatus.COMPLETED
 
             Row(
@@ -449,6 +500,23 @@ fun ModernOrderCard(
 }
 
 @Composable
+private fun PaymentStatusBadge(text: String) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(AppColor.Green.copy(alpha = 0.12f))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text,
+            color = AppColor.Green,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+@Composable
 fun ModernStatusBadge(text: String, color: Color) {
     Box(
         modifier = Modifier
@@ -465,6 +533,22 @@ fun ModernStatusBadge(text: String, color: Color) {
     }
 }
 
+private fun PaymentStatus.displayLabel(): String = when (this) {
+    PaymentStatus.UNPAID -> "Belum dibayar"
+    PaymentStatus.WAITING_UPLOAD -> "Menunggu transfer"
+    PaymentStatus.WAITING_CONFIRMATION -> "Menunggu verifikasi"
+    PaymentStatus.PAID -> "Sudah dibayar"
+    PaymentStatus.FAILED -> "Gagal"
+}
+
+private fun OrderStatus.displayLabel(): String = when (this) {
+    OrderStatus.UNPAID -> "Belum dibayar"
+    OrderStatus.ORDERED -> "Dipesan"
+    OrderStatus.COOKING -> "Diproses"
+    OrderStatus.DELIVERING -> "Dikirim"
+    OrderStatus.COMPLETED -> "Selesai"
+    OrderStatus.CANCELLED -> "Dibatalkan"
+}
 
 @Composable
 fun ModernEmptyOrder() {

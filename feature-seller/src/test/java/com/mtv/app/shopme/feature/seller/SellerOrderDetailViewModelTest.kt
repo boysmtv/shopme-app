@@ -5,6 +5,8 @@ import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
+import com.mtv.app.shopme.domain.usecase.CancelSellerOrderUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureSellerChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrderDetailUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerOrderStatusUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEvent
@@ -24,6 +26,8 @@ class SellerOrderDetailViewModelTest {
 
     private val detailUseCase: GetSellerOrderDetailUseCase = mockk()
     private val updateUseCase: UpdateSellerOrderStatusUseCase = mockk(relaxed = true)
+    private val cancelUseCase: CancelSellerOrderUseCase = mockk(relaxed = true)
+    private val ensureSellerChatConversationUseCase: EnsureSellerChatConversationUseCase = mockk(relaxed = true)
 
     @Test
     fun `load should expose delivery address from backend order detail`() = runTest {
@@ -47,7 +51,9 @@ class SellerOrderDetailViewModelTest {
         val vm = SellerOrderDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
             getSellerOrderDetailUseCase = detailUseCase,
-            updateSellerOrderStatusUseCase = updateUseCase
+            updateSellerOrderStatusUseCase = updateUseCase,
+            cancelSellerOrderUseCase = cancelUseCase,
+            ensureSellerChatConversationUseCase = ensureSellerChatConversationUseCase
         )
 
         vm.onEvent(SellerOrderDetailEvent.Load)

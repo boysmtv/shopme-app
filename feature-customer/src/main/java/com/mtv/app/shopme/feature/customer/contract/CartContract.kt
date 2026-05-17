@@ -17,7 +17,8 @@ data class CartUiState(
     val cartItems: LoadState<List<Cart>> = LoadState.Idle,
     val sessionToken: LoadState<SessionToken> = LoadState.Idle,
     val verifyPin: LoadState<Unit> = LoadState.Idle,
-    val createOrder: LoadState<Unit> = LoadState.Idle
+    val createOrder: LoadState<Unit> = LoadState.Idle,
+    val isRefreshing: Boolean = false
 )
 
 sealed class CartEvent {

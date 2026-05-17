@@ -8,8 +8,9 @@
 
 package com.mtv.app.shopme.feature.seller.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,20 +24,31 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +58,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,10 +70,13 @@ import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
 import com.mtv.app.shopme.common.shimmerBrush
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListUiState
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SellerProductListScreen(
     state: SellerProductListUiState,
@@ -70,6 +86,10 @@ fun SellerProductListScreen(
     val totalProduct = state.products.size
     val totalStock = state.products.sumOf { it.stock }
     val lowStockCount = state.products.count { it.stock <= 5 }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(SellerProductListEvent.Load) }
+    )
 
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
@@ -87,11 +107,13 @@ fun SellerProductListScreen(
             }
         }
     ) { padding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
+                .pullRefresh(pullRefreshState)
                 .padding(padding)
         ) {
+        Column(modifier = Modifier.fillMaxSize()) {
             ProductHeader(
                 totalProduct = totalProduct,
                 totalStock = totalStock,
@@ -102,6 +124,17 @@ fun SellerProductListScreen(
             )
 
             Spacer(Modifier.height(16.dp))
+
+            ProductSearchAndFilters(
+                state = state,
+                onSearch = { event(SellerProductListEvent.ChangeSearchQuery(it)) },
+                onCategory = { event(SellerProductListEvent.SelectCategoryFilter(it)) },
+                onStatus = { event(SellerProductListEvent.SelectStatusFilter(it)) },
+                onActive = { event(SellerProductListEvent.SelectActiveFilter(it)) },
+                onClear = { event(SellerProductListEvent.ClearFilters) }
+            )
+
+            Spacer(Modifier.height(12.dp))
 
             if (state.isLoading && state.products.isEmpty()) {
                 LazyColumn(
@@ -130,7 +163,10 @@ fun SellerProductListScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.padding(horizontal = 20.dp)
                 ) {
-                    items(state.products) { product ->
+                    itemsIndexed(state.products) { index, product ->
+                        if (index >= state.products.lastIndex - 3) {
+                            event(SellerProductListEvent.LoadMore)
+                        }
                         ModernProductItem(
                             product = product,
                             onEdit = {
@@ -141,7 +177,114 @@ fun SellerProductListScreen(
                             }
                         )
                     }
+                    if (state.isLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 12.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(28.dp),
+                                    color = AppColor.Blue,
+                                    strokeWidth = 2.dp
+                                )
+                            }
+                        }
+                    }
                 }
+            }
+        }
+            PullRefreshIndicator(
+                refreshing = state.isRefreshing,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProductSearchAndFilters(
+    state: SellerProductListUiState,
+    onSearch: (String) -> Unit,
+    onCategory: (FoodCategory?) -> Unit,
+    onStatus: (FoodStatus?) -> Unit,
+    onActive: (Boolean?) -> Unit,
+    onClear: () -> Unit
+) {
+    val hasFilter = state.searchQuery.isNotBlank() ||
+        state.categoryFilter != null ||
+        state.statusFilter != null ||
+        state.activeFilter != null
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        OutlinedTextField(
+            value = state.searchQuery,
+            onValueChange = onSearch,
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            shape = RoundedCornerShape(14.dp),
+            leadingIcon = {
+                Icon(Icons.Default.Search, contentDescription = null, tint = AppColor.Blue)
+            },
+            label = { Text("Cari produk") },
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Text),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = AppColor.Blue,
+                unfocusedBorderColor = Color(0xFFE5E7EB),
+                focusedContainerColor = Color.White,
+                unfocusedContainerColor = Color.White,
+                cursorColor = AppColor.Blue
+            )
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                selected = state.activeFilter == true,
+                onClick = { onActive(if (state.activeFilter == true) null else true) },
+                label = { Text("Aktif") }
+            )
+            FilterChip(
+                selected = state.activeFilter == false,
+                onClick = { onActive(if (state.activeFilter == false) null else false) },
+                label = { Text("Hidden") }
+            )
+            FilterChip(
+                selected = state.statusFilter == FoodStatus.READY,
+                onClick = { onStatus(if (state.statusFilter == FoodStatus.READY) null else FoodStatus.READY) },
+                label = { Text("Ready") }
+            )
+            if (hasFilter) {
+                TextButton(onClick = onClear) {
+                    Text("Reset", color = AppColor.Blue)
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FoodCategory.entries.forEach { category ->
+                FilterChip(
+                    selected = state.categoryFilter == category,
+                    onClick = { onCategory(if (state.categoryFilter == category) null else category) },
+                    label = { Text(category.label, maxLines = 1) }
+                )
             }
         }
     }
@@ -331,10 +474,22 @@ fun ModernProductItem(
                 Text(
                     text = product.name,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1
                 )
 
                 Spacer(Modifier.height(6.dp))
+
+                if (product.category.isNotBlank()) {
+                    Text(
+                        text = product.category,
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        maxLines = 1
+                    )
+
+                    Spacer(Modifier.height(6.dp))
+                }
 
                 Text(
                     text = formatRupiah(product.price),
@@ -391,8 +546,8 @@ fun ModernStockBadge(stock: Int, isLow: Boolean) {
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ) {
         Text(
-            if (isLow) "Low Stock • $stock"
-            else "Stock • $stock",
+            if (isLow) "Low Stock - $stock"
+            else "Stock - $stock",
             fontSize = 11.sp,
             fontWeight = FontWeight.SemiBold,
             color = textColor
@@ -419,9 +574,11 @@ fun EmptyProductState(
                 .background(AppColor.Blue.copy(alpha = 0.08f)),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                "📦",
-                fontSize = 42.sp
+            Icon(
+                imageVector = Icons.Default.Inventory2,
+                contentDescription = null,
+                tint = AppColor.Blue,
+                modifier = Modifier.size(48.dp)
             )
         }
 

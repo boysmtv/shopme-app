@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.CreateFoodToCartUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
@@ -66,7 +67,9 @@ class DetailViewModelTest {
                 )
             )
         )
-        every { foodSimilarUseCase.invoke("cafe-1") } returns flowOf(Resource.Success(emptyList()))
+        every { foodSimilarUseCase.invoke("cafe-1", 0, 6) } returns flowOf(
+            Resource.Success(PagedData(emptyList(), page = 0, last = true))
+        )
         every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 

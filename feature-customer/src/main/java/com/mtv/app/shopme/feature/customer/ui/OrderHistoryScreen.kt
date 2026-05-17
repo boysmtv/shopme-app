@@ -27,9 +27,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -62,20 +66,26 @@ import com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryUiState
 import com.mtv.app.shopme.feature.customer.contract.OrderStatusFilter
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OrderHistoryScreen(
     state: OrderHistoryUiState,
     event: (OrderHistoryEvent) -> Unit
 ) {
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.loading,
+        onRefresh = { event(OrderHistoryEvent.Refresh) }
+    )
 
     val filteredOrders = state.orders.filter {
         state.selectedFilter == OrderStatusFilter.SEMUA ||
                 it.status == state.selectedFilter.name
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(
                 Brush.verticalGradient(
                     listOf(AppColor.Green, AppColor.GreenSoft)
@@ -83,38 +93,46 @@ fun OrderHistoryScreen(
             )
             .statusBarsPadding()
     ) {
-        ModernTopBar(
-            onBack = { event(OrderHistoryEvent.ClickBack) }
-        )
+        Column(modifier = Modifier.fillMaxSize()) {
+            ModernTopBar(
+                onBack = { event(OrderHistoryEvent.ClickBack) }
+            )
 
-        Card(
-            modifier = Modifier.fillMaxSize(),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft)
-        ) {
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+                colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft)
+            ) {
 
-            Column(Modifier.fillMaxSize()) {
-                ModernFilter(
-                    selected = state.selectedFilter,
-                    onSelect = { event(OrderHistoryEvent.ChangeFilter(it)) }
-                )
-                if (state.loading) {
-                    ModernSkeleton()
-                } else if (filteredOrders.isEmpty()) {
-                    ModernEmpty()
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    ) {
-                        items(filteredOrders) { order ->
-                            ModernOrderCard(order) {
-                                event(OrderHistoryEvent.ClickOrder(order))
+                Column(Modifier.fillMaxSize()) {
+                    ModernFilter(
+                        selected = state.selectedFilter,
+                        onSelect = { event(OrderHistoryEvent.ChangeFilter(it)) }
+                    )
+                    if (state.loading && state.orders.isEmpty()) {
+                        ModernSkeleton()
+                    } else if (filteredOrders.isEmpty()) {
+                        ModernEmpty()
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        ) {
+                            items(filteredOrders) { order ->
+                                ModernOrderCard(order) {
+                                    event(OrderHistoryEvent.ClickOrder(order))
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        PullRefreshIndicator(
+            refreshing = state.loading,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -262,7 +280,7 @@ fun ModernOrderCard(
                         fontSize = 15.sp
                     )
                     Text(
-                        "Order ID • ${item.id}",
+                        "${item.totalItems} item",
                         fontSize = 11.sp,
                         color = AppColor.Gray
                     )

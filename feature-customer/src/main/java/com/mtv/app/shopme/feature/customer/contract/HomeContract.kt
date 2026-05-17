@@ -16,6 +16,7 @@ data class HomeUiState(
     val customer: LoadState<Customer> = LoadState.Idle,
     val foods: LoadState<List<SearchFood>> = LoadState.Idle,
     val favoriteIds: Set<String> = emptySet(),
+    val isRefreshing: Boolean = false,
     val isLoadingMore: Boolean = false,
     val isLastPage: Boolean = false,
     val page: Int = 0

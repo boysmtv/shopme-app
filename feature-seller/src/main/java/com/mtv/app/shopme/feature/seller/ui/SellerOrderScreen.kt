@@ -25,16 +25,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.DocumentScanner
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -56,17 +61,26 @@ import com.mtv.app.shopme.feature.seller.contract.OrderSummary
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderUiState
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SellerOrderScreen(
     state: SellerOrderUiState,
     event: (SellerOrderEvent) -> Unit
 ) {
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(SellerOrderEvent.Load) }
+    )
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(AppColor.Blue)
             .statusBarsPadding()
+    ) {
+    Column(
+        modifier = Modifier.fillMaxSize()
     ) {
 
         SellerOrderHeader(
@@ -108,11 +122,13 @@ fun SellerOrderScreen(
                     state.selectedFilter == "All" || it.status.equals(state.selectedFilter, true)
                 }
 
-                items(filtered) { order ->
-                    ModernOrderCard(
-                        invoice = order.orderId,
-                        customer = order.customerName,
-                        location = order.location,
+                itemsIndexed(filtered) { index, order ->
+                    if (index >= filtered.lastIndex - 3) {
+                        event(SellerOrderEvent.LoadMore)
+                    }
+                   ModernOrderCard(
+                       customer = order.customerName,
+                       location = order.location,
                         total = order.total,
                         date = order.date,
                         time = order.time,
@@ -123,8 +139,30 @@ fun SellerOrderScreen(
                         }
                     )
                 }
+                if (state.isLoadingMore) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(28.dp),
+                                color = AppColor.Blue,
+                                strokeWidth = 2.dp
+                            )
+                        }
+                    }
+                }
             }
         }
+    }
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -257,7 +295,6 @@ fun SellerOrderHeader(
 
 @Composable
 fun ModernOrderCard(
-    invoice: String,
     customer: String,
     location: String,
     total: String,
@@ -323,19 +360,6 @@ fun ModernOrderCard(
                         Text(location, fontSize = 13.sp, color = Color.Gray)
                     }
 
-                    Spacer(Modifier.height(8.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.DocumentScanner,
-                            contentDescription = null,
-                            tint = Color.Gray,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text(invoice, fontSize = 11.sp, color = Color.Gray)
-                    }
                 }
             }
 
@@ -363,7 +387,7 @@ fun ModernOrderCard(
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text(paymentMethod, fontSize = 11.sp, color = Color.Gray)
+                   Text(paymentMethod.displayPaymentMethodLabel(), fontSize = 11.sp, color = Color.Gray)
                 }
 
                 Box(
@@ -372,11 +396,27 @@ fun ModernOrderCard(
                         .background(statusColor.copy(alpha = 0.25f))
                         .padding(horizontal = 14.dp, vertical = 6.dp)
                 ) {
-                    Text(status, color = statusColor, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                   Text(status.displayOrderStatusLabel(), color = statusColor, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
     }
+}
+
+private fun String.displayPaymentMethodLabel(): String = when (uppercase()) {
+    "CASH" -> "Bayar di tempat"
+    "TRANSFER" -> "Transfer bank"
+    else -> ifBlank { "-" }
+}
+
+private fun String.displayOrderStatusLabel(): String = when (uppercase()) {
+    "UNPAID" -> "Belum dibayar"
+    "ORDERED", "PENDING" -> "Dipesan"
+    "COOKING" -> "Diproses"
+    "DELIVERING" -> "Dikirim"
+    "COMPLETED" -> "Selesai"
+    "CANCELLED" -> "Dibatalkan"
+    else -> ifBlank { "-" }
 }
 
 

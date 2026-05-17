@@ -24,7 +24,10 @@ import com.mtv.app.shopme.feature.customer.ui.OrderScreen
 import com.mtv.app.shopme.nav.customer.CustomerNavActions
 
 @Composable
-fun OrderRoute(nav: NavController) {
+fun OrderRoute(
+    nav: NavController,
+    initialFilter: String = ""
+) {
 
     val vm: OrderViewModel = hiltViewModel()
 
@@ -43,7 +46,8 @@ fun OrderRoute(nav: NavController) {
             ) {
                 OrderScreen(
                     state = uiState,
-                    event = vm::onEvent
+                    event = vm::onEvent,
+                    initialFilter = initialFilter
                 )
             }
         }

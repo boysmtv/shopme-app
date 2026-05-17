@@ -12,5 +12,6 @@ data class SearchParam(
     val name: String,
     val page: Int = 0,
     val size: Int = 10,
-    val sort: String = "name,asc"
+    val sort: String = "name,asc",
+    val seed: String = ""
 )

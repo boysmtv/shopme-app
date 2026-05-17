@@ -12,6 +12,8 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Order
+import com.mtv.app.shopme.domain.usecase.CancelSellerOrderUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureSellerChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrderDetailUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerOrderStatusUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
@@ -27,6 +29,8 @@ class SellerOrderDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getSellerOrderDetailUseCase: GetSellerOrderDetailUseCase,
     private val updateSellerOrderStatusUseCase: UpdateSellerOrderStatusUseCase,
+    private val cancelSellerOrderUseCase: CancelSellerOrderUseCase,
+    private val ensureSellerChatConversationUseCase: EnsureSellerChatConversationUseCase,
 ) : BaseEventViewModel<SellerOrderDetailEvent, SellerOrderDetailEffect>() {
 
     private val orderId: String = checkNotNull(savedStateHandle["orderId"])
@@ -39,6 +43,15 @@ class SellerOrderDetailViewModel @Inject constructor(
             SellerOrderDetailEvent.DismissDialog -> dismissDialog()
             is SellerOrderDetailEvent.ChangeStatus -> _state.update { it.copy(currentStatus = event.status) }
             SellerOrderDetailEvent.SaveStatus -> saveStatus()
+            SellerOrderDetailEvent.ClickCancelOrder -> _state.update { it.copy(showCancelDialog = true) }
+            SellerOrderDetailEvent.SubmitCancelOrder -> cancelOrder()
+            SellerOrderDetailEvent.DismissCancelDialog -> {
+                _state.update { it.copy(showCancelDialog = false, cancelReason = "") }
+            }
+            is SellerOrderDetailEvent.ChangeCancelReason -> {
+                _state.update { it.copy(cancelReason = event.reason) }
+            }
+            SellerOrderDetailEvent.ClickChat -> openChat()
             SellerOrderDetailEvent.ClickBack -> emitEffect(SellerOrderDetailEffect.NavigateBack)
         }
     }
@@ -48,8 +61,14 @@ class SellerOrderDetailViewModel @Inject constructor(
             flow = getSellerOrderDetailUseCase(orderId),
             onState = { state ->
                 _state.update {
-                    if (state is LoadState.Success) state.data.toUiState(it.currentStatus.takeIf { current -> current != state.data.status } ?: state.data.status)
-                    else it.copy(isLoading = state is LoadState.Loading)
+                    if (state is LoadState.Success) {
+                        state.data.toUiState(it.currentStatus.takeIf { current -> current != state.data.status } ?: state.data.status)
+                    } else {
+                        it.copy(
+                            isLoading = state is LoadState.Loading && it.items.isEmpty(),
+                            isRefreshing = state is LoadState.Loading && it.items.isNotEmpty()
+                        )
+                    }
                 }
             },
             onError = {}
@@ -61,8 +80,42 @@ class SellerOrderDetailViewModel @Inject constructor(
         observeDataFlow(
             flow = updateSellerOrderStatusUseCase(orderId, targetStatus),
             onState = { state ->
-                _state.update { it.copy(isLoading = state is LoadState.Loading) }
+                _state.update { it.copy(isLoading = state is LoadState.Loading, isRefreshing = false) }
                 if (state is LoadState.Success) emitEffect(SellerOrderDetailEffect.UpdateSuccess)
+            },
+            onError = {}
+        )
+    }
+
+    private fun cancelOrder() {
+        val reason = _state.value.cancelReason.trim()
+        observeDataFlow(
+            flow = cancelSellerOrderUseCase(orderId, reason.ifBlank { null }),
+            onState = { state ->
+                _state.update {
+                    it.copy(
+                        isLoading = state is LoadState.Loading,
+                        isRefreshing = false,
+                        showCancelDialog = state is LoadState.Loading
+                    )
+                }
+            },
+            onSuccess = {
+                _state.update { it.copy(showCancelDialog = false, cancelReason = "") }
+                load()
+            },
+            onError = {}
+        )
+    }
+
+    private fun openChat() {
+        observeDataFlow(
+            flow = ensureSellerChatConversationUseCase(orderId),
+            onState = { state ->
+                _state.update { it.copy(isLoading = state is LoadState.Loading) }
+                if (state is LoadState.Success) {
+                    emitEffect(SellerOrderDetailEffect.NavigateToChat(state.data))
+                }
             },
             onError = {}
         )
@@ -70,11 +123,13 @@ class SellerOrderDetailViewModel @Inject constructor(
 
     private fun Order.toUiState(status: com.mtv.app.shopme.domain.model.OrderStatus) = SellerOrderDetailUiState(
         isLoading = false,
+        isRefreshing = false,
         orderId = id,
         currentStatus = status,
         customerName = customerName.ifBlank { customerId },
         customerAddress = deliveryAddress.ifBlank { cafeName },
         paymentMethod = paymentMethod.name,
+        paymentStatus = paymentStatus.name,
         total = totalPrice.toRupiah(),
         items = items.map {
             SellerOrderLineItem(
@@ -83,6 +138,8 @@ class SellerOrderDetailViewModel @Inject constructor(
                 price = it.price.toRupiah(),
                 notes = it.notes.orEmpty()
             )
-        }
+        },
+        showCancelDialog = false,
+        cancelReason = ""
     )
 }

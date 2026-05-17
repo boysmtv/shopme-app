@@ -12,3 +12,11 @@ plugins {
     alias(libs.plugins.firebase.appdistribution) apply false
     id("com.google.gms.google-services") version "4.4.4" apply false
 }
+
+subprojects {
+    configurations.configureEach {
+        if (name.contains("debug", ignoreCase = true)) {
+            exclude(group = "com.github.chuckerteam.chucker", module = "library-no-op")
+        }
+    }
+}

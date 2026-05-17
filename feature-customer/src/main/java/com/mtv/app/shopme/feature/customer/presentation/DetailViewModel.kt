@@ -55,6 +55,7 @@ class DetailViewModel @Inject constructor(
     val uiState = _state.asStateFlow()
 
     private val foodId: String = checkNotNull(savedStateHandle["foodId"])
+    private var currentSimilarCafeId: String = ""
 
     override fun onEvent(event: DetailEvent) {
         when (event) {
@@ -64,6 +65,7 @@ class DetailViewModel @Inject constructor(
             is DetailEvent.ChatClicked -> openChat()
             is DetailEvent.ToggleFavorite -> toggleFavorite()
             is DetailEvent.OpenCart -> emitEffect(DetailEffect.NavigateToCart)
+            is DetailEvent.LoadMoreSimilar -> loadMoreSimilar()
             is DetailEvent.ClickCafe -> emitEffect(DetailEffect.NavigateToCafe(event.cafeId))
             is DetailEvent.ClickSimilarFood -> emitEffect(DetailEffect.NavigateToDetail(event.foodId))
             is DetailEvent.AddToCart -> doAddToCart(event)
@@ -89,7 +91,8 @@ class DetailViewModel @Inject constructor(
 
                 if (state is LoadState.Success) {
                     val food = state.data
-                    loadSimilar(food.cafeId)
+                    currentSimilarCafeId = food.cafeId
+                    loadSimilar(food.cafeId, page = 0, append = false)
                 }
             }
         )
@@ -105,11 +108,49 @@ class DetailViewModel @Inject constructor(
         )
     }
 
-    private fun loadSimilar(cafeId: String) {
+    private fun loadMoreSimilar() {
+        val state = _state.value
+        if (currentSimilarCafeId.isBlank()) return
+        if (state.similarIsLoadingMore || state.similarIsLastPage || state.similarFoods is LoadState.Loading) return
+        loadSimilar(
+            cafeId = currentSimilarCafeId,
+            page = state.similarPage + 1,
+            append = true
+        )
+    }
+
+    private fun loadSimilar(cafeId: String, page: Int, append: Boolean) {
         observeDataFlow(
-            flow = foodSimilarUseCase(cafeId),
+            flow = foodSimilarUseCase(cafeId, page, SIMILAR_PAGE_SIZE),
             onState = { state ->
-                _state.update { it.copy(similarFoods = state) }
+                _state.update {
+                    when (state) {
+                        is LoadState.Loading -> it.copy(
+                            similarFoods = if (append) it.similarFoods else LoadState.Loading,
+                            similarIsLoadingMore = append
+                        )
+                        is LoadState.Success -> {
+                            val incoming = state.data.content.filterNot { food -> food.id == foodId }
+                            val existing = (it.similarFoods as? LoadState.Success)?.data.orEmpty()
+                            val merged = if (append) {
+                                (existing + incoming).distinctBy { food -> food.id }
+                            } else {
+                                incoming
+                            }
+                            it.copy(
+                                similarFoods = LoadState.Success(merged),
+                                similarPage = state.data.page,
+                                similarIsLastPage = state.data.last,
+                                similarIsLoadingMore = false
+                            )
+                        }
+                        is LoadState.Error -> it.copy(
+                            similarFoods = if (append) it.similarFoods else LoadState.Error(state.error),
+                            similarIsLoadingMore = false
+                        )
+                        else -> it
+                    }
+                }
             }
         )
     }
@@ -213,5 +254,9 @@ class DetailViewModel @Inject constructor(
                 }
             )
         )
+    }
+
+    private companion object {
+        const val SIMILAR_PAGE_SIZE = 6
     }
 }

@@ -273,22 +273,39 @@ fun SellerNotificationItemCard(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Order #${item.orderId}",
-                style = MaterialTheme.typography.labelMedium,
-                color = AppColor.Blue
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
                 text = item.message,
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.DarkGray,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
+            SellerNotificationMetaLine(item)
         }
     }
+}
+
+@Composable
+private fun SellerNotificationMetaLine(item: SellerNotifItem) {
+    val meta = listOf(
+        item.buyerName,
+        item.orderItemsSummary,
+        item.deliveryAddress,
+        listOf(item.orderStatus, item.paymentStatus)
+            .filter { it.isNotBlank() }
+            .joinToString(" / ")
+    ).filter { it.isNotBlank() }
+
+    if (meta.isEmpty()) return
+
+    Spacer(modifier = Modifier.height(6.dp))
+    Text(
+        text = meta.joinToString(" | "),
+        style = MaterialTheme.typography.labelSmall,
+        color = Color.Gray,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

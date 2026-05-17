@@ -21,6 +21,7 @@ data class SearchUiState(
     val query: String = "",
     val foods: LoadState<List<SearchFood>> = LoadState.Idle,
     val favoriteIds: Set<String> = emptySet(),
+    val isRefreshing: Boolean = false,
     val isLoadingMore: Boolean = false,
     val isLastPage: Boolean = false,
     val page: Int = 0
@@ -31,6 +32,7 @@ sealed class SearchEvent {
     object LoadNextPage : SearchEvent()
     object BackClicked : SearchEvent()
     object DismissDialog : SearchEvent()
+    object ClickFavorites : SearchEvent()
     data class ToggleFavorite(val foodId: String) : SearchEvent()
 
     data class QueryChanged(val query: String) : SearchEvent()
@@ -39,5 +41,6 @@ sealed class SearchEvent {
 
 sealed class SearchEffect {
     object NavigateBack : SearchEffect()
+    object NavigateToFavorites : SearchEffect()
     data class NavigateToDetail(val id: String) : SearchEffect()
 }

@@ -15,4 +15,5 @@ class GetFoodSimilarUseCase @Inject constructor(
     private val repository: FoodRepository
 ) {
     operator fun invoke(cafeId: String) = repository.getSimilarFoods(cafeId)
+    operator fun invoke(cafeId: String, page: Int, size: Int) = repository.getFoodsByCafe(cafeId, page, size)
 }

@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -43,6 +44,7 @@ import androidx.compose.material.icons.filled.PriceChange
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -53,6 +55,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -78,6 +81,8 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.mock.DataUiMock
@@ -102,7 +107,6 @@ fun DetailScreen(
 ) {
     val food = (state.food as? LoadState.Success)?.data
     val similarFoods = (state.similarFoods as? LoadState.Success)?.data.orEmpty()
-    val filteredFoods = similarFoods.filter { it.id != food?.id }
 
     var showSheet by remember { mutableStateOf(false) }
 
@@ -115,6 +119,7 @@ fun DetailScreen(
         ) {
             VariantBottomSheetContent(
                 food = food,
+                isLoading = state.addToCartState is LoadState.Loading,
                 onAddToCart = { variants, qty, note ->
                     event(
                         DetailEvent.AddToCart(
@@ -217,17 +222,47 @@ fun DetailScreen(
 
                     item { Spacer(Modifier.height(12.dp)) }
 
-                    items(filteredFoods) { item ->
-                        SimilarItemRow(
-                            Food = item,
-                            onClickSimilarFood = {
-                                event(DetailEvent.ClickSimilarFood(item.id))
-                            }
-                        )
-                        Spacer(Modifier.height(12.dp))
-                    }
-                }
-            }
+                  if (state.similarFoods is LoadState.Loading) {
+                      items(4) {
+                          SimilarItemShimmer()
+                          Spacer(Modifier.height(12.dp))
+                      }
+                  } else {
+                      itemsIndexed(similarFoods) { index, item ->
+                          if (index >= similarFoods.lastIndex - 2) {
+                              LaunchedEffect(index, similarFoods.size, state.similarIsLastPage) {
+                                  event(DetailEvent.LoadMoreSimilar)
+                              }
+                          }
+                          SimilarItemRow(
+                              Food = item,
+                              onClickSimilarFood = {
+                                  event(DetailEvent.ClickSimilarFood(item.id))
+                              }
+                          )
+                          Spacer(Modifier.height(12.dp))
+                      }
+
+                      if (state.similarIsLoadingMore) {
+                          item {
+                              Box(
+                                  modifier = Modifier
+                                      .fillMaxWidth()
+                                      .padding(vertical = 12.dp),
+                                  contentAlignment = Alignment.Center
+                              ) {
+                                  CircularProgressIndicator(
+                                      modifier = Modifier.size(28.dp),
+                                      color = AppColor.Green,
+                                      strokeWidth = 2.dp
+                                  )
+                              }
+                              Spacer(Modifier.height(12.dp))
+                          }
+                      }
+                  }
+              }
+          }
 
             is LoadState.Error -> {
                 ContentErrorState(
@@ -239,6 +274,34 @@ fun DetailScreen(
             }
 
             else -> Unit
+        }
+    }
+}
+
+@Composable
+private fun SimilarItemShimmer() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color.White)
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ShimmerBlock(
+            modifier = Modifier
+                .size(74.dp)
+                .clip(RoundedCornerShape(16.dp))
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ShimmerLine(widthFraction = 0.72f, heightDp = 14)
+            ShimmerLine(widthFraction = 0.48f, heightDp = 12)
+            ShimmerLine(widthFraction = 0.38f, heightDp = 12)
         }
     }
 }
@@ -574,6 +637,7 @@ fun SimilarItemRow(
 @Composable
 fun VariantBottomSheetContent(
     food: Food,
+    isLoading: Boolean = false,
     onAddToCart: (List<CartAddVariantParam>, Int, String) -> Unit,
     onClose: () -> Unit
 ) {
@@ -724,6 +788,7 @@ fun VariantBottomSheetContent(
 
         Button(
             onClick = {
+                if (isLoading) return@Button
                 if (hasVariants && !hasSelectedAllVariants) {
                     validationMessage = "Pilih semua varian produk sebelum melanjutkan."
                     return@Button
@@ -740,15 +805,24 @@ fun VariantBottomSheetContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
+            enabled = !isLoading,
             colors = ButtonDefaults.buttonColors(AppColor.Green),
             shape = RoundedCornerShape(16.dp)
         ) {
 
-            Icon(
-                imageVector = Icons.Default.ShoppingCart,
-                contentDescription = null,
-                tint = Color.White
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = Color.White,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
 
             Spacer(Modifier.width(8.dp))
 

@@ -145,9 +145,15 @@ class SellerProductFormViewModelTest {
         advanceUntilIdle()
         vm.onEvent(SellerProductFormEvent.ChangeName("Coffee Latte"))
         vm.onEvent(SellerProductFormEvent.ChangeDescription("Hot coffee"))
+        vm.onEvent(SellerProductFormEvent.ChangeCategory(FoodCategory.DRINK.name))
         vm.onEvent(SellerProductFormEvent.ChangePrice("25000"))
         vm.onEvent(SellerProductFormEvent.ChangeStock(10))
         vm.onEvent(SellerProductFormEvent.AddImage("content://picked-image"))
+        vm.onEvent(SellerProductFormEvent.AddVariantGroup)
+        vm.onEvent(SellerProductFormEvent.ChangeVariantGroupName(0, "Size"))
+        vm.onEvent(SellerProductFormEvent.AddVariantOption(0))
+        vm.onEvent(SellerProductFormEvent.ChangeVariantOptionName(0, 0, "Large"))
+        vm.onEvent(SellerProductFormEvent.ChangeVariantOptionPrice(0, 0, "5000"))
         vm.onEvent(SellerProductFormEvent.Save)
         advanceUntilIdle()
 
@@ -155,6 +161,11 @@ class SellerProductFormViewModelTest {
             listOf("http://localhost:8080/api/media/original?key=products/uploaded-1/original.jpg"),
             requestSlot.captured.images
         )
+        assertEquals(FoodCategory.DRINK, requestSlot.captured.category)
+        assertEquals("Hot coffee", requestSlot.captured.description)
+        assertEquals("Size", requestSlot.captured.variants.first().name)
+        assertEquals("Large", requestSlot.captured.variants.first().options.first().name)
+        assertEquals(BigDecimal("5000"), requestSlot.captured.variants.first().options.first().price)
         assertEquals(SellerProductFormEffect.SaveSuccess, effect.await())
     }
 

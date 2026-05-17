@@ -2,8 +2,9 @@ package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.domain.usecase.CancelOrderUseCase
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
-import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureOrderChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrderDetailUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEvent
@@ -26,7 +27,8 @@ class OrderDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getOrderDetailUseCase: GetOrderDetailUseCase,
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase,
-    private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
+    private val cancelOrderUseCase: CancelOrderUseCase,
+    private val ensureOrderChatConversationUseCase: EnsureOrderChatConversationUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<OrderDetailEvent, OrderDetailEffect>() {
 
@@ -41,14 +43,18 @@ class OrderDetailViewModel @Inject constructor(
             OrderDetailEvent.ClickBack -> emitEffect(OrderDetailEffect.NavigateBack)
             OrderDetailEvent.ClickChat -> openChat()
             OrderDetailEvent.ConfirmTransfer -> confirmTransfer()
+            OrderDetailEvent.ClickCancelOrder -> showCancelDialog()
+            OrderDetailEvent.SubmitCancelOrder -> cancelOrder()
+            OrderDetailEvent.DismissCancelDialog -> dismissCancelDialog()
+            is OrderDetailEvent.ChangeCancelReason -> {
+                _state.update { it.copy(cancelReason = event.reason) }
+            }
         }
     }
 
     private fun openChat() {
-        val cafeId = _state.value.order?.cafeId.orEmpty()
-        if (cafeId.isBlank()) return
         observeDataFlow(
-            flow = ensureChatConversationUseCase(cafeId),
+            flow = ensureOrderChatConversationUseCase(orderId),
             onSuccess = { emitEffect(OrderDetailEffect.NavigateToChat(it)) },
             onError = { showError(it) }
         )
@@ -77,6 +83,34 @@ class OrderDetailViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = state is LoadState.Loading) }
             },
             onSuccess = { load() },
+            onError = { showError(it) }
+        )
+    }
+
+    private fun showCancelDialog() {
+        _state.update { it.copy(showCancelDialog = true) }
+    }
+
+    private fun dismissCancelDialog() {
+        _state.update { it.copy(showCancelDialog = false, cancelReason = "") }
+    }
+
+    private fun cancelOrder() {
+        val reason = _state.value.cancelReason.trim()
+        observeDataFlow(
+            flow = cancelOrderUseCase(orderId, reason.ifBlank { null }),
+            onState = { state ->
+                _state.update {
+                    it.copy(
+                        isLoading = state is LoadState.Loading,
+                        showCancelDialog = state is LoadState.Loading
+                    )
+                }
+            },
+            onSuccess = {
+                _state.update { it.copy(showCancelDialog = false, cancelReason = "") }
+                load()
+            },
             onError = { showError(it) }
         )
     }

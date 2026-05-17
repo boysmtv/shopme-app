@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -25,7 +26,9 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -42,6 +45,8 @@ import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.domain.model.Order
+import com.mtv.app.shopme.domain.model.OrderStatus
+import com.mtv.app.shopme.domain.model.OrderTimeline
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEvent
@@ -62,6 +67,16 @@ fun OrderDetailScreen(
             )
             .statusBarsPadding()
     ) {
+        if (state.showCancelDialog) {
+            CancelOrderDialog(
+                title = "Batalkan Pesanan",
+                reason = state.cancelReason,
+                onReasonChange = { event(OrderDetailEvent.ChangeCancelReason(it)) },
+                onDismiss = { event(OrderDetailEvent.DismissCancelDialog) },
+                onConfirm = { event(OrderDetailEvent.SubmitCancelOrder) }
+            )
+        }
+
         OrderDetailHeader(
             onBack = { event(OrderDetailEvent.ClickBack) },
             onChat = { event(OrderDetailEvent.ClickChat) }
@@ -97,15 +112,13 @@ fun OrderDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     OrderDetailSummary(order = order)
+                    OrderTimelineSection(order = order)
                     OrderDetailSection(
                         title = "Alamat Pengiriman",
                         value = order.deliveryAddress.ifBlank { "-" }
                     )
                     OrderDetailItems(order = order)
-                    OrderDetailSection(
-                        title = "Pembayaran",
-                        value = "${order.paymentMethod.name} • ${order.paymentStatus.name}"
-                    )
+                    PaymentDetailSection(order = order)
                     OrderDetailSection(
                         title = "Total",
                         value = order.totalPrice.toRupiah()
@@ -119,6 +132,17 @@ fun OrderDetailScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF59E0B))
                         ) {
                             Text("Konfirmasi Transfer", color = Color.White, fontFamily = PoppinsFont)
+                        }
+                    }
+
+                    if (order.canCustomerCancel()) {
+                        OutlinedButton(
+                            onClick = { event(OrderDetailEvent.ClickCancelOrder) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFDC2626))
+                        ) {
+                            Text("Batalkan Pesanan", fontFamily = PoppinsFont)
                         }
                     }
 
@@ -277,14 +301,184 @@ private fun OrderDetailSummary(order: Order) {
                 color = AppColor.Green
             )
             Text(
-                text = "Order ${order.id}",
+                text = order.items.firstOrNull()?.foodName?.ifBlank { null }
+                    ?: "Pesanan ${order.status.name}",
                 fontFamily = PoppinsFont,
                 fontWeight = FontWeight.SemiBold
             )
             HorizontalDivider(color = AppColor.Green.copy(alpha = 0.15f))
-            Text(text = "Status pesanan: ${order.status.name}", color = AppColor.Gray, fontSize = 13.sp)
+            Text(text = "Status pesanan: ${order.status.displayLabel()}", color = AppColor.Gray, fontSize = 13.sp)
             Text(text = "Dibuat: ${order.createdAt.ifBlank { "-" }}", color = AppColor.Gray, fontSize = 13.sp)
         }
+    }
+}
+
+@Composable
+private fun CancelOrderDialog(
+    title: String,
+    reason: String,
+    onReasonChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(title, fontFamily = PoppinsFont, fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "Tulis alasan singkat agar status pesanan jelas di timeline.",
+                    color = AppColor.Gray,
+                    fontSize = 13.sp,
+                    fontFamily = PoppinsFont
+                )
+                OutlinedTextField(
+                    value = reason,
+                    onValueChange = onReasonChange,
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 2,
+                    label = { Text("Alasan") }
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text("Batalkan", color = Color(0xFFDC2626), fontFamily = PoppinsFont)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Tutup", fontFamily = PoppinsFont)
+            }
+        }
+    )
+}
+
+@Composable
+private fun OrderTimelineSection(order: Order) {
+    val timeline = order.timeline.ifEmpty {
+        listOf(
+            OrderTimeline(
+                status = order.status,
+                actorRole = "system",
+                createdAt = order.createdAt
+            )
+        )
+    }
+
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "Timeline Pesanan",
+                fontFamily = PoppinsFont,
+                fontWeight = FontWeight.Bold,
+                color = AppColor.Green
+            )
+            timeline.forEachIndexed { index, item ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 3.dp)
+                            .size(10.dp)
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(if (index == timeline.lastIndex) AppColor.Green else AppColor.Gray)
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Text(
+                            text = item.status.displayLabel(),
+                            fontFamily = PoppinsFont,
+                            fontWeight = FontWeight.SemiBold,
+                            color = AppColor.Black,
+                            fontSize = 13.sp
+                        )
+                        Text(
+                            text = buildTimelineSubtitle(item),
+                            color = AppColor.Gray,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun buildTimelineSubtitle(item: OrderTimeline): String {
+    val actor = when (item.actorRole.lowercase()) {
+        "seller" -> "Seller"
+        "customer" -> "Customer"
+        else -> "Sistem"
+    }
+    val time = item.createdAt.ifBlank { "-" }
+    val reason = item.reason.ifBlank { "" }
+    return if (reason.isBlank()) "$actor - $time" else "$actor - $time - $reason"
+}
+
+@Composable
+private fun PaymentDetailSection(order: Order) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(
+                text = "Pembayaran",
+                fontFamily = PoppinsFont,
+                fontWeight = FontWeight.Bold,
+                color = AppColor.Green
+            )
+            PaymentInfoRow("Metode", order.paymentMethod.displayLabel())
+            PaymentInfoRow("Status", order.paymentStatus.displayLabel(), highlight = true)
+            val note = order.paymentInstruction()
+            if (note.isNotBlank()) {
+                Text(
+                    text = note,
+                    color = AppColor.Gray,
+                    fontSize = 12.sp,
+                    fontFamily = PoppinsFont
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PaymentInfoRow(
+    label: String,
+    value: String,
+    highlight: Boolean = false
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, color = AppColor.Gray, fontSize = 13.sp, fontFamily = PoppinsFont)
+        Text(
+            value,
+            color = if (highlight) AppColor.Green else AppColor.Black,
+            fontWeight = if (highlight) FontWeight.SemiBold else FontWeight.Medium,
+            fontSize = 13.sp,
+            fontFamily = PoppinsFont
+        )
     }
 }
 
@@ -362,5 +556,48 @@ private fun OrderDetailSection(
 
 private fun Order.canConfirmTransfer(): Boolean {
     return paymentMethod == PaymentMethod.TRANSFER &&
-            paymentStatus in setOf(PaymentStatus.WAITING_UPLOAD, PaymentStatus.FAILED)
+            paymentStatus in setOf(PaymentStatus.WAITING_UPLOAD, PaymentStatus.FAILED) &&
+            status in setOf(OrderStatus.COOKING, OrderStatus.DELIVERING)
+}
+
+private fun Order.canCustomerCancel(): Boolean {
+    return status in setOf(OrderStatus.UNPAID, OrderStatus.ORDERED)
+}
+
+private fun Order.paymentInstruction(): String {
+    return when {
+        paymentMethod == PaymentMethod.CASH -> "Bayar langsung saat pesanan diterima."
+        paymentStatus == PaymentStatus.WAITING_UPLOAD &&
+                status in setOf(OrderStatus.COOKING, OrderStatus.DELIVERING) ->
+            "Pesanan sudah diproses. Silakan konfirmasi transfer."
+        paymentStatus == PaymentStatus.WAITING_UPLOAD ->
+            "Konfirmasi transfer akan tersedia setelah seller mulai memproses pesanan."
+        paymentStatus == PaymentStatus.WAITING_CONFIRMATION ->
+            "Bukti transfer sedang menunggu konfirmasi seller."
+        paymentStatus == PaymentStatus.PAID -> "Pembayaran sudah dikonfirmasi."
+        paymentStatus == PaymentStatus.FAILED -> "Pembayaran gagal. Silakan konfirmasi ulang."
+        else -> ""
+    }
+}
+
+private fun PaymentMethod.displayLabel(): String = when (this) {
+    PaymentMethod.CASH -> "Bayar di tempat"
+    PaymentMethod.TRANSFER -> "Transfer bank"
+}
+
+private fun PaymentStatus.displayLabel(): String = when (this) {
+    PaymentStatus.UNPAID -> "Belum dibayar"
+    PaymentStatus.WAITING_UPLOAD -> "Menunggu konfirmasi transfer"
+    PaymentStatus.WAITING_CONFIRMATION -> "Menunggu verifikasi seller"
+    PaymentStatus.PAID -> "Sudah dibayar"
+    PaymentStatus.FAILED -> "Pembayaran gagal"
+}
+
+private fun OrderStatus.displayLabel(): String = when (this) {
+    OrderStatus.UNPAID -> "Belum dibayar"
+    OrderStatus.ORDERED -> "Dipesan"
+    OrderStatus.COOKING -> "Diproses"
+    OrderStatus.DELIVERING -> "Dikirim"
+    OrderStatus.COMPLETED -> "Selesai"
+    OrderStatus.CANCELLED -> "Dibatalkan"
 }

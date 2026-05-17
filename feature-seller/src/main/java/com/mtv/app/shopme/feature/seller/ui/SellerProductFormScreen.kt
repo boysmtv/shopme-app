@@ -42,6 +42,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -77,6 +78,7 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
+import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.domain.model.VariantGroup
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEvent
@@ -92,6 +94,7 @@ fun SellerProductFormScreen(
     event: (SellerProductFormEvent) -> Unit
 ) {
     val currentStep = state.step
+    val isEditMode = state.product.id.isNotBlank()
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -111,7 +114,7 @@ fun SellerProductFormScreen(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         fontFamily = PoppinsFont,
-                        text = "Daftarkan Menu",
+                        text = if (isEditMode) "Edit Menu" else "Daftarkan Menu",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
                         textAlign = TextAlign.Center
@@ -174,14 +177,25 @@ fun SellerProductFormScreen(
                                 event(SellerProductFormEvent.NextStep)
                             }
                         },
+                        enabled = !state.isSaving,
                         shape = RoundedCornerShape(24.dp),
                         colors = ButtonDefaults.buttonColors(AppColor.Blue)
                     ) {
+                        if (state.isSaving && currentStep == ProductStep.REVIEW) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = Color.White,
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(Modifier.width(8.dp))
+                        }
                         Text(
                             fontFamily = PoppinsFont,
-                            text = if (currentStep == ProductStep.REVIEW)
-                                "Save Product"
-                            else "Next"
+                            text = if (currentStep == ProductStep.REVIEW) {
+                                if (isEditMode) "Simpan Perubahan" else "Simpan Produk"
+                            } else {
+                                "Next"
+                            }
                         )
                     }
                 }
@@ -329,7 +343,15 @@ fun SellerProductFormScreen(
                                     },
                                     label = "Description",
                                     icon = Icons.Default.Description,
+                                    singleLine = false,
                                     modifier = Modifier.fillMaxWidth()
+                                )
+
+                                CategorySelector(
+                                    selected = state.product.category,
+                                    onSelect = {
+                                        event(SellerProductFormEvent.ChangeCategory(it.name))
+                                    }
                                 )
 
                                 Row(
@@ -529,6 +551,22 @@ fun SellerProductFormScreen(
                                     }
                                 }
 
+                                Column {
+                                    Text(
+                                        "Category",
+                                        fontFamily = PoppinsFont,
+                                        fontSize = 12.sp,
+                                        color = Color.Gray
+                                    )
+
+                                    Text(
+                                        FoodCategory.entries.firstOrNull { it.name == state.product.category }?.label
+                                            ?: state.product.category.ifBlank { "-" },
+                                        fontFamily = PoppinsFont,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+
                                 // Availability Badge
                                 Row(verticalAlignment = Alignment.CenterVertically) {
 
@@ -721,6 +759,49 @@ fun AvailabilitySelector(
                     )
                 }
             )
+        }
+    }
+}
+
+@Composable
+fun CategorySelector(
+    selected: String,
+    onSelect: (FoodCategory) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = "Category",
+            fontFamily = PoppinsFont,
+            color = Color.Gray,
+            fontSize = 12.sp
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FoodCategory.entries.take(4).forEach { category ->
+                FilterChip(
+                    selected = selected == category.name,
+                    onClick = { onSelect(category) },
+                    label = {
+                        Text(
+                            fontFamily = PoppinsFont,
+                            text = category.label
+                        )
+                    }
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FoodCategory.entries.drop(4).forEach { category ->
+                FilterChip(
+                    selected = selected == category.name,
+                    onClick = { onSelect(category) },
+                    label = {
+                        Text(
+                            fontFamily = PoppinsFont,
+                            text = category.label
+                        )
+                    }
+                )
+            }
         }
     }
 }

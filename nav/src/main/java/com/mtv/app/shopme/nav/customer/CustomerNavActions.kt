@@ -73,8 +73,13 @@ object CustomerNavActions {
         nav.navigate(CustomerDestinations.NOTIF_GRAPH)
     }
 
-    fun toOrder(nav: NavController) {
-        nav.navigate(CustomerDestinations.ORDER_GRAPH)
+    fun toOrder(nav: NavController, filter: String? = null) {
+        nav.navigate(
+            filter
+                ?.takeIf { it.isNotBlank() }
+                ?.let { CustomerDestinations.navigateToOrder(it) }
+                ?: CustomerDestinations.ORDER_GRAPH
+        )
     }
 
     fun toChat(nav: NavController, id: String? = null) {

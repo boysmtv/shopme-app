@@ -34,6 +34,10 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -79,6 +83,7 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.distinctUntilChanged
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchScreen(
     state: SearchUiState,
@@ -87,6 +92,10 @@ fun SearchScreen(
     val listState = rememberLazyListState()
     val items = (state.foods as? LoadState.Success)?.data ?: emptyList()
     val isLoading = state.foods is LoadState.Loading
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(SearchEvent.Load) }
+    )
 
     LaunchedEffect(listState) {
         snapshotFlow {
@@ -101,9 +110,10 @@ fun SearchScreen(
             }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(
                 Brush.verticalGradient(
                     listOf(
@@ -113,14 +123,19 @@ fun SearchScreen(
                     )
                 )
             )
-            .padding(horizontal = 20.dp)
-            .statusBarsPadding()
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp)
+                .statusBarsPadding()
     ) {
         Spacer(Modifier.height(16.dp))
 
         SearchHeader(
             query = state.query,
-            onQueryChanged = { event(SearchEvent.QueryChanged(it)) }
+            onQueryChanged = { event(SearchEvent.QueryChanged(it)) },
+            onFavoritesClick = { event(SearchEvent.ClickFavorites) }
         )
 
         Spacer(Modifier.height(16.dp))
@@ -181,6 +196,13 @@ fun SearchScreen(
                 }
             }
         }
+        }
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
@@ -201,7 +223,8 @@ private fun SearchPaginationShimmer() {
 @Composable
 fun SearchHeader(
     query: String,
-    onQueryChanged: (String) -> Unit
+    onQueryChanged: (String) -> Unit,
+    onFavoritesClick: () -> Unit = {}
 ) {
     var localQuery by remember(query) { mutableStateOf(query) }
 
@@ -286,6 +309,7 @@ fun SearchHeader(
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Color.White)
+                .clickable { onFavoritesClick() }
                 .padding(12.dp),
             tint = Color.Red
         )

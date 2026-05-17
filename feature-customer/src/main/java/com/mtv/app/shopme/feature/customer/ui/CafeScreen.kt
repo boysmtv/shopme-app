@@ -57,6 +57,8 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.common.ShimmerBlock
+import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.data.mock.DataUiMock
@@ -150,20 +152,53 @@ fun CafeScreen(
                 Spacer(Modifier.height(12.dp))
             }
 
-            gridItems(
-                data = foods,
-                columnCount = 2,
-                horizontalSpacing = 16.dp,
-                verticalSpacing = 16.dp
-            ) { item ->
-                CafeFoodItem(
-                    item = item,
-                    isFavorite = state.favoriteIds.contains(item.id),
-                    onClickDetail = { event(CafeEvent.ClickFood(it)) },
-                    onToggleFavorite = { event(CafeEvent.ToggleFavorite(item.id)) }
-                )
+            if (state.foods is LoadState.Loading && foods.isEmpty()) {
+                gridItems(
+                    data = List(6) { it },
+                    columnCount = 2,
+                    horizontalSpacing = 16.dp,
+                    verticalSpacing = 16.dp
+                ) {
+                    CafeFoodItemShimmer()
+                }
+            } else {
+                gridItems(
+                    data = foods,
+                    columnCount = 2,
+                    horizontalSpacing = 16.dp,
+                    verticalSpacing = 16.dp
+                ) { item ->
+                    CafeFoodItem(
+                        item = item,
+                        isFavorite = state.favoriteIds.contains(item.id),
+                        onClickDetail = { event(CafeEvent.ClickFood(it)) },
+                        onToggleFavorite = { event(CafeEvent.ToggleFavorite(item.id)) }
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun CafeFoodItemShimmer() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color.White)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        ShimmerBlock(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(112.dp),
+            shape = RoundedCornerShape(16.dp)
+        )
+        ShimmerLine(widthFraction = 0.72f, heightDp = 14)
+        ShimmerLine(widthFraction = 0.48f, heightDp = 12)
+        ShimmerLine(widthFraction = 0.36f, heightDp = 12)
     }
 }
 

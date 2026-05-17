@@ -12,7 +12,8 @@ import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.based.core.network.utils.LoadState
 
 data class ProfileUiState(
-    val customer: LoadState<Customer> = LoadState.Idle
+    val customer: LoadState<Customer> = LoadState.Idle,
+    val isRefreshing: Boolean = false
 )
 
 sealed class ProfileEvent {
@@ -24,7 +25,7 @@ sealed class ProfileEvent {
     object ClickFavorites : ProfileEvent()
     object ClickSettings : ProfileEvent()
     object ClickHelpCenter : ProfileEvent()
-    object ClickOrder : ProfileEvent()
+    data class ClickOrder(val filter: String = "") : ProfileEvent()
 
     object ClickCheckTncCafe : ProfileEvent()
     object ClickLogout : ProfileEvent()
@@ -36,7 +37,7 @@ sealed class ProfileEffect {
     object NavigateToFavorites : ProfileEffect()
     object NavigateToSettings : ProfileEffect()
     object NavigateToHelpCenter : ProfileEffect()
-    object NavigateToOrder : ProfileEffect()
+    data class NavigateToOrder(val filter: String = "") : ProfileEffect()
     object NavigateToTnc : ProfileEffect()
     object NavigateToSeller : ProfileEffect()
     object NavigateToLogin : ProfileEffect()

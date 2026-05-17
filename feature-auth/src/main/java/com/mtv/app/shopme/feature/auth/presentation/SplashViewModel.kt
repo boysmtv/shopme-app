@@ -9,8 +9,10 @@
 package com.mtv.app.shopme.feature.auth.presentation
 
 import com.mtv.app.shopme.common.Constant.PLATFORM
+import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
+import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
 import com.mtv.app.shopme.common.config.AppInfoProvider
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Splash
@@ -34,6 +36,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Base64
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
@@ -103,7 +106,11 @@ class SplashViewModel @Inject constructor(
             }
 
             data.isAuthenticated -> {
-                emitEffect(SplashEffect.NavigateToHome)
+                if (resolveSavedRole().equals("SELLER", ignoreCase = true)) {
+                    emitEffect(SplashEffect.NavigateToSellerDashboard)
+                } else {
+                    emitEffect(SplashEffect.NavigateToHome)
+                }
             }
 
             else -> {
@@ -121,6 +128,35 @@ class SplashViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun resolveSavedRole(): String {
+        val savedRole = securePrefs.getString(USER_ROLE).orEmpty()
+        if (savedRole.isNotBlank()) return savedRole
+
+        val decodedRole = securePrefs.getString(ACCESS_TOKEN).orEmpty().decodeJwtRole()
+        if (decodedRole.isNotBlank()) {
+            securePrefs.putString(USER_ROLE, decodedRole.uppercase())
+        }
+        return decodedRole
+    }
+
+    private fun String.decodeJwtRole(): String {
+        val payload = split('.').getOrNull(1).orEmpty()
+        if (payload.isBlank()) return ""
+
+        return runCatching {
+            val normalizedPayload = payload
+                .replace('-', '+')
+                .replace('_', '/')
+                .let { value -> value + "=".repeat((4 - value.length % 4) % 4) }
+            val json = String(Base64.getDecoder().decode(normalizedPayload), Charsets.UTF_8)
+            Regex(""""role"\s*:\s*"([^"]+)"""")
+                .find(json)
+                ?.groupValues
+                ?.getOrNull(1)
+                .orEmpty()
+        }.getOrDefault("")
     }
 
 }

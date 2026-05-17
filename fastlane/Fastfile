@@ -21,30 +21,61 @@ def firebase_service_credentials_file!
   output_file
 end
 
+def firebase_distribution_options(options)
+  {
+    app_id: required_env!("FIREBASE_APP_ID"),
+    service_credentials_file: firebase_service_credentials_file!,
+    groups: options[:groups] || ENV["FIREBASE_APP_DISTRIBUTION_GROUPS"] || "internal-tester",
+    release_notes: options[:notes] || ENV["FIREBASE_RELEASE_NOTES"] || "Shopme Android Fastlane release"
+  }
+end
+
 platform :android do
   desc "Build release APK and upload it to Firebase App Distribution"
   lane :firebase do |options|
-    app_id = required_env!("FIREBASE_APP_ID")
-    service_credentials_file = firebase_service_credentials_file!
-    groups = options[:groups] || ENV["FIREBASE_APP_DISTRIBUTION_GROUPS"] || "internal-testers"
-    release_notes = options[:notes] || ENV["FIREBASE_RELEASE_NOTES"] || "Shopme Android Fastlane release"
+    distribution = firebase_distribution_options(options)
 
     gradle(
-      task: ":app:assembleRelease"
+      task: ":app:assembleRelease",
+      gradle_path: "gradlew.bat"
     )
 
     firebase_app_distribution(
-      app: app_id,
-      service_credentials_file: service_credentials_file,
-      groups: groups,
-      release_notes: release_notes,
+      app: distribution[:app_id],
+      service_credentials_file: distribution[:service_credentials_file],
+      groups: distribution[:groups],
+      release_notes: distribution[:release_notes],
       android_artifact_type: "APK",
       android_artifact_path: "app/build/outputs/apk/release/app-release.apk"
+    )
+  end
+
+  desc "Build debug APK with Chucker and upload it to Firebase App Distribution"
+  lane :firebase_debug do |options|
+    distribution = firebase_distribution_options(options)
+
+    gradle(
+      task: ":app:assembleDebug",
+      gradle_path: "gradlew.bat"
+    )
+
+    firebase_app_distribution(
+      app: distribution[:app_id],
+      service_credentials_file: distribution[:service_credentials_file],
+      groups: distribution[:groups],
+      release_notes: distribution[:release_notes],
+      android_artifact_type: "APK",
+      android_artifact_path: "app/build/outputs/apk/debug/app-debug.apk"
     )
   end
 
   desc "Alias for firebase deployment"
   lane :deploy do |options|
     firebase(options)
+  end
+
+  desc "Alias for debug Firebase deployment with Chucker"
+  lane :deploy_debug do |options|
+    firebase_debug(options)
   end
 end

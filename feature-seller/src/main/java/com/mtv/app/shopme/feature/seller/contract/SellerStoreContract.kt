@@ -10,6 +10,7 @@ package com.mtv.app.shopme.feature.seller.contract
 
 data class SellerStoreUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
 
     val sellerName: String = "",
     val sellerPhoto: String = "",

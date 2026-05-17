@@ -26,7 +26,7 @@ sealed class OrderEvent {
 
     object ClickBack : OrderEvent()
     object ClickChatList : OrderEvent()
-    data class ClickChat(val cafeId: String) : OrderEvent()
+    data class ClickChat(val orderId: String) : OrderEvent()
 }
 
 sealed class OrderEffect {

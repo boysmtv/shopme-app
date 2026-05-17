@@ -53,6 +53,7 @@ private fun handleEffect(
 ) {
     when (effect) {
         LoginEffect.NavigateToHome -> CustomerNavActions.toHome(nav)
+        LoginEffect.NavigateToSellerDashboard -> CustomerNavActions.toSeller(nav)
         LoginEffect.NavigateToRegister -> CustomerNavActions.toRegister(nav)
         LoginEffect.NavigateToForgotPassword -> CustomerNavActions.toForgetPassword(nav)
     }

@@ -43,5 +43,35 @@ data class OrderResponse(
     val paymentMethod: PaymentMethod,
     val paymentStatus: PaymentStatus,
     val createdAt: String? = null,
-    val items: List<OrderItemResponse>
+    val items: List<OrderItemResponse>,
+    val timeline: List<OrderTimelineResponse> = emptyList(),
+    val payment: OrderPaymentResponse? = null
+)
+
+@Serializable
+data class OrderTimelineResponse(
+    val status: OrderStatus,
+    val actorRole: String = "",
+    val reason: String? = null,
+    val createdAt: String = ""
+)
+
+@Serializable
+data class OrderPaymentResponse(
+    val method: PaymentMethod,
+    val status: PaymentStatus,
+    val transferConfirmationAvailable: Boolean = false,
+    val sellerVerificationRequired: Boolean = false,
+    val proofRequired: Boolean = false,
+    val proofUrl: String? = null,
+    val instruction: String = "",
+    val history: List<OrderPaymentHistoryResponse> = emptyList()
+)
+
+@Serializable
+data class OrderPaymentHistoryResponse(
+    val status: PaymentStatus,
+    val actorRole: String = "",
+    val reason: String? = null,
+    val createdAt: String = ""
 )

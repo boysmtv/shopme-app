@@ -255,8 +255,13 @@ class SellerProductFormViewModel @Inject constructor(
     private fun save() {
         val product = _state.value.product
 
-        if (product.name.isBlank() || product.price.isBlank() || product.stock <= 0) {
-            showError(UiError.Validation(message = "Nama, harga, dan stok wajib valid"))
+        if (product.name.isBlank() || product.description.isBlank() || product.price.isBlank() || product.stock <= 0) {
+            showError(UiError.Validation(message = "Nama, deskripsi, harga, dan stok wajib valid"))
+            return
+        }
+
+        if (_state.value.images.filterNotNull().none { it.startsWith("content://") || it.startsWith("http://") || it.startsWith("https://") }) {
+            showError(UiError.Validation(message = "Tambahkan minimal 1 gambar produk yang valid"))
             return
         }
 

@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.seller.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,16 +26,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,9 +64,8 @@ import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailMessage
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailUiState
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
-import com.mtv.based.uicomponent.core.component.loading.LoadingV1
-import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SellerChatScreen(
     state: SellerChatDetailUiState,
@@ -64,31 +73,40 @@ fun SellerChatScreen(
 ) {
     val messages = state.messages
     val messageInput = state.currentMessage
+    val listState = rememberLazyListState()
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(SellerChatDetailEvent.Load) }
+    )
+    val presenceText = if (state.isPeerOnline) {
+        "Customer online"
+    } else {
+        "Customer offline"
+    }
+    val presenceColor = if (state.isPeerOnline) Color(0xFF4CAF50) else Color.Gray
 
-    if (state.isLoading && messages.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LoadingV2()
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.lastIndex)
         }
-        return
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(Color.White)
     ) {
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .statusBarsPadding()
-                .padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .statusBarsPadding()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
             IconButton(onClick = { event(SellerChatDetailEvent.ClickBack) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
@@ -114,33 +132,51 @@ fun SellerChatScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "Percakapan aktif",
+                    presenceText,
                     fontFamily = PoppinsFont,
                     fontSize = 12.sp,
-                    color = Color(0xFF4CAF50)
+                    color = presenceColor
                 )
             }
 
             Spacer(Modifier.weight(1f))
-        }
-
-        Spacer(Modifier.height(16.dp))
-        HorizontalDivider()
-        Spacer(Modifier.height(16.dp))
-
-        LazyColumn(
-            modifier = Modifier.weight(1f).padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(messages) { msg ->
-                SellerChatBubble(msg)
             }
-        }
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+            Spacer(Modifier.height(16.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(16.dp))
+
+            if (messages.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Chat belum ada", fontFamily = PoppinsFont, fontSize = 14.sp, color = Color.Gray)
+                }
+            } else {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.weight(1f).padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(messages) { msg ->
+                        SellerChatBubble(
+                            msg = msg,
+                            onRetry = {
+                                event(SellerChatDetailEvent.RetryMessage(msg.id, msg.message))
+                            }
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
             OutlinedTextField(
                 value = messageInput,
                 onValueChange = { event(SellerChatDetailEvent.ChangeMessage(it)) },
@@ -154,7 +190,7 @@ fun SellerChatScreen(
 
             IconButton(
                 onClick = {
-                    if (messageInput.isNotBlank() && !state.isSending) {
+                    if (messageInput.isNotBlank()) {
                         event(SellerChatDetailEvent.SendMessage)
                     }
                 },
@@ -163,18 +199,24 @@ fun SellerChatScreen(
                     .width(64.dp)
                     .background(AppColor.Blue, RoundedCornerShape(20.dp))
             ) {
-                if (state.isSending) {
-                    LoadingV1(modifier = Modifier.size(20.dp))
-                } else {
-                    Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = Color.White)
-                }
+                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = Color.White)
+            }
             }
         }
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
 @Composable
-fun SellerChatBubble(msg: SellerChatDetailMessage) {
+fun SellerChatBubble(
+    msg: SellerChatDetailMessage,
+    onRetry: () -> Unit = {}
+) {
     val bubbleColor = if (msg.isFromSeller) AppColor.Blue else AppColor.BlueSoft
     val textColor = if (msg.isFromSeller) Color.White else Color.Black
     val arrangement = if (msg.isFromSeller) Arrangement.End else Arrangement.Start
@@ -183,12 +225,69 @@ fun SellerChatBubble(msg: SellerChatDetailMessage) {
         Box(
             modifier = Modifier
                 .background(bubbleColor, RoundedCornerShape(16.dp))
-                .padding(12.dp)
+                .padding(start = 12.dp, end = 10.dp, top = 10.dp, bottom = 8.dp)
                 .widthIn(max = 250.dp)
         ) {
-            Text(msg.message, fontFamily = PoppinsFont, fontSize = 14.sp, color = textColor)
+            Column {
+                Text(msg.message, fontFamily = PoppinsFont, fontSize = 14.sp, color = textColor)
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = msg.time.ifBlank { "Baru saja" },
+                        fontFamily = PoppinsFont,
+                        fontSize = 10.sp,
+                        color = textColor.copy(alpha = 0.72f)
+                    )
+                    if (msg.isFromSeller) {
+                        if (msg.isFailed) {
+                            Row(
+                                modifier = Modifier.clickable { onRetry() },
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Retry",
+                                    tint = Color(0xFFFFCDD2),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Text(
+                                    text = "Kirim ulang",
+                                    color = Color(0xFFFFCDD2),
+                                    fontFamily = PoppinsFont,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        } else {
+                            SellerChatDeliveryCheck(
+                                isPending = msg.isPending,
+                                isRead = msg.isRead
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun SellerChatDeliveryCheck(
+    isPending: Boolean,
+    isRead: Boolean
+) {
+    val icon = if (isPending) Icons.Default.Done else Icons.Default.DoneAll
+    val tint = if (isRead && !isPending) Color(0xFF34B7F1) else Color(0xFFE0E0E0)
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = tint,
+        modifier = Modifier.size(14.dp)
+    )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

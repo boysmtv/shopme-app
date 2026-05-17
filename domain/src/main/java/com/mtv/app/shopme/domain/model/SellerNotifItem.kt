@@ -8,4 +8,8 @@ data class SellerNotifItem(
     val date: String,
     val time: String,
     val isRead: Boolean,
+    val orderItemsSummary: String = "",
+    val deliveryAddress: String = "",
+    val paymentStatus: String = "",
+    val orderStatus: String = "",
 )

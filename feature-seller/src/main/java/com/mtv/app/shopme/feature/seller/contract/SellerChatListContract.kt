@@ -10,6 +10,7 @@ package com.mtv.app.shopme.feature.seller.contract
 
 data class SellerChatListUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val chatList: List<SellerChatListItem> = emptyList()
 )
 

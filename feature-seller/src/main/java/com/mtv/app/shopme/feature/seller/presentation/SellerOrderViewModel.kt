@@ -58,6 +58,7 @@ class SellerOrderViewModel @Inject constructor(
         when (event) {
 
             SellerOrderEvent.Load -> load()
+            SellerOrderEvent.LoadMore -> loadMore()
 
             SellerOrderEvent.DismissDialog -> dismissDialog()
 
@@ -80,19 +81,49 @@ class SellerOrderViewModel @Inject constructor(
         realtimeGateway.ensureConnected()
         observeProfile()
         observeIndependentDataFlow(
-            flow = getSellerOrdersUseCase(),
+            flow = getSellerOrdersUseCase(0, PAGE_SIZE),
             onState = { result ->
                 _state.update {
                     it.copy(
-                        isLoading = result is LoadState.Loading,
+                        isLoading = result is LoadState.Loading && it.orders.isEmpty(),
+                        isRefreshing = result is LoadState.Loading && it.orders.isNotEmpty(),
+                        isLoadingMore = false,
+                        currentPage = if (result is LoadState.Success) result.data.page else it.currentPage,
+                        isLastPage = if (result is LoadState.Success) result.data.last else it.isLastPage,
                         orders = if (result is LoadState.Success) {
-                            result.data.map { sellerOrder ->
+                            result.data.content.map { sellerOrder ->
                                 sellerOrder.toOrderSummary()
                             }
                         } else {
                             it.orders
                         }
                     )
+                }
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun loadMore() {
+        val state = _state.value
+        if (state.isLoading || state.isRefreshing || state.isLoadingMore || state.isLastPage) return
+        observeIndependentDataFlow(
+            flow = getSellerOrdersUseCase(state.currentPage + 1, PAGE_SIZE),
+            onState = { result ->
+                _state.update {
+                    when (result) {
+                        is LoadState.Loading -> it.copy(isLoadingMore = true)
+                        is LoadState.Success -> it.copy(
+                            isLoadingMore = false,
+                            currentPage = result.data.page,
+                            isLastPage = result.data.last,
+                            orders = it.orders + result.data.content.map { sellerOrder ->
+                                sellerOrder.toOrderSummary()
+                            }
+                        )
+                        is LoadState.Error -> it.copy(isLoadingMore = false)
+                        else -> it
+                    }
                 }
             },
             onError = ::showError
@@ -145,7 +176,7 @@ class SellerOrderViewModel @Inject constructor(
         handleSessionError(
             error = error,
             sessionManager = sessionManager,
-            beforeLogout = { update { copy(isLoading = false) } }
+            beforeLogout = { update { copy(isLoading = false, isRefreshing = false) } }
         ) {
             setDialog(
                 UiDialog.Center(
@@ -158,5 +189,9 @@ class SellerOrderViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private companion object {
+        const val PAGE_SIZE = 20
     }
 }

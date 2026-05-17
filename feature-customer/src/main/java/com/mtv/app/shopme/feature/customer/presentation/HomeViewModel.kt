@@ -43,6 +43,8 @@ class HomeViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(HomeUiState())
     val uiState = _state.asStateFlow()
+    private var foodSeed: String = newFoodSeed()
+
     override fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.Load -> load()
@@ -57,6 +59,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun load() {
+        foodSeed = newFoodSeed()
         observeCustomer()
         observeFoods()
         observeFavorites()
@@ -74,19 +77,32 @@ class HomeViewModel @Inject constructor(
 
     private fun observeFoods() {
         observeIndependentDataFlow(
-            flow = homeFoodUseCase(SearchParam(name = "", page = 0)),
+            flow = homeFoodUseCase(SearchParam(name = "", page = 0, sort = "random", seed = foodSeed)),
             onState = { state ->
                 when (state) {
-                    is LoadState.Loading -> _state.update { it.copy(foods = LoadState.Loading, isLoadingMore = false) }
+                    is LoadState.Loading -> _state.update {
+                        if (it.foods is LoadState.Success) {
+                            it.copy(isRefreshing = true, isLoadingMore = false)
+                        } else {
+                            it.copy(foods = LoadState.Loading, isRefreshing = false, isLoadingMore = false)
+                        }
+                    }
                     is LoadState.Success -> _state.update {
                         it.copy(
                             foods = LoadState.Success(state.data.content),
                             page = state.data.page,
                             isLastPage = state.data.last,
+                            isRefreshing = false,
                             isLoadingMore = false
                         )
                     }
-                    is LoadState.Error -> _state.update { it.copy(foods = LoadState.Error(state.error), isLoadingMore = false) }
+                    is LoadState.Error -> _state.update {
+                        if (it.foods is LoadState.Success) {
+                            it.copy(isRefreshing = false, isLoadingMore = false)
+                        } else {
+                            it.copy(foods = LoadState.Error(state.error), isRefreshing = false, isLoadingMore = false)
+                        }
+                    }
                     else -> Unit
                 }
             },
@@ -100,7 +116,7 @@ class HomeViewModel @Inject constructor(
         val state = _state.value
         if (state.isLastPage || state.isLoadingMore || state.foods is LoadState.Loading) return
         observeIndependentDataFlow(
-            flow = homeFoodUseCase(SearchParam(name = "", page = state.page + 1)),
+            flow = homeFoodUseCase(SearchParam(name = "", page = state.page + 1, sort = "random", seed = foodSeed)),
             onState = { result ->
                 when (result) {
                     is LoadState.Loading -> _state.update { it.copy(isLoadingMore = true) }
@@ -128,7 +144,11 @@ class HomeViewModel @Inject constructor(
             flow = customerUseCase(),
             onState = { state ->
                 _state.update {
-                    it.copy(customer = state)
+                    if (state is LoadState.Loading && it.customer is LoadState.Success) {
+                        it.copy(isRefreshing = true)
+                    } else {
+                        it.copy(customer = state, isRefreshing = state is LoadState.Loading && it.foods is LoadState.Success)
+                    }
                 }
             },
             onError = {
@@ -175,5 +195,7 @@ class HomeViewModel @Inject constructor(
             )
         }
     }
+
+    private fun newFoodSeed(): String = System.currentTimeMillis().toString()
 
 }

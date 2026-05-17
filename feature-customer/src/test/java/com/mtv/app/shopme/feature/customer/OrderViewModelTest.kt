@@ -6,7 +6,7 @@ import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
-import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureOrderChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
@@ -32,7 +32,7 @@ class OrderViewModelTest {
 
     private val getOrdersUseCase: GetOrdersUseCase = mockk()
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase = mockk()
-    private val ensureChatConversationUseCase: EnsureChatConversationUseCase = mockk()
+    private val ensureOrderChatConversationUseCase: EnsureOrderChatConversationUseCase = mockk()
     private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
@@ -55,7 +55,7 @@ class OrderViewModelTest {
         val vm = OrderViewModel(
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
-            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
             realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
@@ -79,7 +79,7 @@ class OrderViewModelTest {
         val vm = OrderViewModel(
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
-            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
             realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
@@ -92,19 +92,19 @@ class OrderViewModelTest {
     }
 
     @Test
-    fun `click chat should ensure conversation for selected cafe`() = runTest {
-        every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
+    fun `click chat should ensure conversation for selected order`() = runTest {
+        every { ensureOrderChatConversationUseCase.invoke("order-1") } returns flowOf(Resource.Success("conv-1"))
 
         val vm = OrderViewModel(
             getOrdersUseCase = getOrdersUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
-            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
             realtimeGateway = realtimeGateway,
             sessionManager = sessionManager
         )
         val effect = async { vm.effect.first() }
 
-        vm.onEvent(OrderEvent.ClickChat("cafe-1"))
+        vm.onEvent(OrderEvent.ClickChat("order-1"))
         advanceUntilIdle()
 
         assertEquals(OrderEffect.NavigateToChat("conv-1"), effect.await())

@@ -31,6 +31,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -64,57 +68,65 @@ import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
 import com.mtv.based.core.network.utils.LoadState
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatListScreen(
     state: ChatListUiState,
     event: (ChatListEvent) -> Unit
 ) {
-    Column(
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(ChatListEvent.Load) }
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(AppColor.White)
     ) {
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .statusBarsPadding()
-                .padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(Modifier.height(16.dp))
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .statusBarsPadding()
+                    .padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(onClick = { event(ChatListEvent.ClickBack) }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        modifier = Modifier.size(24.dp)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    IconButton(onClick = { event(ChatListEvent.ClickBack) }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    Text(
+                        text = "Chats",
+                        fontFamily = PoppinsFont,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
 
-                Text(
-                    text = "Chats",
-                    fontFamily = PoppinsFont,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                IconButton(onClick = { event(ChatListEvent.ClickClearAll) }) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteOutline,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
+            Spacer(Modifier.height(16.dp))
 
-            IconButton(onClick = { event(ChatListEvent.ClickClearAll) }) {
-                Icon(
-                    imageVector = Icons.Default.DeleteOutline,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-        }
-        Spacer(Modifier.height(16.dp))
-
-        HorizontalDivider()
-        Spacer(modifier = Modifier.height(16.dp))
+            HorizontalDivider()
+            Spacer(modifier = Modifier.height(16.dp))
 
         val chats = when (val state = state.chatListState) {
             is LoadState.Success -> state.data.chatList
@@ -139,8 +151,9 @@ fun ChatListScreen(
                 if (chatListState.data.chatList.isEmpty()) {
                     Box(
                         modifier = Modifier
+                            .weight(1f)
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 48.dp),
+                            .padding(horizontal = 24.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -180,6 +193,13 @@ fun ChatListScreen(
                 Unit
             }
         }
+        }
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 

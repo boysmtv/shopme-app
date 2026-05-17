@@ -9,11 +9,11 @@
 package com.mtv.app.shopme.feature.auth.presentation
 
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
+import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.param.LoginParam
 import com.mtv.app.shopme.domain.usecase.GetLoginUseCase
 import com.mtv.app.shopme.feature.auth.contract.*
-import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SecurePrefs
@@ -56,23 +56,39 @@ class LoginViewModel @Inject constructor(
 
     private fun doLogin() {
         val state = _state.value
+        val submittedEmail = state.email
+        val submittedPassword = state.password
 
-        observeDataFlow(
+        observeIndependentDataFlow(
             flow = loginUseCase(
                 LoginParam(
-                    email = state.email,
-                    password = state.password
+                    email = submittedEmail,
+                    password = submittedPassword
                 )
             ),
             onState = { result ->
-                _state.update { it.copy(login = result) }
+                _state.update {
+                    it.copy(
+                        email = it.email.ifBlank { submittedEmail },
+                        password = it.password.ifBlank { submittedPassword },
+                        login = result
+                    )
+                }
 
                 if (result is LoadState.Success) {
                     securePrefs.putString(
                         ACCESS_TOKEN,
                         result.data.accessToken
                     )
-                    emitEffect(LoginEffect.NavigateToHome)
+                    securePrefs.putString(
+                        USER_ROLE,
+                        result.data.role.uppercase()
+                    )
+                    if (result.data.role.equals("SELLER", ignoreCase = true)) {
+                        emitEffect(LoginEffect.NavigateToSellerDashboard)
+                    } else {
+                        emitEffect(LoginEffect.NavigateToHome)
+                    }
                 }
             },
             onError = {
@@ -86,7 +102,7 @@ class LoginViewModel @Inject constructor(
             UiDialog.Center(
                 state = DialogStateV1(
                     type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
+                    title = "Login gagal",
                     message = error.message
                 ),
                 onPrimary = { dismissDialog() }

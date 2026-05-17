@@ -77,6 +77,12 @@ fun SellerBottomNavigationBar(navController: NavController) {
                 NavigationBarItem(
                     selected = isSelected,
                     onClick = {
+                        if (isSelected) {
+                            navController.currentBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("refreshTick", System.currentTimeMillis())
+                            return@NavigationBarItem
+                        }
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true

@@ -10,6 +10,10 @@ package com.mtv.app.shopme.feature.seller.contract
 
 data class SellerOrderUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val currentPage: Int = 0,
+    val isLastPage: Boolean = false,
 
     val selectedFilter: String = "All",
     val isOnline: Boolean = true,
@@ -30,6 +34,7 @@ data class OrderSummary(
 
 sealed class SellerOrderEvent {
     object Load : SellerOrderEvent()
+    object LoadMore : SellerOrderEvent()
     object DismissDialog : SellerOrderEvent()
     data class SelectFilter(val value: String) : SellerOrderEvent()
     object ToggleOnline : SellerOrderEvent()

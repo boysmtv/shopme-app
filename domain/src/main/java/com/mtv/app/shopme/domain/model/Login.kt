@@ -10,4 +10,5 @@ package com.mtv.app.shopme.domain.model
 
 data class Login(
     val accessToken: String,
+    val role: String,
 )

@@ -31,6 +31,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,41 +63,49 @@ import com.mtv.app.shopme.feature.seller.contract.SellerChatListEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListItem
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListUiState
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SellerChatListScreen(
     state: SellerChatListUiState,
     event: (SellerChatListEvent) -> Unit
 ) {
-    Column(
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(SellerChatListEvent.Load) }
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(Color.White)
     ) {
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .statusBarsPadding()
-                .padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { event(SellerChatListEvent.ClickBack) }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .statusBarsPadding()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = { event(SellerChatListEvent.ClickBack) }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                    Text("Chats", fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                 }
-                Text("Chats", fontFamily = PoppinsFont, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+
+                IconButton(onClick = { event(SellerChatListEvent.ClickClearAll) }) {
+                    Icon(Icons.Default.DeleteOutline, contentDescription = null)
+                }
             }
 
-            IconButton(onClick = { event(SellerChatListEvent.ClickClearAll) }) {
-                Icon(Icons.Default.DeleteOutline, contentDescription = null)
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-        HorizontalDivider()
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
+            HorizontalDivider()
+            Spacer(Modifier.height(16.dp))
 
         when {
             state.isLoading && state.chatList.isEmpty() -> {
@@ -112,8 +124,9 @@ fun SellerChatListScreen(
             state.chatList.isEmpty() -> {
                 Box(
                     modifier = Modifier
+                        .weight(1f)
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 48.dp),
+                        .padding(horizontal = 24.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -141,6 +154,13 @@ fun SellerChatListScreen(
                 }
             }
         }
+        }
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 

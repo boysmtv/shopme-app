@@ -15,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
+import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerOrderDetailViewModel
@@ -62,5 +63,8 @@ private fun handleEffect(
                 ?.set("sellerOrderRefresh", true)
             nav.popBackStack()
         }
+
+        is SellerOrderDetailEffect.NavigateToChat ->
+            nav.navigate(SellerDestinations.navigateToChatDetail(effect.chatId))
     }
 }

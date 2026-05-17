@@ -11,7 +11,7 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
-import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureOrderChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 class OrderViewModel @Inject constructor(
     private val getOrdersUseCase: GetOrdersUseCase,
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase,
-    private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
+    private val ensureOrderChatConversationUseCase: EnsureOrderChatConversationUseCase,
     private val realtimeGateway: ShopmeRealtimeGateway,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<OrderEvent, OrderEffect>() {
@@ -61,15 +61,15 @@ class OrderViewModel @Inject constructor(
             is OrderEvent.ClickOrder -> emitEffect(OrderEffect.NavigateToDetail(event.orderId))
             is OrderEvent.ConfirmTransfer -> confirmTransfer(event.orderId)
             is OrderEvent.ClickChatList -> emitEffect(OrderEffect.NavigateToChatList)
-            is OrderEvent.ClickChat -> openChat(event.cafeId)
+            is OrderEvent.ClickChat -> openChat(event.orderId)
             is OrderEvent.ClickBack -> emitEffect(OrderEffect.NavigateBack)
         }
     }
 
-    private fun openChat(cafeId: String) {
-        if (cafeId.isBlank()) return
+    private fun openChat(orderId: String) {
+        if (orderId.isBlank()) return
         observeDataFlow(
-            flow = ensureChatConversationUseCase(cafeId),
+            flow = ensureOrderChatConversationUseCase(orderId),
             onSuccess = { emitEffect(OrderEffect.NavigateToChat(it)) },
             onError = { error ->
                 _state.update { it.copy(isLoading = false) }

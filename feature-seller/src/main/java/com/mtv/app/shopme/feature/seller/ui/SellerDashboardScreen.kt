@@ -29,10 +29,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Payment
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -70,6 +74,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.max
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SellerDashboardScreen(
     state: SellerDashboardUiState,
@@ -85,10 +90,15 @@ fun SellerDashboardScreen(
         if (selectedSort == "Asc") orders.sortedBy { it.location }
         else orders.sortedByDescending { it.location }
     }
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(SellerDashboardEvent.Refresh) }
+    )
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(
                 Brush.verticalGradient(
                     listOf(AppColor.Blue, AppColor.BlueSoft)
@@ -96,7 +106,6 @@ fun SellerDashboardScreen(
             )
             .statusBarsPadding()
     ) {
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -191,6 +200,12 @@ fun SellerDashboardScreen(
                 }
             }
         }
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 
 }

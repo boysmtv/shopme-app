@@ -11,12 +11,14 @@ package com.mtv.app.shopme.feature.customer.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
+import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatEffect
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatUiState
@@ -33,6 +35,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -64,6 +69,9 @@ class ChatViewModel @Inject constructor(
 
                     else -> Unit
                 }
+                if (event.type == ShopmeRealtimeEventType.PRESENCE_CHANGED) {
+                    handlePresence(event)
+                }
             }
         }
     }
@@ -73,6 +81,7 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.Load -> load()
             is ChatEvent.DismissDialog -> dismissDialog()
             is ChatEvent.SendMessage -> sendMessage(event)
+            is ChatEvent.RetryMessage -> retryMessage(event)
             is ChatEvent.ReadAllMessage -> readAll(event)
             is ChatEvent.ClickBack -> emitEffect(ChatEffect.NavigateBack)
         }
@@ -118,6 +127,12 @@ class ChatViewModel @Inject constructor(
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {
+                    if (state is com.mtv.based.core.network.utils.LoadState.Loading &&
+                        it.chats is com.mtv.based.core.network.utils.LoadState.Success
+                    ) {
+                        return@update it.copy(isRefreshing = true)
+                    }
+
                     val activeId = (state as? com.mtv.based.core.network.utils.LoadState.Success)
                         ?.data
                         ?.firstOrNull()
@@ -126,7 +141,13 @@ class ChatViewModel @Inject constructor(
 
                     it.copy(
                         activeChatId = it.activeChatId.ifBlank { activeId },
-                        chats = state
+                        chats = state,
+                        optimisticMessages = if (state is com.mtv.based.core.network.utils.LoadState.Success) {
+                            emptyList()
+                        } else {
+                            it.optimisticMessages
+                        },
+                        isRefreshing = false
                     ).also { nextState ->
                         nextActiveChatId = nextState.activeChatId
                     }
@@ -140,6 +161,23 @@ class ChatViewModel @Inject constructor(
     private fun sendMessage(event: ChatEvent.SendMessage) {
         val activeChatId = _state.value.activeChatId.ifBlank { event.id }
         if (activeChatId.isBlank()) return
+        val localMessage = ChatListItem(
+            id = "local-${System.currentTimeMillis()}",
+            name = "",
+            lastMessage = event.message,
+            time = currentChatTime(),
+            unreadCount = 0,
+            avatarUrl = null,
+            isFromUser = true,
+            isPending = true,
+            isRead = false,
+            isFailed = false
+        )
+        _state.update {
+            it.copy(
+                optimisticMessages = it.optimisticMessages + localMessage
+            )
+        }
         observeIndependentDataFlow(
             flow = chatSendMessageUseCase(activeChatId, event.message),
             onState = { state ->
@@ -151,8 +189,30 @@ class ChatViewModel @Inject constructor(
                 observeChatMetadata()
                 observeChat()
             },
-            onError = { showError(it) }
+            onError = {
+                _state.update { state ->
+                    state.copy(
+                        optimisticMessages = state.optimisticMessages.map { message ->
+                            if (message.id == localMessage.id) {
+                                message.copy(isPending = false, isRead = false, isFailed = true)
+                            } else {
+                                message
+                            }
+                        }
+                    )
+                }
+                showError(it)
+            }
         )
+    }
+
+    private fun retryMessage(event: ChatEvent.RetryMessage) {
+        val activeChatId = _state.value.activeChatId
+        if (activeChatId.isBlank() || event.message.isBlank()) return
+        _state.update {
+            it.copy(optimisticMessages = it.optimisticMessages.filterNot { message -> message.id == event.localId })
+        }
+        sendMessage(ChatEvent.SendMessage(activeChatId, event.message))
     }
 
     private fun readAll(event: ChatEvent.ReadAllMessage) {
@@ -176,6 +236,19 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    private fun handlePresence(event: ShopmeRealtimeEvent) {
+        val activeCafeId = _state.value.activeChatId.conversationCafeId()
+        if (activeCafeId.isBlank() || event.onlineCafeId != activeCafeId) {
+            return
+        }
+        _state.update {
+            it.copy(
+                isPeerOnline = event.online == true,
+                peerLastSeenAt = event.lastSeenAt.orEmpty()
+            )
+        }
+    }
+
     private fun showError(error: UiError) {
         handleSessionError(error, sessionManager) {
             setDialog(
@@ -190,4 +263,9 @@ class ChatViewModel @Inject constructor(
             )
         }
     }
+
+    private fun currentChatTime(): String =
+        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 }
+
+private fun String.conversationCafeId(): String = substringBefore("_", missingDelimiterValue = "")

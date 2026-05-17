@@ -20,6 +20,10 @@ import androidx.compose.material.icons.filled.LocalMall
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SetMeal
 import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,14 +54,21 @@ import java.math.BigDecimal
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     state: HomeUiState,
     event: (HomeEvent) -> Unit
 ) {
-    Column(
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(HomeEvent.Load) }
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(
                 Brush.verticalGradient(
                     listOf(
@@ -70,34 +81,44 @@ fun HomeScreen(
             .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
-        when (val customerState = state.customer) {
-            is LoadState.Loading -> {
-                ShimmerHomeHeaderSkeleton()
+            when (val customerState = state.customer) {
+                is LoadState.Loading -> {
+                    ShimmerHomeHeaderSkeleton()
+                }
+
+                is LoadState.Success -> {
+                    HomeHeader(
+                        customerData = customerState.data,
+                        onNotifClick = { event(HomeEvent.ClickNotif) }
+                    )
+                }
+
+                else -> Unit
             }
 
-            is LoadState.Success -> {
-                HomeHeader(
-                    customerData = customerState.data,
-                    onNotifClick = { event(HomeEvent.ClickNotif) }
-                )
-            }
+            Spacer(Modifier.height(16.dp))
 
-            else -> Unit
+            HomeContent(
+                state = state,
+                onClickFood = { event(HomeEvent.ClickFood(it)) },
+                onToggleFavorite = { event(HomeEvent.ToggleFavorite(it)) },
+                onClickSearch = { event(HomeEvent.ClickSearch) },
+                onCategoryClick = { event(HomeEvent.ClickCategory(it)) },
+                onLoadNextPage = { event(HomeEvent.LoadNextPage) },
+                onRetry = { event(HomeEvent.Load) }
+            )
         }
 
-        Spacer(Modifier.height(16.dp))
-
-        HomeContent(
-            state = state,
-            onClickFood = { event(HomeEvent.ClickFood(it)) },
-            onToggleFavorite = { event(HomeEvent.ToggleFavorite(it)) },
-            onClickSearch = { event(HomeEvent.ClickSearch) },
-            onCategoryClick = { event(HomeEvent.ClickCategory(it)) },
-            onLoadNextPage = { event(HomeEvent.LoadNextPage) },
-            onRetry = { event(HomeEvent.Load) }
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 }
@@ -221,9 +242,7 @@ private fun PaginationFoodShimmer() {
             .padding(vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        repeat(2) {
-            PaginationGridCardShimmer()
-        }
+        PaginationGridCardShimmer()
     }
 }
 

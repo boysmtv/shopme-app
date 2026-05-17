@@ -13,6 +13,7 @@ import com.mtv.based.core.network.utils.LoadState
 
 data class ChatListUiState(
     val chatListState: LoadState<ChatList> = LoadState.Idle,
+    val isRefreshing: Boolean = false
 )
 
 sealed class ChatListEvent {

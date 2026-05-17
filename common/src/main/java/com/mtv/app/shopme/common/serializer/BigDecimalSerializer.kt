@@ -7,6 +7,8 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.jsonPrimitive
 
 object BigDecimalSerializer : KSerializer<BigDecimal> {
 
@@ -18,6 +20,10 @@ object BigDecimalSerializer : KSerializer<BigDecimal> {
     }
 
     override fun deserialize(decoder: Decoder): BigDecimal {
-        return decoder.decodeString().toBigDecimal()
+        return if (decoder is JsonDecoder) {
+            decoder.decodeJsonElement().jsonPrimitive.content.toBigDecimal()
+        } else {
+            decoder.decodeString().toBigDecimal()
+        }
     }
 }

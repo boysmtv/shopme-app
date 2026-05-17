@@ -74,14 +74,24 @@ class CartViewModel @Inject constructor(
     private fun observeCart() {
         observeDataFlow(
             flow = cartItemUseCase(),
-            onLoad = { showLoading() },
-            onSuccess = { hideLoading() },
             onState = { state ->
                 _state.update {
-                    it.copy(cartItems = state)
+                    when (state) {
+                        is LoadState.Loading -> {
+                            if (it.cartItems is LoadState.Success) it.copy(isRefreshing = true)
+                            else it.copy(cartItems = LoadState.Loading, isRefreshing = false)
+                        }
+                        is LoadState.Success -> it.copy(cartItems = state, isRefreshing = false)
+                        is LoadState.Error -> {
+                            if (it.cartItems is LoadState.Success) it.copy(isRefreshing = false)
+                            else it.copy(cartItems = state, isRefreshing = false)
+                        }
+                        else -> it.copy(cartItems = state, isRefreshing = false)
+                    }
                 }
             },
             onError = {
+                _state.update { it.copy(isRefreshing = false) }
                 showError(it)
             }
         )

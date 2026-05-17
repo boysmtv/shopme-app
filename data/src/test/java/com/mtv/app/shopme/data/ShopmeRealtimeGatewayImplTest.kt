@@ -39,6 +39,19 @@ class ShopmeRealtimeGatewayImplTest {
     }
 
     @Test
+    fun `parseRealtimeEvent should decode presence payload`() {
+        val event = parseRealtimeEvent(
+            """{"type":"PRESENCE_CHANGED","onlineCafeId":"cafe-1","online":true,"lastSeenAt":"2026-05-17T01:00:00Z","occurredAt":"2026-05-17T01:00:00Z"}"""
+        )
+
+        assertNotNull(event)
+        assertEquals(ShopmeRealtimeEventType.PRESENCE_CHANGED, event?.type)
+        assertEquals("cafe-1", event?.onlineCafeId)
+        assertEquals(true, event?.online)
+        assertEquals("2026-05-17T01:00:00Z", event?.lastSeenAt)
+    }
+
+    @Test
     fun `parseRealtimeEvent should ignore invalid payload`() {
         val event = parseRealtimeEvent("not-json")
 

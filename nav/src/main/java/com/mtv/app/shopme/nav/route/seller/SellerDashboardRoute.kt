@@ -9,7 +9,10 @@
 package com.mtv.app.shopme.nav.route.seller
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -28,6 +31,15 @@ fun SellerDashboardRoute(nav: NavController) {
 
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+    val refreshTick by nav.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("refreshTick", 0L)
+        ?.collectAsStateWithLifecycle()
+        ?: remember { mutableLongStateOf(0L) }
+
+    LaunchedEffect(refreshTick) {
+        if (refreshTick > 0L) vm.onEvent(SellerDashboardEvent.Refresh)
+    }
 
     BaseRoute(
         viewModel = vm,

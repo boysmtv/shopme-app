@@ -204,6 +204,12 @@ fun NavGraphBuilder.orderGraph(nav: NavHostController) {
         OrderRoute(nav)
     }
     composable(
+        route = CustomerDestinations.ORDER_GRAPH_WITH_FILTER,
+        arguments = listOf(navArgument("filter") { type = NavType.StringType })
+    ) {
+        OrderRoute(nav, initialFilter = it.arguments?.getString("filter").orEmpty())
+    }
+    composable(
         route = CustomerDestinations.ORDER_DETAIL_GRAPH_WITH_ID,
         arguments = listOf(navArgument("orderId") { type = NavType.StringType })
     ) {

@@ -132,6 +132,7 @@ class SellerDashboardViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoading = result is LoadState.Loading,
+                        isRefreshing = result is LoadState.Loading && it.orders.isNotEmpty(),
                         orders = if (result is LoadState.Success) result.data else it.orders,
                         errorMessage = when (result) {
                             is LoadState.Success, is LoadState.Loading -> null
@@ -142,7 +143,7 @@ class SellerDashboardViewModel @Inject constructor(
             },
             onError = {
                 _state.update { state ->
-                    state.copy(isLoading = false, errorMessage = it.message)
+                    state.copy(isLoading = false, isRefreshing = false, errorMessage = it.message)
                 }
                 showError(it)
             }
@@ -169,7 +170,7 @@ class SellerDashboardViewModel @Inject constructor(
         handleSessionError(
             error = error,
             sessionManager = sessionManager,
-            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+            beforeLogout = { _state.update { it.copy(isLoading = false, isRefreshing = false) } }
         ) {
             setDialog(
                 UiDialog.Center(

@@ -2,6 +2,7 @@ package com.mtv.app.shopme.core.realtime
 
 enum class ShopmeRealtimeEventType {
     CONNECTED,
+    PRESENCE_CHANGED,
     CHAT_MESSAGE,
     CHAT_READ,
     NOTIFICATION_CREATED,
@@ -21,5 +22,9 @@ data class ShopmeRealtimeEvent(
     val title: String? = null,
     val message: String? = null,
     val actorId: String? = null,
+    val onlineCustomerId: String? = null,
+    val onlineCafeId: String? = null,
+    val online: Boolean? = null,
+    val lastSeenAt: String? = null,
     val occurredAt: String? = null
 )

@@ -55,6 +55,7 @@ private fun handleEffect(
 ) {
     when (effect) {
         SplashEffect.NavigateToHome -> CustomerNavActions.toHome(nav)
+        SplashEffect.NavigateToSellerDashboard -> CustomerNavActions.toSeller(nav)
         SplashEffect.NavigateToLogin -> CustomerNavActions.toLogin(nav)
         SplashEffect.ExitApp -> (nav.context as? Activity)?.finishAffinity()
     }

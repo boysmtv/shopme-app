@@ -20,6 +20,10 @@ interface ChatRepository {
 
     fun ensureConversation(cafeId: String): Flow<Resource<String>>
 
+    fun ensureOrderConversation(orderId: String): Flow<Resource<String>>
+
+    fun ensureSellerConversation(orderId: String): Flow<Resource<String>>
+
     fun sendMessage(id: String, message: String, asSeller: Boolean = false): Flow<Resource<Unit>>
 
     fun readAllMessage(id: String, asSeller: Boolean = false): Flow<Resource<Unit>>

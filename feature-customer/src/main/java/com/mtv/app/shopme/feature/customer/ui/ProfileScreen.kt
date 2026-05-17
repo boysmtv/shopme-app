@@ -40,6 +40,10 @@ import androidx.compose.material.icons.filled.LocalShipping
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -79,6 +83,7 @@ import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
 import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerProfileScreen
 import com.mtv.based.core.network.utils.LoadState
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ProfileScreen(
     state: ProfileUiState,
@@ -86,12 +91,24 @@ fun ProfileScreen(
 ) {
     val customer = (state.customer as? LoadState.Success)?.data
     val scrollState = rememberScrollState()
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(ProfileEvent.Load) }
+    )
 
+    val activeOrderCount = customer?.stats?.activeOrders ?: 0
+    val menuSummary = customer?.menuSummary
+    val hasMenuSummary = listOf(
+        menuSummary?.ordered ?: 0,
+        menuSummary?.cooking ?: 0,
+        menuSummary?.shipping ?: 0,
+        menuSummary?.completed ?: 0
+    ).any { it > 0 }
     val orderMenus = listOf(
-        OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet, customer?.menuSummary?.ordered ?: 0),
-        OrderMenu("Dimasak", Icons.Filled.Inventory, customer?.menuSummary?.cooking ?: 0),
-        OrderMenu("Dikirim", Icons.Filled.LocalShipping, customer?.menuSummary?.shipping ?: 0),
-        OrderMenu("Selesai", Icons.Filled.CheckCircle, customer?.menuSummary?.completed ?: 0)
+        OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet, menuSummary?.ordered ?: activeOrderCount.takeUnless { hasMenuSummary } ?: 0, "ORDERED"),
+        OrderMenu("Dimasak", Icons.Filled.Inventory, menuSummary?.cooking ?: 0, "COOKING"),
+        OrderMenu("Dikirim", Icons.Filled.LocalShipping, menuSummary?.shipping ?: 0, "DELIVERING"),
+        OrderMenu("Selesai", Icons.Filled.CheckCircle, menuSummary?.completed ?: 0, "COMPLETED")
     )
 
     when (val customerState = state.customer) {
@@ -109,9 +126,10 @@ fun ProfileScreen(
         }
 
         else -> {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .pullRefresh(pullRefreshState)
                     .background(
                         Brush.verticalGradient(
                             listOf(
@@ -120,8 +138,12 @@ fun ProfileScreen(
                             )
                         )
                     )
-                    .statusBarsPadding()
-                    .padding(top = 24.dp)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .padding(top = 24.dp)
             ) {
                 HeaderProfile(customer)
 
@@ -166,12 +188,12 @@ fun ProfileScreen(
                         ) {
                             orderMenus.forEach { menu ->
 
-                                Column(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable { event(ProfileEvent.ClickOrder) },
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .clickable { event(ProfileEvent.ClickOrder(menu.filter)) },
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
 
                                     Box(
                                         modifier = Modifier
@@ -245,11 +267,6 @@ fun ProfileScreen(
                                 onClickMenu = { event(ProfileEvent.ClickSettings) }
                             )
                             ProfileMenuItem(
-                                title = "Menjadi Penjual",
-                                icon = Icons.Default.CardTravel,
-                                onClickMenu = { event(ProfileEvent.ClickCheckTncCafe) }
-                            )
-                            ProfileMenuItem(
                                 title = "Bantuan",
                                 icon = Icons.AutoMirrored.Filled.Help,
                                 onClickMenu = { event(ProfileEvent.ClickHelpCenter) }
@@ -263,6 +280,13 @@ fun ProfileScreen(
                         }
                     }
                 }
+                }
+
+                PullRefreshIndicator(
+                    refreshing = state.isRefreshing,
+                    state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
             }
         }
     }
@@ -345,9 +369,9 @@ fun HeaderProfile(
                     .padding(vertical = 14.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                ProfileStat(customer?.stats?.totalOrders.toString(), "Pesanan")
-                ProfileStat(customer?.stats?.activeOrders.toString(), "Aktif")
-                ProfileStat(customer?.stats?.membership.toString(), "Member")
+                ProfileStat((customer?.stats?.totalOrders ?: 0).toString(), "Pesanan")
+                ProfileStat((customer?.stats?.activeOrders ?: 0).toString(), "Aktif")
+                ProfileStat(customer?.stats?.membership.orEmpty().ifBlank { "-" }, "Member")
             }
         }
     }
@@ -425,7 +449,8 @@ fun ProfileMenuItem(
 data class OrderMenu(
     val title: String,
     val icon: ImageVector,
-    val count: Int
+    val count: Int,
+    val filter: String
 )
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

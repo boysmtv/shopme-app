@@ -53,6 +53,7 @@ class SearchViewModel @Inject constructor(
     val uiState = _state.asStateFlow()
 
     private val queryFlow = MutableStateFlow(initialQuery)
+    private var searchSeed: String = newSearchSeed()
 
     init {
         observeSearch()
@@ -72,6 +73,10 @@ class SearchViewModel @Inject constructor(
             }
 
             is SearchEvent.LoadNextPage -> loadNextPage()
+
+            SearchEvent.ClickFavorites -> {
+                emitEffect(SearchEffect.NavigateToFavorites)
+            }
 
             is SearchEvent.BackClicked -> {
                 emitEffect(SearchEffect.NavigateBack)
@@ -106,10 +111,15 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun doSearch(query: String, page: Int = 0) {
+        if (page == 0) {
+            searchSeed = newSearchSeed()
+        }
 
         val param = SearchParam(
             name = query,
-            page = page
+            page = page,
+            sort = "random",
+            seed = searchSeed
         )
 
         observeDataFlow(
@@ -119,8 +129,10 @@ class SearchViewModel @Inject constructor(
 
                     is LoadState.Loading -> {
                         if (page == 0) {
+                            val currentList = _state.value.getDataOrEmpty()
                             _state.update {
-                                it.copy(foods = LoadState.Loading)
+                                if (currentList.isNotEmpty()) it.copy(isRefreshing = true)
+                                else it.copy(foods = LoadState.Loading, isRefreshing = false)
                             }
                         } else {
                             _state.update {
@@ -143,6 +155,7 @@ class SearchViewModel @Inject constructor(
                                 foods = LoadState.Success(newList),
                                 page = data.page,
                                 isLastPage = data.last,
+                                isRefreshing = false,
                                 isLoadingMore = false
                             )
                         }
@@ -150,10 +163,15 @@ class SearchViewModel @Inject constructor(
 
                     is LoadState.Error -> {
                         _state.update {
-                            it.copy(
-                                foods = LoadState.Error(state.error),
-                                isLoadingMore = false
-                            )
+                            if (it.foods is LoadState.Success) {
+                                it.copy(isRefreshing = false, isLoadingMore = false)
+                            } else {
+                                it.copy(
+                                    foods = LoadState.Error(state.error),
+                                    isRefreshing = false,
+                                    isLoadingMore = false
+                                )
+                            }
                         }
                         showError(state.error)
                     }
@@ -222,4 +240,6 @@ class SearchViewModel @Inject constructor(
             )
         }
     }
+
+    private fun newSearchSeed(): String = System.currentTimeMillis().toString()
 }

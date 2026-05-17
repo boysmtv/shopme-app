@@ -48,7 +48,7 @@ class ProfileViewModel @Inject constructor(
             is ProfileEvent.ClickFavorites -> emitEffect(ProfileEffect.NavigateToFavorites)
             is ProfileEvent.ClickSettings -> emitEffect(ProfileEffect.NavigateToSettings)
             is ProfileEvent.ClickHelpCenter -> emitEffect(ProfileEffect.NavigateToHelpCenter)
-            is ProfileEvent.ClickOrder -> emitEffect(ProfileEffect.NavigateToOrder)
+            is ProfileEvent.ClickOrder -> emitEffect(ProfileEffect.NavigateToOrder(event.filter))
             is ProfileEvent.ClickCheckTncCafe -> handleCheckTnc()
             is ProfileEvent.ClickLogout -> logout()
         }
@@ -59,8 +59,26 @@ class ProfileViewModel @Inject constructor(
     private fun observeCustomer() {
         observeDataFlow(
             flow = customerUseCase(),
-            onState = { state -> _state.update { it.copy(customer = state) } },
-            onError = ::showError
+            onState = { state ->
+                _state.update {
+                    when (state) {
+                        is LoadState.Loading -> {
+                            if (it.customer is LoadState.Success) it.copy(isRefreshing = true)
+                            else it.copy(customer = LoadState.Loading, isRefreshing = false)
+                        }
+                        is LoadState.Success -> it.copy(customer = state, isRefreshing = false)
+                        is LoadState.Error -> {
+                            if (it.customer is LoadState.Success) it.copy(isRefreshing = false)
+                            else it.copy(customer = state, isRefreshing = false)
+                        }
+                        else -> it.copy(customer = state, isRefreshing = false)
+                    }
+                }
+            },
+            onError = {
+                _state.update { it.copy(isRefreshing = false) }
+                showError(it)
+            }
         )
     }
 

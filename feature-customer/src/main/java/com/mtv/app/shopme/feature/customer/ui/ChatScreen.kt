@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.customer.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,17 +27,26 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,8 +71,6 @@ import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatUiState
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.uicomponent.core.component.loading.LoadingV1
-import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class ChatMessage(
@@ -70,6 +78,7 @@ data class ChatMessage(
     val isFromUser: Boolean
 )
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ChatScreen(
     state: ChatUiState,
@@ -77,34 +86,45 @@ fun ChatScreen(
 ) {
     var userMessage by remember { mutableStateOf(EMPTY_STRING) }
 
-    val messages = (state.chats as? LoadState.Success)?.data.orEmpty()
-    val isInitialLoading = state.chats is LoadState.Loading && messages.isEmpty()
-    val isSending = state.sendMessage is LoadState.Loading
+    val messages = (state.chats as? LoadState.Success)?.data.orEmpty() + state.optimisticMessages
+    val listState = rememberLazyListState()
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(ChatEvent.Load) }
+    )
+    val presenceText = if (state.isPeerOnline) {
+        "Seller online"
+    } else if (state.peerLastSeenAt.isNotBlank()) {
+        "Seller offline"
+    } else {
+        "Seller offline"
+    }
+    val presenceColor = if (state.isPeerOnline) Color(0xFF4CAF50) else Color.Gray
 
-    if (isInitialLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            LoadingV2()
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.lastIndex)
         }
-        return
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .pullRefresh(pullRefreshState)
             .background(Color.White)
     ) {
-        Spacer(Modifier.height(16.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .statusBarsPadding()
-                .padding(horizontal = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
+            Spacer(Modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .statusBarsPadding()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
             IconButton(onClick = { event(ChatEvent.ClickBack) }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
@@ -130,39 +150,62 @@ fun ChatScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "Percakapan aktif",
+                    presenceText,
                     fontFamily = PoppinsFont,
                     fontSize = 12.sp,
-                    color = Color(0xFF4CAF50)
+                    color = presenceColor
                 )
             }
 
             Spacer(Modifier.weight(1f))
-        }
-        Spacer(Modifier.height(16.dp))
-
-        HorizontalDivider(modifier = Modifier.height(1.dp))
-
-        Spacer(Modifier.height(16.dp))
-
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(messages) { msg ->
-                ChatBubble(msg)
             }
-        }
+            Spacer(Modifier.height(16.dp))
 
-        Row(
+            HorizontalDivider(modifier = Modifier.height(1.dp))
+
+            Spacer(Modifier.height(16.dp))
+
+            if (messages.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Chat belum ada",
+                        fontFamily = PoppinsFont,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(messages) { msg ->
+                        ChatBubble(
+                            chatListItem = msg,
+                            onRetry = {
+                                event(ChatEvent.RetryMessage(msg.id, msg.lastMessage))
+                            }
+                        )
+                    }
+                }
+            }
+
+            Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
-        ) {
+            ) {
             OutlinedTextField(
                 value = userMessage,
                 onValueChange = { userMessage = it },
@@ -186,7 +229,7 @@ fun ChatScreen(
 
             IconButton(
                 onClick = {
-                    if (userMessage.isNotEmpty() && !isSending) {
+                    if (userMessage.isNotBlank()) {
                         val targetId = state.activeChatId.ifBlank {
                             messages.firstOrNull()?.id.orEmpty()
                         }
@@ -210,22 +253,28 @@ fun ChatScreen(
                     .align(Alignment.Bottom)
                     .background(AppColor.Green, RoundedCornerShape(20.dp))
             ) {
-                if (isSending) {
-                    LoadingV1(modifier = Modifier.size(20.dp))
-                } else {
-                    Icon(
-                        Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Send",
-                        tint = AppColor.White
-                    )
-                }
+                Icon(
+                    Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "Send",
+                    tint = AppColor.White
+                )
+            }
             }
         }
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
     }
 }
 
 @Composable
-fun ChatBubble(chatListItem: ChatListItem) {
+fun ChatBubble(
+    chatListItem: ChatListItem,
+    onRetry: () -> Unit = {}
+) {
     val bubbleColor = if (chatListItem.isFromUser) AppColor.Green else AppColor.GreenSoft
     val alignment = if (chatListItem.isFromUser) Arrangement.End else Arrangement.Start
     val textColor = if (chatListItem.isFromUser) AppColor.White else Color.Black
@@ -237,17 +286,76 @@ fun ChatBubble(chatListItem: ChatListItem) {
         Box(
             modifier = Modifier
                 .background(bubbleColor, RoundedCornerShape(16.dp))
-                .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
+                .padding(start = 16.dp, end = 12.dp, top = 10.dp, bottom = 8.dp)
                 .widthIn(max = 250.dp)
         ) {
-            Text(
-                text = chatListItem.lastMessage,
-                color = textColor,
-                fontFamily = PoppinsFont,
-                fontSize = 14.sp
-            )
+            Column {
+                Text(
+                    text = chatListItem.lastMessage,
+                    color = textColor,
+                    fontFamily = PoppinsFont,
+                    fontSize = 14.sp
+                )
+
+                Spacer(Modifier.height(4.dp))
+
+                Row(
+                    modifier = Modifier.align(Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = chatListItem.time.ifBlank { "Baru saja" },
+                        color = textColor.copy(alpha = 0.72f),
+                        fontFamily = PoppinsFont,
+                        fontSize = 10.sp
+                    )
+                    if (chatListItem.isFromUser) {
+                        if (chatListItem.isFailed) {
+                            Row(
+                                modifier = Modifier.clickable { onRetry() },
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Retry",
+                                    tint = Color(0xFFFFCDD2),
+                                    modifier = Modifier.size(13.dp)
+                                )
+                                Text(
+                                    text = "Kirim ulang",
+                                    color = Color(0xFFFFCDD2),
+                                    fontFamily = PoppinsFont,
+                                    fontSize = 10.sp
+                                )
+                            }
+                        } else {
+                            ChatDeliveryCheck(
+                                isPending = chatListItem.isPending,
+                                isRead = chatListItem.isRead
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
+}
+
+@Composable
+private fun ChatDeliveryCheck(
+    isPending: Boolean,
+    isRead: Boolean
+) {
+    val icon = if (isPending) Icons.Default.Done else Icons.Default.DoneAll
+    val tint = if (isRead && !isPending) Color(0xFF34B7F1) else Color(0xFFE0E0E0)
+    Icon(
+        imageVector = icon,
+        contentDescription = null,
+        tint = tint,
+        modifier = Modifier.size(14.dp)
+    )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

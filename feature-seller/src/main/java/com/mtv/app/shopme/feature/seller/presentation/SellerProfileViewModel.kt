@@ -84,6 +84,7 @@ class SellerProfileViewModel @Inject constructor(
                     val profile = (result as? LoadState.Success)?.data
                     it.copy(
                         isLoading = result is LoadState.Loading,
+                        isRefreshing = result is LoadState.Loading && (it.sellerName.isNotBlank() || it.storeName.isNotBlank()),
                         sellerName = profile?.sellerName ?: it.sellerName,
                         sellerPhoto = profile?.sellerPhoto ?: it.sellerPhoto,
                         email = profile?.email ?: it.email,
@@ -108,6 +109,7 @@ class SellerProfileViewModel @Inject constructor(
                     val profile = (result as? LoadState.Success)?.data
                     it.copy(
                         isLoading = result is LoadState.Loading,
+                        isRefreshing = false,
                         sellerName = profile?.sellerName ?: it.sellerName,
                         sellerPhoto = profile?.sellerPhoto ?: it.sellerPhoto,
                         email = profile?.email ?: it.email,
@@ -132,7 +134,7 @@ class SellerProfileViewModel @Inject constructor(
         handleSessionError(
             error = error,
             sessionManager = sessionManager,
-            beforeLogout = { _state.update { it.copy(isLoading = false) } }
+            beforeLogout = { _state.update { it.copy(isLoading = false, isRefreshing = false) } }
         ) {
             setDialog(
                 UiDialog.Center(

@@ -15,6 +15,8 @@ import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.utils.requireData
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.based.core.network.model.RequestOptions
@@ -32,6 +34,29 @@ class FoodRemoteDataSource @Inject constructor(
     suspend fun getFoodsByCafe(id: String) = request<ApiResponse<List<FoodResponse>>>(
         endpoint = ApiEndPoint.Foods.GetByCafeId(id)
     ).requireData()
+
+    suspend fun getFoodsByCafe(
+        id: String,
+        page: Int,
+        size: Int,
+        query: String = "",
+        category: FoodCategory? = null,
+        status: FoodStatus? = null,
+        active: Boolean? = null
+    ) =
+        request<ApiResponse<PageResponse<FoodResponse>>>(
+            endpoint = ApiEndPoint.Foods.GetByCafeIdPage(id),
+            options = RequestOptions(
+                query = buildMap {
+                    put("page", page.toString())
+                    put("size", size.toString())
+                    if (query.isNotBlank()) put("q", query.trim())
+                    category?.let { put("category", it.name) }
+                    status?.let { put("status", it.name) }
+                    active?.let { put("active", it.toString()) }
+                }
+            )
+        ).requireData()
 
     suspend fun getFoodDetail(id: String) =
         request<ApiResponse<FoodResponse>>(
@@ -68,7 +93,8 @@ class FoodRemoteDataSource @Inject constructor(
                 "name" to param.name,
                 "page" to param.page.toString(),
                 "size" to param.size.toString(),
-                "sort" to param.sort
+                "sort" to param.sort,
+                "seed" to param.seed
             )
         )
     ).requireData()

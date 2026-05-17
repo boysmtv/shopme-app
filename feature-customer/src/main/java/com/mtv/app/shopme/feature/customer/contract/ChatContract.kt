@@ -16,8 +16,12 @@ data class ChatUiState(
     val chatName: String = "",
     val chatAvatarUrl: String? = null,
     val chats: LoadState<List<ChatListItem>> = LoadState.Idle,
+    val optimisticMessages: List<ChatListItem> = emptyList(),
     val sendMessage: LoadState<Unit> = LoadState.Idle,
-    val readAll: LoadState<Unit> = LoadState.Idle
+    val readAll: LoadState<Unit> = LoadState.Idle,
+    val isRefreshing: Boolean = false,
+    val isPeerOnline: Boolean = false,
+    val peerLastSeenAt: String = ""
 )
 
 sealed class ChatEvent {
@@ -25,6 +29,7 @@ sealed class ChatEvent {
     object DismissDialog : ChatEvent()
 
     data class SendMessage(val id: String, val message: String) : ChatEvent()
+    data class RetryMessage(val localId: String, val message: String) : ChatEvent()
     data class ReadAllMessage(val id: String) : ChatEvent()
 
     object ClickBack : ChatEvent()

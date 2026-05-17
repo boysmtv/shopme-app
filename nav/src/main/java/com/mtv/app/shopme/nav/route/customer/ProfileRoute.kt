@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.nav.route.customer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -28,6 +29,15 @@ fun ProfileRoute(nav: NavController) {
 
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+    val refreshTick by nav.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getStateFlow("refreshTick", 0L)
+        ?.collectAsStateWithLifecycle()
+        ?: androidx.compose.runtime.remember { androidx.compose.runtime.mutableLongStateOf(0L) }
+
+    LaunchedEffect(refreshTick) {
+        if (refreshTick > 0L) vm.onEvent(ProfileEvent.Load)
+    }
 
     BaseRoute(
         viewModel = vm,
@@ -58,7 +68,7 @@ private fun handleProfileEffect(
         ProfileEffect.NavigateToFavorites -> CustomerNavActions.toFavorites(nav)
         ProfileEffect.NavigateToSettings -> CustomerNavActions.toSettings(nav)
         ProfileEffect.NavigateToHelpCenter -> CustomerNavActions.toHelpCenter(nav)
-        ProfileEffect.NavigateToOrder -> CustomerNavActions.toOrder(nav)
+        is ProfileEffect.NavigateToOrder -> CustomerNavActions.toOrder(nav, effect.filter)
         ProfileEffect.NavigateToTnc -> CustomerNavActions.toTnc(nav)
         ProfileEffect.NavigateToSeller -> CustomerNavActions.toSeller(nav)
         ProfileEffect.NavigateToLogin -> CustomerNavActions.toLogin(nav)

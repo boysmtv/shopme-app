@@ -74,7 +74,7 @@ android {
         }
         debug {
             buildConfigField("String", "BASE_URL", "\"$debugBaseUrl\"")
-            buildConfigField("Boolean", "USE_KTOR", "true")
+            buildConfigField("Boolean", "USE_KTOR", "false")
         }
     }
 

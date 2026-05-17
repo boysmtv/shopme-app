@@ -11,6 +11,7 @@ package com.mtv.app.shopme.feature.seller.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
@@ -35,6 +36,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @HiltViewModel
 class SellerChatDetailViewModel @Inject constructor(
@@ -68,6 +72,9 @@ class SellerChatDetailViewModel @Inject constructor(
 
                     else -> Unit
                 }
+                if (event.type == ShopmeRealtimeEventType.PRESENCE_CHANGED) {
+                    handlePresence(event)
+                }
             }
         }
     }
@@ -82,6 +89,7 @@ class SellerChatDetailViewModel @Inject constructor(
             }
 
             is SellerChatDetailEvent.SendMessage -> sendMessage()
+            is SellerChatDetailEvent.RetryMessage -> retryMessage(event)
 
             is SellerChatDetailEvent.ClickBack ->
                 emitEffect(SellerChatDetailEffect.NavigateBack)
@@ -89,7 +97,12 @@ class SellerChatDetailViewModel @Inject constructor(
     }
 
     private fun load() {
-        _state.update { it.copy(isLoading = true) }
+        _state.update {
+            it.copy(
+                isLoading = it.messages.isEmpty(),
+                isRefreshing = it.messages.isNotEmpty()
+            )
+        }
         realtimeGateway.ensureConnected()
         observeChatMetadata()
     }
@@ -104,6 +117,7 @@ class SellerChatDetailViewModel @Inject constructor(
                     .orEmpty()
                 _state.update {
                     val resolvedActiveId = when {
+                        routeChatId.isNotBlank() -> routeChatId
                         it.activeChatId.isBlank() -> items.firstOrNull()?.id.orEmpty()
                         items.any { item -> item.id == it.activeChatId } -> it.activeChatId
                         else -> items.firstOrNull()?.id.orEmpty()
@@ -112,7 +126,8 @@ class SellerChatDetailViewModel @Inject constructor(
                         ?: items.firstOrNull()
                     it.copy(
                         isLoading = false,
-                        activeChatId = activeChat?.id.orEmpty(),
+                        isRefreshing = false,
+                        activeChatId = resolvedActiveId,
                         chatName = activeChat?.name.orEmpty(),
                         chatAvatarUrl = activeChat?.avatarUrl
                     )
@@ -139,13 +154,18 @@ class SellerChatDetailViewModel @Inject constructor(
                         ?.map { item ->
                             SellerChatDetailMessage(
                                 message = item.lastMessage,
-                                isFromSeller = !item.isFromUser
+                                isFromSeller = item.isFromUser,
+                                id = item.id,
+                                time = item.time,
+                                isPending = false,
+                                isRead = true
                             )
                         }
                         .orEmpty()
 
                     it.copy(
-                        isLoading = state is LoadState.Loading,
+                        isLoading = state is LoadState.Loading && it.messages.isEmpty(),
+                        isRefreshing = state is LoadState.Loading && it.messages.isNotEmpty(),
                         activeChatId = it.activeChatId.ifBlank { activeId },
                         messages = if (messages.isNotEmpty()) messages else it.messages
                     ).also { nextState ->
@@ -163,6 +183,21 @@ class SellerChatDetailViewModel @Inject constructor(
         if (message.isBlank()) return
         val chatId = _state.value.activeChatId
         if (chatId.isBlank()) return
+        val localMessage = SellerChatDetailMessage(
+            id = "local-${System.currentTimeMillis()}",
+            message = message,
+            isFromSeller = true,
+            time = currentChatTime(),
+            isPending = true,
+            isRead = false,
+            isFailed = false
+        )
+        _state.update {
+            it.copy(
+                currentMessage = "",
+                messages = it.messages + localMessage
+            )
+        }
 
         observeIndependentDataFlow(
             flow = sendChatMessageUseCase(chatId, message, asSeller = true),
@@ -170,12 +205,33 @@ class SellerChatDetailViewModel @Inject constructor(
                 _state.update { it.copy(isSending = state is LoadState.Loading) }
             },
             onSuccess = {
-                _state.update { it.copy(currentMessage = "", isSending = false) }
+                _state.update { it.copy(isSending = false) }
                 observeChatMetadata()
                 observeChat()
             },
-            onError = ::showError
+            onError = { error ->
+                _state.update { state ->
+                    state.copy(
+                        messages = state.messages.map {
+                            if (it.id == localMessage.id) it.copy(isPending = false, isRead = false, isFailed = true)
+                            else it
+                        }
+                    )
+                }
+                showError(error)
+            }
         )
+    }
+
+    private fun retryMessage(event: SellerChatDetailEvent.RetryMessage) {
+        if (event.message.isBlank()) return
+        _state.update {
+            it.copy(
+                currentMessage = event.message,
+                messages = it.messages.filterNot { message -> message.id == event.localId }
+            )
+        }
+        sendMessage()
     }
 
     private fun readAll(chatId: String) {
@@ -191,9 +247,22 @@ class SellerChatDetailViewModel @Inject constructor(
         readAll(chatId)
     }
 
+    private fun handlePresence(event: ShopmeRealtimeEvent) {
+        val activeCustomerId = _state.value.activeChatId.conversationCustomerId()
+        if (activeCustomerId.isBlank() || event.onlineCustomerId != activeCustomerId) {
+            return
+        }
+        _state.update {
+            it.copy(
+                isPeerOnline = event.online == true,
+                peerLastSeenAt = event.lastSeenAt.orEmpty()
+            )
+        }
+    }
+
     private fun showError(error: UiError) {
         handleSessionError(error, sessionManager) {
-            _state.update { it.copy(isLoading = false, isSending = false) }
+            _state.update { it.copy(isLoading = false, isRefreshing = false, isSending = false) }
             setDialog(
                 UiDialog.Center(
                     state = DialogStateV1(
@@ -206,4 +275,9 @@ class SellerChatDetailViewModel @Inject constructor(
             )
         }
     }
+
+    private fun currentChatTime(): String =
+        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
 }
+
+private fun String.conversationCustomerId(): String = substringAfter("_", missingDelimiterValue = "")

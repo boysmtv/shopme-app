@@ -9,7 +9,7 @@ Dokumen ini fokus ke:
 - perceived performance
 - rendering cost
 - network efficiency
-- image/base64 cost
+- image upload/render cost
 - cache/offline behavior
 - runtime stability saat data besar
 
@@ -29,13 +29,13 @@ Target praktis v1 optimasi:
 - home, detail, cart, chat list, seller dashboard terasa responsif pada dataset realistis
 - first content render lebih cepat dari baseline sebelumnya
 - scrolling list utama tidak terasa patah pada device uji normal
-- tidak ada decode base64 besar di main thread
+- tidak ada decode/render image besar di main thread
 - request list tidak menarik payload lebih besar dari yang dibutuhkan screen
 
-## Workstream 1. Image And Base64 Cost
+## Workstream 1. Image Upload And Render Cost
 
-- [ ] Audit semua titik decode base64 di Android
-- [ ] Pastikan decode base64 tidak terjadi di main thread
+- [ ] Audit semua titik upload, resolve, decode, dan render image di Android
+- [ ] Pastikan decode/render image besar tidak terjadi di main thread
 - [ ] Pisahkan penggunaan image list/thumbnail dari image detail/full
 - [ ] Tambahkan guard untuk image invalid, oversized, atau empty
 - [ ] Hindari decode ulang image yang sama pada screen yang sama
@@ -135,7 +135,7 @@ Evidence minimum:
 
 Kerjakan urutan ini lebih dulu:
 
-1. image/base64 cost
+1. image upload/render cost
 2. list rendering home/search/chat/order
 3. cache `show cached first`
 4. realtime delta update

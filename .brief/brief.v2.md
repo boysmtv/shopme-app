@@ -8,6 +8,27 @@ Brief ini merangkum hasil analisa dari kondisi Android saat ini, gap yang masih 
 
 V2 ini juga harus dianggap sebagai mandat kerja untuk `ai-agent`: agent wajib memahami konteks penuh Android, backend, integrasi Docker, demo data, contract verifier, test flow, dan dependency antar fitur sebelum menyimpulkan bahwa pekerjaan sudah selesai.
 
+## 2026-05-16 Cross-Codebase Audit Addendum
+
+Agent harus memperlakukan hasil audit silang Android-backend berikut sebagai brief aktif sebelum membuat perubahan berikutnya:
+
+- Endpoint aktif Android sudah broadly aligned dengan backend untuk auth, splash, customer/profile/address/village, cafe/seller, foods, cart, order, chat/support, notifications, media, dan realtime `/ws/realtime`.
+- Gap prioritas tertinggi adalah kontrak numeric: Android `BigDecimalSerializer` saat ini decode dari JSON string, sementara backend response DTO memakai `BigDecimal` normal untuk `price`/`totalPrice` dan Jackson belum memaksa BigDecimal keluar sebagai string.
+- Gap nullable penting: Android menganggap `CafeResponse.address` non-null, sementara backend dapat mengembalikan address nullable. Create/edit cafe juga berjalan dua tahap, yaitu cafe lalu cafe address.
+- `FoodStatus.UNKNOWN` hanya boleh dianggap fallback lokal Android/cache/UI. Jangan kirim `UNKNOWN` ke backend.
+- Seller notification belum membawa order id asli. Android saat ini dapat menampilkan notification id sebagai `Order #...`; deep-link/order labeling harus menunggu payload backend berisi order metadata.
+- Clear notification Android saat ini berarti mark-all-read via backend, bukan delete.
+- Compact food cache Android tidak boleh dianggap data otoritatif untuk detail atau keputusan bisnis karena beberapa field diisi placeholder.
+- Realtime payload aktif sudah selaras untuk `CONNECTED`, `CHAT_MESSAGE`, `CHAT_READ`, dan `NOTIFICATION_CREATED`.
+
+Pipeline audit terakhir:
+
+- Android `.\gradlew.bat testDebugUnitTest` passed pada Windows dengan Android Studio JBR.
+- Backend `./mvnw test` passed via Git Bash dengan Android Studio JBR.
+- 2026-05-16 pipeline live: Android `.\gradlew.bat assembleDebug testDebugUnitTest` passed.
+- Backend Docker app/postgres/redis/minio started successfully; `seed-demo-data.sh` passed using temporary PNG media fixtures; `test-api.sh --ci --cleanup` passed with `114 passed, 0 failed`.
+- Android contract verifier passed against `http://127.0.0.1:8080/v3/api-docs` with demo buyer/seller credentials.
+
 ## Current Baseline
 
 Hal yang sudah baik dan harus dipertahankan:
@@ -74,17 +95,17 @@ Target hasil:
 - perubahan payload backend cepat terdeteksi
 - UI tidak diam-diam salah menampilkan data
 
-### 2A. Standardize Photo Handling As Base64 String
+### 2A. Standardize Media Upload And URL Handling
 
-Semua foto pada integrasi `shopme` harus dianggap menggunakan format `base64 string` sebagai kontrak utama antara Android dan backend.
+Kontrak media aktif `shopme` memakai media upload/presign dan URL/reference string, bukan inline base64.
 
 Implikasi pengembangan yang wajib diikuti:
 
-- Android tidak boleh lagi mengasumsikan foto sebagai multipart upload, file path lokal, atau model list image bila kontrak endpoint hanya menerima string
-- semua request create/update yang membawa foto harus mengirim `base64 string` yang valid
-- semua response yang membawa foto harus dimapping sebagai string yang bisa langsung dirender, disimpan sementara, atau diubah ke representasi UI bila perlu
-- logika kompresi, resize, preview, cache, dan retry upload di Android harus menyesuaikan format `base64 string`
-- validasi ukuran payload, fallback saat image kosong, dan error parsing image harus ditangani secara eksplisit
+- Android harus mengunggah `content://` image melalui media API dengan scope yang sesuai sebelum request domain dikirim
+- request create/update yang membawa foto harus mengirim URL/reference hasil upload, bukan file path lokal, `content://`, atau inline `data:` payload
+- semua response yang membawa foto harus dimapping sebagai URL/reference string yang bisa langsung dirender, disimpan sementara, atau diubah ke representasi UI bila perlu
+- logika kompresi, resize, preview, cache, dan retry upload di Android harus menyesuaikan media upload/URL contract aktif
+- validasi ukuran upload, fallback saat image kosong, dan error parsing image harus ditangani secara eksplisit
 
 Target hasil:
 
@@ -93,9 +114,8 @@ Target hasil:
 
 Aturan yang masih harus ditegaskan saat implementasi:
 
-- tentukan satu format kontrak final: raw base64 atau data URL seperti `data:image/jpeg;base64,...`
 - tetapkan format gambar yang diizinkan: `jpg`, `jpeg`, `png`, atau `webp`
-- tetapkan ukuran maksimum payload foto per request
+- tetapkan ukuran maksimum upload foto per request
 - tentukan apakah resize dan kompresi wajib dilakukan di Android sebelum request dikirim
 
 ### 3. Harden Seller Operations
@@ -218,14 +238,14 @@ Target hasil:
 - screen tetap stabil saat data valid tetapi belum lengkap
 - empty state dan partial state lebih jujur terhadap kondisi backend
 
-### 9. Add Performance Guardrails For Base64 And Repeated Fetches
+### 9. Add Performance Guardrails For Media And Repeated Fetches
 
-Karena foto memakai `base64 string`, Android perlu guardrail performa yang eksplisit.
+Karena foto memakai media upload dan URL/reference string, Android perlu guardrail performa yang eksplisit.
 
 Pengembangan yang disarankan:
 
 - batasi ukuran foto sebelum upload
-- hindari render ulang string base64 besar secara berulang tanpa cache yang tepat
+- hindari render ulang image/reference besar secara berulang tanpa cache yang tepat
 - pertimbangkan pemisahan kebutuhan thumbnail vs detail image
 - audit screen list agar tidak memuat payload berat secara berlebihan
 
@@ -315,13 +335,13 @@ Target hasil:
 
 ### 15. Preserve A Migration Path For Media Contract Changes
 
-Kontrak aktif saat ini adalah foto sebagai `base64 string`, tetapi Android perlu siap bila suatu saat backend memigrasikan media ke model lain.
+Kontrak aktif saat ini adalah media upload dan URL/reference string. Android tetap perlu siap bila suatu saat backend memigrasikan media ke model lain.
 
 Pengembangan yang disarankan:
 
-- perlakukan `base64 string` sebagai kontrak aktif, bukan asumsi sementara yang kabur
-- siapkan area kode yang terisolasi untuk encoding/decoding media agar migrasi kontrak nanti tidak menyebar ke seluruh app
-- jangan campur logika preview image, upload encoding, dan parsing response di terlalu banyak fitur
+- perlakukan media upload/URL contract sebagai kontrak aktif, bukan asumsi sementara yang kabur
+- siapkan area kode yang terisolasi untuk upload/resolve media agar migrasi kontrak nanti tidak menyebar ke seluruh app
+- jangan campur logika preview image, upload, dan parsing response di terlalu banyak fitur
 
 Target hasil:
 
@@ -351,7 +371,7 @@ Target hasil:
 - perbaikan UX form
 - optimasi messaging dan visual feedback
 - instrumentation test untuk flow paling penting
-- performance guardrails untuk base64 image
+- performance guardrails untuk media upload dan render image
 - observability untuk bug mobile di runtime
 - poor-network behavior yang lebih matang
 - isolasi logika media untuk migration path
@@ -392,7 +412,7 @@ Milestone keluarannya:
 
 ### Workstream 4. Media And Performance
 
-- standardisasi base64 image
+- standardisasi media upload dan URL/reference image
 - optimasi resize/compress, memory, dan render image
 - rapikan poor-network dan retry behavior untuk payload besar
 
@@ -416,7 +436,7 @@ Pembagian tanggung jawab Android sebaiknya minimal seperti ini:
 - Android contract adaptation: DTO, mapper, repository, dan use case yang membaca kontrak backend
 - Android UX state: loading, empty, partial, error, retry, dan navigation recovery
 - Android auth/security: token storage, refresh flow, unauthorized handling, dan logout
-- Android media/base64: encoding, preview, resize, compress, cache, dan render
+- Android media: upload, preview, resize, compress, cache, dan render URL/reference
 - Android regression: unit test, integration verifier, dan runtime smoke evidence
 - Backend counterpart: perubahan kontrak, error semantics, auth boundary, dan demo data yang mempengaruhi Android
 
@@ -425,7 +445,7 @@ Pembagian tanggung jawab Android sebaiknya minimal seperti ini:
 V2 Android perlu target non-fungsional yang eksplisit:
 
 - app tidak boleh crash saat menerima payload backend aktif, termasuk partial data dan error response
-- parsing image base64 tidak boleh menyebabkan screen utama unusable
+- parsing/render image URL/reference tidak boleh menyebabkan screen utama unusable
 - screen list utama tetap responsif walau payload memuat image string
 - aksi penting harus tahan terhadap retry dan poor network tanpa duplikasi UX yang membingungkan
 - regression verification harus bisa dijalankan ulang dengan langkah yang konsisten
@@ -435,7 +455,7 @@ V2 Android perlu target non-fungsional yang eksplisit:
 Android harus menjaga data sensitif dengan aturan yang jelas:
 
 - token tidak boleh ditulis ke log biasa
-- base64 image tidak boleh dicetak penuh di log atau analytics
+- media URL/reference sensitif tidak boleh dicetak penuh di log atau analytics
 - field sensitif seperti email, nomor kontak, alamat, dan payload chat harus dimasking bila masuk log debug
 - data demo dan data nyata tidak boleh tercampur tanpa penanda yang jelas
 - screen yang menampilkan data sensitif harus menghindari fallback debug yang membocorkan isi payload
@@ -469,7 +489,7 @@ Selain automated test, V2 Android perlu checklist uji manual minimum:
 - seller happy path
 - auth failure dan expired token path
 - forbidden path untuk role yang salah
-- upload/render image base64 path
+- upload/render image media path
 - empty data dan partial data path
 - poor network, retry, dan recovery path
 
@@ -531,7 +551,7 @@ V2 Android harus menjaga aturan berikut:
 - error message jangan disederhanakan sampai kehilangan konteks bisnis
 - semua fitur utama buyer dan seller harus punya state kosong, state gagal, dan retry path
 - perubahan base URL, auth, atau contract harus diuji kembali terhadap backend Docker
-- semua field foto harus diperlakukan sebagai `base64 string` end-to-end kecuali kontrak backend resmi berubah
+- semua field foto harus mengikuti media upload/URL contract aktif; jangan reintroduce inline base64 atau `data:` payload
 - setiap perubahan kontrak field, enum, atau nullability harus punya review kompatibilitas Android-backend
 - halaman list tidak boleh mengasumsikan response tanpa paging akan selalu aman untuk jangka panjang
 - state tombol dan aksi di UI harus mengikuti state bisnis backend, bukan asumsi lokal
@@ -546,7 +566,7 @@ Perubahan kontrak Android-backend harus mengikuti aturan ini:
 - Android dan backend tidak boleh merge perubahan kontrak penting secara terpisah tanpa verifikasi silang
 - source of truth kontrak tetap payload backend aktif yang telah tervalidasi
 - perubahan kontrak harus disertai update test, verifier, atau bukti runtime yang relevan
-- perubahan format media di masa depan harus melalui migration plan yang eksplisit, tidak boleh diam-diam mengubah `base64 string`
+- perubahan format media di masa depan harus melalui migration plan yang eksplisit, tidak boleh diam-diam meninggalkan media upload/URL contract aktif
 
 ## Definition Of Done
 

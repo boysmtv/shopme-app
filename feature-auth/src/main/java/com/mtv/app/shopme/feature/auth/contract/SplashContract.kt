@@ -29,6 +29,7 @@ sealed class SplashBlockingState {
 
 sealed class SplashEffect {
     data object NavigateToHome : SplashEffect()
+    data object NavigateToSellerDashboard : SplashEffect()
     data object NavigateToLogin : SplashEffect()
     data object ExitApp : SplashEffect()
 }

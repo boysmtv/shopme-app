@@ -35,6 +35,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -85,10 +89,12 @@ import com.mtv.app.shopme.feature.customer.contract.CartUiState
 import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerCartScreen
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CartScreen(
     state: CartUiState,
@@ -202,8 +208,15 @@ fun CartScreen(
         }
     }
 
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isRefreshing,
+        onRefresh = { event(CartEvent.Load) }
+    )
+
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .pullRefresh(pullRefreshState)
     ) {
 
         Column(
@@ -232,10 +245,10 @@ fun CartScreen(
                     text = "Clear Cart",
                     fontFamily = PoppinsFont,
                     fontSize = 14.sp,
-                    color = AppColor.Green,
+                    color = if (cartItems.isNotEmpty()) AppColor.Green else AppColor.Gray,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
-                        .clickable {
+                        .clickable(enabled = cartItems.isNotEmpty()) {
                             event(CartEvent.ClearCart)
                         }
                 )
@@ -243,19 +256,23 @@ fun CartScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyColumn(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                groupedByCafe.forEach { (_, items) ->
-                    item {
-                        CafeGroupCard(
-                            state = state,
-                            event = event,
-                            itemResponses = items,
-                            onNavigateToDetail = onNavigateToDetail,
-                            onDeleteFoodByCafe = { event(CartEvent.ClearCartByCafe(it)) }
-                        )
+            if (cartItems.isEmpty()) {
+                EmptyCartView(modifier = Modifier.weight(1f))
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    groupedByCafe.forEach { (_, items) ->
+                        item {
+                            CafeGroupCard(
+                                state = state,
+                                event = event,
+                                itemResponses = items,
+                                onNavigateToDetail = onNavigateToDetail,
+                                onDeleteFoodByCafe = { event(CartEvent.ClearCartByCafe(it)) }
+                            )
+                        }
                     }
                 }
             }
@@ -329,6 +346,12 @@ fun CartScreen(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
+        )
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 }
@@ -988,6 +1011,11 @@ fun PinVerificationSheet(
 
             Spacer(modifier = Modifier.height(height = 28.dp))
 
+            if (isLoading) {
+                LoadingV2()
+                Spacer(modifier = Modifier.height(height = 20.dp))
+            }
+
             PinKeypad(
                 isLoading = isLoading,
                 onNumberClick = { number ->
@@ -1166,9 +1194,11 @@ fun OrderSuccessDialog(
 }
 
 @Composable
-fun EmptyCartView() {
+fun EmptyCartView(
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(Color.White),
         verticalArrangement = Arrangement.Center,
@@ -1185,20 +1215,12 @@ fun EmptyCartView() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Keranjang kamu kosong 😢",
+            text = "Tidak ada keranjang",
             fontFamily = PoppinsFont,
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Yuk tambah menu dulu",
-            fontFamily = PoppinsFont,
-            fontSize = 13.sp,
-            color = AppColor.Gray
-        )
     }
 }
 

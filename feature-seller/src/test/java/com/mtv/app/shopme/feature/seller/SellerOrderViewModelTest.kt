@@ -1,6 +1,7 @@
 package com.mtv.app.shopme.feature.seller
 
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SellerProfile
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
@@ -29,7 +30,7 @@ class SellerOrderViewModelTest {
 
     @Test
     fun `load and toggle online should follow backend profile state`() = runTest {
-        every { getOrdersUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { getOrdersUseCase.invoke(0, 20) } returns flowOf(Resource.Success(PagedData(emptyList(), 0, true)))
         every { getProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
                 SellerProfile(

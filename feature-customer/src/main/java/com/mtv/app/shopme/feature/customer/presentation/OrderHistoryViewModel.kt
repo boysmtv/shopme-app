@@ -12,6 +12,7 @@ import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
+import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent
@@ -69,7 +70,7 @@ class OrderHistoryViewModel @Inject constructor(
     private fun toItem(order: Order): OrderHistoryItem = OrderHistoryItem(
         id = order.id,
         storeName = order.cafeName.ifBlank { order.cafeId },
-        title = order.items.firstOrNull()?.foodName?.ifBlank { order.items.firstOrNull()?.foodId.orEmpty() }.orEmpty().ifBlank { "Order ${order.id}" },
+        title = order.items.firstOrNull()?.foodName?.ifBlank { "Pesanan" }.orEmpty().ifBlank { "Pesanan" },
         date = order.createdAt.substringBefore("T").ifBlank { "-" },
         price = order.totalPrice.toRupiah(),
         status = when (order.status) {
@@ -78,9 +79,14 @@ class OrderHistoryViewModel @Inject constructor(
             else -> "DIPROSES"
         },
         totalItems = order.itemCount.takeIf { it > 0 } ?: order.items.sumOf { it.quantity },
-        paymentMethod = order.paymentMethod.name,
+        paymentMethod = order.paymentMethod.displayLabel(),
         deliveryType = "Delivery"
     )
+
+    private fun PaymentMethod.displayLabel(): String = when (this) {
+        PaymentMethod.CASH -> "Bayar di tempat"
+        PaymentMethod.TRANSFER -> "Transfer bank"
+    }
 
     private fun showError(error: UiError) {
         handleSessionError(

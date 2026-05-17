@@ -67,11 +67,13 @@ import com.mtv.app.shopme.domain.model.User
 import com.mtv.app.shopme.data.remote.response.OrderItemResponse
 import com.mtv.app.shopme.data.remote.response.OrderResponse
 import com.mtv.app.shopme.data.remote.response.OrderSummaryResponse
+import com.mtv.app.shopme.data.remote.response.OrderTimelineResponse
 import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
 import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderItem
+import com.mtv.app.shopme.domain.model.OrderTimeline
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.model.SellerPaymentMethod
 import com.mtv.app.shopme.domain.model.SellerProfile
@@ -94,7 +96,8 @@ fun OrderResponse.toDomain(): Order = Order(
     paymentStatus = paymentStatus,
     paymentMethod = paymentMethod,
     createdAt = createdAt.orEmpty(),
-    deliveryAddress = deliveryAddress.orEmpty()
+    deliveryAddress = deliveryAddress.orEmpty(),
+    timeline = timeline.map { it.toDomain() }
 )
 
 fun OrderSummaryResponse.toDomain(): Order = Order(
@@ -131,6 +134,13 @@ fun OrderItemResponse.toDomain(): OrderItem = OrderItem(
     status = status
 )
 
+fun OrderTimelineResponse.toDomain(): OrderTimeline = OrderTimeline(
+    status = status,
+    actorRole = actorRole,
+    reason = reason.orEmpty(),
+    createdAt = createdAt
+)
+
 fun CafeResponse.toDomain(): Cafe = Cafe(
     id = id,
     name = name,
@@ -141,7 +151,14 @@ fun CafeResponse.toDomain(): Cafe = Cafe(
     closeTime = closeTime,
     image = image,
     isActive = isActive,
-    address = address.toDomain()
+    address = address?.toDomain() ?: CafeAddress(
+        id = "",
+        name = "",
+        block = "",
+        number = "",
+        rt = "",
+        rw = ""
+    )
 )
 
 fun CafeAddressResponse.toDomain(): CafeAddress = CafeAddress(
@@ -285,10 +302,11 @@ fun ChatItem.toDomain(): ChatListItem {
         id = id,
         name = "",
         lastMessage = message,
-        time = "",
+        time = time.orEmpty(),
         unreadCount = 0,
         avatarUrl = null,
-        isFromUser = isFromUser
+        isFromUser = isFromUser,
+        isRead = isRead
     )
 }
 
@@ -413,28 +431,54 @@ fun SupportSellerTermResponse.toDomain() = SupportSellerTerm(
 )
 
 fun LoginResponse.toDomain() = Login(
-    accessToken = accessToken
+    accessToken = accessToken,
+    role = role
 )
 
 fun Unit.toDomain() = Register(success = true)
 
 
 fun AppNotificationResponse.toCustomerNotification() = NotificationItem(
-    title = title,
+    title = data["type"]?.toNotificationTitle(title) ?: title,
     message = message,
     photo = "",
-    signatureName = title,
+    signatureName = data["actorName"]
+        ?: data["cafeName"]
+        ?: data["sellerName"]
+        ?: title,
     signatureDate = createdAt.substringBefore("T"),
     signatureTime = createdAt.substringAfter("T", "").substringBefore("."),
-    isRead = isRead
+    isRead = isRead,
+    actorName = data["actorName"].orEmpty(),
+    orderId = data["orderId"].orEmpty(),
+    orderItemsSummary = data["orderItemsSummary"].orEmpty(),
+    deliveryAddress = data["deliveryAddress"].orEmpty(),
+    paymentStatus = data["paymentStatus"].orEmpty(),
+    orderStatus = data["orderStatus"].orEmpty()
 )
 
 fun AppNotificationResponse.toSellerNotification() = SellerNotifItem(
-    title = title,
+    title = data["type"]?.toNotificationTitle(title) ?: title,
     message = message,
-    orderId = id,
-    buyerName = title,
+    orderId = data["orderId"].orEmpty().ifBlank { id },
+    buyerName = data["customerName"].orEmpty()
+        .ifBlank { data["actorName"].orEmpty() }
+        .ifBlank { title },
     date = createdAt.substringBefore("T"),
     time = createdAt.substringAfter("T", "").substringBefore("."),
-    isRead = isRead
+    isRead = isRead,
+    orderItemsSummary = data["orderItemsSummary"].orEmpty(),
+    deliveryAddress = data["deliveryAddress"].orEmpty(),
+    paymentStatus = data["paymentStatus"].orEmpty(),
+    orderStatus = data["orderStatus"].orEmpty()
 )
+
+private fun String.toNotificationTitle(fallback: String): String {
+    return when (this) {
+        "order_created" -> "Pesanan baru"
+        "payment_confirmation" -> "Konfirmasi pembayaran"
+        "order_status_updated" -> "Status pesanan"
+        "chat_message" -> "Chat baru"
+        else -> fallback
+    }
+}

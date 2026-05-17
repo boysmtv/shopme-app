@@ -89,6 +89,7 @@ class SellerChatListViewModel @Inject constructor(
                     when (state) {
                         is LoadState.Success -> it.copy(
                             isLoading = false,
+                            isRefreshing = false,
                             chatList = state.data.chatList.map { item ->
                                 SellerChatListItem(
                                     id = item.id,
@@ -101,8 +102,11 @@ class SellerChatListViewModel @Inject constructor(
                             }
                         )
 
-                        is LoadState.Loading -> it.copy(isLoading = true)
-                        else -> it.copy(isLoading = false)
+                        is LoadState.Loading -> {
+                            if (it.chatList.isEmpty()) it.copy(isLoading = true, isRefreshing = false)
+                            else it.copy(isLoading = false, isRefreshing = true)
+                        }
+                        else -> it.copy(isLoading = false, isRefreshing = false)
                     }
                 }
             },
@@ -113,12 +117,12 @@ class SellerChatListViewModel @Inject constructor(
     private fun clearChats() {
         observeIndependentDataFlow(
             flow = clearChatListUseCase(asSeller = true),
-            onLoad = { _state.update { it.copy(isLoading = true) } },
+            onLoad = { _state.update { it.copy(isLoading = it.chatList.isEmpty(), isRefreshing = it.chatList.isNotEmpty()) } },
             onSuccess = {
-                _state.update { it.copy(isLoading = false, chatList = emptyList()) }
+                _state.update { it.copy(isLoading = false, isRefreshing = false, chatList = emptyList()) }
             },
             onError = { error ->
-                _state.update { it.copy(isLoading = false) }
+                _state.update { it.copy(isLoading = false, isRefreshing = false) }
                 showError(error)
             }
         )

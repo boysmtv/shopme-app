@@ -4,15 +4,18 @@ import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
+import com.mtv.app.shopme.data.remote.request.CancelOrderRequest
 import com.mtv.app.shopme.data.remote.request.SellerAvailabilityRequest
 import com.mtv.app.shopme.data.remote.request.SellerPaymentMethodRequest
 import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
 import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.param.SellerPaymentMethodParam
+import com.mtv.based.core.network.model.RequestOptions
 import com.mtv.based.core.network.repository.NetworkRepository
 import javax.inject.Inject
 
@@ -35,6 +38,17 @@ class SellerRemoteDataSource @Inject constructor(
             endpoint = ApiEndPoint.Seller.Orders
         ).requireData()
 
+    suspend fun getOrders(page: Int, size: Int) =
+        request<ApiResponse<PageResponse<SellerOrderSummaryResponse>>>(
+            endpoint = ApiEndPoint.Seller.OrdersPage,
+            options = RequestOptions(
+                query = mapOf(
+                    "page" to page.toString(),
+                    "size" to size.toString()
+                )
+            )
+        ).requireData()
+
     suspend fun getOrderDetail(orderId: String) =
         request<ApiResponse<OrderResponse>>(
             endpoint = ApiEndPoint.Seller.OrderDetail(orderId)
@@ -43,6 +57,12 @@ class SellerRemoteDataSource @Inject constructor(
     suspend fun updateOrderStatus(orderId: String, status: OrderStatus) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Order.UpdateStatus(orderId, status)
+        ).requireData()
+
+    suspend fun cancelOrder(orderId: String, reason: String?) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Order.Cancel(orderId),
+            body = CancelOrderRequest(reason = reason?.takeIf { it.isNotBlank() })
         ).requireData()
 
     suspend fun updateAvailability(isOnline: Boolean) =

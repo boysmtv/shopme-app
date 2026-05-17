@@ -6,8 +6,9 @@ import com.mtv.app.shopme.domain.model.OrderItem
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
+import com.mtv.app.shopme.domain.usecase.CancelOrderUseCase
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
-import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
+import com.mtv.app.shopme.domain.usecase.EnsureOrderChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetOrderDetailUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderDetailEvent
@@ -31,7 +32,8 @@ class OrderDetailViewModelTest {
 
     private val getOrderDetailUseCase: GetOrderDetailUseCase = mockk()
     private val confirmOrderTransferUseCase: ConfirmOrderTransferUseCase = mockk()
-    private val ensureChatConversationUseCase: EnsureChatConversationUseCase = mockk()
+    private val cancelOrderUseCase: CancelOrderUseCase = mockk()
+    private val ensureOrderChatConversationUseCase: EnsureOrderChatConversationUseCase = mockk()
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -66,7 +68,8 @@ class OrderDetailViewModelTest {
             savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
             getOrderDetailUseCase = getOrderDetailUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
-            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            cancelOrderUseCase = cancelOrderUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
             sessionManager = sessionManager
         )
 
@@ -98,7 +101,8 @@ class OrderDetailViewModelTest {
             savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
             getOrderDetailUseCase = getOrderDetailUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
-            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            cancelOrderUseCase = cancelOrderUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
             sessionManager = sessionManager
         )
 
@@ -123,13 +127,14 @@ class OrderDetailViewModelTest {
                 )
             )
         )
-        every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
+        every { ensureOrderChatConversationUseCase.invoke("order-1") } returns flowOf(Resource.Success("conv-1"))
 
         val vm = OrderDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
             getOrderDetailUseCase = getOrderDetailUseCase,
             confirmOrderTransferUseCase = confirmOrderTransferUseCase,
-            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            cancelOrderUseCase = cancelOrderUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
             sessionManager = sessionManager
         )
         val effect = async { vm.effect.first() }

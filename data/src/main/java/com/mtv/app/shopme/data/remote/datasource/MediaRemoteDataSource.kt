@@ -1,13 +1,16 @@
 package com.mtv.app.shopme.data.remote.datasource
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.mtv.app.shopme.data.base.BaseRemoteDataSource
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.MediaUploadResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.based.core.network.repository.NetworkRepository
-import java.io.IOException
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -15,10 +18,17 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 
 class MediaRemoteDataSource @Inject constructor(
-    network: NetworkRepository
+    network: NetworkRepository,
+    @ApplicationContext context: Context
 ) : BaseRemoteDataSource(network) {
 
-    private val httpClient = OkHttpClient.Builder().build()
+    private val httpClient = OkHttpClient.Builder()
+        .addInterceptor(
+            ChuckerInterceptor.Builder(context)
+                .redactHeaders("Authorization", "Cookie")
+                .build()
+        )
+        .build()
 
     suspend fun createUploadTicket(scope: String, contentType: String) =
         request<ApiResponse<MediaUploadResponse>>(

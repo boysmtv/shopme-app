@@ -29,6 +29,7 @@ sealed class LoginEvent {
 
 sealed class LoginEffect {
     data object NavigateToHome : LoginEffect()
+    data object NavigateToSellerDashboard : LoginEffect()
     data object NavigateToRegister : LoginEffect()
     data object NavigateToForgotPassword : LoginEffect()
 }

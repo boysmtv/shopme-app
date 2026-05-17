@@ -26,5 +26,5 @@ data class CafeResponse(
     val closeTime: String,
     val image: String,
     val isActive: Boolean,
-    val address: CafeAddressResponse
+    val address: CafeAddressResponse? = null
 )

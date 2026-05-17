@@ -30,7 +30,8 @@ class SearchRemoteDataSource @Inject constructor(
                     "name" to param.name,
                     "page" to param.page.toString(),
                     "size" to param.size.toString(),
-                    "sort" to param.sort
+                    "sort" to param.sort,
+                    "seed" to param.seed
                 )
             )
         ).requireData()

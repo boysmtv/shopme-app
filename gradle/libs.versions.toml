@@ -42,6 +42,7 @@ uiToolingPreview = "1.10.1"
 mockk = "1.13.10"
 turbine = "1.1.0"
 coroutinesTest = "1.7.3"
+chucker = "4.0.0"
 
 [libraries]
 
@@ -88,6 +89,8 @@ retrofit-moshi = { group = "com.squareup.retrofit2", name = "converter-moshi", v
 retrofit-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
 retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+chucker = { group = "com.github.chuckerteam.chucker", name = "library", version.ref = "chucker" }
+chucker-no-op = { group = "com.github.chuckerteam.chucker", name = "library-no-op", version.ref = "chucker" }
 moshi = { group = "com.squareup.moshi", name = "moshi", version.ref = "moshi" }
 moshi-kotlin = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshi" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }

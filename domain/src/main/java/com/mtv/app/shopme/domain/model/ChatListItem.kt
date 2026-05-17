@@ -16,4 +16,7 @@ data class ChatListItem(
     val unreadCount: Int,
     val avatarUrl: String?,
     val isFromUser: Boolean = false,
+    val isPending: Boolean = false,
+    val isRead: Boolean = true,
+    val isFailed: Boolean = false,
 )

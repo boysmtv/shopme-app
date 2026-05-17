@@ -24,5 +24,6 @@ data class Order(
     val timestamp: Long = System.currentTimeMillis(),
     val createdAt: String = EMPTY_STRING,
     val deliveryAddress: String = EMPTY_STRING,
-    val paymentMethod: PaymentMethod = PaymentMethod.TRANSFER
+    val paymentMethod: PaymentMethod = PaymentMethod.TRANSFER,
+    val timeline: List<OrderTimeline> = emptyList()
 )

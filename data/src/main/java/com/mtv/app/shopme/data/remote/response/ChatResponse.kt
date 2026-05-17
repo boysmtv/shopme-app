@@ -19,5 +19,8 @@ data class ChatResponse(
 data class ChatItem(
     val id: String,
     val message: String,
-    val isFromUser: Boolean
+    val isFromUser: Boolean,
+    val messageId: String? = null,
+    val time: String? = null,
+    val isRead: Boolean = false
 )

@@ -9,6 +9,8 @@
 package com.mtv.app.shopme.domain.repository
 
 import com.mtv.app.shopme.domain.model.Food
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
@@ -23,6 +25,16 @@ interface FoodRepository {
     fun getFoodDetail(id: String): Flow<Resource<Food>>
 
     fun getFoodsByCafe(id: String): Flow<Resource<List<Food>>>
+
+    fun getFoodsByCafe(
+        id: String,
+        page: Int,
+        size: Int,
+        query: String = "",
+        category: FoodCategory? = null,
+        status: FoodStatus? = null,
+        active: Boolean? = null
+    ): Flow<Resource<PagedData<Food>>>
 
     fun getSimilarFoods(cafeId: String): Flow<Resource<List<Food>>>
 

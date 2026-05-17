@@ -79,15 +79,24 @@ class ChatListViewModel @Inject constructor(
         realtimeGateway.ensureConnected()
         observeDataFlow(
             flow = chatListUseCase(),
-            onLoad = ::showLoading,
-            onSuccess = { hideLoading() },
             onState = { state ->
                 _state.update {
-                    it.copy(chatListState = state)
+                    when (state) {
+                        is LoadState.Loading -> {
+                            if (it.chatListState is LoadState.Success) it.copy(isRefreshing = true)
+                            else it.copy(chatListState = LoadState.Loading, isRefreshing = false)
+                        }
+                        is LoadState.Success -> it.copy(chatListState = state, isRefreshing = false)
+                        is LoadState.Error -> {
+                            if (it.chatListState is LoadState.Success) it.copy(isRefreshing = false)
+                            else it.copy(chatListState = state, isRefreshing = false)
+                        }
+                        else -> it.copy(chatListState = state, isRefreshing = false)
+                    }
                 }
             },
             onError = {
-                hideLoading()
+                _state.update { it.copy(isRefreshing = false) }
                 showError(it)
             }
         )

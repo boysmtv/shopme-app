@@ -228,9 +228,10 @@ fun NotificationItemCard(
                     color = Color.Gray
                 )
 
-                Spacer(modifier = Modifier.width(6.dp))
-
-                UnreadDot()
+                if (!item.isRead) {
+                    Spacer(modifier = Modifier.width(6.dp))
+                    UnreadDot()
+                }
             }
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -242,8 +243,33 @@ fun NotificationItemCard(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
+            NotificationMetaLine(item)
         }
     }
+}
+
+@Composable
+private fun NotificationMetaLine(item: NotificationItem) {
+    val meta = listOf(
+        item.actorName.ifBlank { item.signatureName },
+        item.orderItemsSummary,
+        item.deliveryAddress,
+        listOf(item.orderStatus, item.paymentStatus)
+            .filter { it.isNotBlank() }
+            .joinToString(" / ")
+    ).filter { it.isNotBlank() }
+
+    if (meta.isEmpty()) return
+
+    Spacer(modifier = Modifier.height(6.dp))
+    Text(
+        text = meta.joinToString(" | "),
+        style = MaterialTheme.typography.labelSmall,
+        color = Color.Gray,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis
+    )
 }
 
 @Composable

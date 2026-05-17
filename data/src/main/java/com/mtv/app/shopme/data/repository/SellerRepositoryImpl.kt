@@ -14,6 +14,7 @@ import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.data.sync.PendingMutationAction
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.OrderStatus
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.param.SellerPaymentMethodParam
 import com.mtv.app.shopme.domain.repository.SellerRepository
 import com.mtv.based.core.network.utils.Resource
@@ -117,6 +118,25 @@ class SellerRepositoryImpl @Inject constructor(
             }
         }.flowOn(Dispatchers.IO)
 
+    override fun getOrders(page: Int, size: Int) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val remoteOrders = remote.getOrders(page, size)
+                emit(
+                    Resource.Success(
+                        PagedData(
+                            content = remoteOrders.content.map { it.toDomain() },
+                            page = remoteOrders.page,
+                            last = remoteOrders.last
+                        )
+                    )
+                )
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
+
     override fun getOrderDetail(orderId: String) =
         flow {
             emit(Resource.Loading)
@@ -149,6 +169,13 @@ class SellerRepositoryImpl @Inject constructor(
     override fun updateOrderStatus(orderId: String, status: OrderStatus) =
         resultFlow.create {
             remote.updateOrderStatus(orderId, status)
+            PayloadCacheStore.clear(homeDao, SELLER_ORDERS_CACHE_KEY)
+            PayloadCacheStore.clear(homeDao, sellerOrderDetailCacheKey(orderId))
+        }
+
+    override fun cancelOrder(orderId: String, reason: String?) =
+        resultFlow.create {
+            remote.cancelOrder(orderId, reason)
             PayloadCacheStore.clear(homeDao, SELLER_ORDERS_CACHE_KEY)
             PayloadCacheStore.clear(homeDao, sellerOrderDetailCacheKey(orderId))
         }

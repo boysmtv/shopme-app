@@ -16,6 +16,9 @@ import com.mtv.based.core.network.utils.LoadState
 data class DetailUiState(
     val food: LoadState<Food> = LoadState.Idle,
     val similarFoods: LoadState<List<Food>> = LoadState.Idle,
+    val similarPage: Int = 0,
+    val similarIsLastPage: Boolean = false,
+    val similarIsLoadingMore: Boolean = false,
     val addToCartState: LoadState<Unit> = LoadState.Idle,
     val isFavorite: Boolean = false
 )
@@ -27,6 +30,7 @@ sealed class DetailEvent {
     object ChatClicked : DetailEvent()
     object ToggleFavorite : DetailEvent()
     object OpenCart : DetailEvent()
+    object LoadMoreSimilar : DetailEvent()
 
     data class AddToCart(
         val foodId: String,

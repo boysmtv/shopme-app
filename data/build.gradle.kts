@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.retrofit.moshi)
     implementation(libs.retrofit.scalars)
     implementation(libs.okhttp)
+    debugImplementation(libs.chucker)
+    releaseImplementation(libs.chucker.no.op)
 
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)

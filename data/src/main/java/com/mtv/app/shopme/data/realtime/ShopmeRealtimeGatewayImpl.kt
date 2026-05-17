@@ -1,11 +1,14 @@
 package com.mtv.app.shopme.data.realtime
 
+import android.content.Context
+import com.chuckerteam.chucker.api.ChuckerInterceptor
 import com.mtv.app.shopme.common.BuildConfig
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.based.core.provider.utils.SecurePrefs
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,12 +29,19 @@ import okhttp3.WebSocketListener
 
 @Singleton
 class ShopmeRealtimeGatewayImpl @Inject constructor(
-    private val securePrefs: SecurePrefs
+    private val securePrefs: SecurePrefs,
+    @ApplicationContext context: Context
 ) : ShopmeRealtimeGateway {
 
     private val _events = MutableSharedFlow<ShopmeRealtimeEvent>(extraBufferCapacity = 64)
     override val events = _events.asSharedFlow()
-    private val client = OkHttpClient.Builder().build()
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(
+            ChuckerInterceptor.Builder(context)
+                .redactHeaders("Authorization", "Cookie")
+                .build()
+        )
+        .build()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val lock = Any()
 
@@ -143,6 +153,10 @@ private data class RealtimeEventPayloadDto(
     val title: String? = null,
     val message: String? = null,
     val actorId: String? = null,
+    val onlineCustomerId: String? = null,
+    val onlineCafeId: String? = null,
+    val online: Boolean? = null,
+    val lastSeenAt: String? = null,
     val occurredAt: String? = null
 )
 
@@ -173,6 +187,10 @@ private fun RealtimeEventPayloadDto.toDomain() = ShopmeRealtimeEvent(
     title = title,
     message = message,
     actorId = actorId,
+    onlineCustomerId = onlineCustomerId,
+    onlineCafeId = onlineCafeId,
+    online = online,
+    lastSeenAt = lastSeenAt,
     occurredAt = occurredAt
 )
 

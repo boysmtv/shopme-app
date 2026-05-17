@@ -13,6 +13,7 @@ import com.mtv.based.core.network.utils.ResourceFirebase
 
 data class SellerDashboardUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
     val errorMessage: String? = null,
 

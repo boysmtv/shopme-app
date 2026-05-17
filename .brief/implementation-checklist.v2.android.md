@@ -68,11 +68,11 @@ Evidence minimum:
 - tidak ada halaman seller yang technically terbuka tetapi secara fungsi tidak usable
 - semua role/ownership rejection seller muncul benar di UI
 
-## Workstream 4. Media, Base64, And Performance
+## Workstream 4. Media Upload, URL References, And Performance
 
-- [ ] Semua field foto di Android diperlakukan sebagai `base64 string`
+- [ ] Semua field foto di Android mengikuti media upload/URL contract aktif
 - [ ] Tentukan dan implementasikan format final media yang didukung
-- [ ] Pastikan preview, compress, resize, encode, dan render image konsisten
+- [ ] Pastikan preview, compress, resize, upload, dan render image konsisten
 - [ ] Tambahkan guard untuk payload gambar besar
 - [ ] Pastikan image kosong atau invalid tidak menyebabkan crash
 - [ ] Siapkan isolasi kode media agar migrasi kontrak masa depan lebih mudah
@@ -80,7 +80,7 @@ Evidence minimum:
 Evidence minimum:
 
 - flow create/update/read image berjalan terhadap backend nyata
-- tidak ada crash parsing/render image base64
+- tidak ada crash upload/parsing/render image
 
 ## Workstream 5. Auth, Security, And Session Lifecycle
 
@@ -120,7 +120,7 @@ Release Android v2 tidak boleh dianggap aman bila salah satu ini belum hijau:
 - [ ] seller profile/cafe/product/payment method/order/notification/chat
 - [ ] error response mapping utama
 - [ ] auth dan role boundary
-- [ ] base64 image flow
+- [ ] media upload/render image flow
 - [ ] contract verification ke backend Docker
 
 ## Deferred Until Proven Necessary

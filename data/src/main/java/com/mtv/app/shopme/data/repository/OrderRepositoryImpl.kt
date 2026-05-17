@@ -87,6 +87,13 @@ class OrderRepositoryImpl @Inject constructor(
             PayloadCacheStore.clear(homeDao, orderDetailCacheKey(orderId))
         }
 
+    override fun cancelOrder(orderId: String, reason: String?) =
+        resultFlow.create {
+            remoteDataSource.cancelOrder(orderId, reason)
+            PayloadCacheStore.clear(homeDao, CUSTOMER_ORDERS_CACHE_KEY)
+            PayloadCacheStore.clear(homeDao, orderDetailCacheKey(orderId))
+        }
+
     private fun orderDetailCacheKey(orderId: String) = "orders:detail:$orderId"
 
     companion object {

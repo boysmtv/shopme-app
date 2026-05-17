@@ -66,7 +66,7 @@ class SellerChatDetailViewModelTest {
                         time = "",
                         unreadCount = 0,
                         avatarUrl = null,
-                        isFromUser = false
+                        isFromUser = true
                     )
                 )
             )
@@ -95,7 +95,7 @@ class SellerChatDetailViewModelTest {
     }
 
     @Test
-    fun `load should fall back to first valid seller conversation when route id is stale`() = runTest {
+    fun `load should keep route conversation id when seller opens direct chat`() = runTest {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(true) } returns flowOf(
             Resource.Success(
@@ -114,11 +114,11 @@ class SellerChatDetailViewModelTest {
                 )
             )
         )
-        every { getChatMessageUseCase.invoke("conv-valid", true) } returns flowOf(
+        every { getChatMessageUseCase.invoke("stale-id", true) } returns flowOf(
             Resource.Success(
                 listOf(
                     ChatListItem(
-                        id = "conv-valid",
+                        id = "stale-id",
                         name = "",
                         lastMessage = "Halo seller",
                         time = "",
@@ -129,7 +129,7 @@ class SellerChatDetailViewModelTest {
                 )
             )
         )
-        every { markReadUseCase.invoke("conv-valid", true) } returns flowOf(Resource.Success(Unit))
+        every { markReadUseCase.invoke("stale-id", true) } returns flowOf(Resource.Success(Unit))
 
         val vm = SellerChatDetailViewModel(
             savedStateHandle = SavedStateHandle(mapOf("chatId" to "stale-id")),
@@ -144,8 +144,8 @@ class SellerChatDetailViewModelTest {
         vm.onEvent(SellerChatDetailEvent.Load)
         advanceUntilIdle()
 
-        assertEquals("conv-valid", vm.uiState.value.activeChatId)
-        verify(exactly = 1) { getChatMessageUseCase.invoke("conv-valid", true) }
-        verify(exactly = 1) { markReadUseCase.invoke("conv-valid", true) }
+        assertEquals("stale-id", vm.uiState.value.activeChatId)
+        verify(exactly = 1) { getChatMessageUseCase.invoke("stale-id", true) }
+        verify(exactly = 1) { markReadUseCase.invoke("stale-id", true) }
     }
 }

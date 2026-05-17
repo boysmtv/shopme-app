@@ -18,6 +18,7 @@ object CustomerDestinations {
     const val CHAT_GRAPH = "CHAT_GRAPH"
     const val CHAT_GRAPH_WITH_ID = "CHAT_GRAPH/{chatId}"
     const val ORDER_GRAPH = "ORDER_GRAPH"
+    const val ORDER_GRAPH_WITH_FILTER = "ORDER_GRAPH/{filter}"
     const val CAFE_GRAPH = "CAFE_GRAPH"
     const val CAFE_GRAPH_WITH_ID = "CAFE_GRAPH_WITH_ID/{cafeId}"
     const val ORDER_DETAIL_GRAPH = "ORDER_DETAIL_GRAPH"
@@ -38,6 +39,8 @@ object CustomerDestinations {
     fun navigateToChat(chatId: String) = "CHAT_GRAPH/$chatId"
 
     fun navigateToOrderDetail(orderId: String) = "ORDER_DETAIL_GRAPH/$orderId"
+
+    fun navigateToOrder(filter: String) = "ORDER_GRAPH/$filter"
 
     fun navigateToSearch(query: String) = "SEARCH/$query"
 
