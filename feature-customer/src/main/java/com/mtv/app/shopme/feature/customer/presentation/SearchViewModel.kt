@@ -12,8 +12,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
+import com.mtv.app.shopme.domain.usecase.GetDiscoveryFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSearchFoodUseCase
 import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
@@ -41,6 +43,7 @@ import kotlinx.coroutines.launch
 class SearchViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val searchFoodUseCase: GetSearchFoodUseCase,
+    private val discoveryFoodUseCase: GetDiscoveryFoodUseCase,
     private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase,
     private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase,
     private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase,
@@ -115,15 +118,27 @@ class SearchViewModel @Inject constructor(
             searchSeed = newSearchSeed()
         }
 
-        val param = SearchParam(
-            name = query,
-            page = page,
-            sort = "random",
-            seed = searchSeed
-        )
+        val flow = if (query.isBlank()) {
+            discoveryFoodUseCase(
+                DiscoveryParam(
+                    section = DEFAULT_DISCOVERY_SECTION,
+                    page = page,
+                    seed = searchSeed
+                )
+            )
+        } else {
+            searchFoodUseCase(
+                SearchParam(
+                    name = query,
+                    page = page,
+                    sort = "random",
+                    seed = searchSeed
+                )
+            )
+        }
 
         observeDataFlow(
-            flow = searchFoodUseCase(param),
+            flow = flow,
             onState = { state ->
                 when (state) {
 
@@ -242,4 +257,8 @@ class SearchViewModel @Inject constructor(
     }
 
     private fun newSearchSeed(): String = System.currentTimeMillis().toString()
+
+    private companion object {
+        const val DEFAULT_DISCOVERY_SECTION = "newest"
+    }
 }

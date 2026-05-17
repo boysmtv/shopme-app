@@ -17,6 +17,7 @@ import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.based.core.network.model.RequestOptions
@@ -111,6 +112,17 @@ class FoodRemoteDataSource @Inject constructor(
                 "sort" to param.sort,
                 "seed" to param.seed
             )
+        )
+    ).requireData()
+
+    suspend fun discoverFoods(param: DiscoveryParam) = request<ApiResponse<PageResponse<FoodResponse>>>(
+        endpoint = ApiEndPoint.Foods.Discovery(param.section),
+        options = RequestOptions(
+            query = buildMap {
+                put("page", param.page.toString())
+                put("size", param.size.toString())
+                if (param.seed.isNotBlank()) put("seed", param.seed)
+            }
         )
     ).requireData()
 

@@ -134,6 +134,7 @@ object ApiEndPoint {
         object GetAll : IApiEndPoint { override val path = "$API/$FOODS"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Create : IApiEndPoint { override val path = "$API/$FOODS"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object Search : IApiEndPoint { override val path = "$API/$FOODS/search"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        class Discovery(section: String) : IApiEndPoint { override val path = "$API/$FOODS/discovery/$section"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class Detail(foodId: String) : IApiEndPoint { override val path = "$API/$FOODS/$foodId"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class Update(foodId: String) : IApiEndPoint { override val path = "$API/$FOODS/$foodId"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
         class Delete(foodId: String) : IApiEndPoint { override val path = "$API/$FOODS/$foodId"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }

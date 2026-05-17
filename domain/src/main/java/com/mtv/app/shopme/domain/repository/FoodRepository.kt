@@ -13,6 +13,7 @@ import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.based.core.network.utils.Resource
@@ -39,6 +40,8 @@ interface FoodRepository {
     fun getSimilarFoods(cafeId: String): Flow<Resource<List<Food>>>
 
     fun searchFoods(request: SearchParam): Flow<Resource<PagedData<SearchFood>>>
+
+    fun discoverFoods(request: DiscoveryParam): Flow<Resource<PagedData<SearchFood>>>
 
     fun createFood(param: FoodUpsertParam): Flow<Resource<Unit>>
 

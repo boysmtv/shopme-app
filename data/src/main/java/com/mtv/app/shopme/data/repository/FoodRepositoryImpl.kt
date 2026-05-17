@@ -22,6 +22,7 @@ import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.SearchFood
+import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.repository.FoodRepository
@@ -162,6 +163,25 @@ class FoodRepositoryImpl @Inject constructor(
                 if (cached.isEmpty()) {
                     emit(Resource.Error(errorMapper.map(throwable)))
                 }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun discoverFoods(request: DiscoveryParam): Flow<Resource<PagedData<SearchFood>>> =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val response = remote.discoverFoods(request)
+                emit(
+                    Resource.Success(
+                        PagedData(
+                            content = response.content.map { it.toSearchDomain() },
+                            page = response.page,
+                            last = response.last
+                        )
+                    )
+                )
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
             }
         }.flowOn(Dispatchers.IO)
 

@@ -4,11 +4,11 @@ import app.cash.turbine.test
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SearchFood
-import com.mtv.app.shopme.domain.param.SearchParam
+import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetDiscoveryFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
-import com.mtv.app.shopme.domain.usecase.GetSearchFoodUseCase
 import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
@@ -36,7 +36,7 @@ class HomeViewModelTest {
     val dispatcherRule = MainDispatcherRule()
 
     private val customerUseCase: GetCustomerUseCase = mockk()
-    private val homeFoodUseCase: GetSearchFoodUseCase = mockk()
+    private val discoveryFoodUseCase: GetDiscoveryFoodUseCase = mockk()
     private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase = mockk()
     private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase = mockk()
     private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase = mockk()
@@ -48,7 +48,7 @@ class HomeViewModelTest {
     fun setup() {
         viewModel = HomeViewModel(
             customerUseCase = customerUseCase,
-            homeFoodUseCase = homeFoodUseCase,
+            discoveryFoodUseCase = discoveryFoodUseCase,
             getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
             addFavoriteFoodUseCase = addFavoriteFoodUseCase,
             removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
@@ -61,7 +61,7 @@ class HomeViewModelTest {
         val foods = listOf(fakeFood())
 
         coEvery { customerUseCase() } returns flowOf(Resource.Error(mockk(relaxed = true)))
-        coEvery { homeFoodUseCase(any()) } returns flowOf(Resource.Success(PagedData(foods, page = 0, last = true)))
+        coEvery { discoveryFoodUseCase(any()) } returns flowOf(Resource.Success(PagedData(foods, page = 0, last = true)))
         coEvery { getFavoriteFoodIdsUseCase() } returns flowOf(Resource.Success(emptyList()))
 
         viewModel.onEvent(HomeEvent.Load)
@@ -95,8 +95,8 @@ class HomeViewModelTest {
     fun `load next page should append foods and update pagination state`() = runTest {
         coEvery { customerUseCase() } returns flowOf(Resource.Success(fakeCustomer()))
         coEvery { getFavoriteFoodIdsUseCase() } returns flowOf(Resource.Success(emptyList()))
-        coEvery { homeFoodUseCase(any()) } answers {
-            val request = firstArg<SearchParam>()
+        coEvery { discoveryFoodUseCase(any()) } answers {
+            val request = firstArg<DiscoveryParam>()
             when (request.page) {
                 0 -> flowOf(
                     Resource.Success(

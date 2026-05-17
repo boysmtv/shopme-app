@@ -9,12 +9,12 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
-import com.mtv.app.shopme.domain.param.SearchParam
+import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
+import com.mtv.app.shopme.domain.usecase.GetDiscoveryFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
 import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
-import com.mtv.app.shopme.domain.usecase.GetSearchFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val customerUseCase: GetCustomerUseCase,
-    private val homeFoodUseCase: GetSearchFoodUseCase,
+    private val discoveryFoodUseCase: GetDiscoveryFoodUseCase,
     private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase,
     private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase,
     private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase,
@@ -77,7 +77,7 @@ class HomeViewModel @Inject constructor(
 
     private fun observeFoods() {
         observeIndependentDataFlow(
-            flow = homeFoodUseCase(SearchParam(name = "", page = 0, sort = "random", seed = foodSeed)),
+            flow = discoveryFoodUseCase(DiscoveryParam(section = HOME_DISCOVERY_SECTION, page = 0, seed = foodSeed)),
             onState = { state ->
                 when (state) {
                     is LoadState.Loading -> _state.update {
@@ -116,7 +116,7 @@ class HomeViewModel @Inject constructor(
         val state = _state.value
         if (state.isLastPage || state.isLoadingMore || state.foods is LoadState.Loading) return
         observeIndependentDataFlow(
-            flow = homeFoodUseCase(SearchParam(name = "", page = state.page + 1, sort = "random", seed = foodSeed)),
+            flow = discoveryFoodUseCase(DiscoveryParam(section = HOME_DISCOVERY_SECTION, page = state.page + 1, seed = foodSeed)),
             onState = { result ->
                 when (result) {
                     is LoadState.Loading -> _state.update { it.copy(isLoadingMore = true) }
@@ -197,5 +197,9 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun newFoodSeed(): String = System.currentTimeMillis().toString()
+
+    private companion object {
+        const val HOME_DISCOVERY_SECTION = "recommendations"
+    }
 
 }
