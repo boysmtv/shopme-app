@@ -44,6 +44,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -88,6 +89,7 @@ fun ChatScreen(
 
     val messages = (state.chats as? LoadState.Success)?.data.orEmpty() + state.optimisticMessages
     val listState = rememberLazyListState()
+    var canLoadOlder by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = { event(ChatEvent.Load) }
@@ -101,9 +103,10 @@ fun ChatScreen(
     }
     val presenceColor = if (state.isPeerOnline) Color(0xFF4CAF50) else Color.Gray
 
-    LaunchedEffect(messages.size) {
-        if (messages.isNotEmpty()) {
+    LaunchedEffect(messages.lastOrNull()?.id, state.isLoadingOlder) {
+        if (messages.isNotEmpty() && !state.isLoadingOlder) {
             listState.animateScrollToItem(messages.lastIndex)
+            canLoadOlder = true
         }
     }
 
@@ -189,6 +192,29 @@ fun ChatScreen(
                         .padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    if (!state.isFirstPage) {
+                        item(key = "older-loader-${state.chatPage}") {
+                            LaunchedEffect(state.activeChatId, state.chatPage, state.isLoadingOlder) {
+                                if (canLoadOlder) {
+                                    event(ChatEvent.LoadOlderMessages)
+                                }
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (state.isLoadingOlder) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = AppColor.Green,
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            }
+                        }
+                    }
                     items(messages) { msg ->
                         ChatBubble(
                             chatListItem = msg,

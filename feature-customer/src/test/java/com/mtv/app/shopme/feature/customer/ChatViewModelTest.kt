@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
@@ -55,9 +56,10 @@ class ChatViewModelTest {
                 )
             )
         )
-        every { getChatMessageUseCase.invoke("conv-1", false) } returns flowOf(
+        every { getChatMessageUseCase.page("conv-1", false, -1, 30) } returns flowOf(
             Resource.Success(
-                listOf(
+                PagedData(
+                    content = listOf(
                     ChatListItem(
                         id = "conv-1",
                         name = "Cafe Kopi Kita",
@@ -67,6 +69,9 @@ class ChatViewModelTest {
                         avatarUrl = null,
                         isFromUser = false
                     )
+                    ),
+                    page = 0,
+                    last = true
                 )
             )
         )

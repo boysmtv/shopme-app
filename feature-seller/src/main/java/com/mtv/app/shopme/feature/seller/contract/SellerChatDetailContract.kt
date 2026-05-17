@@ -11,6 +11,9 @@ package com.mtv.app.shopme.feature.seller.contract
 data class SellerChatDetailUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
+    val isLoadingOlder: Boolean = false,
+    val chatPage: Int = -1,
+    val isFirstPage: Boolean = true,
     val isSending: Boolean = false,
     val messages: List<SellerChatDetailMessage> = emptyList(),
     val currentMessage: String = "",
@@ -28,6 +31,7 @@ sealed class SellerChatDetailEvent {
     data class ChangeMessage(val value: String) : SellerChatDetailEvent()
     object SendMessage : SellerChatDetailEvent()
     data class RetryMessage(val localId: String, val message: String) : SellerChatDetailEvent()
+    object LoadOlderMessages : SellerChatDetailEvent()
 
     object ClickBack : SellerChatDetailEvent()
 }

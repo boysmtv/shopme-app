@@ -16,6 +16,8 @@ import com.mtv.app.shopme.data.remote.request.ChatMessageSendRequest
 import com.mtv.app.shopme.data.remote.response.ChatConversationResponse
 import com.mtv.app.shopme.data.remote.response.ChatResponse
 import com.mtv.app.shopme.data.remote.response.ChatListResponse
+import com.mtv.app.shopme.data.remote.response.ChatItem
+import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.based.core.network.model.RequestOptions
 import com.mtv.based.core.network.repository.NetworkRepository
@@ -61,6 +63,23 @@ class ChatRemoteDataSource @Inject constructor(
                 query = mapOf("cafeId" to cafeId)
             )
         ).requireData()
+
+    suspend fun getChatsPage(
+        id: String,
+        asSeller: Boolean = false,
+        page: Int,
+        size: Int
+    ) = request<ApiResponse<PageResponse<ChatItem>>>(
+        endpoint = ApiEndPoint.Chat.GetPage,
+        options = RequestOptions(
+            query = mapOf(
+                "id" to id,
+                "asSeller" to asSeller.toString(),
+                "page" to page.toString(),
+                "size" to size.toString()
+            )
+        )
+    ).requireData()
 
     suspend fun ensureOrderConversation(orderId: String) =
         request<ApiResponse<ChatConversationResponse>>(

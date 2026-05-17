@@ -20,6 +20,9 @@ data class ChatUiState(
     val sendMessage: LoadState<Unit> = LoadState.Idle,
     val readAll: LoadState<Unit> = LoadState.Idle,
     val isRefreshing: Boolean = false,
+    val isLoadingOlder: Boolean = false,
+    val chatPage: Int = -1,
+    val isFirstPage: Boolean = true,
     val isPeerOnline: Boolean = false,
     val peerLastSeenAt: String = ""
 )
@@ -31,6 +34,7 @@ sealed class ChatEvent {
     data class SendMessage(val id: String, val message: String) : ChatEvent()
     data class RetryMessage(val localId: String, val message: String) : ChatEvent()
     data class ReadAllMessage(val id: String) : ChatEvent()
+    object LoadOlderMessages : ChatEvent()
 
     object ClickBack : ChatEvent()
 }

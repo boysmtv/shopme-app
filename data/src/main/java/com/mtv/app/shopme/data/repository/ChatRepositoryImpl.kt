@@ -15,9 +15,13 @@ import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.mapper.toMessageEntity
 import com.mtv.app.shopme.data.remote.datasource.ChatRemoteDataSource
+import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.remote.request.ChatMessageMarkAsReadRequest
 import com.mtv.app.shopme.data.remote.request.ChatMessageSendRequest
+import com.mtv.app.shopme.data.remote.response.ChatItem
 import com.mtv.app.shopme.domain.repository.ChatRepository
+import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.based.core.network.utils.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +72,11 @@ class ChatRepositoryImpl @Inject constructor(
             }
 
             try {
-                val remoteChats = remote.getChats(chatId, asSeller).toDomain()
+                val remoteChats = if (conversationId.isNotBlank()) {
+                    loadLatestRemoteChats(conversationId, asSeller, CHAT_PAGE_SIZE)
+                } else {
+                    remote.getChats(chatId, asSeller).toDomain()
+                }
                 if (conversationId.isNotBlank()) {
                     homeDao.clearChatMessages(scope, conversationId)
                     homeDao.insertChatMessages(
@@ -84,6 +92,44 @@ class ChatRepositoryImpl @Inject constructor(
                 }
             }
         }.flowOn(Dispatchers.IO)
+
+    override fun getChatsPage(
+        chatId: String,
+        asSeller: Boolean,
+        page: Int,
+        size: Int
+    ) = flow {
+        emit(Resource.Loading)
+        val scope = if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE
+        val cached = if (page < 0) {
+            homeDao.getChatMessagesOnce(scope, chatId).map { it.toDomain() }
+        } else {
+            emptyList()
+        }
+        if (cached.isNotEmpty()) {
+            emit(Resource.Success(PagedData(content = cached, page = page, last = false)))
+        }
+
+        try {
+            val response = if (page < 0) {
+                loadLatestRemotePage(chatId, asSeller, size)
+            } else {
+                remote.getChatsPage(chatId, asSeller, page, size)
+            }
+            val messages = response.content.map { it.toDomain() }
+            if (page < 0) {
+                homeDao.clearChatMessages(scope, chatId)
+            }
+            homeDao.insertChatMessages(
+                messages.mapIndexed { index, item ->
+                    item.toMessageEntity(scope, chatId, response.page * response.size + index)
+                }
+            )
+            emit(Resource.Success(response.toPagedDomain(messages)))
+        } catch (throwable: Throwable) {
+            emit(Resource.Error(errorMapper.map(throwable)))
+        }
+    }.flowOn(Dispatchers.IO)
 
     override fun ensureConversation(cafeId: String) =
         resultFlow.create {
@@ -127,5 +173,37 @@ class ChatRepositoryImpl @Inject constructor(
     companion object {
         private const val CUSTOMER_SCOPE = "customer"
         private const val SELLER_SCOPE = "seller"
+        private const val CHAT_PAGE_SIZE = 30
     }
+
+    private suspend fun loadLatestRemoteChats(
+        conversationId: String,
+        asSeller: Boolean,
+        size: Int
+    ): List<ChatListItem> =
+        loadLatestRemotePage(conversationId, asSeller, size)
+            .content
+            .map { it.toDomain() }
+
+    private suspend fun loadLatestRemotePage(
+        conversationId: String,
+        asSeller: Boolean,
+        size: Int
+    ): PageResponse<ChatItem> {
+        val firstPage = remote.getChatsPage(conversationId, asSeller, page = 0, size = size)
+        if (firstPage.last) {
+            return firstPage
+        }
+
+        val latestPageIndex = (firstPage.totalPages - 1).coerceAtLeast(0)
+        return remote.getChatsPage(conversationId, asSeller, page = latestPageIndex, size = size)
+    }
+
+    private fun PageResponse<ChatItem>.toPagedDomain(
+        messages: List<ChatListItem> = content.map { it.toDomain() }
+    ): PagedData<ChatListItem> = PagedData(
+        content = messages,
+        page = page,
+        last = page <= 0
+    )
 }

@@ -15,4 +15,11 @@ class GetChatMessageUseCase @Inject constructor(
     private val repository: ChatRepository
 ) {
     operator fun invoke(chatId: String? = null, asSeller: Boolean = false) = repository.getChats(chatId, asSeller)
+
+    fun page(
+        chatId: String,
+        asSeller: Boolean = false,
+        page: Int,
+        size: Int
+    ) = repository.getChatsPage(chatId, asSeller, page, size)
 }

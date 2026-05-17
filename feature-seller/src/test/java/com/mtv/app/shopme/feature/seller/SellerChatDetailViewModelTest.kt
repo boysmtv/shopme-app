@@ -5,6 +5,7 @@ import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
@@ -56,9 +57,10 @@ class SellerChatDetailViewModelTest {
                 )
             )
         )
-        every { getChatMessageUseCase.invoke("conv-1", true) } returns flowOf(
+        every { getChatMessageUseCase.page("conv-1", true, -1, 30) } returns flowOf(
             Resource.Success(
-                listOf(
+                PagedData(
+                    content = listOf(
                     ChatListItem(
                         id = "conv-1",
                         name = "",
@@ -68,6 +70,9 @@ class SellerChatDetailViewModelTest {
                         avatarUrl = null,
                         isFromUser = true
                     )
+                    ),
+                    page = 0,
+                    last = true
                 )
             )
         )
@@ -114,9 +119,10 @@ class SellerChatDetailViewModelTest {
                 )
             )
         )
-        every { getChatMessageUseCase.invoke("stale-id", true) } returns flowOf(
+        every { getChatMessageUseCase.page("stale-id", true, -1, 30) } returns flowOf(
             Resource.Success(
-                listOf(
+                PagedData(
+                    content = listOf(
                     ChatListItem(
                         id = "stale-id",
                         name = "",
@@ -126,6 +132,9 @@ class SellerChatDetailViewModelTest {
                         avatarUrl = null,
                         isFromUser = true
                     )
+                    ),
+                    page = 0,
+                    last = true
                 )
             )
         )
@@ -145,7 +154,7 @@ class SellerChatDetailViewModelTest {
         advanceUntilIdle()
 
         assertEquals("stale-id", vm.uiState.value.activeChatId)
-        verify(exactly = 1) { getChatMessageUseCase.invoke("stale-id", true) }
+        verify(exactly = 1) { getChatMessageUseCase.page("stale-id", true, -1, 30) }
         verify(exactly = 1) { markReadUseCase.invoke("stale-id", true) }
     }
 }

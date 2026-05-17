@@ -84,6 +84,7 @@ class ChatViewModel @Inject constructor(
             is ChatEvent.SendMessage -> sendMessage(event)
             is ChatEvent.RetryMessage -> retryMessage(event)
             is ChatEvent.ReadAllMessage -> readAll(event)
+            is ChatEvent.LoadOlderMessages -> loadOlderMessages()
             is ChatEvent.ClickBack -> emitEffect(ChatEffect.NavigateBack)
         }
     }
@@ -123,8 +124,14 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun observeChat(chatId: String? = _state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null }) {
+        val resolvedChatId = chatId?.takeIf { it.isNotBlank() }
+        if (resolvedChatId == null) {
+            observeLegacyChat()
+            return
+        }
+
         observeIndependentDataFlow(
-            flow = chatMessageUseCase(chatId),
+            flow = chatMessageUseCase.page(resolvedChatId, page = LATEST_PAGE, size = CHAT_PAGE_SIZE),
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {
@@ -136,13 +143,31 @@ class ChatViewModel @Inject constructor(
 
                     val activeId = (state as? com.mtv.based.core.network.utils.LoadState.Success)
                         ?.data
+                        ?.content
                         ?.firstOrNull()
                         ?.id
+                        .orEmpty()
+                    val messages = (state as? com.mtv.based.core.network.utils.LoadState.Success)
+                        ?.data
+                        ?.content
                         .orEmpty()
 
                     it.copy(
                         activeChatId = it.activeChatId.ifBlank { activeId },
-                        chats = state,
+                        chats = when (state) {
+                            is com.mtv.based.core.network.utils.LoadState.Success -> {
+                                com.mtv.based.core.network.utils.LoadState.Success(messages)
+                            }
+                            is com.mtv.based.core.network.utils.LoadState.Loading -> {
+                                com.mtv.based.core.network.utils.LoadState.Loading
+                            }
+                            is com.mtv.based.core.network.utils.LoadState.Error -> {
+                                com.mtv.based.core.network.utils.LoadState.Error(state.error)
+                            }
+                            else -> it.chats
+                        },
+                        chatPage = (state as? com.mtv.based.core.network.utils.LoadState.Success)?.data?.page ?: it.chatPage,
+                        isFirstPage = (state as? com.mtv.based.core.network.utils.LoadState.Success)?.data?.last ?: it.isFirstPage,
                         optimisticMessages = if (state is com.mtv.based.core.network.utils.LoadState.Success) {
                             emptyList()
                         } else {
@@ -207,6 +232,27 @@ class ChatViewModel @Inject constructor(
         )
     }
 
+    private fun observeLegacyChat() {
+        observeIndependentDataFlow(
+            flow = chatMessageUseCase(null),
+            onState = { state ->
+                _state.update {
+                    when (state) {
+                        is com.mtv.based.core.network.utils.LoadState.Loading ->
+                            if (it.chats is com.mtv.based.core.network.utils.LoadState.Success) it.copy(isRefreshing = true)
+                            else it.copy(chats = com.mtv.based.core.network.utils.LoadState.Loading)
+                        is com.mtv.based.core.network.utils.LoadState.Success ->
+                            it.copy(chats = state, isRefreshing = false, isFirstPage = true)
+                        is com.mtv.based.core.network.utils.LoadState.Error ->
+                            it.copy(chats = state, isRefreshing = false)
+                        else -> it
+                    }
+                }
+            },
+            onError = { showError(it) }
+        )
+    }
+
     private fun retryMessage(event: ChatEvent.RetryMessage) {
         val activeChatId = _state.value.activeChatId
         if (activeChatId.isBlank() || event.message.isBlank()) return
@@ -233,6 +279,40 @@ class ChatViewModel @Inject constructor(
         lastReadChatId = chatId
         observeIndependentDataFlow(
             flow = chatMessageMarkAsReadUseCase(chatId),
+            onError = { showError(it) }
+        )
+    }
+
+    private fun loadOlderMessages() {
+        val state = _state.value
+        val chatId = state.activeChatId.ifBlank { routeChatId }
+        if (chatId.isBlank() || state.isLoadingOlder || state.isFirstPage || state.chatPage <= 0) return
+
+        observeIndependentDataFlow(
+            flow = chatMessageUseCase.page(
+                chatId = chatId,
+                page = state.chatPage - 1,
+                size = CHAT_PAGE_SIZE
+            ),
+            onState = { result ->
+                _state.update {
+                    when (result) {
+                        is com.mtv.based.core.network.utils.LoadState.Loading -> it.copy(isLoadingOlder = true)
+                        is com.mtv.based.core.network.utils.LoadState.Success -> {
+                            val current = (it.chats as? com.mtv.based.core.network.utils.LoadState.Success)?.data.orEmpty()
+                            val merged = (result.data.content + current).distinctBy { message -> message.id }
+                            it.copy(
+                                chats = com.mtv.based.core.network.utils.LoadState.Success(merged),
+                                chatPage = result.data.page,
+                                isFirstPage = result.data.last,
+                                isLoadingOlder = false
+                            )
+                        }
+                        is com.mtv.based.core.network.utils.LoadState.Error -> it.copy(isLoadingOlder = false)
+                        else -> it
+                    }
+                }
+            },
             onError = { showError(it) }
         )
     }
@@ -283,3 +363,6 @@ class ChatViewModel @Inject constructor(
 }
 
 private fun String.conversationCafeId(): String = substringBefore("_", missingDelimiterValue = "")
+
+private const val LATEST_PAGE = -1
+private const val CHAT_PAGE_SIZE = 30

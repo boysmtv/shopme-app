@@ -91,6 +91,7 @@ class SellerChatDetailViewModel @Inject constructor(
 
             is SellerChatDetailEvent.SendMessage -> sendMessage()
             is SellerChatDetailEvent.RetryMessage -> retryMessage(event)
+            SellerChatDetailEvent.LoadOlderMessages -> loadOlderMessages()
 
             is SellerChatDetailEvent.ClickBack ->
                 emitEffect(SellerChatDetailEffect.NavigateBack)
@@ -140,18 +141,26 @@ class SellerChatDetailViewModel @Inject constructor(
     }
 
     private fun observeChat(chatId: String? = _state.value.activeChatId.ifBlank { routeChatId }.ifBlank { null }) {
+        val resolvedChatId = chatId?.takeIf { it.isNotBlank() } ?: return
         observeIndependentDataFlow(
-            flow = getChatMessageUseCase(chatId, asSeller = true),
+            flow = getChatMessageUseCase.page(
+                chatId = resolvedChatId,
+                asSeller = true,
+                page = LATEST_PAGE,
+                size = CHAT_PAGE_SIZE
+            ),
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {
                     val activeId = (state as? LoadState.Success)
                         ?.data
+                        ?.content
                         ?.firstOrNull()
                         ?.id
                         .orEmpty()
                     val messages = (state as? LoadState.Success)
                         ?.data
+                        ?.content
                         ?.map { item ->
                             SellerChatDetailMessage(
                                 message = item.lastMessage,
@@ -168,12 +177,58 @@ class SellerChatDetailViewModel @Inject constructor(
                         isLoading = state is LoadState.Loading && it.messages.isEmpty(),
                         isRefreshing = state is LoadState.Loading && it.messages.isNotEmpty(),
                         activeChatId = it.activeChatId.ifBlank { activeId },
-                        messages = if (messages.isNotEmpty()) messages else it.messages
+                        messages = if (messages.isNotEmpty()) messages else it.messages,
+                        chatPage = (state as? LoadState.Success)?.data?.page ?: it.chatPage,
+                        isFirstPage = (state as? LoadState.Success)?.data?.last ?: it.isFirstPage,
+                        isLoadingOlder = false
                     ).also { nextState ->
                         nextActiveChatId = nextState.activeChatId
                     }
                 }
                 markAsReadIfNeeded(nextActiveChatId)
+            },
+            onError = ::showError
+        )
+    }
+
+    private fun loadOlderMessages() {
+        val state = _state.value
+        val chatId = state.activeChatId.ifBlank { routeChatId }
+        if (chatId.isBlank() || state.isLoadingOlder || state.isFirstPage || state.chatPage <= 0) return
+
+        observeIndependentDataFlow(
+            flow = getChatMessageUseCase.page(
+                chatId = chatId,
+                asSeller = true,
+                page = state.chatPage - 1,
+                size = CHAT_PAGE_SIZE
+            ),
+            onState = { result ->
+                _state.update {
+                    when (result) {
+                        is LoadState.Loading -> it.copy(isLoadingOlder = true)
+                        is LoadState.Success -> {
+                            val older = result.data.content.map { item ->
+                                SellerChatDetailMessage(
+                                    message = item.lastMessage,
+                                    isFromSeller = item.isFromUser,
+                                    id = item.id,
+                                    time = item.time,
+                                    isPending = false,
+                                    isRead = item.isRead
+                                )
+                            }
+                            it.copy(
+                                messages = (older + it.messages).distinctBy { message -> message.id },
+                                chatPage = result.data.page,
+                                isFirstPage = result.data.last,
+                                isLoadingOlder = false
+                            )
+                        }
+                        is LoadState.Error -> it.copy(isLoadingOlder = false)
+                        else -> it
+                    }
+                }
             },
             onError = ::showError
         )
@@ -295,3 +350,6 @@ class SellerChatDetailViewModel @Inject constructor(
 }
 
 private fun String.conversationCustomerId(): String = substringAfter("_", missingDelimiterValue = "")
+
+private const val LATEST_PAGE = -1
+private const val CHAT_PAGE_SIZE = 30
