@@ -10,6 +10,7 @@ package com.mtv.app.shopme.data.mapper
 
 import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
 import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
+import com.mtv.app.shopme.core.database.entity.ChatMessageCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
 import com.mtv.app.shopme.domain.model.Address
@@ -137,6 +138,34 @@ fun ChatListCacheEntity.toDomain(): ChatListItem = ChatListItem(
     time = time,
     unreadCount = unreadCount,
     avatarUrl = avatarUrl
+)
+
+fun ChatListItem.toMessageEntity(
+    scope: String,
+    conversationId: String,
+    position: Int
+): ChatMessageCacheEntity = ChatMessageCacheEntity(
+    cacheKey = "$scope:$conversationId:${id.ifBlank { position.toString() }}",
+    scope = scope,
+    conversationId = conversationId,
+    messageId = id.ifBlank { "$conversationId-$position" },
+    message = lastMessage,
+    time = time,
+    isFromUser = isFromUser,
+    isRead = isRead,
+    position = position,
+    updatedAt = System.currentTimeMillis()
+)
+
+fun ChatMessageCacheEntity.toDomain(): ChatListItem = ChatListItem(
+    id = messageId,
+    name = "",
+    lastMessage = message,
+    time = time,
+    unreadCount = 0,
+    avatarUrl = null,
+    isFromUser = isFromUser,
+    isRead = isRead
 )
 
 fun NotificationItem.toEntity(scope: String, notificationId: String): AppNotificationCacheEntity = AppNotificationCacheEntity(

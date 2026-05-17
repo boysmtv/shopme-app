@@ -6,4 +6,8 @@ interface ShopmeRealtimeGateway {
     val events: Flow<ShopmeRealtimeEvent>
 
     fun ensureConnected()
+
+    fun retain()
+
+    fun release()
 }

@@ -75,39 +75,43 @@ Evidence minimum:
 
 ## Workstream 4. Cache And Offline
 
-- [ ] Tetapkan screen yang wajib `show cached first`
+- [x] Tetapkan screen yang wajib `show cached first`
 - [ ] Terapkan cache untuk home feed
-- [ ] Terapkan cache ringkas untuk profile, chat list, order ringkas, seller dashboard ringkas bila layak
+- [x] Terapkan cache ringkas untuk profile, chat list, order ringkas, seller dashboard ringkas bila layak
+- [x] Terapkan cache lokal untuk detail chat buyer/seller agar buka chat tidak selalu berat
 - [ ] Pastikan fallback offline tidak memblok loading tanpa akhir
-- [ ] Audit invalidation cache saat favorite, cart, order, atau profile berubah
+- [x] Audit invalidation cache saat favorite, cart, order, atau profile berubah
 
 Evidence minimum:
 
 - screen penting masih usable saat backend lambat atau request gagal
 - cache stale tetap punya recovery path yang jelas
+- 2026-05-17: chat detail cache ditambahkan via Room `chat_message_cache`; address/profile cache disegarkan setelah add/delete/default address.
 
 ## Workstream 5. Compose State And Side Effect Hygiene
 
 - [ ] Audit `LaunchedEffect`, `snapshotFlow`, dan observer yang bisa duplicate work
 - [ ] Audit `rememberSaveable` yang menyimpan object berat atau tidak saveable
-- [ ] Pastikan event realtime tidak memicu reload screen penuh tanpa alasan
+- [x] Pastikan event realtime tidak memicu reload screen penuh tanpa alasan
 - [ ] Pisahkan state content, loading, processing, dan one-shot event dengan jelas
 
 Evidence minimum:
 
 - tidak ada crash/state loop dari side effect yang tidak terkendali
 - screen utama tidak memproses ulang data besar setiap recomposition
+- 2026-05-17: realtime screen ownership dipindah ke `retain()/release()` supaya websocket tidak hidup di luar halaman yang perlu realtime.
 
 ## Workstream 6. Chat And Notification Performance
 
-- [ ] Saat event websocket masuk, update hanya bagian state yang relevan
-- [ ] Hindari reload seluruh chat list untuk satu pesan baru bila delta bisa dipakai
-- [ ] Hindari reload seluruh notification list untuk satu notif baru bila delta bisa dipakai
+- [x] Saat event websocket masuk, update hanya bagian state yang relevan
+- [x] Hindari reload seluruh chat list untuk satu pesan baru bila delta bisa dipakai
+- [x] Hindari reload seluruh notification list untuk satu notif baru bila delta bisa dipakai
 - [ ] Audit unread badge update agar incremental
 
 Evidence minimum:
 
 - chat dan notif tetap realtime tanpa refresh berat yang berulang
+- 2026-05-17: chat list dan notif sudah memakai delta update lokal saat event lengkap; detail chat memakai cache lokal sebelum refresh remote.
 
 ## Workstream 7. Loading UX
 
@@ -123,13 +127,14 @@ Evidence minimum:
 ## Workstream 8. Verification
 
 - [ ] Tambahkan benchmark/check sederhana untuk titik berat utama
-- [ ] Tambahkan unit test/integration test untuk cache behavior penting
-- [ ] Pertahankan build dan verifier backend integration tetap hijau
+- [x] Tambahkan unit test/integration test untuk cache behavior penting
+- [x] Pertahankan build dan verifier backend integration tetap hijau
 
 Evidence minimum:
 
 - `./gradlew -g .gradle-home assembleDebug testDebugUnitTest`
 - `bash ./verify-backend-integration.sh`
+- 2026-05-17: `.\gradlew.bat testDebugUnitTest` passed after cache/realtime lifecycle changes.
 
 ## Priority Order
 

@@ -47,6 +47,7 @@ class SellerDashboardViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SellerDashboardUiState())
     val uiState = _state.asStateFlow()
+    private var realtimeRetained = false
 
     init {
         viewModelScope.launch {
@@ -88,7 +89,7 @@ class SellerDashboardViewModel @Inject constructor(
     }
 
     private fun load() {
-        realtimeGateway.ensureConnected()
+        retainRealtime()
         observeProfile()
         observeNotifications()
         refresh()
@@ -183,5 +184,18 @@ class SellerDashboardViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun retainRealtime() {
+        if (realtimeRetained) return
+        realtimeRetained = true
+        realtimeGateway.retain()
+    }
+
+    override fun onCleared() {
+        if (realtimeRetained) {
+            realtimeGateway.release()
+        }
+        super.onCleared()
     }
 }

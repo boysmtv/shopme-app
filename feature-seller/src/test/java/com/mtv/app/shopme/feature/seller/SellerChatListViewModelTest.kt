@@ -57,7 +57,7 @@ class SellerChatListViewModelTest {
         assertEquals(1, vm.uiState.value.chatList.size)
         assertEquals("conv-1", vm.uiState.value.chatList.first().id)
         assertEquals("Dedy", vm.uiState.value.chatList.first().name)
-        verify(exactly = 1) { realtimeGateway.ensureConnected() }
+        verify(exactly = 1) { realtimeGateway.retain() }
     }
 
     @Test

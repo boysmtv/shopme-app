@@ -44,6 +44,7 @@ class ChatListViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ChatListUiState())
     val uiState = _state.asStateFlow()
+    private var realtimeRetained = false
 
     init {
         viewModelScope.launch {
@@ -76,7 +77,7 @@ class ChatListViewModel @Inject constructor(
     }
 
     private fun observeChatList() {
-        realtimeGateway.ensureConnected()
+        retainRealtime()
         observeDataFlow(
             flow = chatListUseCase(),
             onState = { state ->
@@ -170,6 +171,19 @@ class ChatListViewModel @Inject constructor(
             ?.take(5)
             ?.takeIf { it.length == 5 }
             ?: fallback
+
+    private fun retainRealtime() {
+        if (realtimeRetained) return
+        realtimeRetained = true
+        realtimeGateway.retain()
+    }
+
+    override fun onCleared() {
+        if (realtimeRetained) {
+            realtimeGateway.release()
+        }
+        super.onCleared()
+    }
 
     private fun showError(error: UiError) {
         handleSessionError(

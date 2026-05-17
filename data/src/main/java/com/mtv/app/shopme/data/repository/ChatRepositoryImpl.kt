@@ -13,6 +13,7 @@ import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toEntity
+import com.mtv.app.shopme.data.mapper.toMessageEntity
 import com.mtv.app.shopme.data.remote.datasource.ChatRemoteDataSource
 import com.mtv.app.shopme.data.remote.request.ChatMessageMarkAsReadRequest
 import com.mtv.app.shopme.data.remote.request.ChatMessageSendRequest
@@ -53,9 +54,36 @@ class ChatRepositoryImpl @Inject constructor(
 
 
     override fun getChats(chatId: String?, asSeller: Boolean) =
-        resultFlow.create {
-            remote.getChats(chatId, asSeller).toDomain()
-        }
+        flow {
+            emit(Resource.Loading)
+            val conversationId = chatId.orEmpty()
+            val scope = if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE
+            val cached = if (conversationId.isNotBlank()) {
+                homeDao.getChatMessagesOnce(scope, conversationId).map { it.toDomain() }
+            } else {
+                emptyList()
+            }
+            if (cached.isNotEmpty()) {
+                emit(Resource.Success(cached))
+            }
+
+            try {
+                val remoteChats = remote.getChats(chatId, asSeller).toDomain()
+                if (conversationId.isNotBlank()) {
+                    homeDao.clearChatMessages(scope, conversationId)
+                    homeDao.insertChatMessages(
+                        remoteChats.mapIndexed { index, item ->
+                            item.toMessageEntity(scope, conversationId, index)
+                        }
+                    )
+                }
+                emit(Resource.Success(remoteChats))
+            } catch (throwable: Throwable) {
+                if (cached.isEmpty()) {
+                    emit(Resource.Error(errorMapper.map(throwable)))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun ensureConversation(cafeId: String) =
         resultFlow.create {
@@ -91,7 +119,9 @@ class ChatRepositoryImpl @Inject constructor(
     override fun clearAllMessages(asSeller: Boolean) =
         resultFlow.create {
             remote.clearAll(asSeller)
-            homeDao.clearChatList(if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE)
+            val scope = if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE
+            homeDao.clearChatList(scope)
+            homeDao.clearChatMessagesByScope(scope)
         }
 
     companion object {

@@ -13,14 +13,15 @@ import androidx.room.RoomDatabase
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
 import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
+import com.mtv.app.shopme.core.database.entity.ChatMessageCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
 import com.mtv.app.shopme.core.database.entity.PendingMutationEntity
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 
 @Database(
-    entities = [CustomerEntity::class, FoodEntity::class, ChatListCacheEntity::class, AppNotificationCacheEntity::class, PayloadCacheEntity::class, PendingMutationEntity::class],
-    version = 8,
+    entities = [CustomerEntity::class, FoodEntity::class, ChatListCacheEntity::class, ChatMessageCacheEntity::class, AppNotificationCacheEntity::class, PayloadCacheEntity::class, PendingMutationEntity::class],
+    version = 9,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

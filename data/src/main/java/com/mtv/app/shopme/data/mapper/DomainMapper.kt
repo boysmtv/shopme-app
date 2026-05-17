@@ -299,7 +299,7 @@ fun ChatResponse.toDomain(): List<ChatListItem> {
 
 fun ChatItem.toDomain(): ChatListItem {
     return ChatListItem(
-        id = id,
+        id = messageId.orEmpty().ifBlank { "$id:${time.orEmpty()}:${message.hashCode()}" },
         name = "",
         lastMessage = message,
         time = time.orEmpty(),

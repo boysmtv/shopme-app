@@ -43,6 +43,7 @@ class SellerOrderViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SellerOrderUiState())
     val uiState = _state.asStateFlow()
+    private var realtimeRetained = false
 
     init {
         viewModelScope.launch {
@@ -78,7 +79,7 @@ class SellerOrderViewModel @Inject constructor(
     }
 
     private fun load() {
-        realtimeGateway.ensureConnected()
+        retainRealtime()
         observeProfile()
         observeIndependentDataFlow(
             flow = getSellerOrdersUseCase(0, PAGE_SIZE),
@@ -193,5 +194,18 @@ class SellerOrderViewModel @Inject constructor(
 
     private companion object {
         const val PAGE_SIZE = 20
+    }
+
+    private fun retainRealtime() {
+        if (realtimeRetained) return
+        realtimeRetained = true
+        realtimeGateway.retain()
+    }
+
+    override fun onCleared() {
+        if (realtimeRetained) {
+            realtimeGateway.release()
+        }
+        super.onCleared()
     }
 }

@@ -57,11 +57,31 @@ class ShopmeRealtimeGatewayImpl @Inject constructor(
     @Volatile
     private var reconnectScheduled: Boolean = false
 
+    @Volatile
+    private var retainCount: Int = 0
+
+    override fun retain() {
+        synchronized(lock) {
+            retainCount += 1
+        }
+        ensureConnected()
+    }
+
+    override fun release() {
+        val shouldClose = synchronized(lock) {
+            retainCount = (retainCount - 1).coerceAtLeast(0)
+            retainCount == 0
+        }
+        if (shouldClose) {
+            closeActiveSocket("inactive")
+        }
+    }
+
     override fun ensureConnected() {
         val token = securePrefs.getString(ACCESS_TOKEN).orEmpty().trim()
 
         if (token.isBlank()) {
-            closeActiveSocket()
+            closeActiveSocket("missing-token")
             return
         }
 
@@ -73,7 +93,7 @@ class ShopmeRealtimeGatewayImpl @Inject constructor(
                 return
             }
 
-            closeActiveSocket()
+            closeActiveSocket("reset")
             activeToken = token
             isConnecting = true
         }
@@ -119,7 +139,7 @@ class ShopmeRealtimeGatewayImpl @Inject constructor(
             if (activeToken == token) {
                 activeSocket = null
             }
-            if (reconnectScheduled || activeToken != token) {
+            if (retainCount <= 0 || reconnectScheduled || activeToken != token) {
                 return
             }
             reconnectScheduled = true
@@ -135,10 +155,18 @@ class ShopmeRealtimeGatewayImpl @Inject constructor(
     }
 
     private fun closeActiveSocket() {
+        closeActiveSocket("reset")
+    }
+
+    private fun closeActiveSocket(reason: String) {
         synchronized(lock) {
-            activeSocket?.close(1000, "reset")
+            activeSocket?.close(1000, reason)
             activeSocket = null
             isConnecting = false
+            reconnectScheduled = false
+            if (reason != "reset") {
+                activeToken = null
+            }
         }
     }
 }

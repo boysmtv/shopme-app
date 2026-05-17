@@ -91,7 +91,7 @@ class SellerChatDetailViewModelTest {
         assertEquals("https://media.shopme.test/users/cust-1/thumb.jpg", vm.uiState.value.chatAvatarUrl)
         assertEquals(1, vm.uiState.value.messages.size)
         assertTrue(vm.uiState.value.messages.first().isFromSeller)
-        verify(exactly = 1) { realtimeGateway.ensureConnected() }
+        verify(exactly = 1) { realtimeGateway.retain() }
     }
 
     @Test

@@ -42,6 +42,7 @@ class NotifViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(NotifUiState())
     val uiState = _state.asStateFlow()
+    private var realtimeRetained = false
 
     init {
         viewModelScope.launch {
@@ -66,7 +67,7 @@ class NotifViewModel @Inject constructor(
     }
 
     private fun getNotifications() {
-        realtimeGateway.ensureConnected()
+        retainRealtime()
         observeDataFlow(
             flow = getNotificationsUseCase(),
             onState = { state ->
@@ -139,5 +140,18 @@ class NotifViewModel @Inject constructor(
         is LoadState.Loading -> LoadState.Loading
         is LoadState.Success -> LoadState.Success("")
         is LoadState.Error -> LoadState.Error(this.error)
+    }
+
+    private fun retainRealtime() {
+        if (realtimeRetained) return
+        realtimeRetained = true
+        realtimeGateway.retain()
+    }
+
+    override fun onCleared() {
+        if (realtimeRetained) {
+            realtimeGateway.release()
+        }
+        super.onCleared()
     }
 }

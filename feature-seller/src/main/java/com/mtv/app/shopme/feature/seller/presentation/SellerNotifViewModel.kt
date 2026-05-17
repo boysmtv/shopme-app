@@ -37,6 +37,7 @@ class SellerNotifViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SellerNotifUiState())
     val uiState = _state.asStateFlow()
+    private var realtimeRetained = false
 
     init {
         viewModelScope.launch {
@@ -61,7 +62,7 @@ class SellerNotifViewModel @Inject constructor(
     }
 
     private fun getNotifications() {
-        realtimeGateway.ensureConnected()
+        retainRealtime()
         observeDataFlow(
             flow = getSellerNotificationsUseCase(),
             onState = { state ->
@@ -155,5 +156,18 @@ class SellerNotifViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun retainRealtime() {
+        if (realtimeRetained) return
+        realtimeRetained = true
+        realtimeGateway.retain()
+    }
+
+    override fun onCleared() {
+        if (realtimeRetained) {
+            realtimeGateway.release()
+        }
+        super.onCleared()
     }
 }

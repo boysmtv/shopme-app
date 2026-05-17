@@ -62,7 +62,7 @@ class ChatListViewModelTest {
 
         val state = vm.uiState.value.chatListState as LoadState.Success
         assertEquals(0, state.data.chatList.size)
-        verify(atLeast = 1) { realtimeGateway.ensureConnected() }
+        verify(atLeast = 1) { realtimeGateway.retain() }
     }
 
     @Test

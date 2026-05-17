@@ -60,6 +60,7 @@ class SellerChatDetailViewModel @Inject constructor(
         )
     )
     val uiState = _state.asStateFlow()
+    private var realtimeRetained = false
 
     init {
         viewModelScope.launch {
@@ -103,7 +104,7 @@ class SellerChatDetailViewModel @Inject constructor(
                 isRefreshing = it.messages.isNotEmpty()
             )
         }
-        realtimeGateway.ensureConnected()
+        retainRealtime()
         observeChatMetadata()
     }
 
@@ -278,6 +279,19 @@ class SellerChatDetailViewModel @Inject constructor(
 
     private fun currentChatTime(): String =
         SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+
+    private fun retainRealtime() {
+        if (realtimeRetained) return
+        realtimeRetained = true
+        realtimeGateway.retain()
+    }
+
+    override fun onCleared() {
+        if (realtimeRetained) {
+            realtimeGateway.release()
+        }
+        super.onCleared()
+    }
 }
 
 private fun String.conversationCustomerId(): String = substringAfter("_", missingDelimiterValue = "")

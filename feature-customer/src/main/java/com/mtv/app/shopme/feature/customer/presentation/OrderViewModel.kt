@@ -42,6 +42,7 @@ class OrderViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(OrderUiState())
     val uiState = _state.asStateFlow()
+    private var realtimeRetained = false
 
     init {
         viewModelScope.launch {
@@ -79,7 +80,7 @@ class OrderViewModel @Inject constructor(
     }
 
     private fun loadOrders() {
-        realtimeGateway.ensureConnected()
+        retainRealtime()
         observeDataFlow(
             flow = getOrdersUseCase(),
             onState = { result ->
@@ -128,5 +129,18 @@ class OrderViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    private fun retainRealtime() {
+        if (realtimeRetained) return
+        realtimeRetained = true
+        realtimeGateway.retain()
+    }
+
+    override fun onCleared() {
+        if (realtimeRetained) {
+            realtimeGateway.release()
+        }
+        super.onCleared()
     }
 }

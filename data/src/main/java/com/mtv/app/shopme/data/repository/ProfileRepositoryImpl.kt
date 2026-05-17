@@ -106,19 +106,40 @@ class ProfileRepositoryImpl @Inject constructor(
         }
 
     override fun addAddress(param: AddressAddParam) =
-        resultFlow.create {
-            remote.addAddress(param)
-        }
+        flow {
+            emit(Resource.Loading)
+            try {
+                remote.addAddress(param)
+                refreshCustomerCache()
+                emit(Resource.Success(Unit))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun deleteAddress(param: AddressDeleteParam) =
-        resultFlow.create {
-            remote.deleteAddress(param)
-        }
+        flow {
+            emit(Resource.Loading)
+            try {
+                remote.deleteAddress(param)
+                refreshCustomerCache()
+                emit(Resource.Success(Unit))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun setDefaultAddress(param: AddressDefaultParam) =
-        resultFlow.create {
-            remote.setDefaultAddress(param)
-        }
+        flow {
+            emit(Resource.Loading)
+            try {
+                remote.setDefaultAddress(param)
+                refreshCustomerCache()
+                emit(Resource.Success(Unit))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun getFavoriteFoodIds() =
         resultFlow.create {
@@ -151,6 +172,11 @@ class ProfileRepositoryImpl @Inject constructor(
                 )
             )
         }
+    }
+
+    private suspend fun refreshCustomerCache() {
+        val remoteCustomer = remote.getCustomer().toDomain()
+        homeDao.insertCustomer(remoteCustomer.toEntity())
     }
 
     private fun Throwable.isRetryableOfflineWrite(): Boolean =

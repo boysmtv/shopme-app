@@ -6,18 +6,20 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 object AppDatabaseMigrations {
 
     val ALL = arrayOf(
-        migrationTo8(1),
-        migrationTo8(2),
-        migrationTo8(3),
-        migrationTo8(4),
-        migrationTo8(5),
-        migrationTo8(6),
-        migration7To8()
+        migrationTo9(1),
+        migrationTo9(2),
+        migrationTo9(3),
+        migrationTo9(4),
+        migrationTo9(5),
+        migrationTo9(6),
+        migration7To9(),
+        migration8To9()
     )
 
-    private fun migrationTo8(fromVersion: Int) = object : Migration(fromVersion, 8) {
+    private fun migrationTo9(fromVersion: Int) = object : Migration(fromVersion, 9) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("DROP TABLE IF EXISTS `chat_list_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `chat_message_cache`")
             db.execSQL("DROP TABLE IF EXISTS `app_notification_cache`")
             db.execSQL("DROP TABLE IF EXISTS `payload_cache`")
             db.execSQL("DROP TABLE IF EXISTS `pending_mutation`")
@@ -37,6 +39,7 @@ object AppDatabaseMigrations {
                 )
                 """.trimIndent()
             )
+            createChatMessageCache(db)
             db.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS `app_notification_cache` (
@@ -78,9 +81,10 @@ object AppDatabaseMigrations {
         }
     }
 
-    private fun migration7To8() = object : Migration(7, 8) {
+    private fun migration7To9() = object : Migration(7, 9) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execSQL("DROP TABLE IF EXISTS `chat_list_cache`")
+            db.execSQL("DROP TABLE IF EXISTS `chat_message_cache`")
             db.execSQL(
                 """
                 CREATE TABLE IF NOT EXISTS `chat_list_cache` (
@@ -97,6 +101,33 @@ object AppDatabaseMigrations {
                 )
                 """.trimIndent()
             )
+            createChatMessageCache(db)
         }
+    }
+
+    private fun migration8To9() = object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            createChatMessageCache(db)
+        }
+    }
+
+    private fun createChatMessageCache(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `chat_message_cache` (
+                `cacheKey` TEXT NOT NULL,
+                `scope` TEXT NOT NULL,
+                `conversationId` TEXT NOT NULL,
+                `messageId` TEXT NOT NULL,
+                `message` TEXT NOT NULL,
+                `time` TEXT NOT NULL,
+                `isFromUser` INTEGER NOT NULL,
+                `isRead` INTEGER NOT NULL,
+                `position` INTEGER NOT NULL,
+                `updatedAt` INTEGER NOT NULL,
+                PRIMARY KEY(`cacheKey`)
+            )
+            """.trimIndent()
+        )
     }
 }

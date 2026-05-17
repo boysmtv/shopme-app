@@ -14,6 +14,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
 import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
+import com.mtv.app.shopme.core.database.entity.ChatMessageCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.FoodEntity
 import com.mtv.app.shopme.core.database.entity.PendingMutationEntity
@@ -40,6 +41,18 @@ interface HomeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertChatList(data: List<ChatListCacheEntity>)
+
+    @Query("SELECT * FROM chat_message_cache WHERE scope = :scope AND conversationId = :conversationId ORDER BY position ASC, updatedAt ASC")
+    suspend fun getChatMessagesOnce(scope: String, conversationId: String): List<ChatMessageCacheEntity>
+
+    @Query("DELETE FROM chat_message_cache WHERE scope = :scope AND conversationId = :conversationId")
+    suspend fun clearChatMessages(scope: String, conversationId: String)
+
+    @Query("DELETE FROM chat_message_cache WHERE scope = :scope")
+    suspend fun clearChatMessagesByScope(scope: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertChatMessages(data: List<ChatMessageCacheEntity>)
 
     @Query("SELECT * FROM app_notification_cache WHERE scope = :scope ORDER BY createdAt DESC")
     suspend fun getNotificationsOnce(scope: String): List<AppNotificationCacheEntity>

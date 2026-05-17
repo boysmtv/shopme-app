@@ -90,6 +90,6 @@ class ChatViewModelTest {
         assertEquals("Cafe Kopi Kita", vm.uiState.value.chatName)
         assertEquals("https://media.shopme.test/cafes/cafe-1/thumb.jpg", vm.uiState.value.chatAvatarUrl)
         verify(exactly = 1) { markReadUseCase.invoke("conv-1", false) }
-        verify(exactly = 1) { realtimeGateway.ensureConnected() }
+        verify(exactly = 1) { realtimeGateway.retain() }
     }
 }
