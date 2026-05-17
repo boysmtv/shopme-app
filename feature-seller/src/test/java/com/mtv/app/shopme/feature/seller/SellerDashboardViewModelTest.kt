@@ -2,6 +2,7 @@ package com.mtv.app.shopme.feature.seller
 
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.model.SellerProfile
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
@@ -48,20 +49,24 @@ class SellerDashboardViewModelTest {
                 )
             )
         )
-        every { getSellerOrdersUseCase.invoke() } returns flowOf(
+        every { getSellerOrdersUseCase.invoke(0, 20, null) } returns flowOf(
             Resource.Success(
-                listOf(
-                    SellerOrderItem(
-                        id = "order-1",
-                        invoice = "INV-1",
-                        customer = "Buyer",
-                        total = "Rp 18,000",
-                        date = "11 May 2026",
-                        time = "10:00",
-                        paymentMethod = "TRANSFER",
-                        status = "COMPLETED",
-                        location = "Kemang"
-                    )
+                PagedData(
+                    content = listOf(
+                        SellerOrderItem(
+                            id = "order-1",
+                            invoice = "INV-1",
+                            customer = "Buyer",
+                            total = "Rp 18,000",
+                            date = "11 May 2026",
+                            time = "10:00",
+                            paymentMethod = "TRANSFER",
+                            status = "COMPLETED",
+                            location = "Kemang"
+                        )
+                    ),
+                    page = 0,
+                    last = true
                 )
             )
         )
@@ -88,7 +93,7 @@ class SellerDashboardViewModelTest {
     @Test
     fun `click order detail should emit navigation effect with order id`() = runTest {
         every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
-        every { getSellerOrdersUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { getSellerOrdersUseCase.invoke(0, 20, null) } returns flowOf(Resource.Success(PagedData(emptyList(), 0, true)))
         every { getUnreadNotificationCountUseCase.invoke() } returns flowOf(Resource.Success(0))
 
         val vm = SellerDashboardViewModel(
@@ -109,7 +114,7 @@ class SellerDashboardViewModelTest {
     @Test
     fun `change filter and sort should update dashboard ui state`() = runTest {
         every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
-        every { getSellerOrdersUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { getSellerOrdersUseCase.invoke(0, 20, null) } returns flowOf(Resource.Success(PagedData(emptyList(), 0, true)))
         every { getUnreadNotificationCountUseCase.invoke() } returns flowOf(Resource.Success(0))
 
         val vm = SellerDashboardViewModel(

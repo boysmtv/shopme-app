@@ -14,7 +14,7 @@ interface SellerRepository {
     fun getProfile(): Flow<Resource<SellerProfile>>
     fun getPaymentMethods(): Flow<Resource<SellerPaymentMethod>>
     fun getOrders(): Flow<Resource<List<SellerOrderItem>>>
-    fun getOrders(page: Int, size: Int): Flow<Resource<PagedData<SellerOrderItem>>>
+    fun getOrders(page: Int, size: Int, status: OrderStatus? = null): Flow<Resource<PagedData<SellerOrderItem>>>
     fun getOrderDetail(orderId: String): Flow<Resource<Order>>
     fun updateOrderStatus(orderId: String, status: OrderStatus): Flow<Resource<Unit>>
     fun cancelOrder(orderId: String, reason: String?): Flow<Resource<Unit>>

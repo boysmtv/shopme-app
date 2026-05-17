@@ -128,13 +128,13 @@ class SellerDashboardViewModel @Inject constructor(
 
     private fun refresh() {
         observeIndependentDataFlow(
-            flow = getSellerOrdersUseCase(),
+            flow = getSellerOrdersUseCase(0, DASHBOARD_ORDER_PAGE_SIZE),
             onState = { result ->
                 _state.update {
                     it.copy(
                         isLoading = result is LoadState.Loading,
                         isRefreshing = result is LoadState.Loading && it.orders.isNotEmpty(),
-                        orders = if (result is LoadState.Success) result.data else it.orders,
+                        orders = if (result is LoadState.Success) result.data.content else it.orders,
                         errorMessage = when (result) {
                             is LoadState.Success, is LoadState.Loading -> null
                             else -> it.errorMessage
@@ -197,5 +197,9 @@ class SellerDashboardViewModel @Inject constructor(
             realtimeGateway.release()
         }
         super.onCleared()
+    }
+
+    private companion object {
+        const val DASHBOARD_ORDER_PAGE_SIZE = 20
     }
 }

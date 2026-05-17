@@ -20,9 +20,13 @@ import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.provider.utils.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class SellerProductListViewModel @Inject constructor(
@@ -34,6 +38,7 @@ class SellerProductListViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(SellerProductListUiState())
     val uiState = _state.asStateFlow()
+    private var searchJob: Job? = null
 
     override fun onEvent(event: SellerProductListEvent) {
         when (event) {
@@ -54,7 +59,7 @@ class SellerProductListViewModel @Inject constructor(
 
             is SellerProductListEvent.ChangeSearchQuery -> {
                 _state.update { it.copy(searchQuery = event.value) }
-                reloadProducts()
+                debounceReloadProducts()
             }
 
             is SellerProductListEvent.SelectCategoryFilter -> {
@@ -170,11 +175,20 @@ class SellerProductListViewModel @Inject constructor(
     }
 
     private fun reloadProducts() {
+        searchJob?.cancel()
         val cafeId = _state.value.cafeId
         if (cafeId.isNullOrBlank()) {
             load()
         } else {
             loadProducts(cafeId, page = 0, append = false)
+        }
+    }
+
+    private fun debounceReloadProducts() {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            delay(350)
+            reloadProducts()
         }
     }
 

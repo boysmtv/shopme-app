@@ -118,11 +118,11 @@ class SellerRepositoryImpl @Inject constructor(
             }
         }.flowOn(Dispatchers.IO)
 
-    override fun getOrders(page: Int, size: Int) =
+    override fun getOrders(page: Int, size: Int, status: OrderStatus?) =
         flow {
             emit(Resource.Loading)
             try {
-                val remoteOrders = remote.getOrders(page, size)
+                val remoteOrders = remote.getOrders(page, size, status)
                 emit(
                     Resource.Success(
                         PagedData(

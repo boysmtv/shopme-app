@@ -38,14 +38,15 @@ class SellerRemoteDataSource @Inject constructor(
             endpoint = ApiEndPoint.Seller.Orders
         ).requireData()
 
-    suspend fun getOrders(page: Int, size: Int) =
+    suspend fun getOrders(page: Int, size: Int, status: OrderStatus? = null) =
         request<ApiResponse<PageResponse<SellerOrderSummaryResponse>>>(
             endpoint = ApiEndPoint.Seller.OrdersPage,
             options = RequestOptions(
-                query = mapOf(
-                    "page" to page.toString(),
-                    "size" to size.toString()
-                )
+                query = buildMap {
+                    put("page", page.toString())
+                    put("size", size.toString())
+                    status?.let { put("status", it.name) }
+                }
             )
         ).requireData()
 

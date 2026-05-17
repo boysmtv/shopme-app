@@ -36,7 +36,6 @@ sealed class SellerStoreEvent {
     object ClickBankAccount : SellerStoreEvent()
     object ClickChangePassword : SellerStoreEvent()
     object ClickHelpCenter : SellerStoreEvent()
-    object ClickBackToCustomer : SellerStoreEvent()
 
     object Logout : SellerStoreEvent()
     object ClickBack : SellerStoreEvent()
@@ -44,13 +43,13 @@ sealed class SellerStoreEvent {
 
 sealed class SellerStoreEffect {
     object NavigateBack : SellerStoreEffect()
+    object NavigateToDashboard : SellerStoreEffect()
     object NavigateToOrders : SellerStoreEffect()
     object NavigateToEditProfile : SellerStoreEffect()
     object NavigateToStoreSettings : SellerStoreEffect()
     object NavigateToBankAccount : SellerStoreEffect()
     object NavigateToChangePassword : SellerStoreEffect()
     object NavigateToHelpCenter : SellerStoreEffect()
-    object NavigateToCustomerHome : SellerStoreEffect()
 
     object LogoutSuccess : SellerStoreEffect()
 }

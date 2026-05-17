@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
@@ -63,8 +64,10 @@ class SellerOrderViewModel @Inject constructor(
 
             SellerOrderEvent.DismissDialog -> dismissDialog()
 
-            is SellerOrderEvent.SelectFilter ->
-                update { copy(selectedFilter = event.value) }
+            is SellerOrderEvent.SelectFilter -> {
+                update { copy(selectedFilter = event.value, currentPage = 0, isLastPage = false) }
+                load()
+            }
 
             SellerOrderEvent.ToggleOnline ->
                 toggleOnline()
@@ -82,7 +85,7 @@ class SellerOrderViewModel @Inject constructor(
         retainRealtime()
         observeProfile()
         observeIndependentDataFlow(
-            flow = getSellerOrdersUseCase(0, PAGE_SIZE),
+            flow = getSellerOrdersUseCase(0, PAGE_SIZE, _state.value.selectedFilter.toOrderStatusOrNull()),
             onState = { result ->
                 _state.update {
                     it.copy(
@@ -109,7 +112,11 @@ class SellerOrderViewModel @Inject constructor(
         val state = _state.value
         if (state.isLoading || state.isRefreshing || state.isLoadingMore || state.isLastPage) return
         observeIndependentDataFlow(
-            flow = getSellerOrdersUseCase(state.currentPage + 1, PAGE_SIZE),
+            flow = getSellerOrdersUseCase(
+                page = state.currentPage + 1,
+                size = PAGE_SIZE,
+                status = state.selectedFilter.toOrderStatusOrNull()
+            ),
             onState = { result ->
                 _state.update {
                     when (result) {
@@ -191,6 +198,9 @@ class SellerOrderViewModel @Inject constructor(
             )
         }
     }
+
+    private fun String.toOrderStatusOrNull(): OrderStatus? =
+        OrderStatus.entries.firstOrNull { it.name.equals(this, ignoreCase = true) }
 
     private companion object {
         const val PAGE_SIZE = 20

@@ -63,10 +63,7 @@ class SellerProfileViewModel @Inject constructor(
             SellerStoreEvent.ClickHelpCenter ->
                 emitEffect(SellerStoreEffect.NavigateToHelpCenter)
 
-            SellerStoreEvent.ClickBackToCustomer ->
-                emitEffect(SellerStoreEffect.NavigateToCustomerHome)
-
-            SellerStoreEvent.ClickBack -> emitEffect(SellerStoreEffect.NavigateBack)
+            SellerStoreEvent.ClickBack -> emitEffect(SellerStoreEffect.NavigateToDashboard)
             SellerStoreEvent.Logout -> logout()
             else -> {}
         }

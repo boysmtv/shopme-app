@@ -71,6 +71,13 @@ private fun handleEffect(
         SellerStoreEffect.NavigateBack ->
             nav.popBackStack()
 
+        SellerStoreEffect.NavigateToDashboard ->
+            nav.navigate(SellerDestinations.DASHBOARD) {
+                popUpTo(SellerDestinations.SELLER_GRAPH) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
+            }
+
         SellerStoreEffect.NavigateToOrders ->
             nav.navigate(SellerDestinations.ORDER)
 
@@ -88,11 +95,6 @@ private fun handleEffect(
 
         SellerStoreEffect.NavigateToHelpCenter ->
             nav.navigate(CustomerDestinations.HELP_GRAPH)
-
-        SellerStoreEffect.NavigateToCustomerHome ->
-            nav.navigate(CustomerDestinations.HOME_GRAPH) {
-                popUpTo(SellerDestinations.SELLER_GRAPH) { inclusive = true }
-            }
 
         SellerStoreEffect.LogoutSuccess -> {
             nav.navigate(AuthDestinations.LOGIN_GRAPH) {
