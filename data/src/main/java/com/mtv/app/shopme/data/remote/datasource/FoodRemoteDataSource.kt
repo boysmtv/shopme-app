@@ -27,13 +27,28 @@ class FoodRemoteDataSource @Inject constructor(
     network: NetworkRepository
 ) : BaseRemoteDataSource(network) {
 
-    suspend fun getFoods() = request<ApiResponse<List<FoodResponse>>>(
-        endpoint = ApiEndPoint.Foods.GetAll
-    ).requireData()
+    suspend fun getFoods() = request<ApiResponse<PageResponse<FoodResponse>>>(
+        endpoint = ApiEndPoint.Foods.Search,
+        options = RequestOptions(
+            query = mapOf(
+                "name" to "",
+                "page" to "0",
+                "size" to DEFAULT_HOME_SIZE.toString(),
+                "sort" to "random",
+                "seed" to System.currentTimeMillis().toString()
+            )
+        )
+    ).requireData().content
 
-    suspend fun getFoodsByCafe(id: String) = request<ApiResponse<List<FoodResponse>>>(
-        endpoint = ApiEndPoint.Foods.GetByCafeId(id)
-    ).requireData()
+    suspend fun getFoodsByCafe(id: String) = request<ApiResponse<PageResponse<FoodResponse>>>(
+        endpoint = ApiEndPoint.Foods.GetByCafeIdPage(id),
+        options = RequestOptions(
+            query = mapOf(
+                "page" to "0",
+                "size" to DEFAULT_CAFE_SIZE.toString()
+            )
+        )
+    ).requireData().content
 
     suspend fun getFoodsByCafe(
         id: String,
@@ -98,5 +113,10 @@ class FoodRemoteDataSource @Inject constructor(
             )
         )
     ).requireData()
+
+    private companion object {
+        const val DEFAULT_HOME_SIZE = 20
+        const val DEFAULT_CAFE_SIZE = 30
+    }
 
 }
