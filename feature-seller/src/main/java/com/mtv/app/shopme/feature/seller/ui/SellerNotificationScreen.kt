@@ -112,7 +112,10 @@ fun SellerNotificationScreen(
                 if (state.notifications.isEmpty()) {
                     item { EmptySellerState() }
                 } else {
-                    items(state.notifications) { item ->
+                    items(
+                        items = state.notifications,
+                        key = { item -> listOf(item.orderId, item.title, item.date, item.time, item.message).joinToString("|") }
+                    ) { item ->
                         SellerNotificationItemCard(
                             item = item,
                             onClick = {

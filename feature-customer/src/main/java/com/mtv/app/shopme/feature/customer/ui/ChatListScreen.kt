@@ -170,7 +170,10 @@ fun ChatListScreen(
                             .weight(1f)
                             .padding(start = 20.dp, end = 20.dp)
                     ) {
-                        items(chats) { item ->
+                        items(
+                            items = chats,
+                            key = { item -> item.id }
+                        ) { item ->
                             ListChatItem(
                                 data = item,
                                 onClick = { event(ChatListEvent.ClickItem(item.id)) }

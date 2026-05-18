@@ -145,7 +145,10 @@ fun SellerChatListScreen(
                         .weight(1f)
                         .padding(horizontal = 20.dp)
                 ) {
-                    items(state.chatList) { item ->
+                    items(
+                        items = state.chatList,
+                        key = { item -> item.id }
+                    ) { item ->
                         SellerListChatItem(
                             data = item,
                             onClick = { event(SellerChatListEvent.ClickChat(item)) }

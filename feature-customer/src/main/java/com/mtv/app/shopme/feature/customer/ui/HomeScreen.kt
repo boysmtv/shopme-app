@@ -197,7 +197,8 @@ private fun HomeContent(
                     data = foodsState.data,
                     columnCount = 2,
                     horizontalSpacing = 16.dp,
-                    verticalSpacing = 16.dp
+                    verticalSpacing = 16.dp,
+                    key = { it.id }
                 ) { item ->
                     SearchFoodCard(
                         item = item,
@@ -351,11 +352,17 @@ fun <T> LazyListScope.gridItems(
     horizontalSpacing: Dp,
     verticalSpacing: Dp,
     modifier: Modifier = Modifier,
+    key: ((T) -> Any)? = null,
     itemContent: @Composable BoxScope.(T) -> Unit
 ) {
     val rows = data.chunked(columnCount)
 
-    items(rows) { rowItems ->
+    items(
+        items = rows,
+        key = key?.let { itemKey ->
+            { rowItems: List<T> -> rowItems.joinToString(separator = "|") { itemKey(it).toString() } }
+        }
+    ) { rowItems ->
         Row(
             modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(horizontalSpacing)

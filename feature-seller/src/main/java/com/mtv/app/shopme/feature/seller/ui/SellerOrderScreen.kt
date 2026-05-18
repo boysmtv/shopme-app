@@ -26,6 +26,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -44,6 +45,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +63,7 @@ import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.seller.contract.OrderSummary
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderUiState
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -71,6 +75,18 @@ fun SellerOrderScreen(
         refreshing = state.isRefreshing,
         onRefresh = { event(SellerOrderEvent.Load) }
     )
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisible ->
+                val total = listState.layoutInfo.totalItemsCount
+                if (lastVisible != null && total > 0 && lastVisible >= total - 4) {
+                    event(SellerOrderEvent.LoadMore)
+                }
+            }
+    }
 
     Box(
         modifier = Modifier
@@ -111,6 +127,7 @@ fun SellerOrderScreen(
             }
 
             LazyColumn(
+                state = listState,
                 modifier = Modifier
                     .fillMaxSize()
                     .background(AppColor.WhiteSoft)
@@ -118,14 +135,10 @@ fun SellerOrderScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
-                val filtered = state.orders.filter {
-                    state.selectedFilter == "All" || it.status.equals(state.selectedFilter, true)
-                }
-
-                itemsIndexed(filtered) { index, order ->
-                    if (index >= filtered.lastIndex - 3) {
-                        event(SellerOrderEvent.LoadMore)
-                    }
+                itemsIndexed(
+                    items = state.orders,
+                    key = { _, order -> order.orderId }
+                ) { _, order ->
                    ModernOrderCard(
                        customer = order.customerName,
                        location = order.location,

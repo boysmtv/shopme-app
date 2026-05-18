@@ -115,7 +115,10 @@ fun NotifScreen(
                         EmptyNotificationState()
                     }
                 } else {
-                    items(state.localNotification) { item ->
+                    items(
+                        items = state.localNotification,
+                        key = { item -> listOf(item.title, item.signatureDate, item.signatureTime, item.message).joinToString("|") }
+                    ) { item ->
                         NotificationItemCard(
                             item = item,
                             onClick = { event(NotifEvent.ClickNotification(item)) }
