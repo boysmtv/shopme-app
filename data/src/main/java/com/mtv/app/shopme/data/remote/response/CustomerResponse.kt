@@ -31,6 +31,7 @@ data class StatsResponse(
 
 @Serializable
 data class MenuSummaryResponse(
+    val unpaid: Int = 0,
     val ordered: Int,
     val cooking: Int,
     val shipping: Int,

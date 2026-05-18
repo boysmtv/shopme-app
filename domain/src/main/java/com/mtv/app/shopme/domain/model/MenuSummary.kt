@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.domain.model
 
 data class MenuSummary(
+    val unpaid: Int = 0,
     val ordered: Int,
     val cooking: Int,
     val shipping: Int,

@@ -57,6 +57,7 @@ fun CustomerEntity.toDomain(): Customer = Customer(
         membership = membership
     ),
     menuSummary = MenuSummary(
+        unpaid = 0,
         ordered = ordered,
         cooking = cooking,
         shipping = shipping,

@@ -49,6 +49,7 @@ object DataUiMock {
             membership = "Gold"
         ),
         menuSummary = MenuSummary(
+            unpaid = 1,
             ordered = 10,
             cooking = 2,
             shipping = 1,

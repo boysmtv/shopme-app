@@ -100,15 +100,16 @@ fun ProfileScreen(
     val menuSummary = customer?.menuSummary
     val hasMenuSummary = listOf(
         menuSummary?.ordered ?: 0,
+        menuSummary?.unpaid ?: 0,
         menuSummary?.cooking ?: 0,
         menuSummary?.shipping ?: 0,
         menuSummary?.completed ?: 0
     ).any { it > 0 }
     val orderMenus = listOf(
-        OrderMenu("Dipesan", Icons.Filled.AccountBalanceWallet, menuSummary?.ordered ?: activeOrderCount.takeUnless { hasMenuSummary } ?: 0, "ORDERED"),
+        OrderMenu("Belum Bayar", Icons.Filled.AccountBalanceWallet, menuSummary?.unpaid ?: 0, "ORDERED"),
+        OrderMenu("Dipesan", Icons.Filled.Inventory, menuSummary?.ordered ?: activeOrderCount.takeUnless { hasMenuSummary } ?: 0, "ORDERED"),
         OrderMenu("Dimasak", Icons.Filled.Inventory, menuSummary?.cooking ?: 0, "COOKING"),
         OrderMenu("Dikirim", Icons.Filled.LocalShipping, menuSummary?.shipping ?: 0, "DELIVERING"),
-        OrderMenu("Selesai", Icons.Filled.CheckCircle, menuSummary?.completed ?: 0, "COMPLETED")
     )
 
     when (val customerState = state.customer) {
@@ -496,8 +497,9 @@ fun ProfileScreenPreview() {
                                 ordered = 12,
                                 cooking = 2,
                                 shipping = 1,
-                                completed = 9,
-                                cancelled = 2
+                            completed = 9,
+                            unpaid = 1,
+                            cancelled = 2
                             )
                         )
                     )

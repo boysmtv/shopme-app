@@ -222,6 +222,7 @@ fun StatsResponse.toDomain(): Stats = Stats(
 )
 
 fun MenuSummaryResponse.toDomain(): MenuSummary = MenuSummary(
+    unpaid = unpaid,
     ordered = ordered,
     cooking = cooking,
     shipping = shipping,
