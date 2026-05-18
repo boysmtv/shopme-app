@@ -139,6 +139,8 @@ private fun HomeContent(
     }
 
     val scope = rememberCoroutineScope()
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val columnCount = if (maxWidth < 380.dp) 1 else 2
 
     LaunchedEffect(listState) {
         snapshotFlow {
@@ -153,10 +155,10 @@ private fun HomeContent(
             }
     }
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxSize()
-    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
 
         item {
             Column {
@@ -195,7 +197,7 @@ private fun HomeContent(
             is LoadState.Success -> {
                 gridItems(
                     data = foodsState.data,
-                    columnCount = 2,
+                    columnCount = columnCount,
                     horizontalSpacing = 16.dp,
                     verticalSpacing = 16.dp,
                     key = { it.id }
@@ -232,6 +234,7 @@ private fun HomeContent(
 
             else -> Unit
         }
+    }
     }
 }
 

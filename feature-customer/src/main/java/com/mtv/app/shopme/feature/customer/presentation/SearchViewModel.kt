@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
@@ -256,7 +257,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun newSearchSeed(): String = System.currentTimeMillis().toString()
+    private fun newSearchSeed(): String = UUID.randomUUID().toString()
 
     private companion object {
         const val DEFAULT_DISCOVERY_SECTION = "newest"

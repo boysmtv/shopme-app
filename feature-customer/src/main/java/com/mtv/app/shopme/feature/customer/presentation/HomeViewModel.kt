@@ -30,6 +30,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.UUID
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -196,7 +197,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun newFoodSeed(): String = System.currentTimeMillis().toString()
+    private fun newFoodSeed(): String = UUID.randomUUID().toString()
 
     private companion object {
         const val HOME_DISCOVERY_SECTION = "recommendations"
