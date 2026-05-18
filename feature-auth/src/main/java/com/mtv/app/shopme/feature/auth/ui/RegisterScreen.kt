@@ -164,7 +164,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = state.email,
-                        onValueChange = { event(RegisterEvent.OnEmailChange(state.email)) },
+                        onValueChange = { event(RegisterEvent.OnEmailChange(it)) },
                         leadingIcon = {
                             Icon(Icons.Outlined.Email, contentDescription = null)
                         },
@@ -186,7 +186,7 @@ fun RegisterScreen(
 
                     OutlinedTextField(
                         value = state.password,
-                        onValueChange = { event(RegisterEvent.OnPasswordChange(state.password)) },
+                        onValueChange = { event(RegisterEvent.OnPasswordChange(it)) },
                         leadingIcon = {
                             Icon(Icons.Outlined.Lock, contentDescription = null)
                         },
