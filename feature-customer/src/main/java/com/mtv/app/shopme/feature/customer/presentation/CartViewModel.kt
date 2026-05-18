@@ -122,7 +122,7 @@ class CartViewModel @Inject constructor(
     private fun ensureCustomerReadyForPurchase(onReady: () -> Unit) {
         var handled = false
         observeIndependentDataFlow(
-            flow = customerUseCase(),
+            flow = customerUseCase(forceRefresh = true),
             onSuccess = { customer ->
                 if (handled) return@observeIndependentDataFlow
                 handled = true

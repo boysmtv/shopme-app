@@ -14,5 +14,5 @@ import javax.inject.Inject
 class GetCustomerUseCase @Inject constructor(
     private val repository: ProfileRepository
 ) {
-    operator fun invoke() = repository.getCustomer()
+    operator fun invoke(forceRefresh: Boolean = false) = repository.getCustomer(forceRefresh)
 }

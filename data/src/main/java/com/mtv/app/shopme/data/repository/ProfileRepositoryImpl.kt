@@ -41,10 +41,10 @@ class ProfileRepositoryImpl @Inject constructor(
     private val syncManager: OfflineMutationSyncManager
 ) : ProfileRepository {
 
-    override fun getCustomer() =
+    override fun getCustomer(forceRefresh: Boolean) =
         flow {
             emit(Resource.Loading)
-            val cached = homeDao.getCustomerOnce()?.toDomain()
+            val cached = if (forceRefresh) null else homeDao.getCustomerOnce()?.toDomain()
             if (cached != null) {
                 emit(Resource.Success(cached))
             }

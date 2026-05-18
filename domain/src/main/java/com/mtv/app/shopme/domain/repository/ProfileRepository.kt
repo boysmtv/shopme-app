@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {
 
-    fun getCustomer(): Flow<Resource<Customer>>
+    fun getCustomer(forceRefresh: Boolean = false): Flow<Resource<Customer>>
 
     fun updateProfile(param: CustomerUpdateParam): Flow<Resource<Unit>>
 

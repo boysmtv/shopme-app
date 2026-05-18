@@ -1,5 +1,8 @@
 package com.mtv.app.shopme.feature.customer
 
+import com.mtv.app.shopme.domain.model.Address
+import com.mtv.app.shopme.domain.model.Customer
+import com.mtv.app.shopme.domain.model.SessionToken
 import com.mtv.app.shopme.domain.usecase.CreateOrderUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteCartByCafeIdUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteCartUseCase
@@ -38,6 +41,35 @@ class CartViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
+    fun `checkout eligibility should request fresh customer before session token`() = runTest {
+        every { customerUseCase.invoke(forceRefresh = true) } returns flowOf(
+            Resource.Success(completeCustomer())
+        )
+        every { getSessionTokenUseCase.invoke() } returns flowOf(
+            Resource.Success(SessionToken("trx-1"))
+        )
+
+        val vm = CartViewModel(
+            cartItemUseCase = cartItemUseCase,
+            customerUseCase = customerUseCase,
+            getSessionTokenUseCase = getSessionTokenUseCase,
+            verifyPinUseCase = verifyPinUseCase,
+            createOrderUseCase = createOrderUseCase,
+            cartQuantityUseCase = cartQuantityUseCase,
+            clearCartByCafeIdUseCase = clearCartByCafeIdUseCase,
+            clearCartUseCase = clearCartUseCase,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(CartEvent.GetSession)
+        advanceUntilIdle()
+
+        assertTrue(vm.uiState.value.sessionToken is LoadState.Success)
+        io.mockk.verify(exactly = 1) { customerUseCase.invoke(forceRefresh = true) }
+        io.mockk.verify(exactly = 1) { getSessionTokenUseCase.invoke() }
+    }
+
+    @Test
     fun `invalid pin should not force logout`() = runTest {
         every { verifyPinUseCase.invoke(any()) } returns flowOf(
             Resource.Error(UiError.Unauthorized("Invalid PIN"))
@@ -61,4 +93,23 @@ class CartViewModelTest {
         assertTrue(vm.uiState.value.verifyPin is LoadState.Error)
         coVerify(exactly = 0) { sessionManager.forceLogout() }
     }
+
+    private fun completeCustomer() = Customer(
+        name = "Raka",
+        phone = "081234567890",
+        email = "raka.pratama@shopme.local",
+        address = Address(
+            id = "address-1",
+            village = "Tebet Timur",
+            block = "A",
+            number = "12",
+            rt = "001",
+            rw = "005",
+            isDefault = true
+        ),
+        photo = "",
+        verified = true,
+        stats = null,
+        menuSummary = null
+    )
 }
