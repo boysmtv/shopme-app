@@ -155,3 +155,45 @@ Android-owned work:
   - `testDebugUnitTest assembleDebug`,
   - Android/backend contract verifier when API usage changes,
   - Fastlane upload to `internal-tester` only after green pipeline.
+
+## Codex Manual Pipeline Addendum - 2026-05-18
+
+Pipeline mode: manual Codex audit without local LLM. This replaces the unfinished Ollama/Qdrant run for brief 2345 and should be used as the active execution checklist.
+
+### Audit Evidence
+
+- API constants cover current backend routes in `data/remote/api/ApiEndPoint.kt`: auth, customer, foods, cart, order, cafe, chat, seller, notifications, media, address, village, support.
+- Chat is partially optimized: `ChatRepositoryImpl` stores chat list/messages locally and uses `/api/chat/page` for conversation pages, while legacy `/api/chat` still exists for fallback/no-id access.
+- Realtime socket lifecycle is present in chat/order/notification/seller viewmodels through `ShopmeRealtimeGateway.retain()` and `release()`.
+- Customer/seller order pagination exists in repositories, but legacy full-list methods are still present and must not be used by growing list screens.
+- Product search/discovery pagination exists. Home/search pass random seed; detail similar foods still uses non-paged cafe foods through `getSimilarFoods(cafeId)`.
+- Notification repository still loads the legacy non-paged notification endpoint and caches the whole returned list.
+
+### P0 Cross-Contract Closure
+
+- Replace Android notification list loading with backend `/api/notifications/page`; keep unread count separate.
+- Replace detail-food similar list with `/api/foods/cafe/{id}/page` and auto-pagination on scroll; remove any "muat lagi" behavior from detail.
+- Audit every list screen so UI calls only paged repository methods for growing data: home, search, favorite, cafe foods, similar foods, active orders, order history, seller orders, seller product list, chat messages, chat list, notifications.
+- Keep legacy full-list repository functions only for small bounded data or backwards tests; mark them deprecated after migration.
+- Add contract tests for Android DTOs against `/v3/api-docs` covering order timeline/payment, notification metadata, chat conversation, seller product edit, and paged list envelopes.
+
+### P1 UX And Flow
+
+- Use one loading strategy per screen: initial shimmer/full-center loader, pull-refresh indicator for refresh, small append loader for pagination. Avoid showing multiple loaders for the same state.
+- Keep active-tab tap behavior as refresh only for both customer and seller menus.
+- Chat UX must stay WhatsApp-like: cached messages first, no full reload flicker, newest message autoscroll, older messages load upward, right/left bubbles by actor, checklist/read state, peer online text.
+- Payment transfer CTA must rely on backend `payment.transferConfirmationAvailable`, not local status guessing.
+- Order and notification UI must display human-readable store, customer, items, quantity, address, payment/status, and time; technical IDs only stay in metadata/navigation.
+
+### P2 10k-User Mobile Performance
+
+- Avoid eager composition for large screens: use `LazyColumn`/`LazyVerticalGrid` only, stable item keys, fixed image/card dimensions, and one append trigger guarded by `isLoadingMore`/`isLastPage`.
+- Keep local cache for read-heavy screens but do not emit stale cache as an additional loader state.
+- Stop websocket when leaving screens that need realtime. Current retain/release pattern exists; add regression tests for release on `onCleared`.
+- Ensure Chucker remains debug-only and visible for API regression checks.
+
+### Required Android Verification
+
+- Run targeted unit tests for changed viewmodels/repositories.
+- Run `:app:assembleDebug` before any Fastlane upload.
+- Device smoke must cover public domain API, public media images, websocket reconnect, notifications, chat, order transition, seller product list/edit, and saved role routing.
