@@ -42,7 +42,13 @@ class OrderRepositoryImplTest {
     @Test
     fun `getOrders should emit cached orders first then refresh from backend`() = runTest {
         val cachedResponse = listOf(orderSummaryResponse(id = "order-1", status = OrderStatus.ORDERED))
-        val remoteResponse = listOf(orderSummaryResponse(id = "order-2", status = OrderStatus.DELIVERING))
+        val remoteResponse = listOf(
+            orderSummaryResponse(
+                id = "order-2",
+                status = OrderStatus.DELIVERING,
+                transferConfirmationAvailable = true
+            )
+        )
 
         coEvery { homeDao.getPayloadOnce("orders:list:customer") } returns PayloadCacheEntity(
             cacheKey = "orders:list:customer",
@@ -62,6 +68,7 @@ class OrderRepositoryImplTest {
 
             val refreshed = awaitItem() as Resource.Success
             assertEquals("order-2", refreshed.data.first().id)
+            assertEquals(true, refreshed.data.first().transferConfirmationAvailable)
 
             awaitComplete()
         }
@@ -99,10 +106,15 @@ class OrderRepositoryImplTest {
         )
 
         assertEquals(0, decoded.first().itemCount)
+        assertEquals(false, decoded.first().transferConfirmationAvailable)
         assertEquals("order-1", decoded.first().id)
     }
 
-    private fun orderSummaryResponse(id: String, status: OrderStatus) = OrderSummaryResponse(
+    private fun orderSummaryResponse(
+        id: String,
+        status: OrderStatus,
+        transferConfirmationAvailable: Boolean = false
+    ) = OrderSummaryResponse(
         id = id,
         cafeId = "cafe-1",
         cafeName = "Kopi Senja",
@@ -111,6 +123,7 @@ class OrderRepositoryImplTest {
         status = status,
         paymentMethod = PaymentMethod.TRANSFER,
         paymentStatus = PaymentStatus.UNPAID,
+        transferConfirmationAvailable = transferConfirmationAvailable,
         createdAt = "2026-05-12T10:00:00",
         itemCount = 3,
         items = listOf(

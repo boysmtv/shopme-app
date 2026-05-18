@@ -25,5 +25,6 @@ data class Order(
     val createdAt: String = EMPTY_STRING,
     val deliveryAddress: String = EMPTY_STRING,
     val paymentMethod: PaymentMethod = PaymentMethod.TRANSFER,
+    val transferConfirmationAvailable: Boolean = false,
     val timeline: List<OrderTimeline> = emptyList()
 )

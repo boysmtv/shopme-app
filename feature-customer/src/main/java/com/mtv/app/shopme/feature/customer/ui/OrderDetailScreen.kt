@@ -555,9 +555,7 @@ private fun OrderDetailSection(
 }
 
 private fun Order.canConfirmTransfer(): Boolean {
-    return paymentMethod == PaymentMethod.TRANSFER &&
-            paymentStatus in setOf(PaymentStatus.WAITING_UPLOAD, PaymentStatus.FAILED) &&
-            status in setOf(OrderStatus.COOKING, OrderStatus.DELIVERING)
+    return transferConfirmationAvailable
 }
 
 private fun Order.canCustomerCancel(): Boolean {

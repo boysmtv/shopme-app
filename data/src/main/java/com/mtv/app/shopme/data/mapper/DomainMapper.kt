@@ -97,6 +97,7 @@ fun OrderResponse.toDomain(): Order = Order(
     status = status,
     paymentStatus = paymentStatus,
     paymentMethod = paymentMethod,
+    transferConfirmationAvailable = payment?.transferConfirmationAvailable ?: false,
     createdAt = createdAt.orEmpty(),
     deliveryAddress = deliveryAddress.orEmpty(),
     timeline = timeline.map { it.toDomain() }
@@ -122,6 +123,7 @@ fun OrderSummaryResponse.toDomain(): Order = Order(
     status = status,
     paymentStatus = paymentStatus,
     paymentMethod = paymentMethod,
+    transferConfirmationAvailable = transferConfirmationAvailable,
     createdAt = createdAt.orEmpty(),
     deliveryAddress = deliveryAddress.orEmpty()
 )

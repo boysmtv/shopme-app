@@ -18,6 +18,7 @@ data class OrderSummaryResponse(
     val status: OrderStatus,
     val paymentMethod: PaymentMethod,
     val paymentStatus: PaymentStatus,
+    val transferConfirmationAvailable: Boolean = false,
     val createdAt: String? = null,
     val itemCount: Int = 0,
     val items: List<OrderSummaryItemResponse> = emptyList()

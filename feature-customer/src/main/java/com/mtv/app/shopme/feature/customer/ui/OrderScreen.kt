@@ -483,9 +483,7 @@ fun ModernOrderCard(
 
             Spacer(Modifier.height(14.dp))
 
-            val needsTransferConfirmation = order.paymentMethod == PaymentMethod.TRANSFER &&
-                    order.paymentStatus in setOf(PaymentStatus.WAITING_UPLOAD, PaymentStatus.FAILED) &&
-                    order.status in setOf(OrderStatus.COOKING, OrderStatus.DELIVERING)
+            val needsTransferConfirmation = order.transferConfirmationAvailable
             val isCompleted = order.status == OrderStatus.COMPLETED
 
             Row(
