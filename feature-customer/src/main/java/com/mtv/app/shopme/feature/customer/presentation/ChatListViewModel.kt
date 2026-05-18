@@ -71,9 +71,14 @@ class ChatListViewModel @Inject constructor(
             is ChatListEvent.Load -> observeChatList()
             is ChatListEvent.ClickClearAll -> clearChats()
             is ChatListEvent.DismissDialog -> dismissDialog()
-            is ChatListEvent.ClickItem -> emitEffect(NavigateToChat(event.id))
+            is ChatListEvent.ClickItem -> openChat(event.id)
             is ChatListEvent.ClickBack -> emitEffect(NavigateBack)
         }
+    }
+
+    private fun openChat(id: String) {
+        applyReadDelta(id)
+        emitEffect(NavigateToChat(id))
     }
 
     private fun observeChatList() {

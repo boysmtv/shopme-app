@@ -176,7 +176,6 @@ class CartViewModel @Inject constructor(
             },
             onSuccess = {
                 _state.update { it.copy(createOrder = LoadState.Success(Unit)) }
-                emitEffect(CartEffect.NavigateToOrder)
             },
             onError = {
                 _state.update { error -> error.copy(createOrder = LoadState.Error(it)) }

@@ -99,7 +99,8 @@ import kotlinx.coroutines.launch
 fun CartScreen(
     state: CartUiState,
     event: (CartEvent) -> Unit,
-    onNavigateToDetail: (String) -> Unit = {}
+    onNavigateToDetail: (String) -> Unit = {},
+    onOrderSuccess: () -> Unit = {}
 ) {
     if (state.cartItems is LoadState.Loading) {
         ShimmerCartScreen()
@@ -118,6 +119,7 @@ fun CartScreen(
 
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var showPinSheet by remember { mutableStateOf(false) }
+    var showOrderSuccessDialog by remember { mutableStateOf(false) }
     var selectedCartIds by remember { mutableStateOf<List<String>>(emptyList()) }
     var selectedPaymentMethod by remember { mutableStateOf(PaymentMethod.CASH) }
 
@@ -352,6 +354,21 @@ fun CartScreen(
             refreshing = state.isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
+        )
+    }
+
+    LaunchedEffect(state.createOrder) {
+        if (state.createOrder is LoadState.Success) {
+            showOrderSuccessDialog = true
+        }
+    }
+
+    if (showOrderSuccessDialog) {
+        OrderSuccessDialog(
+            onConfirm = {
+                showOrderSuccessDialog = false
+                onOrderSuccess()
+            }
         )
     }
 }

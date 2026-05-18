@@ -71,7 +71,7 @@ class SellerChatListViewModel @Inject constructor(
             is SellerChatListEvent.DismissDialog -> dismissDialog()
 
             is SellerChatListEvent.ClickChat ->
-                emitEffect(SellerChatListEffect.NavigateToChat(event.item.id))
+                openChat(event.item.id)
 
             is SellerChatListEvent.ClickClearAll ->
                 clearChats()
@@ -173,6 +173,11 @@ class SellerChatListViewModel @Inject constructor(
         if (realtimeRetained) return
         realtimeRetained = true
         realtimeGateway.retain()
+    }
+
+    private fun openChat(id: String) {
+        applyReadDelta(id)
+        emitEffect(SellerChatListEffect.NavigateToChat(id))
     }
 
     override fun onCleared() {

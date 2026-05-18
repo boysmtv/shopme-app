@@ -39,13 +39,15 @@ class ChatRepositoryImpl @Inject constructor(
         flow {
             emit(Resource.Loading)
             val scope = if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE
-            val cached = homeDao.getChatListOnce(scope).map { it.toDomain() }
+            val cached = homeDao.getChatListOnce(scope).map { it.toDomain() }.latestFirst()
             if (cached.isNotEmpty()) {
                 emit(Resource.Success(com.mtv.app.shopme.domain.model.ChatList(cached)))
             }
 
             try {
-                val remoteChatList = remote.getChatList(asSeller).toDomain()
+                val remoteChatList = remote.getChatList(asSeller).toDomain().let {
+                    it.copy(chatList = it.chatList.latestFirst())
+                }
                 homeDao.clearChatList(scope)
                 homeDao.insertChatList(remoteChatList.chatList.map { it.toEntity(scope) })
                 emit(Resource.Success(remoteChatList))
@@ -206,4 +208,15 @@ class ChatRepositoryImpl @Inject constructor(
         page = page,
         last = page <= 0
     )
+
+    private fun List<ChatListItem>.latestFirst(): List<ChatListItem> =
+        sortedWith(
+            compareByDescending<ChatListItem> { it.time.normalizedChatTimeKey() }
+                .thenByDescending { it.id }
+        )
+
+    private fun String.normalizedChatTimeKey(): String =
+        trim()
+            .replace("T", " ")
+            .substringBefore(".")
 }

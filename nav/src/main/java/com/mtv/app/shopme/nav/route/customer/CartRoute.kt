@@ -54,6 +54,9 @@ fun CartRoute(nav: NavController) {
                 event = vm::onEvent,
                 onNavigateToDetail = { foodId ->
                     CustomerNavActions.toDetail(nav, foodId)
+                },
+                onOrderSuccess = {
+                    CustomerNavActions.toOrder(nav)
                 }
             )
         }
