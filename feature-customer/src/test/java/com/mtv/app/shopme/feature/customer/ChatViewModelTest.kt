@@ -96,5 +96,12 @@ class ChatViewModelTest {
         assertEquals("https://media.shopme.test/cafes/cafe-1/thumb.jpg", vm.uiState.value.chatAvatarUrl)
         verify(exactly = 1) { markReadUseCase.invoke("conv-1", false) }
         verify(exactly = 1) { realtimeGateway.retain() }
+
+        ChatViewModel::class.java.getDeclaredMethod("onCleared").apply {
+            isAccessible = true
+            invoke(vm)
+        }
+
+        verify(exactly = 1) { realtimeGateway.release() }
     }
 }

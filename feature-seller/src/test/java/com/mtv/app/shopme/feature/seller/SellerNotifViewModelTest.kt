@@ -3,6 +3,7 @@ package com.mtv.app.shopme.feature.seller
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.app.shopme.domain.usecase.ClearNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
@@ -33,19 +34,23 @@ class SellerNotifViewModelTest {
     @Test
     fun `seller realtime notification should prepend locally without refetch`() = runTest {
         every { realtimeGateway.events } returns realtimeEvents
-        every { getSellerNotificationsUseCase.invoke() } returns flowOf(
+        every { getSellerNotificationsUseCase.invoke(0, 20) } returns flowOf(
             Resource.Success(
-                listOf(
-                    SellerNotifItem(
-                        title = "Notif Lama",
-                        message = "Pesan lama",
-                        orderId = "old-1",
-                        buyerName = "Notif Lama",
-                        date = "2026-05-11",
-                        time = "09:00:00",
-                        isRead = true
+                PagedData(
+                    content = listOf(
+                        SellerNotifItem(
+                            title = "Notif Lama",
+                            message = "Pesan lama",
+                            orderId = "old-1",
+                            buyerName = "Notif Lama",
+                            date = "2026-05-11",
+                            time = "09:00:00",
+                            isRead = true
+                        )
+                    ),
+                    page = 0,
+                    last = true
                     )
-                )
             )
         )
 
@@ -71,6 +76,6 @@ class SellerNotifViewModelTest {
 
         assertEquals("Notif Baru", vm.uiState.value.notifications.first().title)
         assertEquals("notif-2", vm.uiState.value.notifications.first().orderId)
-        verify(exactly = 1) { getSellerNotificationsUseCase.invoke() }
+        verify(exactly = 1) { getSellerNotificationsUseCase.invoke(0, 20) }
     }
 }

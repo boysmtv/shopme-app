@@ -97,6 +97,13 @@ class SellerChatDetailViewModelTest {
         assertEquals(1, vm.uiState.value.messages.size)
         assertTrue(vm.uiState.value.messages.first().isFromSeller)
         verify(exactly = 1) { realtimeGateway.retain() }
+
+        SellerChatDetailViewModel::class.java.getDeclaredMethod("onCleared").apply {
+            isAccessible = true
+            invoke(vm)
+        }
+
+        verify(exactly = 1) { realtimeGateway.release() }
     }
 
     @Test

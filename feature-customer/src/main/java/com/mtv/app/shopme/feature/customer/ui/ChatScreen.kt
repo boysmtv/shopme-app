@@ -215,7 +215,10 @@ fun ChatScreen(
                             }
                         }
                     }
-                    items(messages) { msg ->
+                    items(
+                        items = messages,
+                        key = { msg -> "${msg.id}-${msg.time}-${msg.lastMessage.hashCode()}" }
+                    ) { msg ->
                         ChatBubble(
                             chatListItem = msg,
                             onRetry = {

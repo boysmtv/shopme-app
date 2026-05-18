@@ -4,6 +4,7 @@ import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.NotificationItem
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.usecase.ClearNotificationsUseCase
 import com.mtv.app.shopme.domain.usecase.GetNotificationsUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotifEvent
@@ -32,19 +33,23 @@ class NotifViewModelTest {
     @Test
     fun `realtime notification should prepend locally without refetch`() = runTest {
         every { realtimeGateway.events } returns realtimeEvents
-        every { getNotificationsUseCase.invoke() } returns flowOf(
+        every { getNotificationsUseCase.invoke(0, 20) } returns flowOf(
             Resource.Success(
-                listOf(
-                    NotificationItem(
-                        title = "Notif Lama",
-                        message = "Pesan lama",
-                        photo = "",
-                        signatureName = "Notif Lama",
-                        signatureDate = "2026-05-11",
-                        signatureTime = "09:00:00",
-                        isRead = true
+                PagedData(
+                    content = listOf(
+                        NotificationItem(
+                            title = "Notif Lama",
+                            message = "Pesan lama",
+                            photo = "",
+                            signatureName = "Notif Lama",
+                            signatureDate = "2026-05-11",
+                            signatureTime = "09:00:00",
+                            isRead = true
+                        )
+                    ),
+                    page = 0,
+                    last = true
                     )
-                )
             )
         )
 
@@ -65,6 +70,6 @@ class NotifViewModelTest {
         assertEquals("Notif Baru", vm.uiState.value.localNotification.first().title)
         assertEquals("Pesan baru", vm.uiState.value.localNotification.first().message)
         assertEquals(LoadState.Success(""), vm.uiState.value.notificationState)
-        verify(exactly = 1) { getNotificationsUseCase.invoke() }
+        verify(exactly = 1) { getNotificationsUseCase.invoke(0, 20) }
     }
 }

@@ -192,7 +192,10 @@ fun SellerChatScreen(
                             }
                         }
                     }
-                    items(messages) { msg ->
+                    items(
+                        items = messages,
+                        key = { msg -> "${msg.id}-${msg.time}-${msg.message.hashCode()}" }
+                    ) { msg ->
                         SellerChatBubble(
                             msg = msg,
                             onRetry = {
