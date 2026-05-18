@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import com.mtv.app.shopme.core.base.BaseEventViewModel
+import com.mtv.app.shopme.common.ConstantPreferences.REMEMBERED_LOGIN_EMAIL
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.customer.contract.ProfileEffect
@@ -96,7 +97,11 @@ class ProfileViewModel @Inject constructor(
     }
 
     private fun logout() {
+        val rememberedEmail = securePrefs.getString(REMEMBERED_LOGIN_EMAIL).orEmpty()
         securePrefs.clear()
+        if (rememberedEmail.isNotBlank()) {
+            securePrefs.putString(REMEMBERED_LOGIN_EMAIL, rememberedEmail)
+        }
         emitEffect(ProfileEffect.NavigateToLogin)
     }
 

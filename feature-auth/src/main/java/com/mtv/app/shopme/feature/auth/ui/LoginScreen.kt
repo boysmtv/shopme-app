@@ -20,12 +20,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
@@ -74,7 +77,6 @@ fun LoginScreen(
     event: (LoginEvent) -> Unit
 ) {
 
-    var remember by remember { mutableStateOf(false) }
     val isLoading = state.login is LoadState.Loading
 
     Box(
@@ -83,14 +85,16 @@ fun LoginScreen(
             .background(AppColor.GreenSoft)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
         ) {
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .heightIn(max = 220.dp),
+                    .heightIn(min = 150.dp, max = 220.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -102,14 +106,13 @@ fun LoginScreen(
 
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(2f),
+                    .fillMaxWidth(),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.White)
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
 
@@ -222,8 +225,8 @@ fun LoginScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Checkbox(
-                                checked = remember,
-                                onCheckedChange = { remember = it },
+                                checked = state.rememberEmail,
+                                onCheckedChange = { event(LoginEvent.OnRememberEmailChange(it)) },
                                 colors = CheckboxDefaults.colors(
                                     checkedColor = AppColor.Green
                                 ),

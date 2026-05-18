@@ -18,8 +18,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
@@ -45,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -94,14 +99,16 @@ fun RegisterScreen(
     ) {
 
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
         ) {
 
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .heightIn(max = 220.dp),
+                    .heightIn(min = 150.dp, max = 220.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -113,15 +120,14 @@ fun RegisterScreen(
 
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(2f),
+                    .fillMaxWidth(),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.White)
             ) {
 
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
 
@@ -154,7 +160,8 @@ fun RegisterScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                     )
 
                     Spacer(Modifier.height(16.dp))
@@ -215,7 +222,8 @@ fun RegisterScreen(
                             if (passwordVisible) VisualTransformation.None
                             else PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                     )
 
                     Spacer(Modifier.height(24.dp))

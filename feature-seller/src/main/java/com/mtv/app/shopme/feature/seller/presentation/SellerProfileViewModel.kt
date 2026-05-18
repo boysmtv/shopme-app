@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.seller.presentation
 
+import com.mtv.app.shopme.common.ConstantPreferences.REMEMBERED_LOGIN_EMAIL
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
@@ -16,6 +17,7 @@ import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
@@ -28,6 +30,7 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class SellerProfileViewModel @Inject constructor(
     private val sessionManager: SessionManager,
+    private val securePrefs: SecurePrefs,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase
 ) : BaseEventViewModel<SellerStoreEvent, SellerStoreEffect>() {
@@ -123,7 +126,11 @@ class SellerProfileViewModel @Inject constructor(
     }
 
     private fun logout() {
+        val rememberedEmail = securePrefs.getString(REMEMBERED_LOGIN_EMAIL).orEmpty()
         sessionManager.logout()
+        if (rememberedEmail.isNotBlank()) {
+            securePrefs.putString(REMEMBERED_LOGIN_EMAIL, rememberedEmail)
+        }
         emitEffect(SellerStoreEffect.LogoutSuccess)
     }
 

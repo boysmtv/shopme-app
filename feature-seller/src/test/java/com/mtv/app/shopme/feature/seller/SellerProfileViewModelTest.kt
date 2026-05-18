@@ -6,6 +6,7 @@ import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerProfileViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
@@ -20,6 +21,7 @@ class SellerProfileViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
     private val sessionManager: SessionManager = mockk(relaxed = true)
+    private val securePrefs: SecurePrefs = mockk(relaxed = true)
     private val getProfileUseCase: GetSellerProfileUseCase = mockk()
     private val updateAvailabilityUseCase: UpdateSellerAvailabilityUseCase = mockk()
 
@@ -58,6 +60,7 @@ class SellerProfileViewModelTest {
 
         val vm = SellerProfileViewModel(
             sessionManager = sessionManager,
+            securePrefs = securePrefs,
             getSellerProfileUseCase = getProfileUseCase,
             updateSellerAvailabilityUseCase = updateAvailabilityUseCase
         )

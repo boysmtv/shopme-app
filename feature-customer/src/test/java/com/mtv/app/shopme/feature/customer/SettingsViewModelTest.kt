@@ -5,6 +5,7 @@ import com.mtv.app.shopme.domain.usecase.GetNotificationPreferencesUseCase
 import com.mtv.app.shopme.feature.customer.contract.SettingsEvent
 import com.mtv.app.shopme.feature.customer.presentation.SettingsViewModel
 import com.mtv.based.core.network.utils.Resource
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
@@ -19,6 +20,7 @@ class SettingsViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
     private val sessionManager: SessionManager = mockk(relaxed = true)
+    private val securePrefs: SecurePrefs = mockk(relaxed = true)
     private val getNotificationPreferencesUseCase: GetNotificationPreferencesUseCase = mockk()
 
     @Test
@@ -37,6 +39,7 @@ class SettingsViewModelTest {
 
         val vm = SettingsViewModel(
             sessionManager = sessionManager,
+            securePrefs = securePrefs,
             getNotificationPreferencesUseCase = getNotificationPreferencesUseCase
         )
 

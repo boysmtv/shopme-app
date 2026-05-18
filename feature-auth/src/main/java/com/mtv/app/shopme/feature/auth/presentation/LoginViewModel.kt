@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.auth.presentation
 
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
+import com.mtv.app.shopme.common.ConstantPreferences.REMEMBERED_LOGIN_EMAIL
 import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.param.LoginParam
@@ -35,10 +36,18 @@ class LoginViewModel @Inject constructor(
     private val _state = MutableStateFlow(LoginUiState())
     val uiState = _state.asStateFlow()
 
+    init {
+        val savedEmail = securePrefs.getString(REMEMBERED_LOGIN_EMAIL).orEmpty()
+        if (savedEmail.isNotBlank()) {
+            _state.update { it.copy(email = savedEmail, rememberEmail = true) }
+        }
+    }
+
     override fun onEvent(event: LoginEvent) {
         when (event) {
             is LoginEvent.OnEmailChange -> onEmailChange(event)
             is LoginEvent.OnPasswordChange -> onPasswordChange(event)
+            is LoginEvent.OnRememberEmailChange -> onRememberEmailChange(event)
             LoginEvent.OnLoginClick -> doLogin()
             LoginEvent.DismissDialog -> dismissDialog()
             LoginEvent.NavigateToRegister -> emitEffect(LoginEffect.NavigateToRegister)
@@ -52,6 +61,13 @@ class LoginViewModel @Inject constructor(
 
     private fun onPasswordChange(event: LoginEvent.OnPasswordChange) {
         _state.update { it.copy(password = event.value) }
+    }
+
+    private fun onRememberEmailChange(event: LoginEvent.OnRememberEmailChange) {
+        _state.update { it.copy(rememberEmail = event.value) }
+        if (!event.value) {
+            securePrefs.putString(REMEMBERED_LOGIN_EMAIL, "")
+        }
     }
 
     private fun doLogin() {
@@ -76,6 +92,10 @@ class LoginViewModel @Inject constructor(
                 }
 
                 if (result is LoadState.Success) {
+                    securePrefs.putString(
+                        REMEMBERED_LOGIN_EMAIL,
+                        if (state.rememberEmail) submittedEmail else ""
+                    )
                     securePrefs.putString(
                         ACCESS_TOKEN,
                         result.data.accessToken

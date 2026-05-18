@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.customer.presentation
 
 import androidx.lifecycle.viewModelScope
+import com.mtv.app.shopme.common.ConstantPreferences.REMEMBERED_LOGIN_EMAIL
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.GetNotificationPreferencesUseCase
 import com.mtv.app.shopme.feature.customer.contract.SettingsEffect
@@ -16,6 +17,7 @@ import com.mtv.app.shopme.feature.customer.contract.SettingsEvent
 import com.mtv.app.shopme.feature.customer.contract.SettingsUiState
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -31,6 +33,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val sessionManager: SessionManager,
+    private val securePrefs: SecurePrefs,
     private val getNotificationPreferencesUseCase: GetNotificationPreferencesUseCase
 ) : BaseEventViewModel<SettingsEvent, SettingsEffect>() {
 
@@ -91,7 +94,11 @@ class SettingsViewModel @Inject constructor(
             try {
                 _state.update { it.copy(isLoading = true) }
 
+                val rememberedEmail = securePrefs.getString(REMEMBERED_LOGIN_EMAIL).orEmpty()
                 sessionManager.logout()
+                if (rememberedEmail.isNotBlank()) {
+                    securePrefs.putString(REMEMBERED_LOGIN_EMAIL, rememberedEmail)
+                }
 
                 _state.update { it.copy(isLoading = false) }
 

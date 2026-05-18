@@ -15,12 +15,14 @@ import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 data class LoginUiState(
     val email: String = EMPTY_STRING,
     val password: String = EMPTY_STRING,
+    val rememberEmail: Boolean = false,
     val login: LoadState<Login> = LoadState.Idle
 )
 
 sealed class LoginEvent {
     data class OnEmailChange(val value: String) : LoginEvent()
     data class OnPasswordChange(val value: String) : LoginEvent()
+    data class OnRememberEmailChange(val value: Boolean) : LoginEvent()
     data object OnLoginClick : LoginEvent()
     data object DismissDialog : LoginEvent()
     data object NavigateToRegister : LoginEvent()
