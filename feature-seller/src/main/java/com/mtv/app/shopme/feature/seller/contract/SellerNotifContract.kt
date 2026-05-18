@@ -18,6 +18,9 @@ data class SellerNotifUiState(
     val notifications: List<SellerNotifItem> = emptyList(),
 
     val notificationState: ResourceFirebase<String> = ResourceFirebase.Loading,
+    val page: Int = 0,
+    val isLastPage: Boolean = false,
+    val isLoadingMore: Boolean = false,
     val activeDialog: SellerNotifDialog? = null
 )
 
@@ -26,6 +29,7 @@ sealed class SellerNotifEvent {
     object DismissDialog : SellerNotifEvent()
 
     object GetNotification : SellerNotifEvent()
+    object LoadMore : SellerNotifEvent()
     object ClearNotification : SellerNotifEvent()
 
     data class ClickNotification(val item: SellerNotifItem) : SellerNotifEvent()

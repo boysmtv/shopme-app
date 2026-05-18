@@ -103,9 +103,16 @@ class FoodRemoteDataSource @Inject constructor(
         ).requireData()
 
     suspend fun getSimilarFoods(cafeId: String) =
-        request<ApiResponse<List<FoodResponse>>>(
-            endpoint = ApiEndPoint.Foods.GetSimilarByCafe(cafeId)
-        ).requireData()
+        request<ApiResponse<PageResponse<FoodResponse>>>(
+            endpoint = ApiEndPoint.Foods.GetByCafeIdPage(cafeId),
+            options = RequestOptions(
+                query = mapOf(
+                    "page" to "0",
+                    "size" to DEFAULT_SIMILAR_SIZE.toString(),
+                    "active" to "true"
+                )
+            )
+        ).requireData().content
 
 
     suspend fun searchFoods(param: SearchParam) = request<ApiResponse<PageResponse<FoodResponse>>>(
@@ -135,6 +142,7 @@ class FoodRemoteDataSource @Inject constructor(
     private companion object {
         const val DEFAULT_HOME_SIZE = 20
         const val DEFAULT_CAFE_SIZE = 30
+        const val DEFAULT_SIMILAR_SIZE = 12
     }
 
 }

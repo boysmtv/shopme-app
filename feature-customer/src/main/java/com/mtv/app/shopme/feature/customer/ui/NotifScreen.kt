@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -32,6 +32,7 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -115,14 +116,29 @@ fun NotifScreen(
                         EmptyNotificationState()
                     }
                 } else {
-                    items(
+                    itemsIndexed(
                         items = state.localNotification,
-                        key = { item -> listOf(item.title, item.signatureDate, item.signatureTime, item.message).joinToString("|") }
-                    ) { item ->
+                        key = { _, item -> listOf(item.title, item.signatureDate, item.signatureTime, item.message).joinToString("|") }
+                    ) { index, item ->
+                        if (index >= state.localNotification.lastIndex - 2) {
+                            event(NotifEvent.LoadMore)
+                        }
                         NotificationItemCard(
                             item = item,
                             onClick = { event(NotifEvent.ClickNotification(item)) }
                         )
+                    }
+                    if (state.isLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(28.dp))
+                            }
+                        }
                     }
                 }
             }

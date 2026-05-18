@@ -7,4 +7,5 @@ class GetNotificationsUseCase @Inject constructor(
     private val repository: NotificationRepository
 ) {
     operator fun invoke() = repository.getCustomerNotifications()
+    operator fun invoke(page: Int, size: Int) = repository.getCustomerNotifications(page, size)
 }

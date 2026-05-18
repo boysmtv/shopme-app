@@ -59,6 +59,7 @@ class NotifViewModel @Inject constructor(
     override fun onEvent(event: NotifEvent) {
         when (event) {
             is NotifEvent.Load, is NotifEvent.GetNotification -> getNotifications()
+            is NotifEvent.LoadMore -> loadMore()
             is NotifEvent.DismissDialog -> dismissDialog()
             is NotifEvent.ClearNotification -> clearNotifications()
             is NotifEvent.ClickNotification -> Unit
@@ -67,19 +68,52 @@ class NotifViewModel @Inject constructor(
     }
 
     private fun getNotifications() {
+        loadNotifications(page = 0, append = false)
+    }
+
+    private fun loadMore() {
+        val state = _state.value
+        if (state.isLoadingMore || state.isLastPage || state.notificationState is LoadState.Loading) return
+        loadNotifications(page = state.page + 1, append = true)
+    }
+
+    private fun loadNotifications(page: Int, append: Boolean) {
         retainRealtime()
         observeDataFlow(
-            flow = getNotificationsUseCase(),
+            flow = getNotificationsUseCase(page, NOTIFICATION_PAGE_SIZE),
             onState = { state ->
                 _state.update {
-                    it.copy(
-                        notificationState = if (state is LoadState.Success) LoadState.Success("") else state.transform(),
-                        localNotification = if (state is LoadState.Success) state.data else it.localNotification
-                    )
+                    when (state) {
+                        is LoadState.Loading -> it.copy(
+                            notificationState = if (append) it.notificationState else LoadState.Loading,
+                            isLoadingMore = append
+                        )
+                        is LoadState.Success -> {
+                            val merged = if (append) {
+                                (it.localNotification + state.data.content).distinctBy { item ->
+                                    listOf(item.orderId, item.title, item.signatureDate, item.signatureTime, item.message).joinToString("|")
+                                }
+                            } else {
+                                state.data.content
+                            }
+                            it.copy(
+                                notificationState = LoadState.Success(""),
+                                localNotification = merged,
+                                page = state.data.page,
+                                isLastPage = state.data.last,
+                                isLoadingMore = false
+                            )
+                        }
+                        is LoadState.Error -> it.copy(
+                            notificationState = if (append) it.notificationState else LoadState.Error(state.error),
+                            isLoadingMore = false
+                        )
+                        else -> it.copy(notificationState = state.transform(), isLoadingMore = false)
+                    }
                 }
             },
             onError = { error ->
-                _state.update { it.copy(activeDialog = NotifDialog.Error(error.message)) }
+                _state.update { it.copy(activeDialog = NotifDialog.Error(error.message), isLoadingMore = false) }
             }
         )
     }
@@ -89,7 +123,7 @@ class NotifViewModel @Inject constructor(
             flow = clearNotificationsUseCase(),
             onState = { state ->
                 if (state is LoadState.Success) {
-                    _state.update { it.copy(localNotification = emptyList(), activeDialog = NotifDialog.Success, notificationState = LoadState.Success("")) }
+                    _state.update { it.copy(localNotification = emptyList(), activeDialog = NotifDialog.Success, notificationState = LoadState.Success(""), page = 0, isLastPage = true, isLoadingMore = false) }
                 } else {
                     _state.update { it.copy(notificationState = state.transform()) }
                 }
@@ -153,5 +187,9 @@ class NotifViewModel @Inject constructor(
             realtimeGateway.release()
         }
         super.onCleared()
+    }
+
+    private companion object {
+        const val NOTIFICATION_PAGE_SIZE = 20
     }
 }

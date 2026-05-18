@@ -14,6 +14,9 @@ import com.mtv.based.core.network.utils.LoadState
 data class NotifUiState(
     val localNotification: List<NotificationItem> = emptyList(),
     val notificationState: LoadState<String> = LoadState.Loading,
+    val page: Int = 0,
+    val isLastPage: Boolean = false,
+    val isLoadingMore: Boolean = false,
     val activeDialog: NotifDialog? = null
 )
 
@@ -22,6 +25,7 @@ sealed class NotifEvent {
     object DismissDialog : NotifEvent()
 
     object GetNotification : NotifEvent()
+    object LoadMore : NotifEvent()
     object ClearNotification : NotifEvent()
 
     data class ClickNotification(val item: NotificationItem) : NotifEvent()

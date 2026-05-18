@@ -54,6 +54,7 @@ class SellerNotifViewModel @Inject constructor(
     override fun onEvent(event: SellerNotifEvent) {
         when (event) {
             SellerNotifEvent.Load, SellerNotifEvent.GetNotification -> getNotifications()
+            SellerNotifEvent.LoadMore -> loadMore()
             SellerNotifEvent.DismissDialog -> dismissDialog()
             SellerNotifEvent.ClearNotification -> clearNotifications()
             is SellerNotifEvent.ClickNotification -> Unit
@@ -62,20 +63,48 @@ class SellerNotifViewModel @Inject constructor(
     }
 
     private fun getNotifications() {
+        loadNotifications(page = 0, append = false)
+    }
+
+    private fun loadMore() {
+        val state = _state.value
+        if (state.isLoadingMore || state.isLastPage || state.notificationState is ResourceFirebase.Loading) return
+        loadNotifications(page = state.page + 1, append = true)
+    }
+
+    private fun loadNotifications(page: Int, append: Boolean) {
         retainRealtime()
         observeDataFlow(
-            flow = getSellerNotificationsUseCase(),
+            flow = getSellerNotificationsUseCase(page, NOTIFICATION_PAGE_SIZE),
             onState = { state ->
                 _state.update {
-                    it.copy(
-                        notifications = if (state is com.mtv.based.core.network.utils.LoadState.Success) state.data else it.notifications,
-                        notificationState = when (state) {
-                            is com.mtv.based.core.network.utils.LoadState.Loading -> ResourceFirebase.Loading
-                            is com.mtv.based.core.network.utils.LoadState.Success -> ResourceFirebase.Success("")
-                            is com.mtv.based.core.network.utils.LoadState.Error -> ResourceFirebase.Success("")
-                            else -> ResourceFirebase.Success("")
+                    when (state) {
+                        is com.mtv.based.core.network.utils.LoadState.Loading -> it.copy(
+                            notificationState = if (append) it.notificationState else ResourceFirebase.Loading,
+                            isLoadingMore = append
+                        )
+                        is com.mtv.based.core.network.utils.LoadState.Success -> {
+                            val merged = if (append) {
+                                (it.notifications + state.data.content).distinctBy { item ->
+                                    listOf(item.orderId, item.title, item.date, item.time, item.message).joinToString("|")
+                                }
+                            } else {
+                                state.data.content
+                            }
+                            it.copy(
+                                notifications = merged,
+                                notificationState = ResourceFirebase.Success(""),
+                                page = state.data.page,
+                                isLastPage = state.data.last,
+                                isLoadingMore = false
+                            )
                         }
-                    )
+                        is com.mtv.based.core.network.utils.LoadState.Error -> it.copy(
+                            notificationState = ResourceFirebase.Success(""),
+                            isLoadingMore = false
+                        )
+                        else -> it.copy(notificationState = ResourceFirebase.Success(""), isLoadingMore = false)
+                    }
                 }
             },
             onError = ::showError
@@ -90,6 +119,9 @@ class SellerNotifViewModel @Inject constructor(
                     it.copy(
                         notifications = if (state is com.mtv.based.core.network.utils.LoadState.Success) emptyList() else it.notifications,
                         activeDialog = if (state is com.mtv.based.core.network.utils.LoadState.Success) SellerNotifDialog.Success else it.activeDialog,
+                        page = if (state is com.mtv.based.core.network.utils.LoadState.Success) 0 else it.page,
+                        isLastPage = if (state is com.mtv.based.core.network.utils.LoadState.Success) true else it.isLastPage,
+                        isLoadingMore = false,
                         notificationState = when (state) {
                             is com.mtv.based.core.network.utils.LoadState.Loading -> ResourceFirebase.Loading
                             is com.mtv.based.core.network.utils.LoadState.Success -> ResourceFirebase.Success("")
@@ -152,7 +184,8 @@ class SellerNotifViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     activeDialog = SellerNotifDialog.Error(uiError.message),
-                    notificationState = ResourceFirebase.Success("")
+                    notificationState = ResourceFirebase.Success(""),
+                    isLoadingMore = false
                 )
             }
         }
@@ -169,5 +202,9 @@ class SellerNotifViewModel @Inject constructor(
             realtimeGateway.release()
         }
         super.onCleared()
+    }
+
+    private companion object {
+        const val NOTIFICATION_PAGE_SIZE = 20
     }
 }

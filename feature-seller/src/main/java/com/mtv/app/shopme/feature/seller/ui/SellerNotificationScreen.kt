@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -32,6 +32,7 @@ import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -112,16 +113,31 @@ fun SellerNotificationScreen(
                 if (state.notifications.isEmpty()) {
                     item { EmptySellerState() }
                 } else {
-                    items(
+                    itemsIndexed(
                         items = state.notifications,
-                        key = { item -> listOf(item.orderId, item.title, item.date, item.time, item.message).joinToString("|") }
-                    ) { item ->
+                        key = { _, item -> listOf(item.orderId, item.title, item.date, item.time, item.message).joinToString("|") }
+                    ) { index, item ->
+                        if (index >= state.notifications.lastIndex - 2) {
+                            event(SellerNotifEvent.LoadMore)
+                        }
                         SellerNotificationItemCard(
                             item = item,
                             onClick = {
                                 event(SellerNotifEvent.ClickNotification(item))
                             }
                         )
+                    }
+                    if (state.isLoadingMore) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(modifier = Modifier.size(28.dp))
+                            }
+                        }
                     }
                 }
             }

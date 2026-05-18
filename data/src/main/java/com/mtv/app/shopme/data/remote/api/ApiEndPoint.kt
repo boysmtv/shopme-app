@@ -141,7 +141,6 @@ object ApiEndPoint {
         class GetByCafeId(cafeId: String) : IApiEndPoint { override val path = "$API/$FOODS/$CAFE/$cafeId"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class GetByCafeIdPage(cafeId: String) : IApiEndPoint { override val path = "$API/$FOODS/$CAFE/$cafeId/page"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class GetCafeStats(cafeId: String) : IApiEndPoint { override val path = "$API/$FOODS/$CAFE/$cafeId/stats"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
-        class GetSimilarByCafe(cafeId: String) : IApiEndPoint { override val path = "$API/$FOODS/$CAFE/$cafeId"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
     }
 
     object Cart {
@@ -195,6 +194,7 @@ object ApiEndPoint {
 
     object Notifications {
         object Get : IApiEndPoint { override val path = "$API/$NOTIFICATIONS"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object GetPage : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/page"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object UnreadCount : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/unread-count"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object ReadAll : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/read-all"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
     }

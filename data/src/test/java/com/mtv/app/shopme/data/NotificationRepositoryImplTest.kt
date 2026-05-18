@@ -7,6 +7,7 @@ import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.NotificationRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.AppNotificationResponse
+import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.repository.NotificationRepositoryImpl
 import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
@@ -86,6 +87,38 @@ class NotificationRepositoryImplTest {
             assertEquals(mappedError, error.error)
             awaitComplete()
         }
+    }
+
+    @Test
+    fun `getCustomerNotifications page should use paged endpoint and cache first page`() = runTest {
+        coEvery { homeDao.getNotificationsOnce("customer") } returns emptyList()
+        coEvery { remote.getNotifications(0, 20) } returns PageResponse(
+            content = listOf(
+                AppNotificationResponse(
+                    id = "notif-3",
+                    title = "Paged title",
+                    message = "Paged message",
+                    isRead = false,
+                    createdAt = "2026-05-12T11:00:00"
+                )
+            ),
+            page = 0,
+            size = 20,
+            totalElements = 1,
+            totalPages = 1,
+            last = true
+        )
+
+        repository.getCustomerNotifications(page = 0, size = 20).test {
+            assertEquals(Resource.Loading, awaitItem())
+            val refreshed = awaitItem() as Resource.Success
+            assertEquals("Paged title", refreshed.data.content.first().title)
+            assertEquals(true, refreshed.data.last)
+            awaitComplete()
+        }
+
+        coVerify { homeDao.clearNotifications("customer") }
+        coVerify { homeDao.insertNotifications(match { it.single().notificationId == "notif-3" }) }
     }
 
     @Test
