@@ -92,19 +92,20 @@ fun SearchScreen(
     val listState = rememberLazyListState()
     val items = (state.foods as? LoadState.Success)?.data ?: emptyList()
     val isLoading = state.foods is LoadState.Loading
+    val canLoadMore = !state.isLoadingMore && !state.isLastPage && state.foods is LoadState.Success
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = { event(SearchEvent.Load) }
     )
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, canLoadMore) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
         }
             .distinctUntilChanged()
             .collect { lastVisible ->
                 val total = listState.layoutInfo.totalItemsCount
-                if (lastVisible != null && lastVisible >= total - 2 && total > 0) {
+                if (canLoadMore && lastVisible != null && lastVisible >= total - 2 && total > 0) {
                     event(SearchEvent.LoadNextPage)
                 }
             }

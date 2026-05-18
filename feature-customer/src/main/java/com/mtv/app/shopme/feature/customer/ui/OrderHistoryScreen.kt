@@ -77,9 +77,11 @@ fun OrderHistoryScreen(
         onRefresh = { event(OrderHistoryEvent.Refresh) }
     )
 
-    val filteredOrders = state.orders.filter {
-        state.selectedFilter == OrderStatusFilter.SEMUA ||
-                it.status == state.selectedFilter.name
+    val filteredOrders = remember(state.orders, state.selectedFilter) {
+        state.orders.filter {
+            state.selectedFilter == OrderStatusFilter.SEMUA ||
+                    it.status == state.selectedFilter.name
+        }
     }
 
     Box(
@@ -117,7 +119,10 @@ fun OrderHistoryScreen(
                         LazyColumn(
                             modifier = Modifier.padding(horizontal = 16.dp)
                         ) {
-                            items(filteredOrders) { order ->
+                            items(
+                                items = filteredOrders,
+                                key = { order -> order.id }
+                            ) { order ->
                                 ModernOrderCard(order) {
                                     event(OrderHistoryEvent.ClickOrder(order))
                                 }

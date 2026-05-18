@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -62,6 +62,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -98,6 +99,7 @@ import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,10 +109,28 @@ fun DetailScreen(
 ) {
     val food = (state.food as? LoadState.Success)?.data
     val similarFoods = (state.similarFoods as? LoadState.Success)?.data.orEmpty()
+    val listState = rememberLazyListState()
 
     var showSheet by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    LaunchedEffect(listState, state.similarIsLoadingMore, state.similarIsLastPage, state.similarFoods) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index to listState.layoutInfo.totalItemsCount }
+            .distinctUntilChanged()
+            .collect { (lastVisible, total) ->
+                if (
+                    lastVisible != null &&
+                    total > 0 &&
+                    lastVisible >= total - 4 &&
+                    !state.similarIsLoadingMore &&
+                    !state.similarIsLastPage &&
+                    state.similarFoods is LoadState.Success
+                ) {
+                    event(DetailEvent.LoadMoreSimilar)
+                }
+            }
+    }
 
     if (showSheet && food != null) {
         ModalBottomSheet(
@@ -154,6 +174,7 @@ fun DetailScreen(
 
             is LoadState.Success -> {
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
@@ -228,12 +249,10 @@ fun DetailScreen(
                           Spacer(Modifier.height(12.dp))
                       }
                   } else {
-                      itemsIndexed(similarFoods) { index, item ->
-                          if (index >= similarFoods.lastIndex - 2) {
-                              LaunchedEffect(index, similarFoods.size, state.similarIsLastPage) {
-                                  event(DetailEvent.LoadMoreSimilar)
-                              }
-                          }
+                      items(
+                          items = similarFoods,
+                          key = { item -> item.id }
+                      ) { item ->
                           SimilarItemRow(
                               Food = item,
                               onClickSimilarFood = {

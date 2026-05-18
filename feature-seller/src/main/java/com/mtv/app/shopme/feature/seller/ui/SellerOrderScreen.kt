@@ -76,13 +76,14 @@ fun SellerOrderScreen(
         onRefresh = { event(SellerOrderEvent.Load) }
     )
     val listState = rememberLazyListState()
+    val canLoadMore = !state.isLoading && !state.isLoadingMore && !state.isLastPage
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, canLoadMore) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()
             .collect { lastVisible ->
                 val total = listState.layoutInfo.totalItemsCount
-                if (lastVisible != null && total > 0 && lastVisible >= total - 4) {
+                if (canLoadMore && lastVisible != null && total > 0 && lastVisible >= total - 4) {
                     event(SellerOrderEvent.LoadMore)
                 }
             }

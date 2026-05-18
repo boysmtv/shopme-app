@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -86,9 +87,10 @@ fun SellerDashboardScreen(
 
     val orders = state.orders
 
-    val sortedOrders = remember(orders, selectedSort) {
-        if (selectedSort == "Asc") orders.sortedBy { it.location }
-        else orders.sortedByDescending { it.location }
+    val visibleOrders = remember(orders, selectedFilter, selectedSort) {
+        val filtered = orders.filter { matchesOrderFilter(selectedFilter, it.status) }
+        if (selectedSort == "Asc") filtered.sortedBy { it.location }
+        else filtered.sortedByDescending { it.location }
     }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
@@ -181,22 +183,22 @@ fun SellerDashboardScreen(
                     }
                 }
 
-                items(sortedOrders.size) { index ->
-                    val order = sortedOrders[index]
-                    if (matchesOrderFilter(selectedFilter, order.status)) {
-                        ModernOrderItemCompact(
-                            invoice = order.invoice,
-                            customer = order.customer,
-                            total = order.total,
-                            date = order.date,
-                            time = order.time,
-                            paymentMethod = order.paymentMethod,
-                            status = order.status,
-                            location = order.location,
-                            onClick = { event(SellerDashboardEvent.ClickOrderDetail(order.id)) }
-                        )
-                        Spacer(Modifier.height(8.dp))
-                    }
+                items(
+                    items = visibleOrders,
+                    key = { order -> order.id }
+                ) { order ->
+                    ModernOrderItemCompact(
+                        invoice = order.invoice,
+                        customer = order.customer,
+                        total = order.total,
+                        date = order.date,
+                        time = order.time,
+                        paymentMethod = order.paymentMethod,
+                        status = order.status,
+                        location = order.location,
+                        onClick = { event(SellerDashboardEvent.ClickOrderDetail(order.id)) }
+                    )
+                    Spacer(Modifier.height(8.dp))
                 }
             }
         }

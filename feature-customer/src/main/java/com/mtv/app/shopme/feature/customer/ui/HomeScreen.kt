@@ -139,17 +139,18 @@ private fun HomeContent(
     }
 
     val scope = rememberCoroutineScope()
+    val canLoadMore = !state.isLoadingMore && !state.isLastPage && state.foods is LoadState.Success
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val columnCount = if (maxWidth < 380.dp) 1 else 2
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, canLoadMore) {
         snapshotFlow {
             listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
         }
             .distinctUntilChanged()
             .collect { lastVisible ->
                 val total = listState.layoutInfo.totalItemsCount
-                if (lastVisible != null && lastVisible >= total - 2 && total > 0) {
+                if (canLoadMore && lastVisible != null && lastVisible >= total - 2 && total > 0) {
                     onLoadNextPage()
                 }
             }

@@ -98,17 +98,18 @@ fun SellerProductListScreen(
         )
     }
     val listState = rememberLazyListState()
+    val canLoadMore = !state.isLoading && !state.isLoadingMore && !state.isLastPage
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = { event(SellerProductListEvent.Load) }
     )
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, canLoadMore) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
             .distinctUntilChanged()
             .collect { lastVisible ->
                 val total = listState.layoutInfo.totalItemsCount
-                if (lastVisible != null && total > 0 && lastVisible >= total - 4) {
+                if (canLoadMore && lastVisible != null && total > 0 && lastVisible >= total - 4) {
                     event(SellerProductListEvent.LoadMore)
                 }
             }
