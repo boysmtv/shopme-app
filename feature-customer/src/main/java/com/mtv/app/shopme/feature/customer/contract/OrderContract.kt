@@ -12,6 +12,10 @@ import com.mtv.app.shopme.domain.model.Order
 
 data class OrderUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val currentPage: Int = 0,
+    val isLastPage: Boolean = false,
     val orders: List<Order> = emptyList(),
     val activeDialog: OrderDialog? = null
 )
@@ -21,6 +25,7 @@ sealed class OrderEvent {
     object DismissDialog : OrderEvent()
 
     object Reload : OrderEvent()
+    object LoadMore : OrderEvent()
     data class ClickOrder(val orderId: String) : OrderEvent()
     data class ConfirmTransfer(val orderId: String) : OrderEvent()
 

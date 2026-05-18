@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
@@ -37,15 +38,18 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,6 +72,7 @@ import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderUiState
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 enum class OrderFilter {
     SEMUA,
@@ -85,9 +90,10 @@ fun OrderScreen(
     initialFilter: String = ""
 ) {
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = state.isLoading,
+        refreshing = state.isRefreshing,
         onRefresh = { event(OrderEvent.Reload) }
     )
+    val listState = rememberLazyListState()
 
     var selectedFilter by remember(initialFilter) {
         mutableStateOf(
@@ -142,9 +148,13 @@ fun OrderScreen(
                         ModernEmptyOrder()
                     } else {
                         LazyColumn(
+                            state = listState,
                             modifier = Modifier.padding(horizontal = 16.dp)
                         ) {
-                            items(filteredOrders) { order ->
+                            items(
+                                items = filteredOrders,
+                                key = { order -> order.id }
+                            ) { order ->
                                 ModernOrderCard(
                                     order = order,
                                     onClick = {
@@ -158,6 +168,22 @@ fun OrderScreen(
                                     }
                                 )
                             }
+                            if (state.isLoadingMore) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 12.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(28.dp),
+                                            color = AppColor.Green,
+                                            strokeWidth = 2.dp
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -165,10 +191,21 @@ fun OrderScreen(
         }
 
         PullRefreshIndicator(
-            refreshing = state.isLoading,
+            refreshing = state.isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisible ->
+                val total = listState.layoutInfo.totalItemsCount
+                if (lastVisible != null && total > 0 && lastVisible >= total - 4) {
+                    event(OrderEvent.LoadMore)
+                }
+            }
     }
 }
 

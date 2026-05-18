@@ -7,4 +7,5 @@ class GetOrdersUseCase @Inject constructor(
     private val repository: OrderRepository
 ) {
     operator fun invoke() = repository.getOrders()
+    operator fun invoke(page: Int, size: Int) = repository.getOrders(page, size)
 }

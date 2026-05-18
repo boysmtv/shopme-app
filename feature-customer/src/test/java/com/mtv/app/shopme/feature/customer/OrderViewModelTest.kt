@@ -3,6 +3,7 @@ package com.mtv.app.shopme.feature.customer
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
 import com.mtv.app.shopme.domain.usecase.ConfirmOrderTransferUseCase
@@ -49,7 +50,7 @@ class OrderViewModelTest {
                 paymentStatus = PaymentStatus.WAITING_UPLOAD
             )
         )
-        every { getOrdersUseCase.invoke() } returns flowOf(Resource.Success(orders))
+        every { getOrdersUseCase.invoke(0, 20) } returns flowOf(Resource.Success(PagedData(orders, 0, true)))
         every { confirmOrderTransferUseCase.invoke("order-1") } returns flowOf(Resource.Success(Unit))
 
         val vm = OrderViewModel(
@@ -66,15 +67,13 @@ class OrderViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, vm.uiState.value.orders.size)
-        verify(atLeast = 2) { getOrdersUseCase.invoke() }
+        verify(atLeast = 2) { getOrdersUseCase.invoke(0, 20) }
         verify(exactly = 1) { confirmOrderTransferUseCase.invoke("order-1") }
     }
 
     @Test
     fun `forbidden order error should not force logout`() = runTest {
-        every { getOrdersUseCase.invoke() } returns flowOf(
-            Resource.Error(UiError.Forbidden("Access denied"))
-        )
+        every { getOrdersUseCase.invoke(0, 20) } returns flowOf(Resource.Error(UiError.Forbidden("Access denied")))
 
         val vm = OrderViewModel(
             getOrdersUseCase = getOrdersUseCase,

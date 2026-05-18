@@ -59,6 +59,7 @@ class OrderViewModel @Inject constructor(
             is OrderEvent.Load -> loadOrders()
             is OrderEvent.DismissDialog -> dismissDialog()
             is OrderEvent.Reload -> loadOrders()
+            is OrderEvent.LoadMore -> loadMoreOrders()
             is OrderEvent.ClickOrder -> emitEffect(OrderEffect.NavigateToDetail(event.orderId))
             is OrderEvent.ConfirmTransfer -> confirmTransfer(event.orderId)
             is OrderEvent.ClickChatList -> emitEffect(OrderEffect.NavigateToChatList)
@@ -82,17 +83,48 @@ class OrderViewModel @Inject constructor(
     private fun loadOrders() {
         retainRealtime()
         observeDataFlow(
-            flow = getOrdersUseCase(),
+            flow = getOrdersUseCase(0, PAGE_SIZE),
             onState = { result ->
                 _state.update {
                     it.copy(
-                        isLoading = result is LoadState.Loading,
-                        orders = if (result is LoadState.Success) result.data else it.orders
+                        isLoading = result is LoadState.Loading && it.orders.isEmpty(),
+                        isRefreshing = result is LoadState.Loading && it.orders.isNotEmpty(),
+                        isLoadingMore = false,
+                        currentPage = if (result is LoadState.Success) result.data.page else it.currentPage,
+                        isLastPage = if (result is LoadState.Success) result.data.last else it.isLastPage,
+                        orders = if (result is LoadState.Success) result.data.content else it.orders
                     )
                 }
             },
             onError = { error ->
-                _state.update { it.copy(isLoading = false) }
+                _state.update { it.copy(isLoading = false, isRefreshing = false, isLoadingMore = false) }
+                showError(error)
+            }
+        )
+    }
+
+    private fun loadMoreOrders() {
+        val state = _state.value
+        if (state.isLoading || state.isRefreshing || state.isLoadingMore || state.isLastPage) return
+        observeIndependentDataFlow(
+            flow = getOrdersUseCase(state.currentPage + 1, PAGE_SIZE),
+            onState = { result ->
+                _state.update {
+                    when (result) {
+                        is LoadState.Loading -> it.copy(isLoadingMore = true)
+                        is LoadState.Success -> it.copy(
+                            isLoadingMore = false,
+                            currentPage = result.data.page,
+                            isLastPage = result.data.last,
+                            orders = it.orders + result.data.content
+                        )
+                        is LoadState.Error -> it.copy(isLoadingMore = false)
+                        else -> it
+                    }
+                }
+            },
+            onError = { error ->
+                _state.update { it.copy(isLoadingMore = false) }
                 showError(error)
             }
         )
@@ -142,5 +174,9 @@ class OrderViewModel @Inject constructor(
             realtimeGateway.release()
         }
         super.onCleared()
+    }
+
+    private companion object {
+        const val PAGE_SIZE = 20
     }
 }

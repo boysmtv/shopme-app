@@ -8,6 +8,7 @@ import com.mtv.app.shopme.data.remote.datasource.OrderRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.OrderResponse
 import com.mtv.app.shopme.data.remote.response.OrderSummaryResponse
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.repository.OrderRepository
 import com.mtv.based.core.network.utils.Resource
 import javax.inject.Inject
@@ -44,6 +45,49 @@ class OrderRepositoryImpl @Inject constructor(
                     value = remoteOrders
                 )
                 emit(Resource.Success(remoteOrders.map { it.toDomain() }))
+            } catch (throwable: Throwable) {
+                if (cached.isEmpty()) {
+                    emit(Resource.Error(errorMapper.map(throwable)))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun getOrders(page: Int, size: Int) =
+        flow {
+            emit(Resource.Loading)
+            val useCache = page == 0
+            val cached = if (useCache) {
+                PayloadCacheStore.read(
+                    homeDao = homeDao,
+                    cacheKey = CUSTOMER_ORDERS_CACHE_KEY,
+                    serializer = ListSerializer(OrderSummaryResponse.serializer())
+                ).orEmpty()
+            } else {
+                emptyList()
+            }
+            if (cached.isNotEmpty()) {
+                emit(Resource.Success(PagedData(content = cached.map { it.toDomain() }, page = 0, last = false)))
+            }
+
+            try {
+                val remoteOrders = remoteDataSource.getOrders(page, size)
+                if (useCache) {
+                    PayloadCacheStore.write(
+                        homeDao = homeDao,
+                        cacheKey = CUSTOMER_ORDERS_CACHE_KEY,
+                        serializer = ListSerializer(OrderSummaryResponse.serializer()),
+                        value = remoteOrders.content
+                    )
+                }
+                emit(
+                    Resource.Success(
+                        PagedData(
+                            content = remoteOrders.content.map { it.toDomain() },
+                            page = remoteOrders.page,
+                            last = remoteOrders.last
+                        )
+                    )
+                )
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
                     emit(Resource.Error(errorMapper.map(throwable)))
