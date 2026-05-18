@@ -13,6 +13,7 @@ import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.domain.usecase.DeleteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
+import com.mtv.app.shopme.domain.usecase.GetProductStatsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEffect.*
@@ -33,6 +34,7 @@ class SellerProductListViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase,
+    private val getProductStatsUseCase: GetProductStatsUseCase,
     private val deleteFoodUseCase: DeleteFoodUseCase
 ) : BaseEventViewModel<SellerProductListEvent, SellerProductListEffect>() {
 
@@ -123,6 +125,7 @@ class SellerProductListViewModel @Inject constructor(
                             }
                         } else {
                             _state.update { it.copy(cafeId = cafeId) }
+                            loadProductStats(cafeId)
                             loadProducts(cafeId, page = 0, append = false)
                         }
                     }
@@ -182,6 +185,20 @@ class SellerProductListViewModel @Inject constructor(
         } else {
             loadProducts(cafeId, page = 0, append = false)
         }
+    }
+
+    private fun loadProductStats(cafeId: String) {
+        observeIndependentDataFlow(
+            flow = getProductStatsUseCase(cafeId),
+            onState = { state ->
+                if (state is LoadState.Success) {
+                    _state.update { it.copy(productStats = state.data) }
+                }
+            },
+            onError = {
+                // Stats are secondary; keep the product list usable if this endpoint fails.
+            }
+        )
     }
 
     private fun debounceReloadProducts() {

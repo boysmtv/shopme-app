@@ -21,6 +21,7 @@ import com.mtv.app.shopme.data.remote.response.ChatListResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.FoodOptionResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.response.FoodStatsResponse
 import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
 import com.mtv.app.shopme.data.remote.response.LoginResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
@@ -51,6 +52,7 @@ import com.mtv.app.shopme.domain.model.Login
 import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.model.NotificationPreferences
+import com.mtv.app.shopme.domain.model.ProductStats
 import com.mtv.app.shopme.domain.model.Register
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.model.SellerNotifItem
@@ -263,6 +265,17 @@ fun FoodOptionResponse.toDomain(): FoodOption = FoodOption(
     id = id,
     name = name,
     price = price
+)
+
+fun FoodStatsResponse.toDomain(): ProductStats = ProductStats(
+    totalProducts = totalProducts,
+    activeProducts = activeProducts,
+    inactiveProducts = inactiveProducts,
+    readyProducts = readyProducts,
+    jastipProducts = jastipProducts,
+    preorderProducts = preorderProducts,
+    totalStock = totalStock,
+    totalSold = totalSold
 )
 
 fun SessionTokenResponse.toDomain(): SessionToken =

@@ -4,9 +4,11 @@ import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PagedData
+import com.mtv.app.shopme.domain.model.ProductStats
 import com.mtv.app.shopme.domain.model.SellerProfile
 import com.mtv.app.shopme.domain.usecase.DeleteFoodUseCase
 import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
+import com.mtv.app.shopme.domain.usecase.GetProductStatsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerProductListViewModel
@@ -29,6 +31,7 @@ class SellerProductListViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
     private val getSellerProfileUseCase: GetSellerProfileUseCase = mockk()
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase = mockk()
+    private val getProductStatsUseCase: GetProductStatsUseCase = mockk()
     private val deleteFoodUseCase: DeleteFoodUseCase = mockk(relaxed = true)
 
     @Test
@@ -71,14 +74,18 @@ class SellerProductListViewModelTest {
                     ),
                     page = 0,
                     last = true
-                    )
+                )
             )
+        )
+        every { getProductStatsUseCase.invoke("cafe-1") } returns flowOf(
+            Resource.Success(ProductStats(totalProducts = 54, totalStock = 2061))
         )
 
         val vm = SellerProductListViewModel(
             sessionManager = sessionManager,
             getSellerProfileUseCase = getSellerProfileUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
+            getProductStatsUseCase = getProductStatsUseCase,
             deleteFoodUseCase = deleteFoodUseCase
         )
 
@@ -119,11 +126,15 @@ class SellerProductListViewModelTest {
         every { getFoodsByCafeUseCase.invoke("cafe-1", 0, 20, "coffee", FoodCategory.DRINK, FoodStatus.READY, null) } returns flowOf(
             Resource.Success(PagedData(content = emptyList(), page = 0, last = true))
         )
+        every { getProductStatsUseCase.invoke("cafe-1") } returns flowOf(
+            Resource.Success(ProductStats(totalProducts = 54, totalStock = 2061))
+        )
 
         val vm = SellerProductListViewModel(
             sessionManager = sessionManager,
             getSellerProfileUseCase = getSellerProfileUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
+            getProductStatsUseCase = getProductStatsUseCase,
             deleteFoodUseCase = deleteFoodUseCase
         )
 

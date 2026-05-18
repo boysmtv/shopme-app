@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -50,6 +51,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,6 +79,7 @@ import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListUiState
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -83,13 +88,31 @@ fun SellerProductListScreen(
     event: (SellerProductListEvent) -> Unit
 ) {
 
-    val totalProduct = state.products.size
-    val totalStock = state.products.sumOf { it.stock }
-    val lowStockCount = state.products.count { it.stock <= 5 }
+    val productStats = remember(state.products, state.productStats) {
+        ProductListHeaderStats(
+            total = state.productStats?.totalProducts?.coerceAtMost(Int.MAX_VALUE.toLong())?.toInt()
+                ?: state.products.size,
+            stock = state.productStats?.totalStock?.coerceAtMost(Int.MAX_VALUE.toLong())?.toInt()
+                ?: state.products.sumOf { it.stock },
+            lowStock = state.products.count { it.stock <= 5 }
+        )
+    }
+    val listState = rememberLazyListState()
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = { event(SellerProductListEvent.Load) }
     )
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
+            .distinctUntilChanged()
+            .collect { lastVisible ->
+                val total = listState.layoutInfo.totalItemsCount
+                if (lastVisible != null && total > 0 && lastVisible >= total - 4) {
+                    event(SellerProductListEvent.LoadMore)
+                }
+            }
+    }
 
     Scaffold(
         modifier = Modifier.statusBarsPadding(),
@@ -115,9 +138,9 @@ fun SellerProductListScreen(
         ) {
         Column(modifier = Modifier.fillMaxSize()) {
             ProductHeader(
-                totalProduct = totalProduct,
-                totalStock = totalStock,
-                lowStock = lowStockCount,
+                totalProduct = productStats.total,
+                totalStock = productStats.stock,
+                lowStock = productStats.lowStock,
                 onBack = {
                     event(SellerProductListEvent.ClickBack)
                 }
@@ -160,13 +183,14 @@ fun SellerProductListScreen(
                 )
             } else {
                 LazyColumn(
+                    state = listState,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     modifier = Modifier.padding(horizontal = 20.dp)
                 ) {
-                    itemsIndexed(state.products) { index, product ->
-                        if (index >= state.products.lastIndex - 3) {
-                            event(SellerProductListEvent.LoadMore)
-                        }
+                    itemsIndexed(
+                        items = state.products,
+                        key = { _, product -> product.id }
+                    ) { _, product ->
                         ModernProductItem(
                             product = product,
                             onEdit = {
@@ -204,6 +228,12 @@ fun SellerProductListScreen(
         }
     }
 }
+
+private data class ProductListHeaderStats(
+    val total: Int,
+    val stock: Int,
+    val lowStock: Int
+)
 
 @Composable
 private fun ProductSearchAndFilters(

@@ -13,6 +13,7 @@ import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.api.ApiEndPoint
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.response.FoodStatsResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.app.shopme.domain.model.FoodCategory
@@ -72,6 +73,11 @@ class FoodRemoteDataSource @Inject constructor(
                     active?.let { put("active", it.toString()) }
                 }
             )
+        ).requireData()
+
+    suspend fun getProductStats(cafeId: String) =
+        request<ApiResponse<FoodStatsResponse>>(
+            endpoint = ApiEndPoint.Foods.GetCafeStats(cafeId)
         ).requireData()
 
     suspend fun getFoodDetail(id: String) =

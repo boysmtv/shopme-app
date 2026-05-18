@@ -11,6 +11,7 @@ package com.mtv.app.shopme.feature.seller.contract
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.ProductItem
+import com.mtv.app.shopme.domain.model.ProductStats
 
 data class SellerProductListUiState(
     val isLoading: Boolean = false,
@@ -24,6 +25,7 @@ data class SellerProductListUiState(
     val categoryFilter: FoodCategory? = null,
     val statusFilter: FoodStatus? = null,
     val activeFilter: Boolean? = null,
+    val productStats: ProductStats? = null,
 
     val products: List<ProductItem> = emptyList()
 )

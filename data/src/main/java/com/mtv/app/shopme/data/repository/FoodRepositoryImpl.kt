@@ -93,6 +93,11 @@ class FoodRepositoryImpl @Inject constructor(
             }
         }.flowOn(Dispatchers.IO)
 
+    override fun getProductStats(cafeId: String) =
+        resultFlow.create {
+            remote.getProductStats(cafeId).toDomain()
+        }
+
     override fun getFoodDetail(id: String) =
         flow {
             emit(Resource.Loading)
