@@ -30,52 +30,157 @@ def firebase_distribution_options(options)
   }
 end
 
-platform :android do
-  desc "Build release APK and upload it to Firebase App Distribution"
-  lane :firebase do |options|
-    distribution = firebase_distribution_options(options)
+def print_summary(res, build_type, path)
+  UI.header("Firebase Upload Summary (#{Time.now.iso8601})")
+  release = res[:release] || res
+  console  = release[:firebaseConsoleUri]
+  tester   = release[:testingUri]
+  download = release[:binaryDownloadUri]
 
-    gradle(
-      task: ":app:assembleRelease",
-      gradle_path: "gradlew.bat"
-    )
+  UI.success("✓ #{build_type}")
+  UI.message("  • Artifact: #{path}")
+  UI.message("  • Console : #{console}")  if console
+  UI.message("  • Tester  : #{tester}")   if tester
+  UI.message("  • Download: #{download}") if download
+end
 
-    firebase_app_distribution(
-      app: distribution[:app_id],
-      service_credentials_file: distribution[:service_credentials_file],
-      groups: distribution[:groups],
-      release_notes: distribution[:release_notes],
-      android_artifact_type: "APK",
-      android_artifact_path: "app/build/outputs/apk/release/app-release.apk"
-    )
+def choose_format
+  loop do
+    UI.message("Choose format to upload:")
+    UI.message("1. APK")
+    UI.message("2. AAB")
+    UI.message("Type 'x' to exit.")
+    format_choice = UI.input("Enter your choice: ")
+    case format_choice
+    when "1"
+      return 'APK'
+    when "2"
+      return 'AAB'
+    when "x", "X"
+      UI.message("Exiting the deployment lane.")
+      return nil
+    else
+      UI.error("Invalid option. Please enter 1, 2 or 'x'.")
+    end
+  end
+end
+
+def perform_increment_version
+  # Reliable path detection
+  fastlane_dir = File.expand_path('..', __FILE__)
+  file_path = File.join(File.dirname(fastlane_dir), "app", "build.gradle.kts")
+
+  UI.message("Looking for build file at: #{file_path}")
+
+  unless File.exist?(file_path)
+    UI.error("Build file NOT FOUND at #{file_path}")
+    return nil
   end
 
-  desc "Build debug APK with Chucker and upload it to Firebase App Distribution"
-  lane :firebase_debug do |options|
-    distribution = firebase_distribution_options(options)
+  content = File.read(file_path)
 
-    gradle(
-      task: ":app:assembleDebug",
-      gradle_path: "gradlew.bat"
-    )
+  if content =~ /versionCode\s*=\s*(\d+)/
+    current_version = $1.to_i
+    new_version = current_version + 1
 
-    firebase_app_distribution(
-      app: distribution[:app_id],
-      service_credentials_file: distribution[:service_credentials_file],
-      groups: distribution[:groups],
-      release_notes: distribution[:release_notes],
-      android_artifact_type: "APK",
-      android_artifact_path: "app/build/outputs/apk/debug/app-debug.apk"
-    )
+    # Update content
+    new_content = content.gsub(/versionCode\s*=\s*\d+/, "versionCode = #{new_version}")
+    File.write(file_path, new_content)
+
+    UI.success("Successfully incremented versionCode from #{current_version} to #{new_version}")
+    return new_version
+  else
+    UI.error("Could not find versionCode pattern in build.gradle.kts")
+    return nil
   end
+end
 
-  desc "Alias for firebase deployment"
-  lane :deploy do |options|
-    firebase(options)
-  end
+desc "Build release APK/AAB and upload it to Firebase App Distribution"
+lane :firebase do |options|
+  format = options[:format] || "APK"
+  distribution = firebase_distribution_options(options)
 
-  desc "Alias for debug Firebase deployment with Chucker"
-  lane :deploy_debug do |options|
-    firebase_debug(options)
+  # Auto-increment version code before build
+  perform_increment_version
+
+  gradle(
+    task: format == "AAB" ? ":app:bundleRelease" : ":app:assembleRelease",
+    gradle_path: "gradlew.bat"
+  )
+
+  artifact_path = format == "AAB" ? "app/build/outputs/bundle/release/app-release.aab" : "app/build/outputs/apk/release/app-release.apk"
+
+  res = firebase_app_distribution(
+    app: distribution[:app_id],
+    service_credentials_file: distribution[:service_credentials_file],
+    groups: distribution[:groups],
+    release_notes: distribution[:release_notes],
+    android_artifact_type: format,
+    android_artifact_path: artifact_path
+  )
+  print_summary(res, "Release", artifact_path)
+end
+
+desc "Build debug APK/AAB with Chucker and upload it to Firebase App Distribution"
+lane :firebase_debug do |options|
+  format = options[:format] || "APK"
+  distribution = firebase_distribution_options(options)
+
+  # Auto-increment version code before build
+  perform_increment_version
+
+  gradle(
+    task: format == "AAB" ? ":app:bundleDebug" : ":app:assembleDebug",
+    gradle_path: "gradlew.bat"
+  )
+
+  artifact_path = format == "AAB" ? "app/build/outputs/bundle/debug/app-debug.aab" : "app/build/outputs/apk/debug/app-debug.apk"
+
+  res = firebase_app_distribution(
+    app: distribution[:app_id],
+    service_credentials_file: distribution[:service_credentials_file],
+    groups: distribution[:groups],
+    release_notes: distribution[:release_notes],
+    android_artifact_type: format,
+    android_artifact_path: artifact_path
+  )
+  print_summary(res, "Debug", artifact_path)
+end
+
+desc "Unified deployment lane with menu (Like MtouParentApp)"
+lane :deploy do |options|
+  loop do
+    UI.message("Which one do you want to deploy?")
+    UI.message("1. Release (Production)")
+    UI.message("2. Debug (with Chucker)")
+    UI.message("Type 'x' to exit.")
+
+    deployment_option = UI.input("Enter your choice: ")
+
+    case deployment_option
+    when "1", "2"
+      format = choose_format
+      break if format.nil?
+
+      release_notes = UI.input("Enter the release notes: ")
+      notes = release_notes.empty? ? "Manual upload via Fastlane" : release_notes
+
+      if deployment_option == "1"
+        firebase(format: format, notes: notes)
+      else
+        firebase_debug(format: format, notes: notes)
+      end
+      break
+    when "x", "X"
+      UI.message("Exiting the deployment lane.")
+      break
+    else
+      UI.error("Invalid option. Please enter 1, 2 or 'x'.")
+    end
   end
+end
+
+desc "Alias for debug Firebase deployment with Chucker"
+lane :deploy_debug do |options|
+  firebase_debug(options)
 end

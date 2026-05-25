@@ -13,36 +13,34 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-## Android
-
-### android firebase
+### firebase
 
 ```sh
-[bundle exec] fastlane android firebase
+[bundle exec] fastlane firebase
 ```
 
-Build release APK and upload it to Firebase App Distribution
+Build release APK/AAB and upload it to Firebase App Distribution
 
-### android firebase_debug
+### firebase_debug
 
 ```sh
-[bundle exec] fastlane android firebase_debug
+[bundle exec] fastlane firebase_debug
 ```
 
-Build debug APK with Chucker and upload it to Firebase App Distribution
+Build debug APK/AAB with Chucker and upload it to Firebase App Distribution
 
-### android deploy
+### deploy
 
 ```sh
-[bundle exec] fastlane android deploy
+[bundle exec] fastlane deploy
 ```
 
-Alias for firebase deployment
+Unified deployment lane with menu (Like MtouParentApp)
 
-### android deploy_debug
+### deploy_debug
 
 ```sh
-[bundle exec] fastlane android deploy_debug
+[bundle exec] fastlane deploy_debug
 ```
 
 Alias for debug Firebase deployment with Chucker
