@@ -134,8 +134,6 @@ private fun HomeContent(
     onRetry: () -> Unit
 ) {
 
-    // buatkan validasi untuk load next page, agar tidak terus menerus load ketika user sudah di halaman terakhir
-
     val listState = rememberSaveable(saver = LazyListState.Saver) {
         LazyListState()
     }
