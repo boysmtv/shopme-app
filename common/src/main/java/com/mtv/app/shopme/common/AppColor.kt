@@ -12,10 +12,10 @@ import androidx.compose.ui.graphics.Color
 
 object AppColor {
     val Green = Color(0xFF00B14F)
-    val GreenSoft = Color(0xFFDFF5E8)
+    val GreenSoft = Color(0xFFD3F3DF)
 
     val White = Color(0xFFFFFFFF)
-    val WhiteSoft = Color(0xFFF2FBF6)
+    val WhiteSoft = Color(0xFFEDFFF5)
 
     val Gray = Color(0x99000000)
     val Black = Color(0xFF000000)

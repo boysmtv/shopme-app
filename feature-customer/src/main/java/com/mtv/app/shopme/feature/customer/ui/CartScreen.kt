@@ -92,6 +92,7 @@ import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -102,26 +103,19 @@ fun CartScreen(
     onNavigateToDetail: (String) -> Unit = {},
     onOrderSuccess: () -> Unit = {}
 ) {
-    if (state.cartItems is LoadState.Loading) {
-        ShimmerCartScreen()
-        return
-    }
-
-    if (state.cartItems is LoadState.Error) {
-        ContentErrorState(
-            title = "Gagal memuat keranjang",
-            message = state.cartItems.error.message,
-            actionLabel = "Muat ulang",
-            onRetry = { event(CartEvent.Load) }
-        )
-        return
-    }
 
     var showCheckoutDialog by remember { mutableStateOf(false) }
     var showPinSheet by remember { mutableStateOf(false) }
+    var showLoadingDialog by remember { mutableStateOf(false) }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     var showOrderSuccessDialog by remember { mutableStateOf(false) }
     var selectedCartIds by remember { mutableStateOf<List<String>>(emptyList()) }
     var selectedPaymentMethod by remember { mutableStateOf(PaymentMethod.CASH) }
+    var isOrderCreated by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val scope = rememberCoroutineScope()
 
     val token = (state.sessionToken as? LoadState.Success)?.data?.token.orEmpty()
 
@@ -137,12 +131,33 @@ fun CartScreen(
                 item.variants.fold(BigDecimal.ZERO) { acc, variant ->
                     acc + variant.price
                 }
-
         acc + (itemTotal * item.quantity.toBigDecimal())
     }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    when (state.cartItems) {
+        is LoadState.Loading -> {
+            ShimmerCartScreen()
+            return
+        }
+
+        is LoadState.Error -> {
+            ContentErrorState(
+                title = "Gagal memuat keranjang",
+                message = state.cartItems.error.message,
+                actionLabel = "Muat ulang",
+                onRetry = { event(CartEvent.Load) }
+            )
+            return
+        }
+
+        else -> {}
+    }
+
+    LaunchedEffect(state.sessionToken) {
+        if (state.sessionToken is LoadState.Success) {
+            showPinSheet = true
+        }
+    }
 
     if (showCheckoutDialog) {
         PremiumCheckoutSheet(
@@ -154,12 +169,6 @@ fun CartScreen(
                 event(CartEvent.GetSession)
             }
         )
-    }
-
-    LaunchedEffect(state.sessionToken) {
-        if (state.sessionToken is LoadState.Success) {
-            showPinSheet = true
-        }
     }
 
     if (showPinSheet) {
@@ -174,20 +183,22 @@ fun CartScreen(
                         pin = pin
                     )
                 )
+                // Tutup pin sheet langsung setelah PIN di-submit
+                showPinSheet = false
             }
         )
     }
 
-    var isOrderCreated by remember { mutableStateOf(false) }
-
     LaunchedEffect(state.verifyPin) {
         when (state.verifyPin) {
+            is LoadState.Loading -> {
+                showLoadingDialog = true
+            }
 
             is LoadState.Success -> {
+                showLoadingDialog = false
                 if (!isOrderCreated) {
                     isOrderCreated = true
-                    showPinSheet = false
-
                     event(
                         CartEvent.CreateOrder(
                             cartIds = selectedCartIds,
@@ -199,11 +210,31 @@ fun CartScreen(
             }
 
             is LoadState.Error -> {
-                scope.launch {
-                    snackbarHostState.showSnackbar("PIN salah")
-                }
+                showLoadingDialog = false
+                errorMessage = state.verifyPin.error.message ?: "Gagal verifikasi PIN"
+                showErrorDialog = true
+            }
 
+            else -> Unit
+        }
+    }
+
+    LaunchedEffect(state.createOrder) {
+        when (state.createOrder) {
+            is LoadState.Loading -> {
+                showLoadingDialog = true
+            }
+
+            is LoadState.Success -> {
+                showLoadingDialog = false
+                showOrderSuccessDialog = true
                 isOrderCreated = false
+            }
+
+            is LoadState.Error -> {
+                showLoadingDialog = false
+                errorMessage = state.createOrder.error.message
+                showErrorDialog = true
             }
 
             else -> Unit
@@ -357,12 +388,99 @@ fun CartScreen(
         )
     }
 
-    LaunchedEffect(state.createOrder) {
-        if (state.createOrder is LoadState.Success) {
-            showOrderSuccessDialog = true
+    // Loading Dialog
+    if (showLoadingDialog) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingV2()
         }
     }
 
+    // Error Dialog
+    if (showErrorDialog) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.45f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 28.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(AppColor.White)
+                    .padding(horizontal = 24.dp, vertical = 28.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Error Icon
+                    Box(
+                        modifier = Modifier
+                            .size(88.dp)
+                            .clip(CircleShape)
+                            .background(Color.Red.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = Color.Red,
+                            modifier = Modifier.size(42.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Text(
+                        text = "Gagal",
+                        fontFamily = PoppinsFont,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 20.sp,
+                        color = Color(0xFF1A1A1A)
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text(
+                        text = errorMessage,
+                        fontFamily = PoppinsFont,
+                        fontSize = 14.sp,
+                        color = AppColor.Gray.copy(alpha = 0.85f),
+                        lineHeight = 20.sp,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(26.dp))
+
+                    Button(
+                        onClick = { showErrorDialog = false },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppColor.Green
+                        )
+                    ) {
+                        Text(
+                            text = "Tutup",
+                            fontFamily = PoppinsFont,
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    // Success Dialog
     if (showOrderSuccessDialog) {
         OrderSuccessDialog(
             onConfirm = {
@@ -739,6 +857,7 @@ fun PremiumCheckoutSheet(
             )
         }
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -947,6 +1066,9 @@ fun PinVerificationSheet(
         if (isError) {
             pin = EMPTY_STRING
             isSubmitted = false
+            // Auto-close sheet setelah error ditampilkan selama 1.5 detik
+            delay(1500)
+            onDismiss()
         }
     }
 
@@ -1019,11 +1141,22 @@ fun PinVerificationSheet(
 
             if (isError) {
                 Spacer(modifier = Modifier.height(height = 10.dp))
-                Text(
-                    text = "PIN salah",
-                    color = Color.Red,
-                    fontSize = 12.sp
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = Color.Red.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "❌ PIN salah, silakan coba lagi",
+                        color = Color.Red,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(height = 28.dp))
@@ -1033,24 +1166,34 @@ fun PinVerificationSheet(
                 Spacer(modifier = Modifier.height(height = 20.dp))
             }
 
-            PinKeypad(
-                isLoading = isLoading,
-                onNumberClick = { number ->
-                    if (pin.length < 6) {
-                        pin += number
+            if (!isError && !isLoading) {
+                PinKeypad(
+                    isLoading = isLoading,
+                    onNumberClick = { number ->
+                        if (pin.length < 6) {
+                            pin += number
 
-                        if (pin.length == 6 && !isLoading && !isSubmitted) {
-                            isSubmitted = true
-                            onSuccess(pin)
+                            if (pin.length == 6 && !isLoading && !isSubmitted) {
+                                isSubmitted = true
+                                onSuccess(pin)
+                            }
+                        }
+                    },
+                    onDeleteClick = {
+                        if (pin.isNotEmpty()) {
+                            pin = pin.dropLast(n = 1)
                         }
                     }
-                },
-                onDeleteClick = {
-                    if (pin.isNotEmpty()) {
-                        pin = pin.dropLast(n = 1)
-                    }
-                }
-            )
+                )
+            } else if (isError) {
+                Text(
+                    text = "Pin sheet akan ditutup otomatis...",
+                    fontFamily = PoppinsFont,
+                    fontSize = 12.sp,
+                    color = AppColor.Gray,
+                    textAlign = TextAlign.Center
+                )
+            }
 
             Spacer(modifier = Modifier.height(height = 16.dp))
         }
@@ -1282,17 +1425,134 @@ fun PremiumCheckoutSheetPreview() {
                 .fillMaxWidth()
                 .fillMaxHeight(.55f)
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(Color.White)
+                .background(AppColor.WhiteSoft)
         ) {
-            PremiumCheckoutSheet(
-                total = DataUiMock.cart().first().price,
-                onDismiss = {},
-                onConfirm = {}
-            )
+            // render content directly for preview (ModalBottomSheet may not render in preview)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(72.dp)
+                        .clip(CircleShape)
+                        .background(AppColor.White)
+                        .border(1.dp, AppColor.Green.copy(.18f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        tint = AppColor.Green,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Konfirmasi Checkout",
+                    fontFamily = PoppinsFont,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
+                    color = Color(0xFF1A1A1A)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Pesanan akan dikirim ke penjual",
+                    fontFamily = PoppinsFont,
+                    fontSize = 13.sp,
+                    color = AppColor.Gray
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "Metode Pembayaran",
+                    fontFamily = PoppinsFont,
+                    fontSize = 14.sp,
+                    color = AppColor.Gray
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+                    PaymentPill(
+                        title = "Cash",
+                        selected = true,
+                        onClick = {}
+                    )
+
+                    PaymentPill(
+                        title = "Transfer",
+                        selected = false,
+                        onClick = {}
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(22.dp))
+
+                Text(
+                    text = "Total Pembayaran",
+                    fontFamily = PoppinsFont,
+                    fontSize = 12.sp,
+                    color = AppColor.Gray
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                Text(
+                    text = DataUiMock.cart().first().price.toRupiah(),
+                    fontFamily = PoppinsFont,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AppColor.Green
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+
+                    OutlinedButton(
+                        onClick = {},
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Text(text = "Batal", fontFamily = PoppinsFont)
+                    }
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(AppColor.Green),
+                        shape = RoundedCornerShape(14.dp)
+                    ) {
+                        Text(
+                            text = "Checkout",
+                            fontFamily = PoppinsFont,
+                            color = Color.White
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+            }
         }
     }
 }
-
 
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
@@ -1309,14 +1569,65 @@ fun PinKeypadPreview() {
                 .fillMaxWidth()
                 .fillMaxHeight(.60f)
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(Color.White)
+                .background(AppColor.WhiteSoft)
         ) {
-            PinVerificationSheet(
-                isLoading = false,
-                isError = false,
-                onDismiss = {},
-                onSuccess = {}
-            )
+            // render content directly for preview
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Text(
+                    text = "Masukkan PIN",
+                    fontFamily = PoppinsFont,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF1A1A1A)
+                )
+
+                Spacer(modifier = Modifier.height(height = 8.dp))
+
+                Text(
+                    text = "Untuk konfirmasi pembayaran",
+                    fontFamily = PoppinsFont,
+                    fontSize = 14.sp,
+                    color = AppColor.Gray.copy(alpha = 0.75f)
+                )
+
+                Spacer(modifier = Modifier.height(height = 28.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
+                ) {
+                    repeat(times = 6) { index ->
+                        Box(
+                            modifier = Modifier
+                                .size(size = 14.dp)
+                                .clip(shape = CircleShape)
+                                .background(
+                                    color = Color.Transparent
+                                )
+                                .border(
+                                    width = 1.5.dp,
+                                    color = Color.LightGray,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(height = 28.dp))
+
+                PinKeypad(
+                    isLoading = false,
+                    onNumberClick = {},
+                    onDeleteClick = {}
+                )
+
+                Spacer(modifier = Modifier.height(height = 16.dp))
+            }
         }
     }
 }
