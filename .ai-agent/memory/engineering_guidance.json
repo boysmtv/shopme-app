@@ -1,13 +1,13 @@
 {
-  "updated_at": "2026-05-14T04:22:32.921753+00:00",
-  "project_root": "D:\\Boys\\Android\\shopme-app",
-  "final_project_root": "D:\\Boys\\Android\\shopme-app",
+  "updated_at": "2026-05-31T17:13:14.523717+00:00",
+  "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
+  "final_project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
   "dominant_language": "kotlin",
-  "dominant_platform": "mobile",
+  "dominant_platform": "",
   "languages": [
     {
       "language": "kotlin",
-      "file_count": 557,
+      "file_count": 572,
       "modeling_guidance": "Prefer enum class, sealed hierarchies, data classes, and explicit domain types over raw command strings.",
       "localization_guidance": "Separate CLI copy or UI strings from control flow so localization can evolve without rewriting logic.",
       "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
@@ -15,8 +15,6 @@
         "Kotlin language guide",
         "Kotlin enum and sealed class patterns",
         "Kotlin testing and Gradle or Maven integration",
-        "Mobile platform navigation and resource guidance",
-        "State, storage, and offline behavior guidance",
         "Gradle project structure and task guidance"
       ],
       "next_checks": [
@@ -36,8 +34,6 @@
         "Python language reference",
         "Python typing and dataclass patterns",
         "Pytest and packaging practices",
-        "Mobile platform navigation and resource guidance",
-        "State, storage, and offline behavior guidance",
         "Gradle project structure and task guidance"
       ],
       "next_checks": [
@@ -48,10 +44,7 @@
       ]
     }
   ],
-  "platforms": [
-    "mobile",
-    "commerce"
-  ],
+  "platforms": [],
   "framework_hints": [
     "gradle"
   ],
@@ -59,8 +52,6 @@
     "Kotlin language guide",
     "Kotlin enum and sealed class patterns",
     "Kotlin testing and Gradle or Maven integration",
-    "Mobile platform navigation and resource guidance",
-    "State, storage, and offline behavior guidance",
     "Gradle project structure and task guidance",
     "Python language reference",
     "Python typing and dataclass patterns",
@@ -84,15 +75,33 @@
     "When the project supports Docker review, make the latest promoted version runnable in Docker before asking for review."
   ],
   "active_goals": [
+    "add",
+    "create",
+    "list",
     "login",
-    "start"
+    "return",
+    "run",
+    "start",
+    "status",
+    "transfer",
+    "update"
   ],
   "current_focus": {
-    "problem_statement": "Multi-module Kotlin Android Compose app for Shopme buyer/seller flows, integrated with Shopme backend, media presigned upload, Hilt, Room, Firebase Messaging.",
+    "problem_statement": "",
     "entrypoints": [
       "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/EditProfileScreen.kt"
     ],
-    "contracts": [],
-    "feature_count": 2
+    "contracts": [
+      "add",
+      "status",
+      "run",
+      "login",
+      "create",
+      "transfer",
+      "update",
+      "list",
+      "return"
+    ],
+    "feature_count": 10
   }
 }

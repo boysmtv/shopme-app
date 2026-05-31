@@ -15,6 +15,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -29,13 +30,13 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -53,6 +54,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,6 +75,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.ContentErrorState
@@ -84,55 +88,45 @@ import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
+import com.mtv.app.shopme.feature.customer.contract.CartEffect
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.contract.CartUiState
+import com.mtv.app.shopme.feature.customer.presentation.CartViewModel
 import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerCartScreen
 import com.mtv.app.shopme.feature.customer.utils.StatusStatItem
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CartScreen(
     state: CartUiState,
+    effectFlow: Flow<CartEffect>,
     event: (CartEvent) -> Unit,
     onNavigateToDetail: (String) -> Unit = {},
-    onOrderSuccess: () -> Unit = {}
+    onNavigateToOrder: () -> Unit = {},
+    onNavigateToEditProfile: () -> Unit = {}
 ) {
-
-    var showCheckoutDialog by remember { mutableStateOf(false) }
-    var showPinSheet by remember { mutableStateOf(false) }
-    var showLoadingDialog by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-    var showOrderSuccessDialog by remember { mutableStateOf(false) }
-    var selectedCartIds by remember { mutableStateOf<List<String>>(emptyList()) }
-    var selectedPaymentMethod by remember { mutableStateOf(PaymentMethod.CASH) }
-    var isOrderCreated by remember { mutableStateOf(false) }
+    val screenState = rememberCartScreenState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val scope = rememberCoroutineScope()
-
-    val token = (state.sessionToken as? LoadState.Success)?.data?.token.orEmpty()
-
-    val cartItems = when (val result = state.cartItems) {
-        is LoadState.Success -> result.data
-        else -> emptyList()
-    }
-
+    val cartItems = state.cartItems.dataOrEmpty()
     val groupedByCafe = cartItems.groupBy { it.cafeId }
+    val grandTotal = cartItems.grandTotal()
 
-    val grandTotal = cartItems.fold(BigDecimal.ZERO) { acc, item ->
-        val itemTotal = item.price +
-                item.variants.fold(BigDecimal.ZERO) { acc, variant ->
-                    acc + variant.price
-                }
-        acc + (itemTotal * item.quantity.toBigDecimal())
-    }
+    CartEffectHandler(
+        effectFlow = effectFlow,
+        screenState = screenState,
+        snackbarHostState = snackbarHostState,
+        onNavigateToOrder = onNavigateToOrder,
+        onNavigateToEditProfile = onNavigateToEditProfile
+    )
 
     when (state.cartItems) {
         is LoadState.Loading -> {
@@ -150,96 +144,97 @@ fun CartScreen(
             return
         }
 
-        else -> {}
+        else -> Unit
     }
 
-    LaunchedEffect(state.sessionToken) {
-        if (state.sessionToken is LoadState.Success) {
-            showPinSheet = true
-        }
+    CartMainContent(
+        state = state,
+        event = event,
+        cartItems = cartItems,
+        groupedByCafe = groupedByCafe,
+        grandTotal = grandTotal,
+        screenState = screenState,
+        snackbarHostState = snackbarHostState,
+        onNavigateToDetail = onNavigateToDetail
+    )
+
+    CartDialogs(
+        state = state,
+        event = event,
+        grandTotal = grandTotal,
+        screenState = screenState,
+        onNavigateToOrder = onNavigateToOrder
+    )
+}
+
+@Composable
+private fun rememberCartScreenState(): CartScreenState {
+    return remember { CartScreenState() }
+}
+
+@Stable
+private class CartScreenState {
+    var showCheckoutSheet by mutableStateOf(false)
+    var showPinSheet by mutableStateOf(false)
+    var showSuccessDialog by mutableStateOf(false)
+    var selectedPaymentMethod by mutableStateOf(PaymentMethod.CASH)
+
+    fun closeCheckout() {
+        showCheckoutSheet = false
+        showPinSheet = false
+        selectedPaymentMethod = PaymentMethod.CASH
     }
+}
 
-    if (showCheckoutDialog) {
-        PremiumCheckoutSheet(
-            total = grandTotal,
-            onDismiss = { showCheckoutDialog = false },
-            onConfirm = { paymentMethod ->
-                selectedPaymentMethod = paymentMethod
-                showCheckoutDialog = false
-                event(CartEvent.GetSession)
-            }
-        )
-    }
+@Composable
+private fun CartEffectHandler(
+    effectFlow: Flow<CartEffect>,
+    screenState: CartScreenState,
+    snackbarHostState: SnackbarHostState,
+    onNavigateToOrder: () -> Unit,
+    onNavigateToEditProfile: () -> Unit
+) {
+    LaunchedEffect(effectFlow) {
+        effectFlow.collectLatest { effect ->
+            when (effect) {
+                is CartEffect.OpenPinSheet -> {
+                    screenState.showPinSheet = true
+                }
 
-    if (showPinSheet) {
-        PinVerificationSheet(
-            isLoading = state.verifyPin is LoadState.Loading,
-            isError = state.verifyPin is LoadState.Error,
-            onDismiss = { showPinSheet = false },
-            onSuccess = { pin ->
-                event(
-                    CartEvent.VerifyPin(
-                        token = token,
-                        pin = pin
-                    )
-                )
-                // Tutup pin sheet langsung setelah PIN di-submit
-                showPinSheet = false
-            }
-        )
-    }
+                is CartEffect.ShowSuccessDialog -> {
+                    screenState.closeCheckout()
+                    screenState.showSuccessDialog = true
+                }
 
-    LaunchedEffect(state.verifyPin) {
-        when (state.verifyPin) {
-            is LoadState.Loading -> {
-                showLoadingDialog = true
-            }
+                is CartEffect.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(effect.message)
+                }
 
-            is LoadState.Success -> {
-                showLoadingDialog = false
-                if (!isOrderCreated) {
-                    isOrderCreated = true
-                    event(
-                        CartEvent.CreateOrder(
-                            cartIds = selectedCartIds,
-                            payment = selectedPaymentMethod,
-                            token = token
-                        )
-                    )
+                is CartEffect.NavigateToOrder -> {
+                    onNavigateToOrder()
+                }
+
+                is CartEffect.NavigateToEditProfile -> {
+                    onNavigateToEditProfile()
                 }
             }
-
-            is LoadState.Error -> {
-                showLoadingDialog = false
-                errorMessage = state.verifyPin.error.message ?: "Gagal verifikasi PIN"
-                showErrorDialog = true
-            }
-
-            else -> Unit
         }
     }
+}
 
-    LaunchedEffect(state.createOrder) {
-        when (state.createOrder) {
-            is LoadState.Loading -> {
-                showLoadingDialog = true
-            }
-
-            is LoadState.Success -> {
-                showLoadingDialog = false
-                showOrderSuccessDialog = true
-                isOrderCreated = false
-            }
-
-            is LoadState.Error -> {
-                showLoadingDialog = false
-                errorMessage = state.createOrder.error.message
-                showErrorDialog = true
-            }
-
-            else -> Unit
-        }
-    }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun CartMainContent(
+    state: CartUiState,
+    event: (CartEvent) -> Unit,
+    cartItems: List<Cart>,
+    groupedByCafe: Map<String, List<Cart>>,
+    grandTotal: BigDecimal,
+    screenState: CartScreenState,
+    snackbarHostState: SnackbarHostState,
+    onNavigateToDetail: (String) -> Unit
+) {
+    val scope = rememberCoroutineScope()
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
@@ -251,127 +246,47 @@ fun CartScreen(
             .fillMaxSize()
             .pullRefresh(pullRefreshState)
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(AppColor.White)
-                .padding(start = 16.dp, end = 16.dp)
+                .padding(horizontal = 16.dp)
                 .statusBarsPadding()
         ) {
             CartHeader()
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Total ${cartItems.size} Items",
-                    fontFamily = PoppinsFont,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "Clear Cart",
-                    fontFamily = PoppinsFont,
-                    fontSize = 14.sp,
-                    color = if (cartItems.isNotEmpty()) AppColor.Green else AppColor.Gray,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier
-                        .clickable(enabled = cartItems.isNotEmpty()) {
-                            event(CartEvent.ClearCart)
-                        }
-                )
-            }
+            CartTopActionBar(
+                totalItems = cartItems.size,
+                onClearCart = { event(CartEvent.ClearCart) }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (cartItems.isEmpty()) {
-                EmptyCartView(modifier = Modifier.weight(1f))
-            } else {
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    groupedByCafe.forEach { (_, items) ->
-                        item {
-                            CafeGroupCard(
-                                state = state,
-                                event = event,
-                                itemResponses = items,
-                                onNavigateToDetail = onNavigateToDetail,
-                                onDeleteFoodByCafe = { event(CartEvent.ClearCartByCafe(it)) }
-                            )
-                        }
-                    }
-                }
-            }
+            CartListContent(
+                cartItems = cartItems,
+                groupedByCafe = groupedByCafe,
+                event = event,
+                onNavigateToDetail = onNavigateToDetail
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-
-                    Column {
-                        Text(
-                            fontFamily = PoppinsFont,
-                            text = "Total shopping cart",
-                            color = AppColor.Gray,
-                            fontSize = 12.sp,
-                        )
-
-                        Spacer(Modifier.height(8.dp))
-
-                        Text(
-                            fontFamily = PoppinsFont,
-                            text = grandTotal.toRupiah(),
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+            CartSummaryBar(
+                total = grandTotal,
+                isCheckoutEnabled = cartItems.isNotEmpty(),
+                onCheckoutClick = {
+                    if (cartItems.isEmpty()) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Keranjang masih kosong")
+                        }
+                        return@CartSummaryBar
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Button(
-                        onClick = {
-                            if (cartItems.isEmpty()) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("Keranjang masih kosong")
-                                }
-                                return@Button
-                            }
-                            selectedCartIds = cartItems.map { it.id }
-                            showCheckoutDialog = true
-                        },
-                        enabled = cartItems.isNotEmpty(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (cartItems.isNotEmpty()) AppColor.Green else Color.Gray
-                        ),
-                        shape = RoundedCornerShape(18.dp),
-                        modifier = Modifier
-                            .height(42.dp)
-                    ) {
-                        Text(
-                            fontFamily = PoppinsFont,
-                            text = "Checkout",
-                            color = Color.White,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal,
-                        )
-                    }
+                    screenState.showCheckoutSheet = true
                 }
-            }
+            )
         }
 
         SnackbarHost(
@@ -385,108 +300,6 @@ fun CartScreen(
             refreshing = state.isRefreshing,
             state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
-        )
-    }
-
-    // Loading Dialog
-    if (showLoadingDialog) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f)),
-            contentAlignment = Alignment.Center
-        ) {
-            LoadingV2()
-        }
-    }
-
-    // Error Dialog
-    if (showErrorDialog) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 28.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(AppColor.White)
-                    .padding(horizontal = 24.dp, vertical = 28.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Error Icon
-                    Box(
-                        modifier = Modifier
-                            .size(88.dp)
-                            .clip(CircleShape)
-                            .background(Color.Red.copy(alpha = 0.12f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = Color.Red,
-                            modifier = Modifier.size(42.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    Text(
-                        text = "Gagal",
-                        fontFamily = PoppinsFont,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp,
-                        color = Color(0xFF1A1A1A)
-                    )
-
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Text(
-                        text = errorMessage,
-                        fontFamily = PoppinsFont,
-                        fontSize = 14.sp,
-                        color = AppColor.Gray.copy(alpha = 0.85f),
-                        lineHeight = 20.sp,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Spacer(modifier = Modifier.height(26.dp))
-
-                    Button(
-                        onClick = { showErrorDialog = false },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AppColor.Green
-                        )
-                    ) {
-                        Text(
-                            text = "Tutup",
-                            fontFamily = PoppinsFont,
-                            color = Color.White,
-                            fontSize = 14.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    // Success Dialog
-    if (showOrderSuccessDialog) {
-        OrderSuccessDialog(
-            onConfirm = {
-                showOrderSuccessDialog = false
-                onOrderSuccess()
-            }
         )
     }
 }
@@ -512,21 +325,134 @@ private fun CartHeader() {
 }
 
 @Composable
+private fun CartTopActionBar(
+    totalItems: Int,
+    onClearCart: () -> Unit
+) {
+    val hasItems = totalItems > 0
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Total $totalItems Items",
+            fontFamily = PoppinsFont,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        Text(
+            text = "Clear Cart",
+            fontFamily = PoppinsFont,
+            fontSize = 14.sp,
+            color = if (hasItems) AppColor.Green else AppColor.Gray,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.clickable(enabled = hasItems) {
+                onClearCart()
+            }
+        )
+    }
+}
+
+@Composable
+private fun ColumnScope.CartListContent(
+    cartItems: List<Cart>,
+    groupedByCafe: Map<String, List<Cart>>,
+    event: (CartEvent) -> Unit,
+    onNavigateToDetail: (String) -> Unit
+) {
+    if (cartItems.isEmpty()) {
+        EmptyCartView(
+            modifier = Modifier.weight(1f)
+        )
+        return
+    }
+
+    LazyColumn(
+        modifier = Modifier.weight(1f),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        groupedByCafe.forEach { (_, items) ->
+            item {
+                CafeGroupCard(
+                    event = event,
+                    itemResponses = items,
+                    onNavigateToDetail = onNavigateToDetail,
+                    onDeleteFoodByCafe = {
+                        event(CartEvent.ClearCartByCafe(it))
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CartSummaryBar(
+    total: BigDecimal,
+    isCheckoutEnabled: Boolean,
+    onCheckoutClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.Transparent)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "Total shopping cart",
+                    fontFamily = PoppinsFont,
+                    color = AppColor.Gray,
+                    fontSize = 12.sp
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = total.toRupiah(),
+                    fontFamily = PoppinsFont,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Button(
+                onClick = onCheckoutClick,
+                enabled = isCheckoutEnabled,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isCheckoutEnabled) AppColor.Green else Color.Gray
+                ),
+                shape = RoundedCornerShape(18.dp),
+                modifier = Modifier.height(42.dp)
+            ) {
+                Text(
+                    text = "Checkout",
+                    fontFamily = PoppinsFont,
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun CafeGroupCard(
-    state: CartUiState,
     event: (CartEvent) -> Unit,
     itemResponses: List<Cart>,
     onNavigateToDetail: (foodId: String) -> Unit,
-    onDeleteFoodByCafe: (foodId: String) -> Unit
+    onDeleteFoodByCafe: (cafeId: String) -> Unit
 ) {
-    val cafeSubtotal = itemResponses.fold(BigDecimal.ZERO) { acc, item ->
-        val itemTotal = item.price +
-                item.variants.fold(BigDecimal.ZERO) { acc, variant ->
-                    acc + variant.price
-                }
-
-        acc + (itemTotal * item.quantity.toBigDecimal())
-    }
+    val cafeSubtotal = itemResponses.grandTotal()
 
     Column(
         modifier = Modifier
@@ -537,67 +463,33 @@ fun CafeGroupCard(
             )
             .padding(12.dp)
     ) {
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = null,
-                    tint = AppColor.Green,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = itemResponses.first().cafeName,
-                    fontFamily = PoppinsFont,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+        CafeGroupHeader(
+            cafeName = itemResponses.first().cafeName,
+            onDeleteClick = {
+                onDeleteFoodByCafe(itemResponses.first().cafeId)
             }
-
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = null,
-                tint = AppColor.Green,
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable {
-                        onDeleteFoodByCafe(itemResponses.first().cafeId)
-                    }
-            )
-        }
+        )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        HorizontalDivider(color = AppColor.Gray, modifier = Modifier.height(1.dp))
+        HorizontalDivider(
+            color = AppColor.Gray,
+            modifier = Modifier.height(1.dp)
+        )
 
         itemResponses.forEachIndexed { index, item ->
             CartItemRow(
                 itemResponse = item,
                 onFoodClick = { onNavigateToDetail(item.foodId) },
                 onMinusClick = {
-                    if (item.quantity == 1) {
-                        event(
-                            CartEvent.ChangeQuantity(
-                                cartId = item.id,
-                                quantity = 0
-                            )
+                    val newQuantity = if (item.quantity == 1) 0 else item.quantity - 1
+
+                    event(
+                        CartEvent.ChangeQuantity(
+                            cartId = item.id,
+                            quantity = newQuantity
                         )
-                    } else {
-                        event(
-                            CartEvent.ChangeQuantity(
-                                cartId = item.id,
-                                quantity = item.quantity - 1
-                            )
-                        )
-                    }
+                    )
                 },
                 onPlusClick = {
                     event(
@@ -619,43 +511,93 @@ fun CafeGroupCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    AppColor.GreenSoft.copy(alpha = 0.9f),
-                    RoundedCornerShape(12.dp)
-                )
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Total ${itemResponses.size} items",
-                fontFamily = PoppinsFont,
-                fontSize = 13.sp,
-                color = AppColor.Gray
-            )
-
-            Text(
-                text = cafeSubtotal.toRupiah(),
-                fontFamily = PoppinsFont,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        CafeGroupFooter(
+            totalItems = itemResponses.size,
+            subtotal = cafeSubtotal
+        )
     }
 }
 
+@Composable
+private fun CafeGroupHeader(
+    cafeName: String,
+    onDeleteClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Home,
+                contentDescription = null,
+                tint = AppColor.Green,
+                modifier = Modifier.size(24.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = cafeName,
+                fontFamily = PoppinsFont,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = null,
+            tint = AppColor.Green,
+            modifier = Modifier
+                .size(24.dp)
+                .clickable { onDeleteClick() }
+        )
+    }
+}
+
+@Composable
+private fun CafeGroupFooter(
+    totalItems: Int,
+    subtotal: BigDecimal
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = AppColor.GreenSoft.copy(alpha = 0.9f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Total $totalItems items",
+            fontFamily = PoppinsFont,
+            fontSize = 13.sp,
+            color = AppColor.Gray
+        )
+
+        Text(
+            text = subtotal.toRupiah(),
+            fontFamily = PoppinsFont,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
 
 @Composable
 fun CartItemRow(
     itemResponse: Cart,
     onFoodClick: () -> Unit,
     onMinusClick: () -> Unit,
-    onPlusClick: () -> Unit,
+    onPlusClick: () -> Unit
 ) {
-
     val isPreview = LocalInspectionMode.current
 
     Row(
@@ -664,59 +606,30 @@ fun CartItemRow(
             .padding(vertical = 16.dp),
         verticalAlignment = Alignment.Top
     ) {
+        CartItemImage(
+            isPreview = isPreview,
+            image = itemResponse.image,
+            name = itemResponse.name
+        )
 
-        if (isPreview) {
-            Image(
-                painter = painterResource(R.drawable.image_burger),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.Crop
-            )
-        } else {
-            SmartImage(
-                model = itemResponse.image,
-                placeholder = painterResource(R.drawable.image_burger),
-                error = painterResource(R.drawable.image_burger),
-                contentDescription = itemResponse.name,
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        Spacer(Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    fontFamily = PoppinsFont,
-                    text = itemResponse.name,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    modifier = Modifier
-                        .clickable {
-                            onFoodClick()
-                        }
-                )
-                StatusStatItem(FoodStatus.READY)
-            }
+            CartItemTitleRow(
+                name = itemResponse.name,
+                onFoodClick = onFoodClick
+            )
 
             Text(
-                fontFamily = PoppinsFont,
                 text = "Notes: ${itemResponse.notes}",
+                fontFamily = PoppinsFont,
                 color = Color.DarkGray,
                 fontSize = 12.sp
             )
 
-            Spacer(Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = itemResponse.variants.joinToString(", ") { it.optionName },
@@ -724,27 +637,94 @@ fun CartItemRow(
                 color = Color.Gray
             )
 
-            Spacer(Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    fontFamily = PoppinsFont,
-                    text = itemResponse.price.toRupiah(),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                )
-
-                QuantityCounter(
-                    quantity = itemResponse.quantity,
-                    onMinusClick = { onMinusClick() },
-                    onPlusClick = { onPlusClick() }
-                )
-            }
+            CartItemPriceRow(
+                price = itemResponse.price,
+                quantity = itemResponse.quantity,
+                onMinusClick = onMinusClick,
+                onPlusClick = onPlusClick
+            )
         }
+    }
+}
+
+@Composable
+private fun CartItemImage(
+    isPreview: Boolean,
+    image: String,
+    name: String
+) {
+    if (isPreview) {
+        Image(
+            painter = painterResource(R.drawable.image_burger),
+            contentDescription = null,
+            modifier = Modifier
+                .size(50.dp)
+                .clip(RoundedCornerShape(4.dp)),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        SmartImage(
+            model = image,
+            placeholder = painterResource(R.drawable.image_burger),
+            error = painterResource(R.drawable.image_burger),
+            contentDescription = name,
+            modifier = Modifier
+                .size(50.dp)
+                .clip(RoundedCornerShape(4.dp)),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+private fun CartItemTitleRow(
+    name: String,
+    onFoodClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = name,
+            fontFamily = PoppinsFont,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+            modifier = Modifier.clickable {
+                onFoodClick()
+            }
+        )
+
+        StatusStatItem(FoodStatus.READY)
+    }
+}
+
+@Composable
+private fun CartItemPriceRow(
+    price: BigDecimal,
+    quantity: Int,
+    onMinusClick: () -> Unit,
+    onPlusClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = price.toRupiah(),
+            fontFamily = PoppinsFont,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp
+        )
+
+        QuantityCounter(
+            quantity = quantity,
+            onMinusClick = onMinusClick,
+            onPlusClick = onPlusClick
+        )
     }
 }
 
@@ -752,78 +732,185 @@ fun CartItemRow(
 fun QuantityCounter(
     quantity: Int,
     onMinusClick: () -> Unit,
-    onPlusClick: () -> Unit,
+    onPlusClick: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
+        QuantityMinusButton(
+            quantity = quantity,
+            onClick = onMinusClick
+        )
 
-        Box(
-            modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape)
-                .background(
-                    if (quantity == 1)
-                        Color.Red.copy(alpha = 0.15f)
-                    else
-                        Color.LightGray.copy(alpha = 0.3f)
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            if (quantity == 1) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = Color.Red,
-                    modifier = Modifier
-                        .size(16.dp)
-                        .clickable {
-                            onMinusClick()
-                        }
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Remove,
-                    contentDescription = null,
-                    tint = AppColor.Gray,
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clickable {
-                            onMinusClick()
-                        }
-                )
-            }
-        }
-
-        Spacer(Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            fontFamily = PoppinsFont,
             text = quantity.toString(),
-            fontWeight = FontWeight.Normal,
+            fontFamily = PoppinsFont,
             fontSize = 14.sp
         )
 
-        Spacer(Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(12.dp))
 
-        Box(
+        QuantityPlusButton(
+            onClick = onPlusClick
+        )
+    }
+}
+
+@Composable
+private fun QuantityMinusButton(
+    quantity: Int,
+    onClick: () -> Unit
+) {
+    val isDeleteMode = quantity == 1
+
+    Box(
+        modifier = Modifier
+            .size(28.dp)
+            .clip(CircleShape)
+            .background(
+                if (isDeleteMode) {
+                    Color.Red.copy(alpha = 0.15f)
+                } else {
+                    Color.LightGray.copy(alpha = 0.3f)
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = if (isDeleteMode) Icons.Default.Delete else Icons.Default.Remove,
+            contentDescription = null,
+            tint = if (isDeleteMode) Color.Red else AppColor.Gray,
             modifier = Modifier
-                .size(28.dp)
-                .clip(CircleShape)
-                .background(AppColor.Green),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                Icons.Default.Add,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .size(18.dp)
-                    .clickable {
-                        onPlusClick()
-                    }
-            )
-        }
+                .size(if (isDeleteMode) 16.dp else 18.dp)
+                .clickable { onClick() }
+        )
+    }
+}
+
+@Composable
+private fun QuantityPlusButton(
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(28.dp)
+            .clip(CircleShape)
+            .background(AppColor.Green),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier
+                .size(18.dp)
+                .clickable { onClick() }
+        )
+    }
+}
+
+@Composable
+fun EmptyCartView(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.White),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = null,
+            tint = AppColor.Gray,
+            modifier = Modifier.size(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Tidak ada keranjang",
+            fontFamily = PoppinsFont,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+@Composable
+private fun CartDialogs(
+    state: CartUiState,
+    event: (CartEvent) -> Unit,
+    grandTotal: BigDecimal,
+    screenState: CartScreenState,
+    onNavigateToOrder: () -> Unit
+) {
+    if (screenState.showCheckoutSheet) {
+        PremiumCheckoutSheet(
+            total = grandTotal,
+            onDismiss = {
+                screenState.showCheckoutSheet = false
+                event(CartEvent.CheckoutCancelled)
+            },
+            onConfirm = { paymentMethod ->
+                screenState.selectedPaymentMethod = paymentMethod
+                screenState.showCheckoutSheet = false
+
+                event(
+                    CartEvent.CheckoutClicked(
+                        cartIds = state.cartItems.dataOrEmpty().map { it.id },
+                        payment = paymentMethod
+                    )
+                )
+            }
+        )
+    }
+
+    if (screenState.showPinSheet) {
+        PinVerificationSheet(
+            isLoading = state.isCheckoutLoading,
+            onDismiss = {
+                screenState.showPinSheet = false
+                event(CartEvent.CheckoutCancelled)
+            },
+            onSuccess = { pin ->
+                screenState.showPinSheet = false
+
+                event(
+                    CartEvent.PinSubmitted(
+                        pin = pin
+                    )
+                )
+            }
+        )
+    }
+
+    if (state.isCheckoutLoading) {
+        LoadingOverlay()
+    }
+
+    if (screenState.showSuccessDialog) {
+        OrderSuccessDialog(
+            onConfirm = {
+                screenState.showSuccessDialog = false
+                onNavigateToOrder()
+            }
+        )
+    }
+}
+
+@Composable
+private fun LoadingOverlay() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.5f)),
+        contentAlignment = Alignment.Center
+    ) {
+        LoadingV2()
     }
 }
 
@@ -847,41 +934,15 @@ fun PremiumCheckoutSheet(
         sheetState = sheetState,
         containerColor = AppColor.GreenSoft,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .size(width = 42.dp, height = 4.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(AppColor.Gray.copy(alpha = 0.35f))
-            )
-        }
+        dragHandle = { SheetDragHandle() }
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(CircleShape)
-                    .background(AppColor.White)
-                    .border(1.dp, AppColor.Green.copy(.18f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
-                    tint = AppColor.Green,
-                    modifier = Modifier.size(36.dp)
-                )
-            }
+            CheckoutIcon()
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -904,57 +965,14 @@ fun PremiumCheckoutSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "Metode Pembayaran",
-                fontFamily = PoppinsFont,
-                fontSize = 14.sp,
-                color = AppColor.Gray
+            PaymentMethodSelector(
+                selectedPaymentMethod = paymentMethod,
+                onPaymentSelected = { paymentMethod = it }
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-
-                PaymentPill(
-                    title = "Cash",
-                    selected = paymentMethod == PaymentMethod.CASH,
-                    onClick = { paymentMethod = PaymentMethod.CASH }
-                )
-
-                PaymentPill(
-                    title = "Transfer",
-                    selected = paymentMethod == PaymentMethod.TRANSFER,
-                    onClick = { paymentMethod = PaymentMethod.TRANSFER }
-                )
-            }
-
             if (paymentMethod == PaymentMethod.TRANSFER) {
-
                 Spacer(modifier = Modifier.height(12.dp))
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(AppColor.White)
-                        .border(
-                            width = 1.dp,
-                            color = AppColor.Green.copy(alpha = 0.18f),
-                            shape = RoundedCornerShape(14.dp)
-                        )
-                        .padding(horizontal = 14.dp, vertical = 12.dp)
-                ) {
-                    Text(
-                        text = "Setelah transfer, buka halaman Order lalu tekan Konfirmasi Transfer.",
-                        fontFamily = PoppinsFont,
-                        fontSize = 13.sp,
-                        color = Color(0xFF444444),
-                        lineHeight = 18.sp,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                TransferInformationBox()
             }
 
             Spacer(modifier = Modifier.height(22.dp))
@@ -978,34 +996,133 @@ fun PremiumCheckoutSheet(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-
-                OutlinedButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Text(text = "Batal", fontFamily = PoppinsFont)
-                }
-
-                Button(
-                    onClick = { onConfirm(paymentMethod) },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(AppColor.Green),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Text(
-                        text = "Checkout",
-                        fontFamily = PoppinsFont,
-                        color = Color.White
-                    )
-                }
-            }
+            CheckoutActionButtons(
+                onCancel = onDismiss,
+                onConfirm = { onConfirm(paymentMethod) }
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
+        }
+    }
+}
+
+@Composable
+private fun SheetDragHandle() {
+    Box(
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .size(width = 42.dp, height = 4.dp)
+            .clip(RoundedCornerShape(50))
+            .background(AppColor.Gray.copy(alpha = 0.35f))
+    )
+}
+
+@Composable
+private fun CheckoutIcon() {
+    Box(
+        modifier = Modifier
+            .size(72.dp)
+            .clip(CircleShape)
+            .background(AppColor.White)
+            .border(1.dp, AppColor.Green.copy(alpha = 0.18f), CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.ShoppingCart,
+            contentDescription = null,
+            tint = AppColor.Green,
+            modifier = Modifier.size(36.dp)
+        )
+    }
+}
+
+@Composable
+private fun PaymentMethodSelector(
+    selectedPaymentMethod: PaymentMethod,
+    onPaymentSelected: (PaymentMethod) -> Unit
+) {
+    Text(
+        text = "Metode Pembayaran",
+        fontFamily = PoppinsFont,
+        fontSize = 14.sp,
+        color = AppColor.Gray
+    )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        PaymentPill(
+            title = "Cash",
+            selected = selectedPaymentMethod == PaymentMethod.CASH,
+            onClick = { onPaymentSelected(PaymentMethod.CASH) }
+        )
+
+        PaymentPill(
+            title = "Transfer",
+            selected = selectedPaymentMethod == PaymentMethod.TRANSFER,
+            onClick = { onPaymentSelected(PaymentMethod.TRANSFER) }
+        )
+    }
+}
+
+@Composable
+private fun TransferInformationBox() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(AppColor.White)
+            .border(
+                width = 1.dp,
+                color = AppColor.Green.copy(alpha = 0.18f),
+                shape = RoundedCornerShape(14.dp)
+            )
+            .padding(horizontal = 14.dp, vertical = 12.dp)
+    ) {
+        Text(
+            text = "Setelah transfer, buka halaman Order lalu tekan Konfirmasi Transfer.",
+            fontFamily = PoppinsFont,
+            fontSize = 13.sp,
+            color = Color(0xFF444444),
+            lineHeight = 18.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun CheckoutActionButtons(
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        OutlinedButton(
+            onClick = onCancel,
+            modifier = Modifier.weight(1f),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text(
+                text = "Batal",
+                fontFamily = PoppinsFont
+            )
+        }
+
+        Button(
+            onClick = onConfirm,
+            modifier = Modifier.weight(1f),
+            colors = ButtonDefaults.buttonColors(AppColor.Green),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text(
+                text = "Checkout",
+                fontFamily = PoppinsFont,
+                color = Color.White
+            )
         }
     }
 }
@@ -1020,12 +1137,15 @@ fun PaymentPill(
         modifier = Modifier
             .clip(RoundedCornerShape(14.dp))
             .background(
-                if (selected) AppColor.Green.copy(alpha = 0.12f)
-                else AppColor.White
+                if (selected) {
+                    AppColor.Green.copy(alpha = 0.12f)
+                } else {
+                    AppColor.White
+                }
             )
             .border(
                 width = 1.dp,
-                color = if (selected) AppColor.Green else AppColor.Gray.copy(.25f),
+                color = if (selected) AppColor.Green else AppColor.Gray.copy(alpha = 0.25f),
                 shape = RoundedCornerShape(14.dp)
             )
             .clickable { onClick() }
@@ -1046,30 +1166,19 @@ fun PaymentPill(
 @Composable
 fun PinVerificationSheet(
     isLoading: Boolean,
-    isError: Boolean,
     onDismiss: () -> Unit,
     onSuccess: (String) -> Unit
 ) {
-
-    var pin by remember { mutableStateOf(value = EMPTY_STRING) }
-    var isSubmitted by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
 
+    var pin by remember { mutableStateOf(EMPTY_STRING) }
+    var isSubmitted by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         pin = EMPTY_STRING
         isSubmitted = false
-    }
-
-    LaunchedEffect(isError) {
-        if (isError) {
-            pin = EMPTY_STRING
-            isSubmitted = false
-            // Auto-close sheet setelah error ditampilkan selama 1.5 detik
-            delay(1500)
-            onDismiss()
-        }
     }
 
     ModalBottomSheet(
@@ -1080,24 +1189,14 @@ fun PinVerificationSheet(
             topStart = 28.dp,
             topEnd = 28.dp
         ),
-        dragHandle = {
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .size(width = 42.dp, height = 4.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(AppColor.Gray.copy(alpha = 0.35f))
-            )
-        }
+        dragHandle = { SheetDragHandle() }
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(all = 24.dp),
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Text(
                 text = "Masukkan PIN",
                 fontFamily = PoppinsFont,
@@ -1106,7 +1205,7 @@ fun PinVerificationSheet(
                 color = Color(0xFF1A1A1A)
             )
 
-            Spacer(modifier = Modifier.height(height = 8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Untuk konfirmasi pembayaran",
@@ -1115,65 +1214,23 @@ fun PinVerificationSheet(
                 color = AppColor.Gray.copy(alpha = 0.75f)
             )
 
-            Spacer(modifier = Modifier.height(height = 28.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
-            ) {
-                repeat(times = 6) { index ->
-                    val filled = index < pin.length
+            PinIndicator(pinLength = pin.length)
 
-                    Box(
-                        modifier = Modifier
-                            .size(size = 14.dp)
-                            .clip(shape = CircleShape)
-                            .background(
-                                color = if (filled) AppColor.Green else Color.Transparent
-                            )
-                            .border(
-                                width = 1.5.dp,
-                                color = if (filled) AppColor.Green else Color.LightGray,
-                                shape = CircleShape
-                            )
-                    )
-                }
-            }
-
-            if (isError) {
-                Spacer(modifier = Modifier.height(height = 10.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = Color.Red.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "❌ PIN salah, silakan coba lagi",
-                        color = Color.Red,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(height = 28.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             if (isLoading) {
                 LoadingV2()
-                Spacer(modifier = Modifier.height(height = 20.dp))
-            }
-
-            if (!isError && !isLoading) {
+                Spacer(modifier = Modifier.height(20.dp))
+            } else {
                 PinKeypad(
-                    isLoading = isLoading,
+                    isLoading = false,
                     onNumberClick = { number ->
-                        if (pin.length < 6) {
+                        if (pin.length < PIN_LENGTH) {
                             pin += number
 
-                            if (pin.length == 6 && !isLoading && !isSubmitted) {
+                            if (pin.length == PIN_LENGTH && !isSubmitted) {
                                 isSubmitted = true
                                 onSuccess(pin)
                             }
@@ -1181,21 +1238,40 @@ fun PinVerificationSheet(
                     },
                     onDeleteClick = {
                         if (pin.isNotEmpty()) {
-                            pin = pin.dropLast(n = 1)
+                            pin = pin.dropLast(1)
                         }
                     }
                 )
-            } else if (isError) {
-                Text(
-                    text = "Pin sheet akan ditutup otomatis...",
-                    fontFamily = PoppinsFont,
-                    fontSize = 12.sp,
-                    color = AppColor.Gray,
-                    textAlign = TextAlign.Center
-                )
             }
 
-            Spacer(modifier = Modifier.height(height = 16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun PinIndicator(
+    pinLength: Int
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        repeat(PIN_LENGTH) { index ->
+            val filled = index < pinLength
+
+            Box(
+                modifier = Modifier
+                    .size(14.dp)
+                    .clip(CircleShape)
+                    .background(
+                        color = if (filled) AppColor.Green else Color.Transparent
+                    )
+                    .border(
+                        width = 1.5.dp,
+                        color = if (filled) AppColor.Green else Color.LightGray,
+                        shape = CircleShape
+                    )
+            )
         }
     }
 }
@@ -1206,64 +1282,76 @@ fun PinKeypad(
     onNumberClick: (String) -> Unit,
     onDeleteClick: () -> Unit
 ) {
-
-    val buttons = listOf(
-        "1", "2", "3",
-        "4", "5", "6",
-        "7", "8", "9",
-        EMPTY_STRING, "0", "del"
-    )
-
     Column(
-        verticalArrangement = Arrangement.spacedBy(space = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        buttons.chunked(size = 3).forEach { row ->
+        PIN_BUTTONS.chunked(3).forEach { row ->
             Row(
-                horizontalArrangement = Arrangement.spacedBy(space = 32.dp),
+                horizontalArrangement = Arrangement.spacedBy(32.dp),
                 modifier = Modifier.wrapContentWidth()
             ) {
                 row.forEach { key ->
-                    val size = 84.dp
-
-                    Box(
-                        modifier = Modifier
-                            .size(size = size)
-                            .clip(shape = CircleShape)
-                            .background(color = AppColor.White)
-                            .border(
-                                width = 1.dp,
-                                color = AppColor.Green.copy(alpha = 0.1f),
-                                shape = CircleShape
-                            )
-                            .clickable(enabled = key.isNotEmpty() && !isLoading) {
-                                when (key) {
-                                    "del" -> onDeleteClick()
-                                    else -> onNumberClick(key)
-                                }
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        when (key) {
-
-                            "del" -> Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = null,
-                                tint = AppColor.Gray.copy(alpha = 0.8f),
-                                modifier = Modifier.size(size = 20.dp)
-                            )
-
-                            EMPTY_STRING -> Spacer(modifier = Modifier.size(size = size))
-
-                            else -> Text(
-                                text = key,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                fontFamily = PoppinsFont
-                            )
-                        }
-                    }
+                    PinKeypadButton(
+                        key = key,
+                        isLoading = isLoading,
+                        onNumberClick = onNumberClick,
+                        onDeleteClick = onDeleteClick
+                    )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PinKeypadButton(
+    key: String,
+    isLoading: Boolean,
+    onNumberClick: (String) -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    val buttonSize = 84.dp
+
+    Box(
+        modifier = Modifier
+            .size(buttonSize)
+            .clip(CircleShape)
+            .background(AppColor.White)
+            .border(
+                width = 1.dp,
+                color = AppColor.Green.copy(alpha = 0.1f),
+                shape = CircleShape
+            )
+            .clickable(enabled = key.isNotEmpty() && !isLoading) {
+                when (key) {
+                    KEY_DELETE -> onDeleteClick()
+                    else -> onNumberClick(key)
+                }
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        when (key) {
+            KEY_DELETE -> {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = AppColor.Gray.copy(alpha = 0.8f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            EMPTY_STRING -> {
+                Spacer(modifier = Modifier.size(buttonSize))
+            }
+
+            else -> {
+                Text(
+                    text = key,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = PoppinsFont
+                )
             }
         }
     }
@@ -1279,7 +1367,6 @@ fun OrderSuccessDialog(
             .background(Color.Black.copy(alpha = 0.45f)),
         contentAlignment = Alignment.Center
     ) {
-
         Box(
             modifier = Modifier
                 .padding(horizontal = 28.dp)
@@ -1288,26 +1375,10 @@ fun OrderSuccessDialog(
                 .padding(horizontal = 24.dp, vertical = 28.dp),
             contentAlignment = Alignment.Center
         ) {
-
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                // ===== SUCCESS ICON =====
-                Box(
-                    modifier = Modifier
-                        .size(88.dp)
-                        .clip(CircleShape)
-                        .background(AppColor.Green.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = null,
-                        tint = AppColor.Green,
-                        modifier = Modifier.size(42.dp)
-                    )
-                }
+                SuccessIcon()
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -1326,7 +1397,8 @@ fun OrderSuccessDialog(
                     fontFamily = PoppinsFont,
                     fontSize = 14.sp,
                     color = AppColor.Gray.copy(alpha = 0.85f),
-                    lineHeight = 20.sp
+                    lineHeight = 20.sp,
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(26.dp))
@@ -1354,33 +1426,48 @@ fun OrderSuccessDialog(
 }
 
 @Composable
-fun EmptyCartView(
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.White),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+private fun SuccessIcon() {
+    Box(
+        modifier = Modifier
+            .size(88.dp)
+            .clip(CircleShape)
+            .background(AppColor.Green.copy(alpha = 0.12f)),
+        contentAlignment = Alignment.Center
     ) {
-
         Icon(
             imageVector = Icons.Default.ShoppingCart,
             contentDescription = null,
-            tint = AppColor.Gray,
-            modifier = Modifier.size(64.dp)
+            tint = AppColor.Green,
+            modifier = Modifier.size(42.dp)
         )
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
+private const val PIN_LENGTH = 6
+private const val KEY_DELETE = "del"
 
-        Text(
-            text = "Tidak ada keranjang",
-            fontFamily = PoppinsFont,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+private val PIN_BUTTONS = listOf(
+    "1", "2", "3",
+    "4", "5", "6",
+    "7", "8", "9",
+    EMPTY_STRING, "0", KEY_DELETE
+)
 
+private fun LoadState<List<Cart>>.dataOrEmpty(): List<Cart> {
+    return when (this) {
+        is LoadState.Success -> data
+        else -> emptyList()
+    }
+}
+
+private fun List<Cart>.grandTotal(): BigDecimal {
+    return fold(BigDecimal.ZERO) { acc, item ->
+        val variantTotal = item.variants.fold(BigDecimal.ZERO) { sum, variant ->
+            sum + variant.price
+        }
+
+        val itemTotal = item.price + variantTotal
+        acc + (itemTotal * item.quantity.toBigDecimal())
     }
 }
 
@@ -1388,6 +1475,7 @@ fun EmptyCartView(
 @Composable
 fun CartScreenPreview() {
     val navController = rememberNavController()
+
     Scaffold(
         bottomBar = {
             CustomerBottomNavigationBar(navController)
@@ -1403,6 +1491,7 @@ fun CartScreenPreview() {
                 state = CartUiState(
                     cartItems = LoadState.Success(DataUiMock.cart())
                 ),
+                effectFlow = emptyFlow(),
                 event = {}
             )
         }
@@ -1411,149 +1500,9 @@ fun CartScreenPreview() {
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
-fun PremiumCheckoutSheetPreview() {
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0x66000000)),
-        contentAlignment = Alignment.BottomCenter
-    ) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.55f)
-                .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(AppColor.WhiteSoft)
-        ) {
-            // render content directly for preview (ModalBottomSheet may not render in preview)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .background(AppColor.White)
-                        .border(1.dp, AppColor.Green.copy(.18f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = null,
-                        tint = AppColor.Green,
-                        modifier = Modifier.size(36.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Konfirmasi Checkout",
-                    fontFamily = PoppinsFont,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 20.sp,
-                    color = Color(0xFF1A1A1A)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Pesanan akan dikirim ke penjual",
-                    fontFamily = PoppinsFont,
-                    fontSize = 13.sp,
-                    color = AppColor.Gray
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "Metode Pembayaran",
-                    fontFamily = PoppinsFont,
-                    fontSize = 14.sp,
-                    color = AppColor.Gray
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-
-                    PaymentPill(
-                        title = "Cash",
-                        selected = true,
-                        onClick = {}
-                    )
-
-                    PaymentPill(
-                        title = "Transfer",
-                        selected = false,
-                        onClick = {}
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(22.dp))
-
-                Text(
-                    text = "Total Pembayaran",
-                    fontFamily = PoppinsFont,
-                    fontSize = 12.sp,
-                    color = AppColor.Gray
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = DataUiMock.cart().first().price.toRupiah(),
-                    fontFamily = PoppinsFont,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = AppColor.Green
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-
-                    OutlinedButton(
-                        onClick = {},
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Text(text = "Batal", fontFamily = PoppinsFont)
-                    }
-
-                    Button(
-                        onClick = {},
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(AppColor.Green),
-                        shape = RoundedCornerShape(14.dp)
-                    ) {
-                        Text(
-                            text = "Checkout",
-                            fontFamily = PoppinsFont,
-                            color = Color.White
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-        }
-    }
+fun EmptyCartViewPreview() {
+    EmptyCartView()
 }
-
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable
@@ -1567,18 +1516,16 @@ fun PinKeypadPreview() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(.60f)
+                .fillMaxHeight(0.60f)
                 .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-                .background(AppColor.WhiteSoft)
+                .background(AppColor.GreenSoft)
         ) {
-            // render content directly for preview
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(all = 24.dp),
+                    .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
                 Text(
                     text = "Masukkan PIN",
                     fontFamily = PoppinsFont,
@@ -1587,7 +1534,7 @@ fun PinKeypadPreview() {
                     color = Color(0xFF1A1A1A)
                 )
 
-                Spacer(modifier = Modifier.height(height = 8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = "Untuk konfirmasi pembayaran",
@@ -1596,37 +1543,17 @@ fun PinKeypadPreview() {
                     color = AppColor.Gray.copy(alpha = 0.75f)
                 )
 
-                Spacer(modifier = Modifier.height(height = 28.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
-                ) {
-                    repeat(times = 6) { index ->
-                        Box(
-                            modifier = Modifier
-                                .size(size = 14.dp)
-                                .clip(shape = CircleShape)
-                                .background(
-                                    color = Color.Transparent
-                                )
-                                .border(
-                                    width = 1.5.dp,
-                                    color = Color.LightGray,
-                                    shape = CircleShape
-                                )
-                        )
-                    }
-                }
+                PinIndicator(pinLength = 2)
 
-                Spacer(modifier = Modifier.height(height = 28.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
                 PinKeypad(
                     isLoading = false,
                     onNumberClick = {},
                     onDeleteClick = {}
                 )
-
-                Spacer(modifier = Modifier.height(height = 16.dp))
             }
         }
     }

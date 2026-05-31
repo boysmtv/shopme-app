@@ -26,6 +26,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.ShimmerBlock
@@ -374,5 +376,59 @@ private fun ScaffoldColumnWithBottomBar(
             content()
         }
         bottomBar()
+    }
+}
+
+@Preview(
+    name = "Shimmer Home Content Skeleton",
+    showBackground = true,
+    device = Devices.PIXEL_4_XL
+)
+@Composable
+fun ShimmerHomeContentSkeletonPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColor.White)
+            .padding(16.dp)
+    ) {
+        ShimmerHomeContentSkeleton()
+    }
+}
+
+@Preview(
+    name = "Shimmer Home Food Flow",
+    showBackground = true,
+    device = Devices.PIXEL_4_XL
+)
+@Composable
+private fun ShimmerHomeFoodFlowPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(AppColor.White)
+            .padding(16.dp)
+    ) {
+        ShimmerHomeFoodFlow()
+    }
+}
+
+@Preview(
+    name = "Shimmer Home Food Card",
+    showBackground = true,
+    device = Devices.PIXEL_4_XL
+)
+@Composable
+private fun ShimmerHomeFoodCardPreview() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(AppColor.White)
+            .padding(16.dp)
+    ) {
+        ShimmerHomeFoodCard(
+            modifier = Modifier.width(170.dp),
+            imageHeight = 112.dp
+        )
     }
 }

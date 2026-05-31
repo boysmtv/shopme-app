@@ -1,6 +1,128 @@
 {
   "flows": [
     {
+      "name": "add",
+      "entrypoints": [
+        "app/src/main/java/com/mtv/app/shopme/config/AppAdditionalHeaderProvider.kt",
+        "app/src/main/java/com/mtv/app/shopme/config/AppAdditionalHeaderProvider.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/AppAdditionalHeaderModule.kt",
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt"
+      ],
+      "domain_functions": [
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt:addition_isCorrect",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt:addition_isCorrect",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt:addition_isCorrect",
+        "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:addresses",
+        "data/src/test/java/com/mtv/app/shopme/data/ExampleUnitTest.kt:addition_isCorrect",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:getCafeAddress",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:upsertCafeAddress",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:addCart"
+      ],
+      "tests": [
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "data/src/test/java/com/mtv/app/shopme/data/ExampleUnitTest.kt",
+        "domain/src/test/java/com/mtv/app/shopme/domain/ExampleUnitTest.kt",
+        "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ExampleUnitTest.kt"
+      ],
+      "docs": [
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
+      ],
+      "notes": []
+    },
+    {
+      "name": "create",
+      "entrypoints": [
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt"
+      ],
+      "domain_functions": [
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:createCafe",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:createOrder",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:SellerCreateCafeScreen",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:PreviewCreateCafeBasic",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:PreviewCreateCafeAddress",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:PreviewCreateCafePhotoStep"
+      ],
+      "tests": [
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeTncViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeViewModelTest.kt"
+      ],
+      "docs": [
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
+      ],
+      "notes": []
+    },
+    {
+      "name": "list",
+      "entrypoints": [
+        "core/src/main/java/com/mtv/app/shopme/core/database/entity/ChatListCacheEntity.kt",
+        "core/src/main/java/com/mtv/app/shopme/core/database/entity/ChatListCacheEntity.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/response/ChatListItemResponse.kt"
+      ],
+      "domain_functions": [
+        "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:chatList",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/ChatRepository.kt:getChatList",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ChatListScreen.kt:ChatListScreen",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ChatListScreen.kt:ListChatItem",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ChatListScreen.kt:ChatListScreenPreview",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerChatListScreen.kt:SellerChatListScreen",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerChatListScreen.kt:SellerListChatItem",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerChatListScreen.kt:SellerChatListPreview"
+      ],
+      "tests": [
+        "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/ChatListViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerChatListViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerProductListViewModelTest.kt"
+      ],
+      "docs": [
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
+      ],
+      "notes": [],
+      "steps": [
+        {
+          "caller": "first_list_item",
+          "calls": "payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 190
+        },
+        {
+          "caller": "first_list_item",
+          "calls": "isinstance",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 191
+        }
+      ],
+      "step_count": 2
+    },
+    {
       "name": "login",
       "entrypoints": [
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
@@ -17,36 +139,351 @@
         "nav/src/main/java/com/mtv/app/shopme/nav/customer/CustomerNavActions.kt:toLogin",
         "nav/src/main/java/com/mtv/app/shopme/nav/route/auth/LoginRoute.kt:LoginRoute"
       ],
-      "tests": [],
+      "tests": [
+        "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/LoginViewModelTest.kt"
+      ],
       "docs": [
-        ".ai-agent/memory/api_contracts.json",
-        ".ai-agent/memory/architecture_map.json",
-        ".ai-agent/memory/change_log.json",
-        ".ai-agent/memory/engineering_guidance.json",
-        ".ai-agent/memory/feature_catalog.json",
-        ".ai-agent/memory/flow_map.json"
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
       ],
       "notes": []
     },
     {
-      "name": "start",
+      "name": "return",
+      "entrypoints": [],
+      "domain_functions": [],
+      "tests": [],
+      "docs": [
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
+      ],
+      "notes": []
+    },
+    {
+      "name": "run",
       "entrypoints": [
-        "data/src/main/java/com/mtv/app/shopme/data/sync/OfflineMutationSyncManager.kt"
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt",
+        "scripts/verify_backend_contract.py"
       ],
       "domain_functions": [
-        "data/src/main/java/com/mtv/app/shopme/data/sync/OfflineMutationSyncManager.kt:start"
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt:SellerUnreadDot",
+        "scripts/verify_backend_contract.py:verify_runtime"
       ],
       "tests": [],
       "docs": [
-        ".ai-agent/memory/api_contracts.json",
-        ".ai-agent/memory/architecture_map.json",
-        ".ai-agent/memory/change_log.json",
-        ".ai-agent/memory/engineering_guidance.json",
-        ".ai-agent/memory/feature_catalog.json",
-        ".ai-agent/memory/flow_map.json"
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
+      ],
+      "notes": [],
+      "steps": [
+        {
+          "caller": "verify_runtime",
+          "calls": "sample_image_path.read_bytes",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 211
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "request_json",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 213
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "expect_status",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 218
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "failures.extend",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 219
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "buyer_login.get('data', {}).get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 248
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "seller_login.get('data', {}).get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 249
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "seller_profile_payload.get('data', {}).get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 276
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "media_ticket_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 288
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "buyer_profile_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 329
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "captured_payloads.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 426
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "support_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 427
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "sorted",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 453
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "support_chat_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 464
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "support_chat_send_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 479
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "first_list_item",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 489
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "food_item.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 494
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "food_detail_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 508
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "isinstance",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 509
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "cart_item.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 560
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "session_payload.get('data', {}).get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 573
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "order_list_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 612
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "ensure_conversation_payload.get('data', {}).get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 653
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "chat_list_payload.get('data', {}).get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 673
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "seller_orders_refresh_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 747
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "assert_envelope",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 219
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "failures.append",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 234
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "media_ticket_data.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 289
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "request_bytes",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 300
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "updated_profile_payload.get",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 352
+        },
+        {
+          "caller": "verify_runtime",
+          "calls": "required_support_fields.difference",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 453
+        }
+      ],
+      "step_count": 79
+    },
+    {
+      "name": "status",
+      "entrypoints": [
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderItemStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderItemStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderStatus.kt"
+      ],
+      "domain_functions": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateOrderStatus",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderHistoryScreen.kt:StatusBadge",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderScreen.kt:ModernStatusBadge",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/utils/ItemExtension.kt:StatusStatItem",
+        "feature-firebase/src/main/java/com/mtv/app/shopme/feature/firebase/NotificationRepository.kt:saveStatus",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerOrderDetailScreen.kt:StatusChip",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerOrderDetailScreen.kt:UpdateStatusBottomBar",
+        "scripts/verify_backend_contract.py:expect_status"
+      ],
+      "tests": [],
+      "docs": [
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
+      ],
+      "notes": [],
+      "steps": [
+        {
+          "caller": "expect_status",
+          "calls": "'/'.join",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 204
+        },
+        {
+          "caller": "expect_status",
+          "calls": "failures.append",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 205
+        },
+        {
+          "caller": "expect_status",
+          "calls": "str",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 204
+        },
+        {
+          "caller": "expect_status",
+          "calls": "sorted",
+          "file": "scripts/verify_backend_contract.py",
+          "line": 204
+        }
+      ],
+      "step_count": 4
+    },
+    {
+      "name": "transfer",
+      "entrypoints": [
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/OrderRepository.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/usecase/ConfirmOrderTransferUseCase.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/usecase/ConfirmOrderTransferUseCase.kt",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/OrderContract.kt",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/OrderDetailContract.kt"
+      ],
+      "domain_functions": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/OrderRepository.kt:confirmTransfer"
+      ],
+      "tests": [],
+      "docs": [
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
+      ],
+      "notes": []
+    },
+    {
+      "name": "update",
+      "entrypoints": [
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt"
+      ],
+      "domain_functions": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:updateCafe",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:updateQuantity",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:updateFood",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/ProfileRepository.kt:updateProfile",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/ProfileRepository.kt:updateNotificationPreferences",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateOrderStatus",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateAvailability",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updatePaymentMethods"
+      ],
+      "tests": [],
+      "docs": [
+        ".brief/brief.2345.md",
+        ".brief/brief.v1.md",
+        ".brief/brief.v2.md",
+        ".brief/brief.v3.md",
+        ".brief/brief.v4.md",
+        ".brief/implementation-checklist.2345.android.md"
       ],
       "notes": []
     }
   ],
-  "updated_at": "2026-05-14T04:22:32.899226+00:00"
+  "updated_at": "2026-05-31T17:13:14.495110+00:00"
 }

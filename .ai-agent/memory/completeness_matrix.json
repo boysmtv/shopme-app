@@ -1,0 +1,448 @@
+{
+  "schema_version": 1,
+  "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
+  "updated_at": "2026-05-31T17:13:14.863903+00:00",
+  "status": "blocked",
+  "rows": [
+    {
+      "requirement": "add",
+      "acceptance_criteria": [
+        "add behavior is implemented and validated."
+      ],
+      "flows": [
+        "add",
+        "create",
+        "run"
+      ],
+      "api_or_ui_paths": [
+        "add"
+      ],
+      "implementation_symbols": [
+        "app/src/main/java/com/mtv/app/shopme/config/AppAdditionalHeaderProvider.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/AppAdditionalHeaderModule.kt",
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt:addition_isCorrect",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt:addition_isCorrect",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt:addition_isCorrect",
+        "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:addresses",
+        "data/src/test/java/com/mtv/app/shopme/data/ExampleUnitTest.kt:addition_isCorrect",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:getCafeAddress",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:upsertCafeAddress",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:addCart",
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt",
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:createCafe",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:createOrder",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood"
+      ],
+      "tests": [
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "data/src/test/java/com/mtv/app/shopme/data/ExampleUnitTest.kt",
+        "domain/src/test/java/com/mtv/app/shopme/domain/ExampleUnitTest.kt",
+        "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ExampleUnitTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeTncViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeViewModelTest.kt"
+      ],
+      "runtime_proof": [],
+      "status": "covered",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "create",
+      "acceptance_criteria": [
+        "create behavior is implemented and validated."
+      ],
+      "flows": [
+        "create"
+      ],
+      "api_or_ui_paths": [
+        "create"
+      ],
+      "implementation_symbols": [
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt",
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:createCafe",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:createOrder",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:SellerCreateCafeScreen",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:PreviewCreateCafeBasic",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:PreviewCreateCafeAddress",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:PreviewCreateCafePhotoStep"
+      ],
+      "tests": [
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeTncViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeViewModelTest.kt"
+      ],
+      "runtime_proof": [],
+      "status": "covered",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "list",
+      "acceptance_criteria": [
+        "list behavior is implemented and validated."
+      ],
+      "flows": [
+        "add",
+        "create",
+        "list",
+        "login",
+        "return",
+        "run",
+        "status",
+        "transfer",
+        "update"
+      ],
+      "api_or_ui_paths": [
+        "list"
+      ],
+      "implementation_symbols": [
+        "app/src/main/java/com/mtv/app/shopme/config/AppAdditionalHeaderProvider.kt",
+        "app/src/main/java/com/mtv/app/shopme/di/AppAdditionalHeaderModule.kt",
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt:addition_isCorrect",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt:addition_isCorrect",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt:addition_isCorrect",
+        "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:addresses",
+        "data/src/test/java/com/mtv/app/shopme/data/ExampleUnitTest.kt:addition_isCorrect",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:getCafeAddress",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:upsertCafeAddress",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:addCart",
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt",
+        "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:createCafe",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:createOrder",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood"
+      ],
+      "tests": [
+        "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt",
+        "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
+        "data/src/test/java/com/mtv/app/shopme/data/ExampleUnitTest.kt",
+        "domain/src/test/java/com/mtv/app/shopme/domain/ExampleUnitTest.kt",
+        "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ExampleUnitTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeTncViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerCreateCafeViewModelTest.kt",
+        "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/ChatListViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerChatListViewModelTest.kt",
+        "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerProductListViewModelTest.kt",
+        "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/LoginViewModelTest.kt"
+      ],
+      "runtime_proof": [],
+      "status": "covered",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "login",
+      "acceptance_criteria": [
+        "login behavior is implemented and validated."
+      ],
+      "flows": [
+        "login",
+        "run"
+      ],
+      "api_or_ui_paths": [
+        "login"
+      ],
+      "implementation_symbols": [
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/LoginRequest.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/response/LoginResponse.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/Login.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/AuthRepository.kt:login",
+        "feature-auth/src/main/java/com/mtv/app/shopme/feature/auth/ui/LoginScreen.kt:LoginScreen",
+        "feature-auth/src/main/java/com/mtv/app/shopme/feature/auth/ui/LoginScreen.kt:LoginPreview",
+        "nav/src/main/java/com/mtv/app/shopme/nav/customer/CustomerNavActions.kt:toLogin",
+        "nav/src/main/java/com/mtv/app/shopme/nav/route/auth/LoginRoute.kt:LoginRoute",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt",
+        "scripts/verify_backend_contract.py",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt:SellerUnreadDot",
+        "scripts/verify_backend_contract.py:verify_runtime"
+      ],
+      "tests": [
+        "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/LoginViewModelTest.kt"
+      ],
+      "runtime_proof": [],
+      "status": "covered",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "return",
+      "acceptance_criteria": [
+        "return behavior is implemented and validated."
+      ],
+      "flows": [
+        "return"
+      ],
+      "api_or_ui_paths": [
+        "return"
+      ],
+      "implementation_symbols": [],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "run",
+      "acceptance_criteria": [
+        "run behavior is implemented and validated."
+      ],
+      "flows": [
+        "run"
+      ],
+      "api_or_ui_paths": [
+        "run"
+      ],
+      "implementation_symbols": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt",
+        "scripts/verify_backend_contract.py",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt:SellerUnreadDot",
+        "scripts/verify_backend_contract.py:verify_runtime"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "start",
+      "acceptance_criteria": [],
+      "flows": [],
+      "api_or_ui_paths": [],
+      "implementation_symbols": [],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "blocked",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "status",
+      "acceptance_criteria": [
+        "status behavior is implemented and validated."
+      ],
+      "flows": [
+        "run",
+        "status",
+        "update"
+      ],
+      "api_or_ui_paths": [
+        "status"
+      ],
+      "implementation_symbols": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt",
+        "scripts/verify_backend_contract.py",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt:SellerUnreadDot",
+        "scripts/verify_backend_contract.py:verify_runtime",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderItemStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateOrderStatus",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderHistoryScreen.kt:StatusBadge",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderScreen.kt:ModernStatusBadge",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/utils/ItemExtension.kt:StatusStatItem",
+        "feature-firebase/src/main/java/com/mtv/app/shopme/feature/firebase/NotificationRepository.kt:saveStatus",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerOrderDetailScreen.kt:StatusChip",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerOrderDetailScreen.kt:UpdateStatusBottomBar",
+        "scripts/verify_backend_contract.py:expect_status",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:updateCafe",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:updateQuantity",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:updateFood",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/ProfileRepository.kt:updateProfile"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "transfer",
+      "acceptance_criteria": [
+        "transfer behavior is implemented and validated."
+      ],
+      "flows": [
+        "transfer"
+      ],
+      "api_or_ui_paths": [
+        "transfer"
+      ],
+      "implementation_symbols": [
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/OrderRepository.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/usecase/ConfirmOrderTransferUseCase.kt",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/OrderContract.kt",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/OrderDetailContract.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/OrderRepository.kt:confirmTransfer"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "update",
+      "acceptance_criteria": [
+        "update behavior is implemented and validated."
+      ],
+      "flows": [
+        "run",
+        "status",
+        "update"
+      ],
+      "api_or_ui_paths": [
+        "update"
+      ],
+      "implementation_symbols": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt",
+        "scripts/verify_backend_contract.py",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt:SellerUnreadDot",
+        "scripts/verify_backend_contract.py:verify_runtime",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderItemStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderStatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateOrderStatus",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderHistoryScreen.kt:StatusBadge",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderScreen.kt:ModernStatusBadge",
+        "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/utils/ItemExtension.kt:StatusStatItem",
+        "feature-firebase/src/main/java/com/mtv/app/shopme/feature/firebase/NotificationRepository.kt:saveStatus",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerOrderDetailScreen.kt:StatusChip",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerOrderDetailScreen.kt:UpdateStatusBottomBar",
+        "scripts/verify_backend_contract.py:expect_status",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:updateCafe",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:updateQuantity",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:updateFood",
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/ProfileRepository.kt:updateProfile"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "requirement": "return",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "run",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "start",
+      "reason": "requirement_has_no_acceptance_criteria"
+    },
+    {
+      "requirement": "status",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "transfer",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "update",
+      "reason": "flow_has_no_test_evidence"
+    }
+  ],
+  "release_readiness": {
+    "blocked": true,
+    "blocking_rules": [
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence",
+      "requirement_has_no_acceptance_criteria",
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence"
+    ]
+  },
+  "coverage": {
+    "requirement_count": 10,
+    "mapped_requirement_count": 9,
+    "test_mapped_requirement_count": 4
+  }
+}

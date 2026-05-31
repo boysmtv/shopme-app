@@ -3,7 +3,7 @@
     {
       "run_id": "bootstrap::shopme-app",
       "final_status": "registered",
-      "summary": "Bootstrapped AI_AGENT_CORE memory from existing project registration (shopme_runtime_gate_green_2026_05_14).",
+      "summary": "Bootstrapped AI_AGENT_CORE memory from existing project registration (project_registration).",
       "changed_artifacts": [
         "app/src/androidTest/java/com/mtv/app/shopme/ExampleInstrumentedTest.kt",
         "app/src/main/java/com/mtv/app/shopme/app/BaseApplication.kt",
@@ -31,10 +31,18 @@
         "common/src/main/java/com/mtv/app/shopme/common/config/AppInfoProvider.kt"
       ],
       "features": [
+        "add",
+        "create",
+        "list",
         "login",
-        "start"
+        "return",
+        "run",
+        "start",
+        "status",
+        "transfer",
+        "update"
       ],
-      "recorded_at": "2026-05-14T04:22:33.014179+00:00"
+      "recorded_at": "2026-05-31T17:13:14.646367+00:00"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
-  "project_root": "D:\\Boys\\Android\\shopme-app",
-  "final_project_root": "D:\\Boys\\Android\\shopme-app",
-  "stack_id": "android-kotlin-compose",
+  "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
+  "final_project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
+  "stack_id": "",
   "entrypoints": [
     "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/EditProfileScreen.kt"
   ],
@@ -28,6 +28,7 @@
     "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
     "common/src/androidTest/java/com/mtv/app/shopme/common/ExampleInstrumentedTest.kt",
     "common/src/test/java/com/mtv/app/shopme/common/ExampleUnitTest.kt",
+    "common/src/test/java/com/mtv/app/shopme/common/notification/NotificationDeepLinkTest.kt",
     "common/src/test/java/com/mtv/app/shopme/common/serializer/LocalDateTimeSerializerTest.kt",
     "core/src/androidTest/java/com/mtv/app/shopme/ExampleInstrumentedTest.kt",
     "core/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
@@ -52,6 +53,7 @@
     "feature-auth/src/androidTest/java/com/mtv/app/shopme/feature/auth/ExampleInstrumentedTest.kt",
     "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ChangePinViewModelTest.kt",
     "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ExampleUnitTest.kt",
+    "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/LoginViewModelTest.kt",
     "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/MainDispatcherRule.kt",
     "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/PasswordViewModelTest.kt",
     "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ResetViewModelTest.kt",
@@ -95,9 +97,13 @@
     "nav/src/test/java/com/mtv/app/shopme/nav/ExampleUnitTest.kt"
   ],
   "docs": [
+    "fastlane/README.md",
+    ".brief/brief.2345.md",
     ".brief/brief.v1.md",
-    ".brief/brief.v2.md"
+    ".brief/brief.v2.md",
+    ".brief/brief.v3.md",
+    ".brief/brief.v4.md"
   ],
-  "updated_at": "2026-05-14T04:22:32.898028+00:00",
-  "source_file_count": 558
+  "updated_at": "2026-05-31T17:13:14.094292+00:00",
+  "source_file_count": 573
 }

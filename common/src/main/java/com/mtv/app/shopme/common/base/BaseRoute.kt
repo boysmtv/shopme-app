@@ -18,17 +18,21 @@ import kotlinx.coroutines.flow.collectLatest
 fun <EVENT, EFFECT> BaseRoute(
     viewModel: BaseEventViewModel<EVENT, EFFECT>,
     onLoad: EVENT? = null,
-    onEffect: (EFFECT) -> Unit,
+    onEffect: ((EFFECT) -> Unit)? = null,
     onEvent: (EVENT) -> Unit,
     content: @Composable () -> Unit
 ) {
-    LaunchedEffect(true) {
+    LaunchedEffect(Unit) {
         onLoad?.let { onEvent(it) }
     }
-    LaunchedEffect(viewModel.effect) {
-        viewModel.effect.collectLatest { effect ->
-            onEffect(effect)
+
+    if (onEffect != null) {
+        LaunchedEffect(viewModel.effect) {
+            viewModel.effect.collectLatest { effect ->
+                onEffect(effect)
+            }
         }
     }
-    content.invoke()
+
+    content()
 }

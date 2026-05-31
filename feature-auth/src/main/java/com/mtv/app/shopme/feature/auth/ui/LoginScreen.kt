@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -54,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -138,8 +140,12 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(8.dp))
 
+                    val focusManager = LocalFocusManager.current
+
                     OutlinedTextField(
                         value = state.email,
+                        singleLine = true,
+                        maxLines = 1,
                         onValueChange = { event(LoginEvent.OnEmailChange(it)) },
                         placeholder = {
                             Text(
@@ -157,7 +163,12 @@ fun LoginScreen(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                focusManager.clearFocus()
+                            }
+                        )
                     )
 
                     Spacer(Modifier.height(16.dp))
@@ -175,6 +186,8 @@ fun LoginScreen(
 
                     OutlinedTextField(
                         value = state.password,
+                        singleLine = true,
+                        maxLines = 1,
                         onValueChange = {
                             event(LoginEvent.OnPasswordChange(it))
                         },
@@ -209,7 +222,12 @@ fun LoginScreen(
                         else
                             PasswordVisualTransformation(),
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp)
+                        shape = RoundedCornerShape(14.dp),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                focusManager.clearFocus()
+                            }
+                        )
                     )
 
                     Spacer(Modifier.height(18.dp))

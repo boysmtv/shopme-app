@@ -1,8 +1,26 @@
 {
   "features": [
+    "add",
+    "create",
+    "list",
     "login",
-    "start"
+    "return",
+    "run",
+    "start",
+    "status",
+    "transfer",
+    "update"
   ],
-  "commands": [],
-  "updated_at": "2026-05-14T04:22:32.897337+00:00"
+  "commands": [
+    "add",
+    "create",
+    "list",
+    "login",
+    "return",
+    "run",
+    "status",
+    "transfer",
+    "update"
+  ],
+  "updated_at": "2026-05-31T17:13:14.092293+00:00"
 }
