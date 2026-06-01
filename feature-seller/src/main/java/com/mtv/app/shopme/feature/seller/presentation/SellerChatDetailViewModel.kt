@@ -126,7 +126,6 @@ class SellerChatDetailViewModel @Inject constructor(
                         else -> items.firstOrNull()?.id.orEmpty()
                     }
                     val activeChat = items.firstOrNull { item -> item.id == resolvedActiveId }
-                        ?: items.firstOrNull()
                     it.copy(
                         isLoading = false,
                         isRefreshing = false,
@@ -153,12 +152,6 @@ class SellerChatDetailViewModel @Inject constructor(
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {
-                    val activeId = (state as? LoadState.Success)
-                        ?.data
-                        ?.content
-                        ?.firstOrNull()
-                        ?.id
-                        .orEmpty()
                     val messages = (state as? LoadState.Success)
                         ?.data
                         ?.content
@@ -177,7 +170,7 @@ class SellerChatDetailViewModel @Inject constructor(
                     it.copy(
                         isLoading = state is LoadState.Loading && it.messages.isEmpty(),
                         isRefreshing = state is LoadState.Loading && it.messages.isNotEmpty(),
-                        activeChatId = it.activeChatId.ifBlank { activeId },
+                        activeChatId = resolvedChatId,
                         messages = if (messages.isNotEmpty()) messages else it.messages,
                         chatPage = (state as? LoadState.Success)?.data?.page ?: it.chatPage,
                         isFirstPage = (state as? LoadState.Success)?.data?.last ?: it.isFirstPage,

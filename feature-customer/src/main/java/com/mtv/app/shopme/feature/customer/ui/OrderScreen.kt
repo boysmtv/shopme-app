@@ -48,6 +48,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -82,6 +83,23 @@ enum class OrderFilter {
     COMPLETED
 }
 
+internal fun resolveOrderFilter(name: String): OrderFilter =
+    OrderFilter.entries.firstOrNull { it.name == name.uppercase() } ?: OrderFilter.SEMUA
+
+internal fun filterOrders(
+    orders: List<Order>,
+    selectedFilter: OrderFilter
+): List<Order> =
+    orders.filter {
+        when (selectedFilter) {
+            OrderFilter.SEMUA -> true
+            OrderFilter.ORDERED -> it.status == OrderStatus.UNPAID || it.status == OrderStatus.ORDERED
+            OrderFilter.COOKING -> it.status == OrderStatus.COOKING
+            OrderFilter.DELIVERING -> it.status == OrderStatus.DELIVERING
+            OrderFilter.COMPLETED -> it.status == OrderStatus.COMPLETED
+        }
+    }
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OrderScreen(
@@ -95,22 +113,11 @@ fun OrderScreen(
     )
     val listState = rememberLazyListState()
 
-    var selectedFilter by remember(initialFilter) {
-        mutableStateOf(
-            OrderFilter.entries.firstOrNull { it.name == initialFilter.uppercase() }
-                ?: OrderFilter.SEMUA
-        )
+    var selectedFilterName by rememberSaveable(initialFilter) {
+        mutableStateOf(resolveOrderFilter(initialFilter).name)
     }
-
-    val filteredOrders = state.orders.filter {
-        when (selectedFilter) {
-            OrderFilter.SEMUA -> true
-            OrderFilter.ORDERED -> it.status == OrderStatus.UNPAID || it.status == OrderStatus.ORDERED
-            OrderFilter.COOKING -> it.status == OrderStatus.COOKING
-            OrderFilter.DELIVERING -> it.status == OrderStatus.DELIVERING
-            OrderFilter.COMPLETED -> it.status == OrderStatus.COMPLETED
-        }
-    }
+    val selectedFilter = resolveOrderFilter(selectedFilterName)
+    val filteredOrders = filterOrders(state.orders, selectedFilter)
 
     Box(
         modifier = Modifier
@@ -139,7 +146,7 @@ fun OrderScreen(
 
                     ModernOrderFilter(
                         selected = selectedFilter,
-                        onChange = { selectedFilter = it }
+                        onChange = { selectedFilterName = it.name }
                     )
 
                     if (state.isLoading && state.orders.isEmpty()) {

@@ -4,6 +4,7 @@ import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.based.core.network.endpoint.EndpointType
 import com.mtv.based.core.network.endpoint.IApiEndPoint
 import com.mtv.based.core.network.utils.HttpMethod
+import java.net.URLEncoder
 
 object ApiEndPoint {
 
@@ -182,9 +183,21 @@ object ApiEndPoint {
         object GetList : IApiEndPoint { override val path = "$API/$CHAT/list"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Get : IApiEndPoint { override val path = "$API/$CHAT"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object GetPage : IApiEndPoint { override val path = "$API/$CHAT/page"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
-        object EnsureConversation : IApiEndPoint { override val path = "$API/$CHAT/conversation"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
-        object EnsureOrderConversation : IApiEndPoint { override val path = "$API/$CHAT/conversation/order"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
-        object EnsureSellerConversation : IApiEndPoint { override val path = "$API/$CHAT/conversation/seller"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
+        class EnsureConversation(cafeId: String) : IApiEndPoint {
+            override val path = "$API/$CHAT/conversation?cafeId=${cafeId.toQueryValue()}"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Json
+        }
+        class EnsureOrderConversation(orderId: String) : IApiEndPoint {
+            override val path = "$API/$CHAT/conversation/order?orderId=${orderId.toQueryValue()}"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Json
+        }
+        class EnsureSellerConversation(orderId: String) : IApiEndPoint {
+            override val path = "$API/$CHAT/conversation/seller?orderId=${orderId.toQueryValue()}"
+            override val method = HttpMethod.Post
+            override val type = EndpointType.Json
+        }
         object SendMessage : IApiEndPoint { override val path = "$API/$CHAT/message"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object MarkAllRead : IApiEndPoint { override val path = "$API/$CHAT/read"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object Clear : IApiEndPoint { override val path = "$API/$CHAT"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
@@ -255,3 +268,6 @@ object ApiEndPoint {
         object SecurityBoundaries : IApiEndPoint { override val path = "$API/$ADMIN/security-boundaries"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
     }
 }
+
+private fun String.toQueryValue(): String =
+    URLEncoder.encode(this, Charsets.UTF_8.name()).replace("+", "%20")

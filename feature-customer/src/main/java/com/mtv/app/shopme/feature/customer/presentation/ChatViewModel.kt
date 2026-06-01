@@ -105,14 +105,14 @@ class ChatViewModel @Inject constructor(
                     .orEmpty()
                 _state.update {
                     val resolvedActiveId = when {
+                        routeChatId.isNotBlank() -> routeChatId
                         it.activeChatId.isBlank() -> items.firstOrNull()?.id.orEmpty()
                         items.any { item -> item.id == it.activeChatId } -> it.activeChatId
                         else -> items.firstOrNull()?.id.orEmpty()
                     }
                     val activeChat = items.firstOrNull { item -> item.id == resolvedActiveId }
-                        ?: items.firstOrNull()
                     it.copy(
-                        activeChatId = activeChat?.id.orEmpty(),
+                        activeChatId = resolvedActiveId,
                         chatName = activeChat?.name.orEmpty(),
                         chatAvatarUrl = activeChat?.avatarUrl
                     )
@@ -141,19 +141,13 @@ class ChatViewModel @Inject constructor(
                         return@update it.copy(isRefreshing = true)
                     }
 
-                    val activeId = (state as? com.mtv.based.core.network.utils.LoadState.Success)
-                        ?.data
-                        ?.content
-                        ?.firstOrNull()
-                        ?.id
-                        .orEmpty()
                     val messages = (state as? com.mtv.based.core.network.utils.LoadState.Success)
                         ?.data
                         ?.content
                         .orEmpty()
 
                     it.copy(
-                        activeChatId = it.activeChatId.ifBlank { activeId },
+                        activeChatId = resolvedChatId,
                         chats = when (state) {
                             is com.mtv.based.core.network.utils.LoadState.Success -> {
                                 com.mtv.based.core.network.utils.LoadState.Success(messages)

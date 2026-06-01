@@ -58,10 +58,7 @@ class ChatRemoteDataSource @Inject constructor(
 
     suspend fun ensureConversation(cafeId: String) =
         request<ApiResponse<ChatConversationResponse>>(
-            endpoint = ApiEndPoint.Chat.EnsureConversation,
-            options = RequestOptions(
-                query = mapOf("cafeId" to cafeId)
-            )
+            endpoint = ApiEndPoint.Chat.EnsureConversation(cafeId)
         ).requireData()
 
     suspend fun getChatsPage(
@@ -83,18 +80,12 @@ class ChatRemoteDataSource @Inject constructor(
 
     suspend fun ensureOrderConversation(orderId: String) =
         request<ApiResponse<ChatConversationResponse>>(
-            endpoint = ApiEndPoint.Chat.EnsureOrderConversation,
-            options = RequestOptions(
-                query = mapOf("orderId" to orderId)
-            )
+            endpoint = ApiEndPoint.Chat.EnsureOrderConversation(orderId)
         ).requireData()
 
     suspend fun ensureSellerConversation(orderId: String) =
         request<ApiResponse<ChatConversationResponse>>(
-            endpoint = ApiEndPoint.Chat.EnsureSellerConversation,
-            options = RequestOptions(
-                query = mapOf("orderId" to orderId)
-            )
+            endpoint = ApiEndPoint.Chat.EnsureSellerConversation(orderId)
         ).requireData()
 
     suspend fun readAll(body: ChatMessageMarkAsReadRequest, asSeller: Boolean = false) =
