@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface CafeRepository {
 
+    fun getCafeList(): Flow<Resource<List<Cafe>>>
+
     fun getCafe(id: String): Flow<Resource<Cafe>>
 
     fun createCafe(param: CafeAddParam): Flow<Resource<Unit>>

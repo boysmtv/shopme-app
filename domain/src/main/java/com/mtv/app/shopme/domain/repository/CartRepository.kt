@@ -35,4 +35,6 @@ interface CartRepository {
     fun verifyPin(param: VerifyPinParam): Flow<Resource<Unit>>
 
     fun getSessionToken(): Flow<Resource<SessionToken>>
+
+    fun deleteCartItem(cartId: String): Flow<Resource<Unit>>
 }

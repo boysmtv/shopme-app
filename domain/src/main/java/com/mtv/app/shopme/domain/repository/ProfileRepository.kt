@@ -16,6 +16,7 @@ import com.mtv.app.shopme.domain.model.Village
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
 import com.mtv.app.shopme.domain.param.AddressDeleteParam
+import com.mtv.app.shopme.domain.param.AddressUpdateParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
 import com.mtv.based.core.network.utils.Resource
@@ -40,6 +41,8 @@ interface ProfileRepository {
     fun addAddress(param: AddressAddParam): Flow<Resource<Unit>>
 
     fun deleteAddress(param: AddressDeleteParam): Flow<Resource<Unit>>
+
+    fun updateAddress(id: String, param: AddressUpdateParam): Flow<Resource<Address>>
 
     fun setDefaultAddress(param: AddressDefaultParam): Flow<Resource<Unit>>
 

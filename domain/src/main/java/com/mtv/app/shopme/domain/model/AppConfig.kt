@@ -9,8 +9,8 @@
 package com.mtv.app.shopme.domain.model
 
 data class AppConfig(
-    val minVersion: Int,
-    val latestVersion: Int,
+    val minVersion: Long,
+    val latestVersion: Long,
     val forceUpdate: Boolean,
     val maintenanceMode: Boolean,
     val maintenanceMessage: String?

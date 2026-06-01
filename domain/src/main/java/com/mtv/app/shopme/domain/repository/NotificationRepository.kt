@@ -13,4 +13,6 @@ interface NotificationRepository {
     fun getSellerNotifications(page: Int, size: Int): Flow<Resource<PagedData<SellerNotifItem>>>
     fun getUnreadCount(): Flow<Resource<Int>>
     fun clearNotifications(): Flow<Resource<Unit>>
+    fun markNotificationRead(id: String): Flow<Resource<Unit>>
+    fun deleteNotification(id: String): Flow<Resource<Unit>>
 }

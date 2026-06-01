@@ -15,6 +15,7 @@ import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.model.ProductStats
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.param.DiscoveryParam
+import com.mtv.app.shopme.domain.param.FoodBulkStatusParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.based.core.network.utils.Resource
@@ -51,5 +52,15 @@ interface FoodRepository {
     fun updateFood(foodId: String, param: FoodUpsertParam): Flow<Resource<Unit>>
 
     fun deleteFood(foodId: String): Flow<Resource<Unit>>
+
+    fun getRecentSearches(size: Int): Flow<Resource<List<String>>>
+
+    fun getSearchSuggestions(query: String, size: Int): Flow<Resource<List<String>>>
+
+    fun getFoodsByCategory(category: String, page: Int, size: Int): Flow<Resource<PagedData<Food>>>
+
+    fun getFavoriteFoodsPaged(page: Int, size: Int): Flow<Resource<PagedData<Food>>>
+
+    fun bulkUpdateActive(param: FoodBulkStatusParam): Flow<Resource<Unit>>
 
 }

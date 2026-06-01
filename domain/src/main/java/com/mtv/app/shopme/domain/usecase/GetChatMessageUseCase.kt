@@ -8,18 +8,23 @@
 
 package com.mtv.app.shopme.domain.usecase
 
+import com.mtv.app.shopme.domain.model.ChatMessage
+import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.repository.ChatRepository
+import com.mtv.based.core.network.utils.Resource
 import javax.inject.Inject
+import kotlinx.coroutines.flow.Flow
 
 class GetChatMessageUseCase @Inject constructor(
     private val repository: ChatRepository
 ) {
-    operator fun invoke(chatId: String? = null, asSeller: Boolean = false) = repository.getChats(chatId, asSeller)
+    operator fun invoke(chatId: String? = null, asSeller: Boolean = false): Flow<Resource<List<ChatMessage>>> =
+        repository.getChats(chatId, asSeller)
 
     fun page(
         chatId: String,
         asSeller: Boolean = false,
         page: Int,
         size: Int
-    ) = repository.getChatsPage(chatId, asSeller, page, size)
+    ): Flow<Resource<PagedData<ChatMessage>>> = repository.getChatsPage(chatId, asSeller, page, size)
 }
