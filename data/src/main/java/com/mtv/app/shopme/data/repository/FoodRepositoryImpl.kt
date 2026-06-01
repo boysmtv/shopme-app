@@ -17,12 +17,15 @@ import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.mapper.toSearchDomain
 import com.mtv.app.shopme.data.remote.datasource.FoodRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.FoodResponse
+import com.mtv.app.shopme.data.remote.request.FoodBulkStatusRequest
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.PagedData
+import kotlinx.serialization.builtins.ListSerializer
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.domain.param.DiscoveryParam
+import com.mtv.app.shopme.domain.param.FoodBulkStatusParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.repository.FoodRepository
@@ -43,17 +46,25 @@ class FoodRepositoryImpl @Inject constructor(
     override fun getFoods() =
         flow {
             emit(Resource.Loading)
-            val cached = homeDao.getFoodsOnce().map { it.toDomain() }
+            val cacheKey = FOOD_LIST_CACHE_KEY
+            val cached = PayloadCacheStore.read(
+                homeDao = homeDao,
+                cacheKey = cacheKey,
+                serializer = ListSerializer(FoodResponse.serializer())
+            ).orEmpty()
             if (cached.isNotEmpty()) {
-                emit(Resource.Success(cached))
+                emit(Resource.Success(cached.map { it.toDomain() }))
             }
 
             try {
                 val remoteFoods = remote.getFoods()
-                val mapped = remoteFoods.map { it.toDomain() }
-                homeDao.clearFoods()
-                homeDao.insertFoods(mapped.map { it.toEntity() })
-                emit(Resource.Success(mapped))
+                PayloadCacheStore.write(
+                    homeDao = homeDao,
+                    cacheKey = cacheKey,
+                    serializer = ListSerializer(FoodResponse.serializer()),
+                    value = remoteFoods
+                )
+                emit(Resource.Success(remoteFoods.map { it.toDomain() }))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
                     emit(Resource.Error(errorMapper.map(throwable)))
@@ -129,7 +140,7 @@ class FoodRepositoryImpl @Inject constructor(
 
     override fun getSimilarFoods(cafeId: String) =
         resultFlow.create {
-            remote.getSimilarFoods(cafeId).map { it.toDomain() }
+            remote.importFoodsByCafe(cafeId).map { it.toDomain() }
         }
 
     override fun searchFoods(request: SearchParam): Flow<Resource<PagedData<SearchFood>>> =
@@ -193,18 +204,83 @@ class FoodRepositoryImpl @Inject constructor(
     override fun createFood(param: FoodUpsertParam) =
         resultFlow.create {
             remote.createFood(param)
+            PayloadCacheStore.clear(homeDao, FOOD_LIST_CACHE_KEY)
         }
 
     override fun updateFood(foodId: String, param: FoodUpsertParam) =
         resultFlow.create {
             remote.updateFood(foodId, param)
+            PayloadCacheStore.clear(homeDao, FOOD_LIST_CACHE_KEY)
         }
 
     override fun deleteFood(foodId: String) =
         resultFlow.create {
             remote.deleteFood(foodId)
+            PayloadCacheStore.clear(homeDao, FOOD_LIST_CACHE_KEY)
+        }
+
+    override fun getRecentSearches(size: Int) =
+        resultFlow.create {
+            remote.getRecentSearches(size)
+        }
+
+    override fun getSearchSuggestions(query: String, size: Int) =
+        resultFlow.create {
+            remote.getSearchSuggestions(query, size)
+        }
+
+    override fun getFoodsByCategory(category: String, page: Int, size: Int) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val response = remote.getFoodsByCategory(category, page, size)
+                emit(
+                    Resource.Success(
+                        PagedData(
+                            content = response.content.map { it.toDomain() },
+                            page = response.page,
+                            last = response.last
+                        )
+                    )
+                )
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun getFavoriteFoodsPaged(page: Int, size: Int) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val response = remote.getFavoriteFoodsPaged(page, size)
+                emit(
+                    Resource.Success(
+                        PagedData(
+                            content = response.content.map { it.toDomain() },
+                            page = response.page,
+                            last = response.last
+                        )
+                    )
+                )
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun bulkUpdateActive(param: FoodBulkStatusParam) =
+        resultFlow.create {
+            remote.bulkUpdateActive(
+                FoodBulkStatusRequest(
+                    foodIds = param.foodIds,
+                    isActive = param.isActive
+                )
+            )
+            PayloadCacheStore.clear(homeDao, FOOD_LIST_CACHE_KEY)
         }
 
     private fun foodDetailCacheKey(id: String) = "food:detail:$id"
 
+    companion object {
+        private const val FOOD_LIST_CACHE_KEY = "food:list:home"
+    }
 }

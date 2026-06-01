@@ -24,17 +24,17 @@ data class CustomerResponse(
 
 @Serializable
 data class StatsResponse(
-    val totalOrders: Int,
-    val activeOrders: Int,
+    val totalOrders: Long,
+    val activeOrders: Long,
     val membership: String
 )
 
 @Serializable
 data class MenuSummaryResponse(
-    val unpaid: Int = 0,
-    val ordered: Int,
-    val cooking: Int,
-    val shipping: Int,
-    val completed: Int,
-    val cancelled: Int
+    val unpaid: Long = 0,
+    val ordered: Long,
+    val cooking: Long,
+    val shipping: Long,
+    val completed: Long,
+    val cancelled: Long
 )

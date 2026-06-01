@@ -44,6 +44,7 @@ import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.CartVariant
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodOption
@@ -109,11 +110,11 @@ fun OrderSummaryResponse.toDomain(): Order = Order(
     cafeName = cafeName.orEmpty(),
     items = items.map {
         OrderItem(
-            id = "",
-            foodId = "",
+            id = it.id,
+            foodId = it.foodId,
             foodName = it.foodName.orEmpty(),
             quantity = it.quantity,
-            price = 0.0,
+            price = it.price.toDouble(),
             notes = null,
             status = com.mtv.app.shopme.domain.model.OrderItemStatus.AVAILABLE
         )
@@ -166,12 +167,12 @@ fun CafeResponse.toDomain(): Cafe = Cafe(
 )
 
 fun CafeAddressResponse.toDomain(): CafeAddress = CafeAddress(
-    id = id,
-    name = name,
-    block = block,
-    number = number,
-    rt = rt,
-    rw = rw
+    id = id.orEmpty(),
+    name = name.orEmpty(),
+    block = block.orEmpty(),
+    number = number.orEmpty(),
+    rt = rt.orEmpty(),
+    rw = rw.orEmpty()
 )
 
 fun CartItemResponse.toDomain(): Cart = Cart(
@@ -313,6 +314,16 @@ fun ChatResponse.toDomain(): List<ChatListItem> {
     return chatList.map { it.toDomain() }
 }
 
+fun ChatItem.toChatMessage(): ChatMessage {
+    return ChatMessage(
+        id = messageId.orEmpty().ifBlank { "$id:${time.orEmpty()}:${message.hashCode()}" },
+        message = message,
+        time = time.orEmpty(),
+        isFromUser = isFromUser,
+        isRead = isRead
+    )
+}
+
 fun ChatItem.toDomain(): ChatListItem {
     return ChatListItem(
         id = messageId.orEmpty().ifBlank { "$id:${time.orEmpty()}:${message.hashCode()}" },
@@ -353,7 +364,7 @@ fun SellerPaymentMethodResponse.toDomain(): SellerPaymentMethod = SellerPaymentM
 
 fun SellerOrderSummaryResponse.toDomain(): SellerOrderItem = SellerOrderItem(
     id = orderId,
-    invoice = orderId,
+    invoice = "INV-${orderId.takeLast(8).uppercase()}",
     customer = customerName,
     total = total,
     date = date,

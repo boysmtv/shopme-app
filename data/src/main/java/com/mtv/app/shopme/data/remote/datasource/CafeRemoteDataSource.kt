@@ -47,4 +47,9 @@ class CafeRemoteDataSource @Inject constructor(
         body = param.toRequest()
     ).requireData()
 
+    suspend fun getCafeList(): List<CafeResponse> =
+        request<ApiResponse<List<CafeResponse>>>(
+            endpoint = ApiEndPoint.Cafe.GetList
+        ).requireData()
+
 }

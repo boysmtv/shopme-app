@@ -169,6 +169,18 @@ class CartRepositoryImpl @Inject constructor(
             remote.getSessionToken().toDomain()
         }
 
+    override fun deleteCartItem(cartId: String) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                remote.deleteCartItem(cartId)
+                patchCartItemDelete(cartId)
+                emit(Resource.Success(Unit))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(errorMapper.map(throwable)))
+            }
+        }.flowOn(Dispatchers.IO)
+
     companion object {
         private const val CART_CACHE_KEY = "cart:list"
     }
@@ -191,6 +203,12 @@ class CartRepositoryImpl @Inject constructor(
         val cached = readCartCache()
         if (cached.isEmpty()) return
         overwriteCartCache(cached.filterNot { it.cafeId == cafeId })
+    }
+
+    private suspend fun patchCartItemDelete(cartId: String) {
+        val cached = readCartCache()
+        if (cached.isEmpty()) return
+        overwriteCartCache(cached.filterNot { it.id == cartId })
     }
 
     private suspend fun patchCartAdd(param: CartAddParam) {

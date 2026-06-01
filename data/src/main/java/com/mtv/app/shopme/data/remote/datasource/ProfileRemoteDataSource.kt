@@ -22,6 +22,8 @@ import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
 import com.mtv.app.shopme.domain.param.AddressDeleteParam
+import com.mtv.app.shopme.domain.param.AddressUpdateParam
+import com.mtv.app.shopme.data.remote.request.AddressUpdateRequest
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
 import com.mtv.based.core.network.repository.NetworkRepository
@@ -106,6 +108,12 @@ class ProfileRemoteDataSource @Inject constructor(
     suspend fun removeFavoriteFood(foodId: String) =
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Customer.RemoveFavorite(foodId)
+        ).requireData()
+
+    suspend fun updateAddress(id: String, body: AddressUpdateRequest): AddressResponse =
+        request<ApiResponse<AddressResponse>>(
+            endpoint = ApiEndPoint.Address.Update(id),
+            body = body
         ).requireData()
 
 }

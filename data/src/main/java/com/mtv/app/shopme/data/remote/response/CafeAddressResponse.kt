@@ -12,10 +12,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CafeAddressResponse(
-    val id: String,
-    val name: String,
-    val block: String,
-    val number: String,
-    val rt: String,
-    val rw: String
+    val id: String? = null,
+    val name: String? = null,
+    val block: String? = null,
+    val number: String? = null,
+    val rt: String? = null,
+    val rw: String? = null
 )

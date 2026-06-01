@@ -18,6 +18,7 @@ import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.utils.requireData
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.data.remote.request.FoodBulkStatusRequest
 import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
@@ -102,7 +103,7 @@ class FoodRemoteDataSource @Inject constructor(
             endpoint = ApiEndPoint.Foods.Delete(foodId)
         ).requireData()
 
-    suspend fun getSimilarFoods(cafeId: String) =
+    suspend fun importFoodsByCafe(cafeId: String) =
         request<ApiResponse<PageResponse<FoodResponse>>>(
             endpoint = ApiEndPoint.Foods.GetByCafeIdPage(cafeId),
             options = RequestOptions(
@@ -138,6 +139,36 @@ class FoodRemoteDataSource @Inject constructor(
             }
         )
     ).requireData()
+
+    suspend fun getRecentSearches(size: Int) =
+        request<ApiResponse<List<String>>>(
+            endpoint = ApiEndPoint.Foods.SearchRecent,
+            options = RequestOptions(query = mapOf("size" to size.toString()))
+        ).requireData()
+
+    suspend fun getSearchSuggestions(query: String, size: Int) =
+        request<ApiResponse<List<String>>>(
+            endpoint = ApiEndPoint.Foods.SearchSuggestions,
+            options = RequestOptions(query = mapOf("q" to query, "size" to size.toString()))
+        ).requireData()
+
+    suspend fun getFoodsByCategory(category: String, page: Int, size: Int) =
+        request<ApiResponse<PageResponse<FoodResponse>>>(
+            endpoint = ApiEndPoint.Foods.ByCategory(category),
+            options = RequestOptions(query = mapOf("page" to page.toString(), "size" to size.toString()))
+        ).requireData()
+
+    suspend fun getFavoriteFoodsPaged(page: Int, size: Int) =
+        request<ApiResponse<PageResponse<FoodResponse>>>(
+            endpoint = ApiEndPoint.Foods.FavoritesPaged,
+            options = RequestOptions(query = mapOf("page" to page.toString(), "size" to size.toString()))
+        ).requireData()
+
+    suspend fun bulkUpdateActive(body: FoodBulkStatusRequest) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Foods.BulkActive,
+            body = body
+        ).requireData()
 
     private companion object {
         const val DEFAULT_HOME_SIZE = 20

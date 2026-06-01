@@ -39,4 +39,14 @@ class NotificationRemoteDataSource @Inject constructor(
         request<ApiResponse<Unit>>(
             endpoint = ApiEndPoint.Notifications.ReadAll
         ).requireData()
+
+    suspend fun markNotificationRead(id: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Notifications.MarkRead(id)
+        ).requireData()
+
+    suspend fun deleteNotification(id: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Notifications.Delete(id)
+        ).requireData()
 }

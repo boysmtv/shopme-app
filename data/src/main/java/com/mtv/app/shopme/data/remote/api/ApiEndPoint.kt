@@ -21,6 +21,7 @@ object ApiEndPoint {
     private const val NOTIFICATIONS = "notifications"
     private const val SUPPORT = "support"
     private const val MEDIA = "media"
+    private const val ADMIN = "admin"
 
     object Auth {
 
@@ -134,10 +135,15 @@ object ApiEndPoint {
         object GetAll : IApiEndPoint { override val path = "$API/$FOODS"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Create : IApiEndPoint { override val path = "$API/$FOODS"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object Search : IApiEndPoint { override val path = "$API/$FOODS/search"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object SearchRecent : IApiEndPoint { override val path = "$API/$FOODS/search/recent"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object SearchSuggestions : IApiEndPoint { override val path = "$API/$FOODS/search/suggestions"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object FavoritesPaged : IApiEndPoint { override val path = "$API/$FOODS/favorites"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object BulkActive : IApiEndPoint { override val path = "$API/$FOODS/bulk/active"; override val method = HttpMethod.Patch; override val type = EndpointType.Json }
         class Discovery(section: String) : IApiEndPoint { override val path = "$API/$FOODS/discovery/$section"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class Detail(foodId: String) : IApiEndPoint { override val path = "$API/$FOODS/$foodId"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class Update(foodId: String) : IApiEndPoint { override val path = "$API/$FOODS/$foodId"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
         class Delete(foodId: String) : IApiEndPoint { override val path = "$API/$FOODS/$foodId"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
+        class ByCategory(category: String) : IApiEndPoint { override val path = "$API/$FOODS/category/$category"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class GetByCafeId(cafeId: String) : IApiEndPoint { override val path = "$API/$FOODS/$CAFE/$cafeId"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class GetByCafeIdPage(cafeId: String) : IApiEndPoint { override val path = "$API/$FOODS/$CAFE/$cafeId/page"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class GetCafeStats(cafeId: String) : IApiEndPoint { override val path = "$API/$FOODS/$CAFE/$cafeId/stats"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
@@ -148,6 +154,7 @@ object ApiEndPoint {
         object Add : IApiEndPoint { override val path = "$API/$CART"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         class Quantity(cartId: String) : IApiEndPoint { override val path = "$API/$CART/$cartId"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
         object Clear : IApiEndPoint { override val path = "$API/$CART/clear"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
+        class Delete(cartId: String) : IApiEndPoint { override val path = "$API/$CART/$cartId"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
         class DeleteByCafeId(cafeId: String) : IApiEndPoint { override val path = "$API/$CART/$CAFE/$cafeId"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
     }
 
@@ -163,6 +170,7 @@ object ApiEndPoint {
     }
 
     object Cafe {
+        object GetList : IApiEndPoint { override val path = "$API/$CAFE"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Create : IApiEndPoint { override val path = "$API/$CAFE"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         class Detail(cafeId: String) : IApiEndPoint { override val path = "$API/$CAFE/$cafeId"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         class Update(cafeId: String) : IApiEndPoint { override val path = "$API/$CAFE/$cafeId"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
@@ -197,6 +205,8 @@ object ApiEndPoint {
         object GetPage : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/page"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object UnreadCount : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/unread-count"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object ReadAll : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/read-all"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
+        class MarkRead(id: String) : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/$id/read"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
+        class Delete(id: String) : IApiEndPoint { override val path = "$API/$NOTIFICATIONS/$id"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
     }
 
     object Media {
@@ -211,6 +221,12 @@ object ApiEndPoint {
             override val method = HttpMethod.Post
             override val type = EndpointType.Multipart
         }
+
+        class Download(variant: String, key: String) : IApiEndPoint {
+            override val path = "$API/$MEDIA/$variant?key=$key"
+            override val method = HttpMethod.Get
+            override val type = EndpointType.Json
+        }
     }
 
     object Address {
@@ -218,13 +234,24 @@ object ApiEndPoint {
         object Create : IApiEndPoint { override val path = "$API/$ADDRESS"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         class Delete(id: String) : IApiEndPoint { override val path = "$API/$ADDRESS/$id"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
         class SetDefault(id: String) : IApiEndPoint { override val path = "$API/$ADDRESS/$id/default"; override val method = HttpMethod.Patch; override val type = EndpointType.Json }
+        class Update(id: String) : IApiEndPoint { override val path = "$API/$ADDRESS/$id"; override val method = HttpMethod.Put; override val type = EndpointType.Json }
     }
 
-    object Village { object Get : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Get; override val type = EndpointType.Json } }
+    object Village {
+        object Get : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object Create : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
+        class Delete(id: String) : IApiEndPoint { override val path = "$API/$VILLAGE/$id"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
+        object Clear : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
+    }
     object Misc {
         object Splash : IApiEndPoint { override val path = "$API/splash"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
         object Support : IApiEndPoint { override val path = "$API/$SUPPORT"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object SupportChat : IApiEndPoint { override val path = "$API/$SUPPORT/chat"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object SendSupportChat : IApiEndPoint { override val path = "$API/$SUPPORT/chat"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
+    }
+
+    object Admin {
+        object Capabilities : IApiEndPoint { override val path = "$API/$ADMIN/capabilities"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
+        object SecurityBoundaries : IApiEndPoint { override val path = "$API/$ADMIN/security-boundaries"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
     }
 }

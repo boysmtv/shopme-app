@@ -22,6 +22,7 @@ import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
@@ -52,17 +53,17 @@ fun CustomerEntity.toDomain(): Customer = Customer(
     photo = photo,
     verified = verified,
     stats = Stats(
-        totalOrders = totalOrders,
-        activeOrders = activeOrders,
+        totalOrders = totalOrders.toLong(),
+        activeOrders = activeOrders.toLong(),
         membership = membership
     ),
     menuSummary = MenuSummary(
-        unpaid = 0,
-        ordered = ordered,
-        cooking = cooking,
-        shipping = shipping,
-        completed = completed,
-        cancelled = cancelled
+        unpaid = 0L,
+        ordered = ordered.toLong(),
+        cooking = cooking.toLong(),
+        shipping = shipping.toLong(),
+        completed = completed.toLong(),
+        cancelled = cancelled.toLong()
     )
 )
 
@@ -100,14 +101,14 @@ fun Customer.toEntity(): CustomerEntity = CustomerEntity(
     addressRw = address?.rw.orEmpty(),
     photo = photo,
     verified = verified,
-    totalOrders = stats?.totalOrders ?: 0,
-    activeOrders = stats?.activeOrders ?: 0,
+    totalOrders = (stats?.totalOrders ?: 0L).toInt(),
+    activeOrders = (stats?.activeOrders ?: 0L).toInt(),
     membership = stats?.membership.orEmpty(),
-    ordered = menuSummary?.ordered ?: 0,
-    cooking = menuSummary?.cooking ?: 0,
-    shipping = menuSummary?.shipping ?: 0,
-    completed = menuSummary?.completed ?: 0,
-    cancelled = menuSummary?.cancelled ?: 0,
+    ordered = (menuSummary?.ordered ?: 0L).toInt(),
+    cooking = (menuSummary?.cooking ?: 0L).toInt(),
+    shipping = (menuSummary?.shipping ?: 0L).toInt(),
+    completed = (menuSummary?.completed ?: 0L).toInt(),
+    cancelled = (menuSummary?.cancelled ?: 0L).toInt(),
     updatedAt = System.currentTimeMillis()
 )
 
@@ -141,7 +142,15 @@ fun ChatListCacheEntity.toDomain(): ChatListItem = ChatListItem(
     avatarUrl = avatarUrl
 )
 
-fun ChatListItem.toMessageEntity(
+fun ChatMessageCacheEntity.toChatMessage(): ChatMessage = ChatMessage(
+    id = messageId,
+    message = message,
+    time = time,
+    isFromUser = isFromUser,
+    isRead = isRead
+)
+
+fun ChatMessage.toMessageEntity(
     scope: String,
     conversationId: String,
     position: Int
@@ -150,23 +159,12 @@ fun ChatListItem.toMessageEntity(
     scope = scope,
     conversationId = conversationId,
     messageId = id.ifBlank { "$conversationId-$position" },
-    message = lastMessage,
+    message = message,
     time = time,
     isFromUser = isFromUser,
     isRead = isRead,
     position = position,
     updatedAt = System.currentTimeMillis()
-)
-
-fun ChatMessageCacheEntity.toDomain(): ChatListItem = ChatListItem(
-    id = messageId,
-    name = "",
-    lastMessage = message,
-    time = time,
-    unreadCount = 0,
-    avatarUrl = null,
-    isFromUser = isFromUser,
-    isRead = isRead
 )
 
 fun NotificationItem.toEntity(scope: String, notificationId: String): AppNotificationCacheEntity = AppNotificationCacheEntity(

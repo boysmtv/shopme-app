@@ -15,6 +15,7 @@ import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.CartVariant
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
@@ -333,69 +334,48 @@ object DataUiMock {
         )
     }
 
-    fun chatDetail(): List<ChatListItem> {
+    fun chatDetail(): List<ChatMessage> {
         return listOf(
-            ChatListItem(
+            ChatMessage(
                 id = "1",
-                name = "Cafe Kopi Kita",
-                lastMessage = "Halo kak 👋",
+                message = "Halo kak 👋",
                 time = "10:00",
-                unreadCount = 0,
-                avatarUrl = null,
                 isFromUser = false
             ),
-            ChatListItem(
+            ChatMessage(
                 id = "2",
-                name = "Cafe Kopi Kita",
-                lastMessage = "Pesanan kamu sedang diproses ya 🍔",
+                message = "Pesanan kamu sedang diproses ya 🍔",
                 time = "10:01",
-                unreadCount = 0,
-                avatarUrl = null,
                 isFromUser = false
             ),
-            ChatListItem(
+            ChatMessage(
                 id = "3",
-                name = "User",
-                lastMessage = "Oke kak, ditunggu ya 🙌",
+                message = "Oke kak, ditunggu ya 🙌",
                 time = "10:02",
-                unreadCount = 0,
-                avatarUrl = null,
                 isFromUser = true
             ),
-            ChatListItem(
+            ChatMessage(
                 id = "4",
-                name = "Cafe Kopi Kita",
-                lastMessage = "Siap kak 👍",
+                message = "Siap kak 👍",
                 time = "10:03",
-                unreadCount = 0,
-                avatarUrl = null,
                 isFromUser = false
             ),
-            ChatListItem(
+            ChatMessage(
                 id = "5",
-                name = "User",
-                lastMessage = "Pesanan sudah selesai kak?",
+                message = "Pesanan sudah selesai kak?",
                 time = "10:04",
-                unreadCount = 0,
-                avatarUrl = null,
                 isFromUser = true
             ),
-            ChatListItem(
+            ChatMessage(
                 id = "6",
-                name = "Cafe Kopi Kita",
-                lastMessage = "Sudah siap diambil ya 🎉",
+                message = "Sudah siap diambil ya 🎉",
                 time = "10:05",
-                unreadCount = 0,
-                avatarUrl = null,
                 isFromUser = false
             ),
-            ChatListItem(
+            ChatMessage(
                 id = "7",
-                name = "User",
-                lastMessage = "Otw 🚀",
+                message = "Otw 🚀",
                 time = "10:06",
-                unreadCount = 0,
-                avatarUrl = null,
                 isFromUser = true
             )
         )

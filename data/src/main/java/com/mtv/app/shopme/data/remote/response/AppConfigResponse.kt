@@ -12,8 +12,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppConfigResponse(
-    val minVersion: Int = 0,
-    val latestVersion: Int = 0,
+    val minVersion: Long = 0,
+    val latestVersion: Long = 0,
     val forceUpdate: Boolean = false,
     val maintenanceMode: Boolean = false,
     val maintenanceMessage: String? = null

@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.data.mapper
 
 import com.mtv.app.shopme.data.remote.request.AddressAddRequest
+import com.mtv.app.shopme.data.remote.request.AddressUpdateRequest
 import com.mtv.app.shopme.data.remote.request.CafeAddRequest
 import com.mtv.app.shopme.data.remote.request.CafeAddressUpsertRequest
 import com.mtv.app.shopme.data.remote.request.CartQuantityRequest
@@ -17,6 +18,7 @@ import com.mtv.app.shopme.data.remote.request.ChangePinRequest
 import com.mtv.app.shopme.data.remote.request.CreateOrderRequest
 import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
 import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
+import com.mtv.app.shopme.data.remote.request.FoodBulkStatusRequest
 import com.mtv.app.shopme.data.remote.request.FoodImageRequest
 import com.mtv.app.shopme.data.remote.request.FoodOptionRequest
 import com.mtv.app.shopme.data.remote.request.FoodUpsertRequest
@@ -31,6 +33,7 @@ import com.mtv.app.shopme.data.remote.request.SellerPaymentMethodRequest
 import com.mtv.app.shopme.data.remote.request.VerifyOtpRequest
 import com.mtv.app.shopme.data.remote.request.VerifyPinRequest
 import com.mtv.app.shopme.domain.param.AddressAddParam
+import com.mtv.app.shopme.domain.param.AddressUpdateParam
 import com.mtv.app.shopme.domain.param.CafeAddParam
 import com.mtv.app.shopme.domain.param.CafeAddressUpsertParam
 import com.mtv.app.shopme.domain.param.CartAddParam
@@ -39,6 +42,7 @@ import com.mtv.app.shopme.domain.param.ChangePasswordParam
 import com.mtv.app.shopme.domain.param.ChangePinParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
+import com.mtv.app.shopme.domain.param.FoodBulkStatusParam
 import com.mtv.app.shopme.domain.param.ForgotPasswordParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.LoginParam
@@ -178,6 +182,20 @@ fun AddressAddParam.toRequest() = AddressAddRequest(
     rt = rt,
     rw = rw,
     isDefault = isDefault
+)
+
+fun AddressUpdateParam.toRequest() = AddressUpdateRequest(
+    villageId = villageId,
+    block = block,
+    number = number,
+    rt = rt,
+    rw = rw,
+    isDefault = isDefault
+)
+
+fun FoodBulkStatusParam.toRequest() = FoodBulkStatusRequest(
+    foodIds = foodIds,
+    isActive = isActive
 )
 
 fun LoginParam.toRequest() = LoginRequest(

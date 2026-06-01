@@ -17,11 +17,13 @@ import com.mtv.app.shopme.data.mapper.toSearchDomain
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.remote.datasource.ProfileRemoteDataSource
+import com.mtv.app.shopme.data.remote.request.AddressUpdateRequest
 import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.data.sync.PendingMutationAction
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
 import com.mtv.app.shopme.domain.param.AddressDeleteParam
+import com.mtv.app.shopme.domain.param.AddressUpdateParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
 import com.mtv.app.shopme.domain.repository.ProfileRepository
@@ -140,6 +142,21 @@ class ProfileRepositoryImpl @Inject constructor(
                 emit(Resource.Error(errorMapper.map(throwable)))
             }
         }.flowOn(Dispatchers.IO)
+
+    override fun updateAddress(id: String, param: AddressUpdateParam) =
+        resultFlow.create {
+            remote.updateAddress(
+                id = id,
+                body = AddressUpdateRequest(
+                    villageId = param.villageId,
+                    block = param.block,
+                    number = param.number,
+                    rt = param.rt,
+                    rw = param.rw,
+                    isDefault = param.isDefault
+                )
+            ).toDomain()
+        }
 
     override fun getFavoriteFoodIds() =
         resultFlow.create {

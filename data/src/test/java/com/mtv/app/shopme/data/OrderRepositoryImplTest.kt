@@ -128,8 +128,11 @@ class OrderRepositoryImplTest {
         itemCount = 3,
         items = listOf(
             OrderSummaryItemResponse(
+                id = "item-1",
+                foodId = "food-1",
                 foodName = "Latte",
-                quantity = 1
+                quantity = 1,
+                price = BigDecimal(42000)
             )
         )
     )

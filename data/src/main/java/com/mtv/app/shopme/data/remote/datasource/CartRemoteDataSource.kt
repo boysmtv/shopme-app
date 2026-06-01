@@ -68,6 +68,11 @@ class CartRemoteDataSource @Inject constructor(
             endpoint = ApiEndPoint.Cart.DeleteByCafeId(cafeId)
         )
 
+    suspend fun deleteCartItem(cartId: String) =
+        request<ApiResponse<Unit>>(
+            endpoint = ApiEndPoint.Cart.Delete(cartId)
+        ).requireData()
+
     suspend fun createOrder(param: CreateOrderParam) =
         request<ApiResponse<List<OrderSummaryResponse>>>(
             endpoint = ApiEndPoint.Order.Create,

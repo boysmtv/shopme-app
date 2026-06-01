@@ -156,6 +156,16 @@ class NotificationRepositoryImpl @Inject constructor(
             homeDao.clearNotifications(SELLER_SCOPE)
         }
 
+    override fun markNotificationRead(id: String) =
+        resultFlow.create {
+            remote.markNotificationRead(id)
+        }
+
+    override fun deleteNotification(id: String) =
+        resultFlow.create {
+            remote.deleteNotification(id)
+        }
+
     companion object {
         private const val CUSTOMER_SCOPE = "customer"
         private const val SELLER_SCOPE = "seller"

@@ -26,8 +26,12 @@ data class OrderSummaryResponse(
 
 @Serializable
 data class OrderSummaryItemResponse(
+    val id: String = "",
+    val foodId: String = "",
     val foodName: String? = null,
-    val quantity: Int
+    val quantity: Int = 0,
+    @Serializable(with = BigDecimalSerializer::class)
+    val price: BigDecimal = BigDecimal.ZERO
 )
 
 @Serializable
@@ -72,7 +76,8 @@ data class OrderPaymentResponse(
 @Serializable
 data class OrderPaymentHistoryResponse(
     val status: PaymentStatus,
-    val actorRole: String = "",
+    val actorRole: String,
     val reason: String? = null,
-    val createdAt: String = ""
+    val createdAt: String
 )
+

@@ -15,6 +15,6 @@ data class UserResponse(
     val id: String,
     val name: String,
     val email: String,
-    val phone: String,
-    val photo: String
+    val phone: String? = null,
+    val photo: String? = null
 )

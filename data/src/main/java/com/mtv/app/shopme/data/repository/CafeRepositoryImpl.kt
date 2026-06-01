@@ -107,6 +107,11 @@ class CafeRepositoryImpl @Inject constructor(
             PayloadCacheStore.clear(homeDao, cafeAddressCacheKey(param.cafeId))
         }
 
+    override fun getCafeList() =
+        resultFlow.create {
+            remote.getCafeList().map { it.toDomain() }
+        }
+
     private fun cafeCacheKey(id: String) = "cafe:detail:$id"
 
     private fun cafeAddressCacheKey(id: String) = "cafe:address:$id"

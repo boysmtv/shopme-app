@@ -11,6 +11,7 @@ package com.mtv.app.shopme.data.repository
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
+import com.mtv.app.shopme.data.mapper.toChatMessage
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toEntity
 import com.mtv.app.shopme.data.mapper.toMessageEntity
@@ -21,6 +22,7 @@ import com.mtv.app.shopme.data.remote.request.ChatMessageSendRequest
 import com.mtv.app.shopme.data.remote.response.ChatItem
 import com.mtv.app.shopme.domain.repository.ChatRepository
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.based.core.network.utils.Resource
 import javax.inject.Inject
@@ -39,14 +41,14 @@ class ChatRepositoryImpl @Inject constructor(
         flow {
             emit(Resource.Loading)
             val scope = if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE
-            val cached = homeDao.getChatListOnce(scope).map { it.toDomain() }.latestFirst()
+            val cached = homeDao.getChatListOnce(scope).map { it.toDomain() }.sortedByDescending { it.time }
             if (cached.isNotEmpty()) {
                 emit(Resource.Success(com.mtv.app.shopme.domain.model.ChatList(cached)))
             }
 
             try {
                 val remoteChatList = remote.getChatList(asSeller).toDomain().let {
-                    it.copy(chatList = it.chatList.latestFirst())
+                    it.copy(chatList = it.chatList.sortedByDescending { it.time })
                 }
                 homeDao.clearChatList(scope)
                 homeDao.insertChatList(remoteChatList.chatList.map { it.toEntity(scope) })
@@ -65,7 +67,7 @@ class ChatRepositoryImpl @Inject constructor(
             val conversationId = chatId.orEmpty()
             val scope = if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE
             val cached = if (conversationId.isNotBlank()) {
-                homeDao.getChatMessagesOnce(scope, conversationId).map { it.toDomain() }
+                homeDao.getChatMessagesOnce(scope, conversationId).map { it.toChatMessage() }
             } else {
                 emptyList()
             }
@@ -77,7 +79,7 @@ class ChatRepositoryImpl @Inject constructor(
                 val remoteChats = if (conversationId.isNotBlank()) {
                     loadLatestRemoteChats(conversationId, asSeller, CHAT_PAGE_SIZE)
                 } else {
-                    remote.getChats(chatId, asSeller).toDomain()
+                    remote.getChats(chatId, asSeller).chatList.map { (it as ChatItem).toChatMessage() }
                 }
                 if (conversationId.isNotBlank()) {
                     homeDao.clearChatMessages(scope, conversationId)
@@ -104,7 +106,7 @@ class ChatRepositoryImpl @Inject constructor(
         emit(Resource.Loading)
         val scope = if (asSeller) SELLER_SCOPE else CUSTOMER_SCOPE
         val cached = if (page < 0) {
-            homeDao.getChatMessagesOnce(scope, chatId).map { it.toDomain() }
+            homeDao.getChatMessagesOnce(scope, chatId).map { it.toChatMessage() }
         } else {
             emptyList()
         }
@@ -118,7 +120,7 @@ class ChatRepositoryImpl @Inject constructor(
             } else {
                 remote.getChatsPage(chatId, asSeller, page, size)
             }
-            val messages = response.content.map { it.toDomain() }
+            val messages = response.content.map { it.toChatMessage() }
             if (page < 0) {
                 homeDao.clearChatMessages(scope, chatId)
             }
@@ -182,10 +184,10 @@ class ChatRepositoryImpl @Inject constructor(
         conversationId: String,
         asSeller: Boolean,
         size: Int
-    ): List<ChatListItem> =
+    ): List<ChatMessage> =
         loadLatestRemotePage(conversationId, asSeller, size)
             .content
-            .map { it.toDomain() }
+            .map { it.toChatMessage() }
 
     private suspend fun loadLatestRemotePage(
         conversationId: String,
@@ -202,18 +204,12 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     private fun PageResponse<ChatItem>.toPagedDomain(
-        messages: List<ChatListItem> = content.map { it.toDomain() }
-    ): PagedData<ChatListItem> = PagedData(
+        messages: List<ChatMessage> = content.map { it.toChatMessage() }
+    ): PagedData<ChatMessage> = PagedData(
         content = messages,
         page = page,
         last = page <= 0
     )
-
-    private fun List<ChatListItem>.latestFirst(): List<ChatListItem> =
-        sortedWith(
-            compareByDescending<ChatListItem> { it.time.normalizedChatTimeKey() }
-                .thenByDescending { it.id }
-        )
 
     private fun String.normalizedChatTimeKey(): String =
         trim()
