@@ -5,6 +5,7 @@ import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
@@ -61,13 +62,10 @@ class SellerChatDetailViewModelTest {
             Resource.Success(
                 PagedData(
                     content = listOf(
-                    ChatListItem(
+                    ChatMessage(
                         id = "conv-1",
-                        name = "",
-                        lastMessage = "Pesanan siap dikirim",
+                        message = "Pesanan siap dikirim",
                         time = "",
-                        unreadCount = 0,
-                        avatarUrl = null,
                         isFromUser = true
                     )
                     ),
@@ -130,13 +128,10 @@ class SellerChatDetailViewModelTest {
             Resource.Success(
                 PagedData(
                     content = listOf(
-                    ChatListItem(
+                    ChatMessage(
                         id = "stale-id",
-                        name = "",
-                        lastMessage = "Halo seller",
+                        message = "Halo seller",
                         time = "",
-                        unreadCount = 0,
-                        avatarUrl = null,
                         isFromUser = true
                     )
                     ),

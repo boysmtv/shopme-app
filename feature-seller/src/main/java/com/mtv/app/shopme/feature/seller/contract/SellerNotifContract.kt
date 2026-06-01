@@ -39,6 +39,7 @@ sealed class SellerNotifEvent {
 
 sealed class SellerNotifEffect {
     object NavigateBack : SellerNotifEffect()
+    data class NavigateToOrderDetail(val orderId: String) : SellerNotifEffect()
 }
 
 sealed class SellerNotifDialog {

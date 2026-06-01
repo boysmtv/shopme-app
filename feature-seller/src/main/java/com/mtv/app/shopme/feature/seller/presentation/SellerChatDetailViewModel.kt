@@ -14,6 +14,7 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
@@ -161,14 +162,14 @@ class SellerChatDetailViewModel @Inject constructor(
                     val messages = (state as? LoadState.Success)
                         ?.data
                         ?.content
-                        ?.map { item ->
+                        ?.map { item: ChatMessage ->
                             SellerChatDetailMessage(
-                                message = item.lastMessage,
+                                message = item.message,
                                 isFromSeller = item.isFromUser,
                                 id = item.id,
                                 time = item.time,
                                 isPending = false,
-                                isRead = true
+                                isRead = item.isRead
                             )
                         }
                         .orEmpty()
@@ -208,9 +209,9 @@ class SellerChatDetailViewModel @Inject constructor(
                     when (result) {
                         is LoadState.Loading -> it.copy(isLoadingOlder = true)
                         is LoadState.Success -> {
-                            val older = result.data.content.map { item ->
+                            val older = result.data.content.map { item: ChatMessage ->
                                 SellerChatDetailMessage(
-                                    message = item.lastMessage,
+                                    message = item.message,
                                     isFromSeller = item.isFromUser,
                                     id = item.id,
                                     time = item.time,

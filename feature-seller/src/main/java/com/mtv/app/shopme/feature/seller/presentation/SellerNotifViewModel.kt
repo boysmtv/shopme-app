@@ -57,7 +57,11 @@ class SellerNotifViewModel @Inject constructor(
             SellerNotifEvent.LoadMore -> loadMore()
             SellerNotifEvent.DismissDialog -> dismissDialog()
             SellerNotifEvent.ClearNotification -> clearNotifications()
-            is SellerNotifEvent.ClickNotification -> Unit
+            is SellerNotifEvent.ClickNotification -> {
+                if (event.item.orderId.isNotBlank()) {
+                    emitEffect(SellerNotifEffect.NavigateToOrderDetail(event.item.orderId))
+                }
+            }
             SellerNotifEvent.ClickBack -> emitEffect(SellerNotifEffect.NavigateBack)
         }
     }

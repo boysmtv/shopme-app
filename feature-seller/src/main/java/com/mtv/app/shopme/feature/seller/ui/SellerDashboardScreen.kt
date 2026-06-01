@@ -9,6 +9,8 @@
 package com.mtv.app.shopme.feature.seller.ui
 
 import android.graphics.Paint
+import com.mtv.app.shopme.feature.seller.ui.component.OrderFilterChips
+import com.mtv.app.shopme.feature.seller.ui.component.matchesOrderFilter
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -660,53 +662,7 @@ private fun buildWeeklyOrderCounts(orders: List<SellerOrderItem>): List<Pair<Str
     }
 }
 
-@Composable
-private fun OrderFilterChips(
-    selected: String,
-    onSelected: (String) -> Unit
-) {
-    val filters = listOf("All", "ORDERED", "COOKING", "DELIVERING", "COMPLETED", "CANCELLED")
 
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(filters.size) { index ->
-            val filter = filters[index]
-            val isSelected = filter.equals(selected, ignoreCase = true)
-
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(
-                        if (isSelected) AppColor.Blue
-                        else Color.LightGray.copy(alpha = 0.3f)
-                    )
-                    .clickable { onSelected(filter) }
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            ) {
-                Text(
-                    filter.toUiFilterLabel(),
-                    color = if (isSelected) AppColor.White else Color.Black,
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
-                )
-            }
-        }
-    }
-}
-
-private fun matchesOrderFilter(selectedFilter: String, status: String): Boolean {
-    if (selectedFilter == "All") return true
-    return status.equals(selectedFilter, ignoreCase = true)
-}
-
-private fun String.toUiFilterLabel(): String = when (this) {
-    "ORDERED" -> "Ordered"
-    "COOKING" -> "Cooking"
-    "DELIVERING" -> "Delivering"
-    "COMPLETED" -> "Completed"
-    "CANCELLED" -> "Cancelled"
-    else -> this
-}
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable

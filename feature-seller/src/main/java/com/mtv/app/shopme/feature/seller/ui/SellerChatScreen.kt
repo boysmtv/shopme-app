@@ -334,30 +334,6 @@ fun SellerChatDetailPreview() {
     )
 }
 
-fun mockSellerChatList(): List<SellerChatListItem> = listOf(
-    SellerChatListItem(
-        id = "1",
-        name = "Dedy Wijaya",
-        lastMessage = "Terima kasih pesanan sudah sampai",
-        time = "10:32",
-        unreadCount = 2
-    ),
-    SellerChatListItem(
-        id = "2",
-        name = "Rina Sari",
-        lastMessage = "Bisa tambah extra cheese?",
-        time = "09:45",
-        unreadCount = 0
-    ),
-    SellerChatListItem(
-        id = "3",
-        name = "Andi Saputra",
-        lastMessage = "Pesanan sudah dibayar",
-        time = "Kemarin",
-        unreadCount = 1
-    )
-)
-
 fun mockSellerChatMessages(): List<SellerChatDetailMessage> = listOf(
     SellerChatDetailMessage("Halo kak! Ada yang bisa kami bantu?", true),
     SellerChatDetailMessage("Saya mau pesan nasi goreng.", false),
