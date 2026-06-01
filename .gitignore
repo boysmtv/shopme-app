@@ -30,3 +30,6 @@ fastlane/test_output/
 fastlane/.env
 fastlane/.env.*
 !fastlane/.env.example
+
+# AI Agent vector store (may contain indexed secrets)
+.ai-agent/vector_store/

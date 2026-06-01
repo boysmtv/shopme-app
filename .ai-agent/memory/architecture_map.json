@@ -11,7 +11,6 @@
     "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt",
     "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt",
     "domain/src/main/java/com/mtv/app/shopme/domain/repository/ChatRepository.kt",
-    "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodDetailRepository.kt",
     "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt",
     "domain/src/main/java/com/mtv/app/shopme/domain/repository/MediaRepository.kt",
     "domain/src/main/java/com/mtv/app/shopme/domain/repository/NotificationRepository.kt",
@@ -104,6 +103,6 @@
     ".brief/brief.v3.md",
     ".brief/brief.v4.md"
   ],
-  "updated_at": "2026-05-31T17:13:14.094292+00:00",
-  "source_file_count": 573
+  "updated_at": "2026-06-01T13:04:40.636270+00:00",
+  "source_file_count": 588
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
-  "updated_at": "2026-05-31T17:13:14.863903+00:00",
+  "updated_at": "2026-06-01T13:04:41.366611+00:00",
   "status": "blocked",
   "rows": [
     {
@@ -12,7 +12,8 @@
       "flows": [
         "add",
         "create",
-        "run"
+        "run",
+        "update"
       ],
       "api_or_ui_paths": [
         "add"
@@ -33,11 +34,11 @@
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:addCart",
         "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt",
         "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:createCafe",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:createOrder",
-        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood"
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:SellerCreateCafeScreen"
       ],
       "tests": [
         "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
@@ -74,7 +75,6 @@
       "implementation_symbols": [
         "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt",
         "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:createCafe",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:createOrder",
@@ -134,11 +134,11 @@
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:addCart",
         "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt",
         "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:createCafe",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:createOrder",
-        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood"
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:createFood",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerCreateCafeScreen.kt:SellerCreateCafeScreen"
       ],
       "tests": [
         "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
@@ -296,9 +296,9 @@
         "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt:SellerUnreadDot",
         "scripts/verify_backend_contract.py:verify_runtime",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodBulkStatusRequest.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderItemStatus.kt",
-        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderStatus.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateOrderStatus",
         "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderHistoryScreen.kt:StatusBadge",
         "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderScreen.kt:ModernStatusBadge",
@@ -310,7 +310,7 @@
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:updateCafe",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:updateQuantity",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:updateFood",
-        "domain/src/main/java/com/mtv/app/shopme/domain/repository/ProfileRepository.kt:updateProfile"
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:bulkUpdateActive"
       ],
       "tests": [],
       "runtime_proof": [],
@@ -374,9 +374,9 @@
         "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerNotificationScreen.kt:SellerUnreadDot",
         "scripts/verify_backend_contract.py:verify_runtime",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodBulkStatusRequest.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderItemStatus.kt",
-        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderStatus.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateOrderStatus",
         "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderHistoryScreen.kt:StatusBadge",
         "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderScreen.kt:ModernStatusBadge",
@@ -388,7 +388,7 @@
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CafeRepository.kt:updateCafe",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/CartRepository.kt:updateQuantity",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:updateFood",
-        "domain/src/main/java/com/mtv/app/shopme/domain/repository/ProfileRepository.kt:updateProfile"
+        "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodRepository.kt:bulkUpdateActive"
       ],
       "tests": [],
       "runtime_proof": [],

@@ -1,6 +1,6 @@
 {
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
-  "file_count": 573,
+  "file_count": 588,
   "files": [
     {
       "path": "app/src/androidTest/java/com/mtv/app/shopme/ExampleInstrumentedTest.kt",
@@ -1964,41 +1964,41 @@
         {
           "name": "DataUiMock",
           "kind": "object",
-          "line": 29
+          "line": 30
         }
       ],
       "functions": [
         {
           "name": "customer",
-          "line": 31
+          "line": 32
         },
         {
           "name": "foods",
-          "line": 60
+          "line": 61
         },
         {
           "name": "cafe",
-          "line": 119
+          "line": 120
         },
         {
           "name": "cart",
-          "line": 139
+          "line": 140
         },
         {
           "name": "chatList",
-          "line": 272
+          "line": 273
         },
         {
           "name": "chatDetail",
-          "line": 335
+          "line": 336
         },
         {
           "name": "villages",
-          "line": 403
+          "line": 383
         },
         {
           "name": "addresses",
-          "line": 409
+          "line": 389
         }
       ],
       "data_members": []
@@ -2107,442 +2107,532 @@
         {
           "name": "Auth",
           "kind": "object",
-          "line": 24
+          "line": 25
         },
         {
           "name": "Register",
           "kind": "object",
-          "line": 26
+          "line": 27
         },
         {
           "name": "Login",
           "kind": "object",
-          "line": 32
+          "line": 33
         },
         {
           "name": "ForgotPassword",
           "kind": "object",
-          "line": 38
+          "line": 39
         },
         {
           "name": "VerifyOtp",
           "kind": "object",
-          "line": 44
+          "line": 45
         },
         {
           "name": "ResetPassword",
           "kind": "object",
-          "line": 50
+          "line": 51
         },
         {
           "name": "ChangePassword",
           "kind": "object",
-          "line": 56
+          "line": 57
         },
         {
           "name": "Customer",
           "kind": "object",
-          "line": 63
+          "line": 64
         },
         {
           "name": "Get",
           "kind": "object",
-          "line": 65
+          "line": 66
         },
         {
           "name": "Update",
           "kind": "object",
-          "line": 71
+          "line": 72
         },
         {
           "name": "Delete",
           "kind": "object",
-          "line": 77
+          "line": 78
         },
         {
           "name": "GetNotificationPreferences",
           "kind": "object",
-          "line": 83
+          "line": 84
         },
         {
           "name": "UpdateNotificationPreferences",
           "kind": "object",
-          "line": 89
+          "line": 90
         },
         {
           "name": "VerifyPin",
           "kind": "object",
-          "line": 95
+          "line": 96
         },
         {
           "name": "ChangePin",
           "kind": "object",
-          "line": 101
+          "line": 102
         },
         {
           "name": "Favorites",
           "kind": "object",
-          "line": 107
+          "line": 108
         },
         {
           "name": "FavoriteItems",
           "kind": "object",
-          "line": 113
+          "line": 114
         },
         {
           "name": "AddFavorite",
           "kind": "class",
-          "line": 119
+          "line": 120
         },
         {
           "name": "RemoveFavorite",
           "kind": "class",
-          "line": 125
+          "line": 126
         },
         {
           "name": "Foods",
           "kind": "object",
-          "line": 132
+          "line": 133
         },
         {
           "name": "GetAll",
           "kind": "object",
-          "line": 134
-        },
-        {
-          "name": "Create",
-          "kind": "object",
           "line": 135
         },
         {
-          "name": "Search",
+          "name": "Create",
           "kind": "object",
           "line": 136
         },
         {
-          "name": "Discovery",
-          "kind": "class",
+          "name": "Search",
+          "kind": "object",
           "line": 137
         },
         {
-          "name": "Detail",
-          "kind": "class",
+          "name": "SearchRecent",
+          "kind": "object",
           "line": 138
         },
         {
-          "name": "Update",
-          "kind": "class",
+          "name": "SearchSuggestions",
+          "kind": "object",
           "line": 139
         },
         {
-          "name": "Delete",
-          "kind": "class",
+          "name": "FavoritesPaged",
+          "kind": "object",
           "line": 140
         },
         {
-          "name": "GetByCafeId",
-          "kind": "class",
+          "name": "BulkActive",
+          "kind": "object",
           "line": 141
         },
         {
-          "name": "GetByCafeIdPage",
+          "name": "Discovery",
           "kind": "class",
           "line": 142
         },
         {
-          "name": "GetCafeStats",
+          "name": "Detail",
           "kind": "class",
           "line": 143
         },
         {
-          "name": "Cart",
-          "kind": "object",
-          "line": 145
-        },
-        {
-          "name": "Get",
-          "kind": "object",
-          "line": 147
-        },
-        {
-          "name": "Add",
-          "kind": "object",
-          "line": 148
-        },
-        {
-          "name": "Quantity",
-          "kind": "class",
-          "line": 149
-        },
-        {
-          "name": "Clear",
-          "kind": "object",
-          "line": 150
-        },
-        {
-          "name": "DeleteByCafeId",
-          "kind": "class",
-          "line": 151
-        },
-        {
-          "name": "Order",
-          "kind": "object",
-          "line": 153
-        },
-        {
-          "name": "GetList",
-          "kind": "object",
-          "line": 155
-        },
-        {
-          "name": "GetPage",
-          "kind": "object",
-          "line": 156
-        },
-        {
-          "name": "Detail",
-          "kind": "class",
-          "line": 157
-        },
-        {
-          "name": "ConfirmTransfer",
-          "kind": "class",
-          "line": 158
-        },
-        {
-          "name": "Cancel",
-          "kind": "class",
-          "line": 159
-        },
-        {
-          "name": "UpdateStatus",
-          "kind": "class",
-          "line": 160
-        },
-        {
-          "name": "GetSession",
-          "kind": "object",
-          "line": 161
-        },
-        {
-          "name": "Create",
-          "kind": "object",
-          "line": 162
-        },
-        {
-          "name": "Cafe",
-          "kind": "object",
-          "line": 164
-        },
-        {
-          "name": "Create",
-          "kind": "object",
-          "line": 166
-        },
-        {
-          "name": "Detail",
-          "kind": "class",
-          "line": 167
-        },
-        {
           "name": "Update",
           "kind": "class",
-          "line": 168
-        },
-        {
-          "name": "Address",
-          "kind": "class",
-          "line": 169
-        },
-        {
-          "name": "UpsertAddress",
-          "kind": "object",
-          "line": 170
-        },
-        {
-          "name": "Chat",
-          "kind": "object",
-          "line": 172
-        },
-        {
-          "name": "GetList",
-          "kind": "object",
-          "line": 174
-        },
-        {
-          "name": "Get",
-          "kind": "object",
-          "line": 175
-        },
-        {
-          "name": "GetPage",
-          "kind": "object",
-          "line": 176
-        },
-        {
-          "name": "EnsureConversation",
-          "kind": "object",
-          "line": 177
-        },
-        {
-          "name": "EnsureOrderConversation",
-          "kind": "object",
-          "line": 178
-        },
-        {
-          "name": "EnsureSellerConversation",
-          "kind": "object",
-          "line": 179
-        },
-        {
-          "name": "SendMessage",
-          "kind": "object",
-          "line": 180
-        },
-        {
-          "name": "MarkAllRead",
-          "kind": "object",
-          "line": 181
-        },
-        {
-          "name": "Clear",
-          "kind": "object",
-          "line": 182
-        },
-        {
-          "name": "Seller",
-          "kind": "object",
-          "line": 184
-        },
-        {
-          "name": "Profile",
-          "kind": "object",
-          "line": 186
-        },
-        {
-          "name": "PaymentMethods",
-          "kind": "object",
-          "line": 187
-        },
-        {
-          "name": "UpdatePaymentMethods",
-          "kind": "object",
-          "line": 188
-        },
-        {
-          "name": "Orders",
-          "kind": "object",
-          "line": 189
-        },
-        {
-          "name": "OrdersPage",
-          "kind": "object",
-          "line": 190
-        },
-        {
-          "name": "OrderDetail",
-          "kind": "class",
-          "line": 191
-        },
-        {
-          "name": "Availability",
-          "kind": "object",
-          "line": 192
-        },
-        {
-          "name": "Notifications",
-          "kind": "object",
-          "line": 194
-        },
-        {
-          "name": "Get",
-          "kind": "object",
-          "line": 196
-        },
-        {
-          "name": "GetPage",
-          "kind": "object",
-          "line": 197
-        },
-        {
-          "name": "UnreadCount",
-          "kind": "object",
-          "line": 198
-        },
-        {
-          "name": "ReadAll",
-          "kind": "object",
-          "line": 199
-        },
-        {
-          "name": "Media",
-          "kind": "object",
-          "line": 201
-        },
-        {
-          "name": "PresignUpload",
-          "kind": "class",
-          "line": 203
-        },
-        {
-          "name": "Upload",
-          "kind": "object",
-          "line": 208
-        },
-        {
-          "name": "Address",
-          "kind": "object",
-          "line": 215
-        },
-        {
-          "name": "Get",
-          "kind": "object",
-          "line": 217
-        },
-        {
-          "name": "Create",
-          "kind": "object",
-          "line": 218
+          "line": 144
         },
         {
           "name": "Delete",
           "kind": "class",
-          "line": 219
+          "line": 145
+        },
+        {
+          "name": "ByCategory",
+          "kind": "class",
+          "line": 146
+        },
+        {
+          "name": "GetByCafeId",
+          "kind": "class",
+          "line": 147
+        },
+        {
+          "name": "GetByCafeIdPage",
+          "kind": "class",
+          "line": 148
+        },
+        {
+          "name": "GetCafeStats",
+          "kind": "class",
+          "line": 149
+        },
+        {
+          "name": "Cart",
+          "kind": "object",
+          "line": 151
+        },
+        {
+          "name": "Get",
+          "kind": "object",
+          "line": 153
+        },
+        {
+          "name": "Add",
+          "kind": "object",
+          "line": 154
+        },
+        {
+          "name": "Quantity",
+          "kind": "class",
+          "line": 155
+        },
+        {
+          "name": "Clear",
+          "kind": "object",
+          "line": 156
+        },
+        {
+          "name": "Delete",
+          "kind": "class",
+          "line": 157
+        },
+        {
+          "name": "DeleteByCafeId",
+          "kind": "class",
+          "line": 158
+        },
+        {
+          "name": "Order",
+          "kind": "object",
+          "line": 160
+        },
+        {
+          "name": "GetList",
+          "kind": "object",
+          "line": 162
+        },
+        {
+          "name": "GetPage",
+          "kind": "object",
+          "line": 163
+        },
+        {
+          "name": "Detail",
+          "kind": "class",
+          "line": 164
+        },
+        {
+          "name": "ConfirmTransfer",
+          "kind": "class",
+          "line": 165
+        },
+        {
+          "name": "Cancel",
+          "kind": "class",
+          "line": 166
+        },
+        {
+          "name": "UpdateStatus",
+          "kind": "class",
+          "line": 167
+        },
+        {
+          "name": "GetSession",
+          "kind": "object",
+          "line": 168
+        },
+        {
+          "name": "Create",
+          "kind": "object",
+          "line": 169
+        },
+        {
+          "name": "Cafe",
+          "kind": "object",
+          "line": 171
+        },
+        {
+          "name": "GetList",
+          "kind": "object",
+          "line": 173
+        },
+        {
+          "name": "Create",
+          "kind": "object",
+          "line": 174
+        },
+        {
+          "name": "Detail",
+          "kind": "class",
+          "line": 175
+        },
+        {
+          "name": "Update",
+          "kind": "class",
+          "line": 176
+        },
+        {
+          "name": "Address",
+          "kind": "class",
+          "line": 177
+        },
+        {
+          "name": "UpsertAddress",
+          "kind": "object",
+          "line": 178
+        },
+        {
+          "name": "Chat",
+          "kind": "object",
+          "line": 180
+        },
+        {
+          "name": "GetList",
+          "kind": "object",
+          "line": 182
+        },
+        {
+          "name": "Get",
+          "kind": "object",
+          "line": 183
+        },
+        {
+          "name": "GetPage",
+          "kind": "object",
+          "line": 184
+        },
+        {
+          "name": "EnsureConversation",
+          "kind": "object",
+          "line": 185
+        },
+        {
+          "name": "EnsureOrderConversation",
+          "kind": "object",
+          "line": 186
+        },
+        {
+          "name": "EnsureSellerConversation",
+          "kind": "object",
+          "line": 187
+        },
+        {
+          "name": "SendMessage",
+          "kind": "object",
+          "line": 188
+        },
+        {
+          "name": "MarkAllRead",
+          "kind": "object",
+          "line": 189
+        },
+        {
+          "name": "Clear",
+          "kind": "object",
+          "line": 190
+        },
+        {
+          "name": "Seller",
+          "kind": "object",
+          "line": 192
+        },
+        {
+          "name": "Profile",
+          "kind": "object",
+          "line": 194
+        },
+        {
+          "name": "PaymentMethods",
+          "kind": "object",
+          "line": 195
+        },
+        {
+          "name": "UpdatePaymentMethods",
+          "kind": "object",
+          "line": 196
+        },
+        {
+          "name": "Orders",
+          "kind": "object",
+          "line": 197
+        },
+        {
+          "name": "OrdersPage",
+          "kind": "object",
+          "line": 198
+        },
+        {
+          "name": "OrderDetail",
+          "kind": "class",
+          "line": 199
+        },
+        {
+          "name": "Availability",
+          "kind": "object",
+          "line": 200
+        },
+        {
+          "name": "Notifications",
+          "kind": "object",
+          "line": 202
+        },
+        {
+          "name": "Get",
+          "kind": "object",
+          "line": 204
+        },
+        {
+          "name": "GetPage",
+          "kind": "object",
+          "line": 205
+        },
+        {
+          "name": "UnreadCount",
+          "kind": "object",
+          "line": 206
+        },
+        {
+          "name": "ReadAll",
+          "kind": "object",
+          "line": 207
+        },
+        {
+          "name": "MarkRead",
+          "kind": "class",
+          "line": 208
+        },
+        {
+          "name": "Delete",
+          "kind": "class",
+          "line": 209
+        },
+        {
+          "name": "Media",
+          "kind": "object",
+          "line": 211
+        },
+        {
+          "name": "PresignUpload",
+          "kind": "class",
+          "line": 213
+        },
+        {
+          "name": "Upload",
+          "kind": "object",
+          "line": 218
+        },
+        {
+          "name": "Download",
+          "kind": "class",
+          "line": 224
+        },
+        {
+          "name": "Address",
+          "kind": "object",
+          "line": 231
+        },
+        {
+          "name": "Get",
+          "kind": "object",
+          "line": 233
+        },
+        {
+          "name": "Create",
+          "kind": "object",
+          "line": 234
+        },
+        {
+          "name": "Delete",
+          "kind": "class",
+          "line": 235
         },
         {
           "name": "SetDefault",
           "kind": "class",
-          "line": 220
+          "line": 236
+        },
+        {
+          "name": "Update",
+          "kind": "class",
+          "line": 237
         },
         {
           "name": "Village",
           "kind": "object",
-          "line": 222
+          "line": 239
+        },
+        {
+          "name": "Get",
+          "kind": "object",
+          "line": 241
+        },
+        {
+          "name": "Create",
+          "kind": "object",
+          "line": 242
+        },
+        {
+          "name": "Delete",
+          "kind": "class",
+          "line": 243
+        },
+        {
+          "name": "Clear",
+          "kind": "object",
+          "line": 244
         },
         {
           "name": "Misc",
           "kind": "object",
-          "line": 224
+          "line": 246
         },
         {
           "name": "Splash",
           "kind": "object",
-          "line": 225
+          "line": 247
         },
         {
           "name": "Support",
           "kind": "object",
-          "line": 226
+          "line": 248
         },
         {
           "name": "SupportChat",
           "kind": "object",
-          "line": 227
+          "line": 249
         },
         {
           "name": "SendSupportChat",
           "kind": "object",
-          "line": 228
+          "line": 250
+        },
+        {
+          "name": "Admin",
+          "kind": "object",
+          "line": 252
+        },
+        {
+          "name": "Capabilities",
+          "kind": "object",
+          "line": 254
+        },
+        {
+          "name": "SecurityBoundaries",
+          "kind": "object",
+          "line": 255
         }
       ],
       "functions": [],
@@ -2665,7 +2755,7 @@
         {
           "name": "FoodRemoteDataSource",
           "kind": "class",
-          "line": 27
+          "line": 28
         }
       ],
       "functions": [],
@@ -2721,7 +2811,7 @@
         {
           "name": "ProfileRemoteDataSource",
           "kind": "class",
-          "line": 29
+          "line": 31
         }
       ],
       "functions": [],
@@ -2829,6 +2919,84 @@
         {
           "name": "id",
           "line": 15
+        }
+      ]
+    },
+    {
+      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/AddressUpdateRequest.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.data.remote.request",
+      "classes": [
+        {
+          "name": "AddressUpdateRequest",
+          "kind": "class",
+          "line": 14
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "villageId",
+          "line": 15
+        },
+        {
+          "name": "block",
+          "line": 16
+        },
+        {
+          "name": "number",
+          "line": 17
+        },
+        {
+          "name": "rt",
+          "line": 18
+        },
+        {
+          "name": "rw",
+          "line": 19
+        },
+        {
+          "name": "isDefault",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/AppConfigUpsertRequest.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.data.remote.request",
+      "classes": [
+        {
+          "name": "AppConfigUpsertRequest",
+          "kind": "class",
+          "line": 14
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "platform",
+          "line": 15
+        },
+        {
+          "name": "minVersion",
+          "line": 16
+        },
+        {
+          "name": "latestVersion",
+          "line": 17
+        },
+        {
+          "name": "forceUpdate",
+          "line": 18
+        },
+        {
+          "name": "maintenanceMode",
+          "line": 19
+        },
+        {
+          "name": "maintenanceMessage",
+          "line": 20
         }
       ]
     },
@@ -3191,6 +3359,29 @@
         {
           "name": "note",
           "line": 18
+        }
+      ]
+    },
+    {
+      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodBulkStatusRequest.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.data.remote.request",
+      "classes": [
+        {
+          "name": "FoodBulkStatusRequest",
+          "kind": "class",
+          "line": 14
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "foodIds",
+          "line": 15
+        },
+        {
+          "name": "isActive",
+          "line": 16
         }
       ]
     },
@@ -3628,6 +3819,25 @@
         {
           "name": "pin",
           "line": 16
+        }
+      ]
+    },
+    {
+      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/VillageAddRequest.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.data.remote.request",
+      "classes": [
+        {
+          "name": "VillageAddRequest",
+          "kind": "class",
+          "line": 14
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "name",
+          "line": 15
         }
       ]
     },
@@ -4490,22 +4700,22 @@
         {
           "name": "OrderResponse",
           "kind": "class",
-          "line": 34
+          "line": 38
         },
         {
           "name": "OrderTimelineResponse",
           "kind": "class",
-          "line": 53
+          "line": 57
         },
         {
           "name": "OrderPaymentResponse",
           "kind": "class",
-          "line": 61
+          "line": 65
         },
         {
           "name": "OrderPaymentHistoryResponse",
           "kind": "class",
-          "line": 73
+          "line": 77
         }
       ],
       "functions": [],
@@ -4559,60 +4769,68 @@
           "line": 24
         },
         {
-          "name": "foodName",
-          "line": 29
-        },
-        {
-          "name": "quantity",
+          "name": "foodId",
           "line": 30
         },
         {
+          "name": "foodName",
+          "line": 31
+        },
+        {
+          "name": "quantity",
+          "line": 32
+        },
+        {
+          "name": "price",
+          "line": 34
+        },
+        {
           "name": "customerId",
-          "line": 36
+          "line": 40
         },
         {
           "name": "customerName",
-          "line": 37
+          "line": 41
         },
         {
           "name": "timeline",
-          "line": 48
+          "line": 52
         },
         {
           "name": "payment",
-          "line": 49
+          "line": 53
         },
         {
           "name": "actorRole",
-          "line": 55
+          "line": 59
         },
         {
           "name": "reason",
-          "line": 56
+          "line": 60
         },
         {
           "name": "method",
-          "line": 62
-        },
-        {
-          "name": "sellerVerificationRequired",
-          "line": 65
-        },
-        {
-          "name": "proofRequired",
           "line": 66
         },
         {
+          "name": "sellerVerificationRequired",
+          "line": 69
+        },
+        {
+          "name": "proofRequired",
+          "line": 70
+        },
+        {
           "name": "proofUrl",
-          "line": 67
+          "line": 71
         },
         {
           "name": "instruction",
-          "line": 68
+          "line": 72
         },
         {
           "name": "history",
-          "line": 69
+          "line": 73
         }
       ]
     },
@@ -5254,26 +5472,26 @@
         {
           "name": "ChatRepositoryImpl",
           "kind": "class",
-          "line": 30
+          "line": 32
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "remote",
-          "line": 32
-        },
-        {
-          "name": "resultFlow",
-          "line": 33
-        },
-        {
-          "name": "homeDao",
           "line": 34
         },
         {
-          "name": "errorMapper",
+          "name": "resultFlow",
           "line": 35
+        },
+        {
+          "name": "homeDao",
+          "line": 36
+        },
+        {
+          "name": "errorMapper",
+          "line": 37
         }
       ]
     },
@@ -5285,26 +5503,26 @@
         {
           "name": "FoodRepositoryImpl",
           "kind": "class",
-          "line": 35
+          "line": 38
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "remote",
-          "line": 37
+          "line": 40
         },
         {
           "name": "resultFlow",
-          "line": 38
+          "line": 41
         },
         {
           "name": "homeDao",
-          "line": 39
+          "line": 42
         },
         {
           "name": "errorMapper",
-          "line": 40
+          "line": 43
         }
       ]
     },
@@ -5405,30 +5623,30 @@
         {
           "name": "ProfileRepositoryImpl",
           "kind": "class",
-          "line": 35
+          "line": 37
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "remote",
-          "line": 37
-        },
-        {
-          "name": "resultFlow",
-          "line": 38
-        },
-        {
-          "name": "homeDao",
           "line": 39
         },
         {
-          "name": "errorMapper",
+          "name": "resultFlow",
           "line": 40
         },
         {
-          "name": "syncManager",
+          "name": "homeDao",
           "line": 41
+        },
+        {
+          "name": "errorMapper",
+          "line": 42
+        },
+        {
+          "name": "syncManager",
+          "line": 43
         }
       ]
     },
@@ -6332,6 +6550,49 @@
         {
           "name": "isFailed",
           "line": 21
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/model/ChatMessage.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.model",
+      "classes": [
+        {
+          "name": "ChatMessage",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "id",
+          "line": 4
+        },
+        {
+          "name": "message",
+          "line": 5
+        },
+        {
+          "name": "time",
+          "line": 6
+        },
+        {
+          "name": "isFromUser",
+          "line": 7
+        },
+        {
+          "name": "isRead",
+          "line": 8
+        },
+        {
+          "name": "isPending",
+          "line": 9
+        },
+        {
+          "name": "isFailed",
+          "line": 10
         }
       ]
     },
@@ -7888,6 +8149,45 @@
       ]
     },
     {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/AddressUpdateParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "AddressUpdateParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "villageId",
+          "line": 4
+        },
+        {
+          "name": "block",
+          "line": 5
+        },
+        {
+          "name": "number",
+          "line": 6
+        },
+        {
+          "name": "rt",
+          "line": 7
+        },
+        {
+          "name": "rw",
+          "line": 8
+        },
+        {
+          "name": "isDefault",
+          "line": 9
+        }
+      ]
+    },
+    {
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/CafeAddParam.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.domain.param",
@@ -8070,6 +8370,33 @@
       ]
     },
     {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/CategoryFilterParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "CategoryFilterParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "category",
+          "line": 4
+        },
+        {
+          "name": "page",
+          "line": 5
+        },
+        {
+          "name": "size",
+          "line": 6
+        }
+      ]
+    },
+    {
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/ChangePasswordParam.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.domain.param",
@@ -8205,6 +8532,52 @@
       ]
     },
     {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/FavoritesPagedParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "FavoritesPagedParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "page",
+          "line": 4
+        },
+        {
+          "name": "size",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/FoodBulkStatusParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "FoodBulkStatusParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "foodIds",
+          "line": 4
+        },
+        {
+          "name": "isActive",
+          "line": 5
+        }
+      ]
+    },
+    {
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/FoodUpsertParam.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.domain.param",
@@ -8316,6 +8689,48 @@
         {
           "name": "password",
           "line": 13
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/MediaDownloadParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "MediaDownloadParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "variant",
+          "line": 4
+        },
+        {
+          "name": "key",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/NotificationActionParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "NotificationActionParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "notificationId",
+          "line": 4
         }
       ]
     },
@@ -8436,6 +8851,48 @@
         {
           "name": "seed",
           "line": 16
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/SearchRecentParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "SearchRecentParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "size",
+          "line": 4
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/SearchSuggestParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "SearchSuggestParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "query",
+          "line": 4
+        },
+        {
+          "name": "size",
+          "line": 5
         }
       ]
     },
@@ -8580,6 +9037,25 @@
       ]
     },
     {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/VillageAddParam.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.param",
+      "classes": [
+        {
+          "name": "VillageAddParam",
+          "kind": "class",
+          "line": 2
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "name",
+          "line": 4
+        }
+      ]
+    },
+    {
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/repository/AppRepository.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.domain.repository",
@@ -8666,24 +9142,28 @@
       ],
       "functions": [
         {
-          "name": "getCafe",
+          "name": "getCafeList",
           "line": 19
         },
         {
-          "name": "createCafe",
+          "name": "getCafe",
           "line": 21
         },
         {
-          "name": "updateCafe",
+          "name": "createCafe",
           "line": 23
         },
         {
-          "name": "getCafeAddress",
+          "name": "updateCafe",
           "line": 25
         },
         {
-          "name": "upsertCafeAddress",
+          "name": "getCafeAddress",
           "line": 27
+        },
+        {
+          "name": "upsertCafeAddress",
+          "line": 29
         }
       ],
       "data_members": []
@@ -8731,6 +9211,10 @@
         {
           "name": "getSessionToken",
           "line": 36
+        },
+        {
+          "name": "deleteCartItem",
+          "line": 38
         }
       ],
       "data_members": []
@@ -8743,61 +9227,47 @@
         {
           "name": "ChatRepository",
           "kind": "interface",
-          "line": 16
+          "line": 17
         }
       ],
       "functions": [
         {
           "name": "getChatList",
-          "line": 18
-        },
-        {
-          "name": "getChats",
           "line": 19
         },
         {
+          "name": "getChats",
+          "line": 20
+        },
+        {
           "name": "getChatsPage",
-          "line": 21
+          "line": 22
         },
         {
           "name": "ensureConversation",
-          "line": 28
+          "line": 29
         },
         {
           "name": "ensureOrderConversation",
-          "line": 30
+          "line": 31
         },
         {
           "name": "ensureSellerConversation",
-          "line": 32
+          "line": 33
         },
         {
           "name": "sendMessage",
-          "line": 34
+          "line": 35
         },
         {
           "name": "readAllMessage",
-          "line": 36
+          "line": 37
         },
         {
           "name": "clearAllMessages",
-          "line": 38
+          "line": 39
         }
       ],
-      "data_members": []
-    },
-    {
-      "path": "domain/src/main/java/com/mtv/app/shopme/domain/repository/FoodDetailRepository.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.domain.repository",
-      "classes": [
-        {
-          "name": "FoodDetailRepository",
-          "kind": "interface",
-          "line": 15
-        }
-      ],
-      "functions": [],
       "data_members": []
     },
     {
@@ -8808,53 +9278,73 @@
         {
           "name": "FoodRepository",
           "kind": "interface",
-          "line": 22
+          "line": 23
         }
       ],
       "functions": [
         {
           "name": "getFoods",
-          "line": 24
+          "line": 25
         },
         {
           "name": "getFoodDetail",
-          "line": 26
+          "line": 27
         },
         {
           "name": "getFoodsByCafe",
-          "line": 28
+          "line": 29
         },
         {
           "name": "getFoodsByCafe",
-          "line": 30
+          "line": 31
         },
         {
           "name": "getProductStats",
-          "line": 40
+          "line": 41
         },
         {
           "name": "getSimilarFoods",
-          "line": 42
+          "line": 43
         },
         {
           "name": "searchFoods",
-          "line": 44
+          "line": 45
         },
         {
           "name": "discoverFoods",
-          "line": 46
+          "line": 47
         },
         {
           "name": "createFood",
-          "line": 48
+          "line": 49
         },
         {
           "name": "updateFood",
-          "line": 50
+          "line": 51
         },
         {
           "name": "deleteFood",
-          "line": 52
+          "line": 53
+        },
+        {
+          "name": "getRecentSearches",
+          "line": 55
+        },
+        {
+          "name": "getSearchSuggestions",
+          "line": 57
+        },
+        {
+          "name": "getFoodsByCategory",
+          "line": 59
+        },
+        {
+          "name": "getFavoriteFoodsPaged",
+          "line": 61
+        },
+        {
+          "name": "bulkUpdateActive",
+          "line": 63
         }
       ],
       "data_members": []
@@ -8913,6 +9403,14 @@
         {
           "name": "clearNotifications",
           "line": 15
+        },
+        {
+          "name": "markNotificationRead",
+          "line": 16
+        },
+        {
+          "name": "deleteNotification",
+          "line": 17
         }
       ],
       "data_members": []
@@ -8960,65 +9458,69 @@
         {
           "name": "ProfileRepository",
           "kind": "interface",
-          "line": 23
+          "line": 24
         }
       ],
       "functions": [
         {
           "name": "getCustomer",
-          "line": 25
+          "line": 26
         },
         {
           "name": "updateProfile",
-          "line": 27
+          "line": 28
         },
         {
           "name": "deleteAccount",
-          "line": 29
+          "line": 30
         },
         {
           "name": "getNotificationPreferences",
-          "line": 31
+          "line": 32
         },
         {
           "name": "updateNotificationPreferences",
-          "line": 33
+          "line": 34
         },
         {
           "name": "getAddresses",
-          "line": 35
+          "line": 36
         },
         {
           "name": "getVillages",
-          "line": 37
+          "line": 38
         },
         {
           "name": "addAddress",
-          "line": 39
+          "line": 40
         },
         {
           "name": "deleteAddress",
-          "line": 41
+          "line": 42
+        },
+        {
+          "name": "updateAddress",
+          "line": 44
         },
         {
           "name": "setDefaultAddress",
-          "line": 43
+          "line": 46
         },
         {
           "name": "getFavoriteFoodIds",
-          "line": 45
+          "line": 48
         },
         {
           "name": "getFavoriteFoods",
-          "line": 47
+          "line": 50
         },
         {
           "name": "addFavoriteFood",
-          "line": 49
+          "line": 52
         },
         {
           "name": "removeFavoriteFood",
-          "line": 51
+          "line": 54
         }
       ],
       "data_members": []
@@ -9090,6 +9592,25 @@
         {
           "name": "repository",
           "line": 7
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/CafeListUseCase.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.usecase",
+      "classes": [
+        {
+          "name": "CafeListUseCase",
+          "kind": "class",
+          "line": 13
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "repository",
+          "line": 15
         }
       ]
     },
@@ -9341,25 +9862,6 @@
       ]
     },
     {
-      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/CreateNotificationUseCase.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.domain.usecase",
-      "classes": [
-        {
-          "name": "CreateNotificationUseCase",
-          "kind": "class",
-          "line": 14
-        }
-      ],
-      "functions": [],
-      "data_members": [
-        {
-          "name": "dataSource",
-          "line": 16
-        }
-      ]
-    },
-    {
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/CreateOrderUseCase.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.domain.usecase",
@@ -9432,6 +9934,25 @@
         {
           "name": "repository",
           "line": 16
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/DeleteCartItemUseCase.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.usecase",
+      "classes": [
+        {
+          "name": "DeleteCartItemUseCase",
+          "kind": "class",
+          "line": 5
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "repository",
+          "line": 7
         }
       ]
     },
@@ -9652,19 +10173,19 @@
         {
           "name": "GetChatMessageUseCase",
           "kind": "class",
-          "line": 13
+          "line": 17
         }
       ],
       "functions": [
         {
           "name": "page",
-          "line": 18
+          "line": 23
         }
       ],
       "data_members": [
         {
           "name": "repository",
-          "line": 15
+          "line": 19
         }
       ]
     },
@@ -9789,25 +10310,6 @@
       "classes": [
         {
           "name": "GetFoodSimilarUseCase",
-          "kind": "class",
-          "line": 13
-        }
-      ],
-      "functions": [],
-      "data_members": [
-        {
-          "name": "repository",
-          "line": 15
-        }
-      ]
-    },
-    {
-      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetFoodUseCase.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.domain.usecase",
-      "classes": [
-        {
-          "name": "GetFoodUseCase",
           "kind": "class",
           "line": 13
         }
@@ -10273,6 +10775,25 @@
         {
           "name": "repository",
           "line": 16
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/UpdateAddressUseCase.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.usecase",
+      "classes": [
+        {
+          "name": "UpdateAddressUseCase",
+          "kind": "class",
+          "line": 6
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "repository",
+          "line": 8
         }
       ]
     },
@@ -11307,67 +11828,77 @@
         {
           "name": "Load",
           "kind": "object",
-          "line": 22
+          "line": 23
         },
         {
           "name": "DismissDialog",
           "kind": "object",
-          "line": 23
+          "line": 24
         },
         {
           "name": "ClickFood",
           "kind": "class",
-          "line": 24
+          "line": 25
         },
         {
           "name": "ClickBack",
           "kind": "object",
-          "line": 26
+          "line": 27
         },
         {
           "name": "ClickChat",
           "kind": "object",
-          "line": 27
+          "line": 28
         },
         {
           "name": "ClickWhatsapp",
           "kind": "object",
-          "line": 28
+          "line": 29
         },
         {
           "name": "ClickSearch",
           "kind": "object",
-          "line": 29
+          "line": 30
         },
         {
           "name": "ToggleFavorite",
           "kind": "class",
-          "line": 30
+          "line": 31
+        },
+        {
+          "name": "ClickCafeItem",
+          "kind": "class",
+          "line": 32
         },
         {
           "name": "NavigateBack",
           "kind": "object",
-          "line": 34
+          "line": 36
         },
         {
           "name": "NavigateToChat",
           "kind": "class",
-          "line": 35
+          "line": 37
         },
         {
           "name": "NavigateToSearch",
           "kind": "object",
-          "line": 36
+          "line": 38
         },
         {
           "name": "OpenWhatsapp",
           "kind": "class",
-          "line": 37
+          "line": 39
         },
         {
           "name": "NavigateToDetail",
           "kind": "class",
-          "line": 38
+          "line": 40
+        },
+        {
+          "name": "NavigateToCafeDetail",
+          "kind": "class",
+          "line": 41
         }
       ],
       "functions": [],
@@ -11377,28 +11908,36 @@
           "line": 16
         },
         {
-          "name": "foods",
+          "name": "cafeList",
           "line": 17
         },
         {
-          "name": "favoriteIds",
+          "name": "foods",
           "line": 18
         },
         {
+          "name": "favoriteIds",
+          "line": 19
+        },
+        {
           "name": "id",
-          "line": 25
+          "line": 26
         },
         {
           "name": "foodId",
-          "line": 30
+          "line": 31
+        },
+        {
+          "name": "cafeId",
+          "line": 32
         },
         {
           "name": "chatId",
-          "line": 35
+          "line": 37
         },
         {
           "name": "phone",
-          "line": 37
+          "line": 39
         }
       ]
     },
@@ -11448,34 +11987,39 @@
           "line": 42
         },
         {
+          "name": "DeleteCartItem",
+          "kind": "class",
+          "line": 46
+        },
+        {
           "name": "ClearCart",
           "kind": "object",
-          "line": 46
+          "line": 50
         },
         {
           "name": "OpenPinSheet",
           "kind": "object",
-          "line": 56
+          "line": 60
         },
         {
           "name": "ShowSuccessDialog",
           "kind": "object",
-          "line": 62
+          "line": 66
         },
         {
           "name": "NavigateToOrder",
           "kind": "object",
-          "line": 68
+          "line": 72
         },
         {
           "name": "NavigateToEditProfile",
           "kind": "object",
-          "line": 74
+          "line": 78
         },
         {
           "name": "ShowSnackbar",
           "kind": "class",
-          "line": 80
+          "line": 84
         }
       ],
       "functions": [],
@@ -11518,7 +12062,7 @@
         },
         {
           "name": "message",
-          "line": 81
+          "line": 85
         }
       ]
     },
@@ -11961,52 +12505,57 @@
         {
           "name": "Load",
           "kind": "object",
-          "line": 30
+          "line": 31
         },
         {
           "name": "DismissDialog",
           "kind": "object",
-          "line": 31
+          "line": 32
         },
         {
           "name": "DismissActiveDialog",
           "kind": "object",
-          "line": 32
+          "line": 33
         },
         {
           "name": "UpdateProfile",
           "kind": "class",
-          "line": 33
+          "line": 34
         },
         {
           "name": "AddAddress",
           "kind": "class",
-          "line": 39
+          "line": 40
         },
         {
           "name": "DeleteAddress",
           "kind": "class",
-          "line": 48
+          "line": 49
+        },
+        {
+          "name": "UpdateAddress",
+          "kind": "class",
+          "line": 51
         },
         {
           "name": "SetDefaultAddress",
           "kind": "class",
-          "line": 50
+          "line": 60
         },
         {
           "name": "ClickBack",
           "kind": "object",
-          "line": 51
+          "line": 61
         },
         {
           "name": "NavigateBack",
           "kind": "object",
-          "line": 56
+          "line": 66
         },
         {
           "name": "SuccessUpdateProfile",
           "kind": "object",
-          "line": 60
+          "line": 70
         }
       ],
       "functions": [],
@@ -12036,52 +12585,56 @@
           "line": 23
         },
         {
-          "name": "setDefaultAddress",
+          "name": "updateAddress",
           "line": 24
         },
         {
+          "name": "setDefaultAddress",
+          "line": 25
+        },
+        {
           "name": "activeDialog",
-          "line": 26
+          "line": 27
         },
         {
           "name": "name",
-          "line": 35
-        },
-        {
-          "name": "phone",
           "line": 36
         },
         {
-          "name": "photo",
+          "name": "phone",
           "line": 37
         },
         {
-          "name": "villageId",
-          "line": 41
+          "name": "photo",
+          "line": 38
         },
         {
-          "name": "block",
+          "name": "villageId",
           "line": 42
         },
         {
-          "name": "number",
+          "name": "block",
           "line": 43
         },
         {
-          "name": "rt",
+          "name": "number",
           "line": 44
         },
         {
-          "name": "rw",
+          "name": "rt",
           "line": 45
         },
         {
-          "name": "isDefault",
+          "name": "rw",
           "line": 46
         },
         {
+          "name": "isDefault",
+          "line": 47
+        },
+        {
           "name": "id",
-          "line": 49
+          "line": 50
         }
       ]
     },
@@ -12412,14 +12965,19 @@
           "line": 37
         },
         {
+          "name": "NavigateToOrderDetail",
+          "kind": "class",
+          "line": 38
+        },
+        {
           "name": "Error",
           "kind": "class",
-          "line": 41
+          "line": 42
         },
         {
           "name": "Success",
           "kind": "object",
-          "line": 44
+          "line": 45
         }
       ],
       "functions": [],
@@ -12453,8 +13011,12 @@
           "line": 31
         },
         {
+          "name": "orderId",
+          "line": 38
+        },
+        {
           "name": "message",
-          "line": 42
+          "line": 43
         }
       ]
     },
@@ -13016,101 +13578,101 @@
         {
           "name": "SearchUiState",
           "kind": "class",
-          "line": 19
+          "line": 14
         },
         {
           "name": "Load",
           "kind": "object",
-          "line": 31
+          "line": 26
         },
         {
           "name": "LoadNextPage",
           "kind": "object",
-          "line": 32
+          "line": 27
         },
         {
           "name": "BackClicked",
           "kind": "object",
-          "line": 33
+          "line": 28
         },
         {
           "name": "DismissDialog",
           "kind": "object",
-          "line": 34
+          "line": 29
         },
         {
           "name": "ClickFavorites",
           "kind": "object",
-          "line": 35
+          "line": 30
         },
         {
           "name": "ToggleFavorite",
           "kind": "class",
-          "line": 36
+          "line": 31
         },
         {
           "name": "QueryChanged",
           "kind": "class",
-          "line": 37
+          "line": 32
         },
         {
           "name": "ClickFood",
           "kind": "class",
-          "line": 39
+          "line": 34
         },
         {
           "name": "NavigateBack",
           "kind": "object",
-          "line": 43
+          "line": 38
         },
         {
           "name": "NavigateToFavorites",
           "kind": "object",
-          "line": 44
+          "line": 39
         },
         {
           "name": "NavigateToDetail",
           "kind": "class",
-          "line": 45
+          "line": 40
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "query",
-          "line": 21
+          "line": 16
         },
         {
           "name": "foods",
-          "line": 22
+          "line": 17
         },
         {
           "name": "favoriteIds",
-          "line": 23
+          "line": 18
         },
         {
           "name": "isRefreshing",
-          "line": 24
+          "line": 19
         },
         {
           "name": "isLoadingMore",
-          "line": 25
+          "line": 20
         },
         {
           "name": "isLastPage",
-          "line": 26
+          "line": 21
         },
         {
           "name": "page",
-          "line": 27
+          "line": 22
         },
         {
           "name": "foodId",
-          "line": 36
+          "line": 31
         },
         {
           "name": "id",
-          "line": 39
+          "line": 34
         }
       ]
     },
@@ -13424,42 +13986,46 @@
         {
           "name": "CafeViewModel",
           "kind": "class",
-          "line": 35
+          "line": 36
         }
       ],
       "functions": [],
       "data_members": [
         {
-          "name": "ensureChatConversationUseCase",
-          "line": 36
-        },
-        {
-          "name": "getCafeUseCase",
+          "name": "cafeListUseCase",
           "line": 37
         },
         {
-          "name": "getFoodsByCafeUseCase",
+          "name": "ensureChatConversationUseCase",
           "line": 38
         },
         {
-          "name": "getFavoriteFoodIdsUseCase",
+          "name": "getCafeUseCase",
           "line": 39
         },
         {
-          "name": "addFavoriteFoodUseCase",
+          "name": "getFoodsByCafeUseCase",
           "line": 40
         },
         {
-          "name": "removeFavoriteFoodUseCase",
+          "name": "getFavoriteFoodIdsUseCase",
           "line": 41
         },
         {
-          "name": "sessionManager",
+          "name": "addFavoriteFoodUseCase",
           "line": 42
         },
         {
+          "name": "removeFavoriteFoodUseCase",
+          "line": 43
+        },
+        {
+          "name": "sessionManager",
+          "line": 44
+        },
+        {
           "name": "cafeId",
-          "line": 49
+          "line": 51
         }
       ]
     },
@@ -13471,62 +14037,66 @@
         {
           "name": "CartViewModel",
           "kind": "class",
-          "line": 43
+          "line": 44
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "cartItemUseCase",
-          "line": 44
-        },
-        {
-          "name": "customerUseCase",
           "line": 45
         },
         {
-          "name": "getSessionTokenUseCase",
+          "name": "customerUseCase",
           "line": 46
         },
         {
-          "name": "verifyPinUseCase",
+          "name": "getSessionTokenUseCase",
           "line": 47
         },
         {
-          "name": "createOrderUseCase",
+          "name": "verifyPinUseCase",
           "line": 48
         },
         {
-          "name": "cartQuantityUseCase",
+          "name": "createOrderUseCase",
           "line": 49
         },
         {
-          "name": "clearCartByCafeIdUseCase",
+          "name": "cartQuantityUseCase",
           "line": 50
         },
         {
-          "name": "clearCartUseCase",
+          "name": "clearCartByCafeIdUseCase",
           "line": 51
         },
         {
-          "name": "sessionManager",
+          "name": "clearCartUseCase",
           "line": 52
         },
         {
+          "name": "deleteCartItemUseCase",
+          "line": 53
+        },
+        {
+          "name": "sessionManager",
+          "line": 54
+        },
+        {
           "name": "pendingCartIds",
-          "line": 58
-        },
-        {
-          "name": "pendingPaymentMethod",
-          "line": 59
-        },
-        {
-          "name": "pendingSessionToken",
           "line": 60
         },
         {
-          "name": "isCreatingOrder",
+          "name": "pendingPaymentMethod",
           "line": 61
+        },
+        {
+          "name": "pendingSessionToken",
+          "line": 62
+        },
+        {
+          "name": "isCreatingOrder",
+          "line": 63
         }
       ]
     },
@@ -13706,46 +14276,50 @@
         {
           "name": "EditProfileViewModel",
           "kind": "class",
-          "line": 46
+          "line": 48
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "sessionManager",
-          "line": 47
-        },
-        {
-          "name": "customerUseCase",
-          "line": 48
-        },
-        {
-          "name": "customerUpdateUseCase",
           "line": 49
         },
         {
-          "name": "addressUseCase",
+          "name": "customerUseCase",
           "line": 50
         },
         {
-          "name": "addressAddUseCase",
+          "name": "customerUpdateUseCase",
           "line": 51
         },
         {
-          "name": "addressDeleteUseCase",
+          "name": "addressUseCase",
           "line": 52
         },
         {
-          "name": "addressDefaultUseCase",
+          "name": "addressAddUseCase",
           "line": 53
         },
         {
-          "name": "villageUseCase",
+          "name": "addressDeleteUseCase",
           "line": 54
         },
         {
-          "name": "uploadMediaUseCase",
+          "name": "addressUpdateUseCase",
           "line": 55
+        },
+        {
+          "name": "addressDefaultUseCase",
+          "line": 56
+        },
+        {
+          "name": "villageUseCase",
+          "line": 57
+        },
+        {
+          "name": "uploadMediaUseCase",
+          "line": 58
         }
       ]
     },
@@ -14161,27 +14735,27 @@
       "functions": [
         {
           "name": "CafeScreen",
-          "line": 75
+          "line": 79
         },
         {
           "name": "CafeToolbar",
-          "line": 207
+          "line": 393
         },
         {
           "name": "CafeHeader",
-          "line": 261
+          "line": 447
         },
         {
           "name": "ActionButton",
-          "line": 384
+          "line": 570
         },
         {
           "name": "CafeFoodItem",
-          "line": 420
+          "line": 606
         },
         {
           "name": "CafeScreenPreview",
-          "line": 535
+          "line": 721
         }
       ],
       "data_members": []
@@ -14194,63 +14768,75 @@
       "functions": [
         {
           "name": "CartScreen",
-          "line": 108
+          "line": 110
         },
         {
           "name": "closeCheckout",
-          "line": 181
+          "line": 185
+        },
+        {
+          "name": "requestDeleteItem",
+          "line": 191
+        },
+        {
+          "name": "confirmDeleteItem",
+          "line": 196
+        },
+        {
+          "name": "cancelDeleteItem",
+          "line": 201
         },
         {
           "name": "CafeGroupCard",
-          "line": 449
+          "line": 473
         },
         {
           "name": "CartItemRow",
-          "line": 595
+          "line": 623
         },
         {
           "name": "QuantityCounter",
-          "line": 732
+          "line": 766
         },
         {
           "name": "EmptyCartView",
-          "line": 815
+          "line": 849
         },
         {
           "name": "PremiumCheckoutSheet",
-          "line": 919
+          "line": 1003
         },
         {
           "name": "PaymentPill",
-          "line": 1131
+          "line": 1215
         },
         {
           "name": "PinVerificationSheet",
-          "line": 1167
+          "line": 1251
         },
         {
           "name": "PinKeypad",
-          "line": 1280
+          "line": 1364
         },
         {
           "name": "OrderSuccessDialog",
-          "line": 1361
+          "line": 1445
         },
         {
           "name": "CartScreenPreview",
-          "line": 1476
+          "line": 1560
         },
         {
           "name": "EmptyCartViewPreview",
-          "line": 1503
+          "line": 1587
         },
         {
           "name": "PinKeypadPreview",
-          "line": 1509
+          "line": 1593
         },
         {
           "name": "OrderSuccessDialogPreview",
-          "line": 1564
+          "line": 1648
         }
       ],
       "data_members": []
@@ -14414,7 +15000,7 @@
         {
           "name": "SheetController",
           "kind": "class",
-          "line": 772
+          "line": 963
         }
       ],
       "functions": [
@@ -14424,65 +15010,69 @@
         },
         {
           "name": "PremiumHeader",
-          "line": 285
+          "line": 313
         },
         {
           "name": "AddressSection",
-          "line": 339
+          "line": 367
         },
         {
           "name": "AnimatedTab",
-          "line": 479
+          "line": 518
         },
         {
           "name": "AddAddressSheet",
-          "line": 513
+          "line": 552
+        },
+        {
+          "name": "EditAddressSheet",
+          "line": 701
         },
         {
           "name": "VillageDropdown",
-          "line": 662
+          "line": 853
         },
         {
           "name": "ProfileSection",
-          "line": 728
+          "line": 919
         },
         {
           "name": "expand",
-          "line": 777
+          "line": 968
         },
         {
           "name": "partial",
-          "line": 780
+          "line": 971
         },
         {
           "name": "hide",
-          "line": 783
+          "line": 974
         },
         {
           "name": "rememberSheetController",
-          "line": 788
+          "line": 979
         },
         {
           "name": "EditProfileScreenPreview",
-          "line": 800
+          "line": 991
         },
         {
           "name": "EditProfileAddressTabPreview",
-          "line": 813
+          "line": 1004
         },
         {
           "name": "AddAddressSheetPreview",
-          "line": 858
+          "line": 1050
         }
       ],
       "data_members": [
         {
           "name": "sheetState",
-          "line": 773
+          "line": 964
         },
         {
           "name": "scope",
-          "line": 774
+          "line": 965
         }
       ]
     },
@@ -14494,7 +15084,7 @@
       "functions": [
         {
           "name": "FavoriteScreen",
-          "line": 35
+          "line": 36
         }
       ],
       "data_members": []
@@ -14582,31 +15172,35 @@
       "functions": [
         {
           "name": "NotifScreen",
-          "line": 68
+          "line": 80
+        },
+        {
+          "name": "SwipeToDismissNotificationItem",
+          "line": 265
         },
         {
           "name": "NotificationItemCard",
-          "line": 212
+          "line": 313
         },
         {
           "name": "ShowNotificationDialog",
-          "line": 311
+          "line": 431
         },
         {
           "name": "UnreadDot",
-          "line": 345
+          "line": 465
         },
         {
           "name": "InitialAvatar",
-          "line": 355
+          "line": 477
         },
         {
           "name": "NotificationItemPreview",
-          "line": 383
+          "line": 505
         },
         {
           "name": "NotificationScreenPreview",
-          "line": 389
+          "line": 514
         }
       ],
       "data_members": []
@@ -14764,23 +15358,19 @@
       "functions": [
         {
           "name": "SearchScreen",
-          "line": 88
+          "line": 100
         },
         {
           "name": "SearchHeader",
-          "line": 225
+          "line": 263
         },
         {
           "name": "SearchItem",
-          "line": 321
-        },
-        {
-          "name": "getPreviewDrawable",
-          "line": 422
+          "line": 386
         },
         {
           "name": "SearchScreenPreview",
-          "line": 437
+          "line": 657
         }
       ],
       "data_members": []
@@ -15006,38 +15596,42 @@
         {
           "name": "CafeViewModelTest",
           "kind": "class",
-          "line": 28
+          "line": 29
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "getCafeUseCase",
-          "line": 32
-        },
-        {
-          "name": "getFoodsByCafeUseCase",
           "line": 33
         },
         {
-          "name": "ensureChatConversationUseCase",
+          "name": "getFoodsByCafeUseCase",
           "line": 34
         },
         {
-          "name": "getFavoriteFoodIdsUseCase",
+          "name": "ensureChatConversationUseCase",
           "line": 35
         },
         {
-          "name": "addFavoriteFoodUseCase",
+          "name": "getFavoriteFoodIdsUseCase",
           "line": 36
         },
         {
-          "name": "removeFavoriteFoodUseCase",
+          "name": "addFavoriteFoodUseCase",
           "line": 37
         },
         {
-          "name": "sessionManager",
+          "name": "removeFavoriteFoodUseCase",
           "line": 38
+        },
+        {
+          "name": "cafeListUseCase",
+          "line": 39
+        },
+        {
+          "name": "sessionManager",
+          "line": 40
         }
       ]
     },
@@ -15162,34 +15756,34 @@
         {
           "name": "ChatViewModelTest",
           "kind": "class",
-          "line": 27
+          "line": 28
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "getChatMessageUseCase",
-          "line": 31
-        },
-        {
-          "name": "getChatListUseCase",
           "line": 32
         },
         {
-          "name": "sendUseCase",
+          "name": "getChatListUseCase",
           "line": 33
         },
         {
-          "name": "markReadUseCase",
+          "name": "sendUseCase",
           "line": 34
         },
         {
+          "name": "markReadUseCase",
+          "line": 35
+        },
+        {
           "name": "realtimeGateway",
-          "line": 36
+          "line": 37
         },
         {
           "name": "sessionManager",
-          "line": 37
+          "line": 38
         }
       ]
     },
@@ -16564,14 +17158,19 @@
           "line": 41
         },
         {
+          "name": "NavigateToOrderDetail",
+          "kind": "class",
+          "line": 42
+        },
+        {
           "name": "Error",
           "kind": "class",
-          "line": 45
+          "line": 46
         },
         {
           "name": "Success",
           "kind": "object",
-          "line": 48
+          "line": 49
         }
       ],
       "functions": [],
@@ -16609,8 +17208,12 @@
           "line": 35
         },
         {
+          "name": "orderId",
+          "line": 42
+        },
+        {
           "name": "message",
-          "line": 46
+          "line": 47
         }
       ]
     },
@@ -17594,42 +18197,42 @@
         {
           "name": "SellerChatDetailViewModel",
           "kind": "class",
-          "line": 44
+          "line": 45
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "getChatListUseCase",
-          "line": 46
-        },
-        {
-          "name": "getChatMessageUseCase",
           "line": 47
         },
         {
-          "name": "sendChatMessageUseCase",
+          "name": "getChatMessageUseCase",
           "line": 48
         },
         {
-          "name": "chatMessageMarkAsReadUseCase",
+          "name": "sendChatMessageUseCase",
           "line": 49
         },
         {
-          "name": "realtimeGateway",
+          "name": "chatMessageMarkAsReadUseCase",
           "line": 50
         },
         {
-          "name": "sessionManager",
+          "name": "realtimeGateway",
           "line": 51
         },
         {
+          "name": "sessionManager",
+          "line": 52
+        },
+        {
           "name": "routeChatId",
-          "line": 54
+          "line": 55
         },
         {
           "name": "lastReadChatId",
-          "line": 55
+          "line": 56
         }
       ]
     },
@@ -18078,6 +18681,23 @@
       ]
     },
     {
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/component/SellerOrderComponents.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.feature.seller.ui.component",
+      "classes": [],
+      "functions": [
+        {
+          "name": "OrderFilterChips",
+          "line": 22
+        },
+        {
+          "name": "matchesOrderFilter",
+          "line": 65
+        }
+      ],
+      "data_members": []
+    },
+    {
       "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/ui/SellerChatListScreen.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.feature.seller.ui",
@@ -18121,12 +18741,8 @@
           "line": 328
         },
         {
-          "name": "mockSellerChatList",
-          "line": 336
-        },
-        {
           "name": "mockSellerChatMessages",
-          "line": 360
+          "line": 336
         }
       ],
       "data_members": []
@@ -18211,35 +18827,35 @@
       "functions": [
         {
           "name": "SellerDashboardScreen",
-          "line": 80
+          "line": 82
         },
         {
           "name": "ModernOrderItemCompact",
-          "line": 325
+          "line": 327
         },
         {
           "name": "DashboardHeader",
-          "line": 407
+          "line": 409
         },
         {
           "name": "NotificationBadge",
-          "line": 478
+          "line": 480
         },
         {
           "name": "WeeklySummaryCard",
-          "line": 514
+          "line": 516
         },
         {
           "name": "SummaryItem",
-          "line": 546
+          "line": 548
         },
         {
           "name": "WeeklyOrdersChart",
-          "line": 554
+          "line": 556
         },
         {
           "name": "SellerDashboardPreview",
-          "line": 713
+          "line": 669
         }
       ],
       "data_members": []
@@ -18371,7 +18987,7 @@
       "functions": [
         {
           "name": "SellerOrderScreen",
-          "line": 70
+          "line": 69
         },
         {
           "name": "SellerOrderHeader",
@@ -18383,7 +18999,7 @@
         },
         {
           "name": "SellerOrderScreenPreview",
-          "line": 515
+          "line": 440
         }
       ],
       "data_members": []
@@ -18551,27 +19167,27 @@
       "functions": [
         {
           "name": "SellerStoreScreen",
-          "line": 78
+          "line": 77
         },
         {
           "name": "SellerStoreTopBar",
-          "line": 181
+          "line": 180
         },
         {
           "name": "ProfileMenuItem",
-          "line": 229
+          "line": 228
         },
         {
           "name": "SellerStoreHeader",
-          "line": 306
+          "line": 305
         },
         {
           "name": "SellerActionButton",
-          "line": 438
+          "line": 437
         },
         {
           "name": "SellerStoreScreenPreview",
-          "line": 466
+          "line": 465
         }
       ],
       "data_members": []
@@ -18622,34 +19238,34 @@
         {
           "name": "SellerChatDetailViewModelTest",
           "kind": "class",
-          "line": 28
+          "line": 29
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "getChatMessageUseCase",
-          "line": 32
-        },
-        {
-          "name": "getChatListUseCase",
           "line": 33
         },
         {
-          "name": "sendUseCase",
+          "name": "getChatListUseCase",
           "line": 34
         },
         {
-          "name": "markReadUseCase",
+          "name": "sendUseCase",
           "line": 35
         },
         {
+          "name": "markReadUseCase",
+          "line": 36
+        },
+        {
           "name": "realtimeGateway",
-          "line": 37
+          "line": 38
         },
         {
           "name": "sessionManager",
-          "line": 38
+          "line": 39
         }
       ]
     },
@@ -19489,13 +20105,13 @@
       "functions": [
         {
           "name": "NotifRoute",
-          "line": 24
+          "line": 25
         }
       ],
       "data_members": [
         {
           "name": "vm",
-          "line": 26
+          "line": 27
         }
       ]
     },
@@ -19759,13 +20375,13 @@
       "functions": [
         {
           "name": "SellerNotifRoute",
-          "line": 24
+          "line": 25
         }
       ],
       "data_members": [
         {
           "name": "vm",
-          "line": 26
+          "line": 27
         }
       ]
     },
@@ -20031,5 +20647,5 @@
       ]
     }
   ],
-  "updated_at": "2026-05-31T17:13:13.926957+00:00"
+  "updated_at": "2026-06-01T13:04:40.627261+00:00"
 }
