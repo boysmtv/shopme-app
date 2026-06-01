@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.auth.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.REMEMBERED_LOGIN_EMAIL
 import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
@@ -16,6 +17,7 @@ import com.mtv.app.shopme.domain.param.LoginParam
 import com.mtv.app.shopme.domain.usecase.GetLoginUseCase
 import com.mtv.app.shopme.feature.auth.contract.*
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -23,8 +25,10 @@ import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
@@ -71,50 +75,70 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun doLogin() {
-        val state = _state.value
-        val submittedEmail = state.email
-        val submittedPassword = state.password
+        val snapshot = _state.value
+        val submittedEmail = snapshot.email
+        val submittedPassword = snapshot.password
 
-        observeIndependentDataFlow(
-            flow = loginUseCase(
+        viewModelScope.launch {
+            loginUseCase(
                 LoginParam(
                     email = submittedEmail,
                     password = submittedPassword
                 )
-            ),
-            onState = { result ->
-                _state.update {
-                    it.copy(
-                        email = it.email.ifBlank { submittedEmail },
-                        password = it.password.ifBlank { submittedPassword },
-                        login = result
-                    )
-                }
-
-                if (result is LoadState.Success) {
-                    securePrefs.putString(
-                        REMEMBERED_LOGIN_EMAIL,
-                        if (state.rememberEmail) submittedEmail else ""
-                    )
-                    securePrefs.putString(
-                        ACCESS_TOKEN,
-                        result.data.accessToken
-                    )
-                    securePrefs.putString(
-                        USER_ROLE,
-                        result.data.role.uppercase()
-                    )
-                    if (result.data.role.equals("SELLER", ignoreCase = true)) {
-                        emitEffect(LoginEffect.NavigateToSellerDashboard)
-                    } else {
-                        emitEffect(LoginEffect.NavigateToHome)
+            ).collect { resource ->
+                when (resource) {
+                    is Resource.Loading -> {
+                        _state.update {
+                            it.copy(
+                                email = submittedEmail,
+                                password = submittedPassword,
+                                login = LoadState.Loading
+                            )
+                        }
                     }
+
+                    is Resource.Success -> {
+                        _state.update {
+                            it.copy(
+                                email = submittedEmail,
+                                password = submittedPassword,
+                                login = LoadState.Success(resource.data)
+                            )
+                        }
+                        securePrefs.putString(
+                            REMEMBERED_LOGIN_EMAIL,
+                            if (snapshot.rememberEmail) submittedEmail else ""
+                        )
+                        securePrefs.putString(
+                            ACCESS_TOKEN,
+                            resource.data.accessToken
+                        )
+                        securePrefs.putString(
+                            USER_ROLE,
+                            resource.data.role.uppercase()
+                        )
+                        if (resource.data.role.equals("SELLER", ignoreCase = true)) {
+                            emitEffect(LoginEffect.NavigateToSellerDashboard)
+                        } else {
+                            emitEffect(LoginEffect.NavigateToHome)
+                        }
+                    }
+
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                email = submittedEmail,
+                                password = submittedPassword,
+                                login = LoadState.Error(resource.error)
+                            )
+                        }
+                        showError(resource.error)
+                    }
+
+                    else -> Unit
                 }
-            },
-            onError = {
-                showError(it)
             }
-        )
+        }
     }
 
     private fun showError(error: UiError) {
