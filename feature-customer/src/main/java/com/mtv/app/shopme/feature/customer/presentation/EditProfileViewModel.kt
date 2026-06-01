@@ -12,10 +12,12 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.param.AddressAddParam
 import com.mtv.app.shopme.domain.param.AddressDefaultParam
 import com.mtv.app.shopme.domain.param.AddressDeleteParam
+import com.mtv.app.shopme.domain.param.AddressUpdateParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.usecase.CreateAddressUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateAddressDefaultUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteAddressUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateAddressUseCase
 import com.mtv.app.shopme.domain.usecase.GetAddressUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateCustomerUseCase
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
@@ -50,6 +52,7 @@ class EditProfileViewModel @Inject constructor(
     private val addressUseCase: GetAddressUseCase,
     private val addressAddUseCase: CreateAddressUseCase,
     private val addressDeleteUseCase: DeleteAddressUseCase,
+    private val addressUpdateUseCase: UpdateAddressUseCase,
     private val addressDefaultUseCase: UpdateAddressDefaultUseCase,
     private val villageUseCase: GetVillageUseCase,
     private val uploadMediaUseCase: UploadMediaUseCase
@@ -65,6 +68,7 @@ class EditProfileViewModel @Inject constructor(
             is EditProfileEvent.DismissActiveDialog -> dismissActiveDialog()
             is EditProfileEvent.UpdateProfile -> updateProfile(event)
             is EditProfileEvent.AddAddress -> addAddress(event)
+            is EditProfileEvent.UpdateAddress -> updateAddress(event)
             is EditProfileEvent.DeleteAddress -> deleteAddress(event)
             is EditProfileEvent.SetDefaultAddress -> setDefault(event)
             is EditProfileEvent.ClickBack -> emitEffect(EditProfileEffect.NavigateBack)
@@ -167,6 +171,27 @@ class EditProfileViewModel @Inject constructor(
             ),
             onState = { state ->
                 _state.update { it.copy(addAddress = state) }
+            },
+            onError = { showError(it) },
+            onSuccess = { observeAddress() }
+        )
+    }
+
+    private fun updateAddress(event: EditProfileEvent.UpdateAddress) {
+        observeDataFlow(
+            flow = addressUpdateUseCase(
+                event.id,
+                AddressUpdateParam(
+                    villageId = event.villageId,
+                    block = event.block,
+                    number = event.number,
+                    rt = event.rt,
+                    rw = event.rw,
+                    isDefault = event.isDefault
+                )
+            ),
+            onState = { state ->
+                _state.update { it.copy(updateAddress = state) }
             },
             onError = { showError(it) },
             onSuccess = { observeAddress() }

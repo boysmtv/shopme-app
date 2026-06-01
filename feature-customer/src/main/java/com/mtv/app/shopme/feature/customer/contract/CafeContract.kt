@@ -14,6 +14,7 @@ import com.mtv.based.core.network.utils.LoadState
 
 data class CafeUiState(
     val cafe: LoadState<Cafe> = LoadState.Idle,
+    val cafeList: LoadState<List<Cafe>> = LoadState.Idle,
     val foods: LoadState<List<Food>> = LoadState.Idle,
     val favoriteIds: Set<String> = emptySet()
 )
@@ -28,6 +29,7 @@ sealed class CafeEvent {
     object ClickWhatsapp : CafeEvent()
     object ClickSearch : CafeEvent()
     data class ToggleFavorite(val foodId: String) : CafeEvent()
+    data class ClickCafeItem(val cafeId: String) : CafeEvent()
 }
 
 sealed class CafeEffect {
@@ -36,4 +38,5 @@ sealed class CafeEffect {
     object NavigateToSearch : CafeEffect()
     data class OpenWhatsapp(val phone: String) : CafeEffect()
     data class NavigateToDetail(val id: String) : CafeEffect()
+    data class NavigateToCafeDetail(val cafeId: String) : CafeEffect()
 }

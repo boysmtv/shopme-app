@@ -21,6 +21,7 @@ data class EditProfileUiState(
     val updateProfile: LoadState<Unit> = LoadState.Idle,
     val addAddress: LoadState<Unit> = LoadState.Idle,
     val deleteAddress: LoadState<Unit> = LoadState.Idle,
+    val updateAddress: LoadState<Address> = LoadState.Idle,
     val setDefaultAddress: LoadState<Unit> = LoadState.Idle,
 
     val activeDialog: EditProfileDialog? = null
@@ -47,6 +48,15 @@ sealed class EditProfileEvent {
     ) : EditProfileEvent()
 
     data class DeleteAddress(val id: String) : EditProfileEvent()
+    data class UpdateAddress(
+        val id: String,
+        val villageId: String,
+        val block: String,
+        val number: String,
+        val rt: String,
+        val rw: String,
+        val isDefault: Boolean
+    ) : EditProfileEvent()
     data class SetDefaultAddress(val id: String) : EditProfileEvent()
 
     object ClickBack : EditProfileEvent()

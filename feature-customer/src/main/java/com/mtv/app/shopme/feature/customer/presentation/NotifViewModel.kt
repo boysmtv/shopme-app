@@ -62,7 +62,11 @@ class NotifViewModel @Inject constructor(
             is NotifEvent.LoadMore -> loadMore()
             is NotifEvent.DismissDialog -> dismissDialog()
             is NotifEvent.ClearNotification -> clearNotifications()
-            is NotifEvent.ClickNotification -> Unit
+            is NotifEvent.ClickNotification -> {
+                if (event.item.orderId.isNotBlank()) {
+                    emitEffect(NotifEffect.NavigateToOrderDetail(event.item.orderId))
+                }
+            }
             is NotifEvent.ClickBack -> emitEffect(NotifEffect.NavigateBack)
         }
     }

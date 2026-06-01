@@ -27,15 +27,28 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,12 +84,40 @@ fun NotifScreen(
 ) {
     ShowNotificationDialog(state, event)
 
+    // Local state for unread items (mark as read locally on tap)
+    var localReadIds by remember { mutableStateOf(setOf<String>()) }
+
+    // Local state for delete confirmation
+    var itemToDelete by remember { mutableStateOf<NotificationItem?>(null) }
+
     val isRefreshing = state.notificationState is LoadState.Loading
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
         onRefresh = { event(NotifEvent.GetNotification) }
     )
+
+    // Delete confirmation dialog
+    itemToDelete?.let { item ->
+        AlertDialog(
+            onDismissRequest = { itemToDelete = null },
+            title = { Text("Delete Notification") },
+            text = { Text("Are you sure you want to delete this notification?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    itemToDelete = null
+                    event(NotifEvent.ClickNotification(item))
+                }) {
+                    Text("Delete", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { itemToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Box(
         modifier = Modifier
@@ -123,9 +164,21 @@ fun NotifScreen(
                         if (index >= state.localNotification.lastIndex - 2) {
                             event(NotifEvent.LoadMore)
                         }
-                        NotificationItemCard(
+                        val isLocalRead = localReadIds.contains(
+                            listOf(item.title, item.signatureDate, item.signatureTime, item.message).joinToString("|")
+                        )
+                        val effectiveIsUnread = !item.isRead && !isLocalRead
+
+                        SwipeToDismissNotificationItem(
                             item = item,
-                            onClick = { event(NotifEvent.ClickNotification(item)) }
+                            isUnread = effectiveIsUnread,
+                            onDeleteRequest = { itemToDelete = it },
+                            onClick = {
+                                if (effectiveIsUnread) {
+                                    localReadIds = localReadIds + listOf(item.title, item.signatureDate, item.signatureTime, item.message).joinToString("|")
+                                }
+                                event(NotifEvent.ClickNotification(item))
+                            }
                         )
                     }
                     if (state.isLoadingMore) {
@@ -208,9 +261,58 @@ private fun NotificationShimmerItem() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SwipeToDismissNotificationItem(
+    item: NotificationItem,
+    isUnread: Boolean,
+    onDeleteRequest: (NotificationItem) -> Unit,
+    onClick: () -> Unit
+) {
+    val dismissState = rememberSwipeToDismissBoxState()
+
+    LaunchedEffect(dismissState.currentValue) {
+        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            onDeleteRequest(item)
+            dismissState.reset()
+        }
+    }
+
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color(0xFFFF5252))
+                    .padding(16.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = Color.White
+                )
+            }
+        },
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = true
+    ) {
+        NotificationItemCard(
+            item = item,
+            isUnread = isUnread,
+            onDeleteClick = { onDeleteRequest(item) },
+            onClick = onClick
+        )
+    }
+}
+
 @Composable
 fun NotificationItemCard(
     item: NotificationItem,
+    isUnread: Boolean = false,
+    onDeleteClick: () -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     Row(
@@ -219,9 +321,18 @@ fun NotificationItemCard(
             .clip(RoundedCornerShape(20.dp))
             .background(Color.White)
             .clickable { onClick() }
-            .padding(16.dp),
+            .padding(start = 12.dp, top = 16.dp, bottom = 16.dp, end = 4.dp),
         verticalAlignment = Alignment.Top
     ) {
+        // Unread indicator dot on the left
+        if (isUnread) {
+            UnreadDot(
+                modifier = Modifier
+                    .padding(top = 14.dp, end = 10.dp)
+            )
+        } else {
+            Spacer(modifier = Modifier.width(20.dp))
+        }
 
         InitialAvatar(text = item.signatureName, size = 44.dp)
 
@@ -246,11 +357,6 @@ fun NotificationItemCard(
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray
                 )
-
-                if (!item.isRead) {
-                    Spacer(modifier = Modifier.width(6.dp))
-                    UnreadDot()
-                }
             }
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -264,6 +370,19 @@ fun NotificationItemCard(
             )
 
             NotificationMetaLine(item)
+        }
+
+        // Delete icon button
+        IconButton(
+            onClick = onDeleteClick,
+            modifier = Modifier.size(36.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Delete",
+                tint = Color.Gray.copy(alpha = 0.6f),
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }
@@ -342,9 +461,11 @@ fun ShowNotificationDialog(
 }
 
 @Composable
-fun UnreadDot() {
+fun UnreadDot(
+    modifier: Modifier = Modifier
+) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(8.dp)
             .clip(CircleShape)
             .background(Color(0xFF1E88E5))
@@ -381,7 +502,10 @@ fun InitialAvatar(
 @Preview(showBackground = true, device = Devices.PIXEL_4)
 @Composable
 fun NotificationItemPreview() {
-    NotificationItemCard(item = previewNotificationItem())
+    NotificationItemCard(
+        item = previewNotificationItem(),
+        isUnread = true
+    )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4)

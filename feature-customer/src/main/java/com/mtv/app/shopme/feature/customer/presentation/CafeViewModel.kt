@@ -11,6 +11,7 @@ package com.mtv.app.shopme.feature.customer.presentation
 import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
+import com.mtv.app.shopme.domain.usecase.CafeListUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class CafeViewModel @Inject constructor(
+    private val cafeListUseCase: CafeListUseCase,
     private val ensureChatConversationUseCase: EnsureChatConversationUseCase,
     private val getCafeUseCase: GetCafeUseCase,
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase,
@@ -58,6 +60,7 @@ class CafeViewModel @Inject constructor(
             is CafeEvent.ClickWhatsapp -> openWhatsapp()
             is CafeEvent.ClickSearch -> emitEffect(CafeEffect.NavigateToSearch)
             is CafeEvent.ToggleFavorite -> toggleFavorite(event.foodId)
+            is CafeEvent.ClickCafeItem -> emitEffect(CafeEffect.NavigateToCafeDetail(event.cafeId))
         }
     }
 
@@ -90,9 +93,22 @@ class CafeViewModel @Inject constructor(
     }
 
     private fun load() {
+        observeCafeList()
         observeCafe()
         observeFoods()
         observeFavorites()
+    }
+
+    private fun observeCafeList() {
+        observeIndependentDataFlow(
+            flow = cafeListUseCase(),
+            onState = { state ->
+                _state.update {
+                    it.copy(cafeList = state)
+                }
+            },
+            onError = { showError(it) }
+        )
     }
 
     private fun observeFavorites() {

@@ -24,6 +24,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +36,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -76,15 +80,17 @@ fun CafeScreen(
     state: CafeUiState,
     event: (CafeEvent) -> Unit
 ) {
-
     val cafe = (state.cafe as? LoadState.Success)?.data
     val foods = (state.foods as? LoadState.Success)?.data ?: emptyList()
+    val cafeList = (state.cafeList as? LoadState.Success)?.data ?: emptyList()
     val cafeError = state.cafe as? LoadState.Error
     val foodsError = state.foods as? LoadState.Error
+    val cafeListError = state.cafeList as? LoadState.Error
     val isInitialLoading =
-        (state.cafe is LoadState.Loading || state.foods is LoadState.Loading) &&
+        (state.cafe is LoadState.Loading || state.foods is LoadState.Loading || state.cafeList is LoadState.Loading) &&
                 cafe == null &&
-                foods.isEmpty()
+                foods.isEmpty() &&
+                cafeList.isEmpty()
 
     if (isInitialLoading) {
         Box(
@@ -93,6 +99,16 @@ fun CafeScreen(
         ) {
             LoadingV2()
         }
+        return
+    }
+
+    if (cafeListError != null) {
+        ContentErrorState(
+            title = "Gagal memuat daftar cafe",
+            message = cafeListError.error?.message ?: "Please try again.",
+            actionLabel = "Muat ulang",
+            onRetry = { event(CafeEvent.Load) }
+        )
         return
     }
 
@@ -132,51 +148,221 @@ fun CafeScreen(
                 .padding(horizontal = 16.dp),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
+            // Cafe list section — show all cafes in a grid
+            if (cafeList.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(16.dp))
 
-            item {
-                CafeHeader(
-                    cafe = cafe,
-                    onChatClick = { event(CafeEvent.ClickChat) },
-                    onWhatsappClick = { event(CafeEvent.ClickWhatsapp) },
-                )
+                    Text(
+                        text = "Semua Cafe",
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = PoppinsFont,
+                        fontSize = 20.sp,
+                    )
 
-                Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
+                }
 
-                Text(
-                    text = "Daftar Menu",
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = PoppinsFont,
-                    fontSize = 16.sp,
-                )
+                item {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(cafeList.size.let { size ->
+                                val rows = (size + 1) / 2
+                                (rows * 280).dp
+                            }),
+                        userScrollEnabled = false
+                    ) {
+                        items(cafeList, key = { it.id }) { cafe ->
+                            CafeGridItem(
+                                cafe = cafe,
+                                onClick = { event(CafeEvent.ClickCafeItem(cafe.id)) }
+                            )
+                        }
+                    }
+                }
 
-                Spacer(Modifier.height(12.dp))
+                item {
+                    Spacer(Modifier.height(24.dp))
+                }
+            } else if (state.cafeList is LoadState.Loading) {
+                item {
+                    repeat(2) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            repeat(2) {
+                                CafeGridItemShimmer(
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                        if (it < 1) Spacer(Modifier.height(12.dp))
+                    }
+                }
             }
 
-            if (state.foods is LoadState.Loading && foods.isEmpty()) {
-                gridItems(
-                    data = List(6) { it },
-                    columnCount = 2,
-                    horizontalSpacing = 16.dp,
-                    verticalSpacing = 16.dp
-                ) {
-                    CafeFoodItemShimmer()
+            // Detail section — shown when a single cafe is loaded
+            if (cafe != null) {
+                item {
+                    CafeHeader(
+                        cafe = cafe,
+                        onChatClick = { event(CafeEvent.ClickChat) },
+                        onWhatsappClick = { event(CafeEvent.ClickWhatsapp) },
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    Text(
+                        text = "Daftar Menu",
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = PoppinsFont,
+                        fontSize = 16.sp,
+                    )
+
+                    Spacer(Modifier.height(12.dp))
                 }
-            } else {
-                gridItems(
-                    data = foods,
-                    columnCount = 2,
-                    horizontalSpacing = 16.dp,
-                    verticalSpacing = 16.dp
-                ) { item ->
-                    CafeFoodItem(
-                        item = item,
-                        isFavorite = state.favoriteIds.contains(item.id),
-                        onClickDetail = { event(CafeEvent.ClickFood(it)) },
-                        onToggleFavorite = { event(CafeEvent.ToggleFavorite(item.id)) }
+
+                if (state.foods is LoadState.Loading && foods.isEmpty()) {
+                    gridItems(
+                        data = List(6) { it },
+                        columnCount = 2,
+                        horizontalSpacing = 16.dp,
+                        verticalSpacing = 16.dp
+                    ) {
+                        CafeFoodItemShimmer()
+                    }
+                } else {
+                    gridItems(
+                        data = foods,
+                        columnCount = 2,
+                        horizontalSpacing = 16.dp,
+                        verticalSpacing = 16.dp
+                    ) { item ->
+                        CafeFoodItem(
+                            item = item,
+                            isFavorite = state.favoriteIds.contains(item.id),
+                            onClickDetail = { event(CafeEvent.ClickFood(it)) },
+                            onToggleFavorite = { event(CafeEvent.ToggleFavorite(item.id)) }
+                        )
+                    }
+                }
+            }
+
+            // If no cafe detail but cafe list is present, just show the list
+            if (cafe == null && cafeList.isEmpty() && state.cafeList !is LoadState.Loading) {
+                item {
+                    Text(
+                        text = "Tidak ada cafe tersedia",
+                        color = Color.Gray,
+                        fontFamily = PoppinsFont,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(vertical = 32.dp)
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CafeGridItem(
+    cafe: Cafe,
+    onClick: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+    ) {
+        Column {
+            // Cafe image
+            Box {
+                SmartImage(
+                    model = cafe.image,
+                    contentDescription = cafe.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                    contentScale = ContentScale.Crop,
+                    placeholder = painterResource(R.drawable.image_burger),
+                    error = painterResource(R.drawable.image_burger)
+                )
+
+                // Status badge (Buka / Tutup)
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(8.dp)
+                        .background(
+                            color = if (cafe.isActive) AppColor.Green else Color.Gray,
+                            shape = RoundedCornerShape(6.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = if (cafe.isActive) "Buka" else "Tutup",
+                        color = Color.White,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = PoppinsFont
+                    )
+                }
+            }
+
+            // Cafe info
+            Column(
+                modifier = Modifier.padding(12.dp)
+            ) {
+                Text(
+                    text = cafe.name,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = PoppinsFont,
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "⏰ ${cafe.openTime} - ${cafe.closeTime}",
+                    fontSize = 11.sp,
+                    color = AppColor.Green,
+                    fontFamily = PoppinsFont,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CafeGridItemShimmer(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        ShimmerBlock(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp),
+            shape = RoundedCornerShape(12.dp)
+        )
+        ShimmerLine(widthFraction = 0.8f, heightDp = 14)
+        ShimmerLine(widthFraction = 0.5f, heightDp = 12)
+        ShimmerLine(widthFraction = 0.6f, heightDp = 12)
     }
 }
 

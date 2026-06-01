@@ -8,12 +8,18 @@
 
 package com.mtv.app.shopme.feature.customer.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +32,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -34,10 +41,14 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -73,6 +84,7 @@ import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
+import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.app.shopme.feature.customer.contract.SearchEvent
 import com.mtv.app.shopme.feature.customer.contract.SearchUiState
@@ -93,6 +105,7 @@ fun SearchScreen(
     val items = (state.foods as? LoadState.Success)?.data ?: emptyList()
     val isLoading = state.foods is LoadState.Loading
     val canLoadMore = !state.isLoadingMore && !state.isLastPage && state.foods is LoadState.Success
+    var selectedCategory by remember { mutableStateOf<FoodCategory?>(null) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = { event(SearchEvent.Load) }
@@ -139,9 +152,34 @@ fun SearchScreen(
             onFavoritesClick = { event(SearchEvent.ClickFavorites) }
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
+
+        // Category Filter Row - always visible
+        CategoryFilterRow(
+            selectedCategory = selectedCategory,
+            onCategorySelected = { category ->
+                selectedCategory = category
+                if (category != null) {
+                    event(SearchEvent.QueryChanged(category.name))
+                } else {
+                    event(SearchEvent.QueryChanged(""))
+                }
+            }
+        )
+
+        Spacer(Modifier.height(12.dp))
 
         when {
+            // Show recent searches when query is empty
+            state.query.isEmpty() && items.isEmpty() && !isLoading -> {
+                RecentSearchesSection(
+                    recentSearches = emptyList(),
+                    onRecentSearchClicked = { query ->
+                        event(SearchEvent.QueryChanged(query))
+                    }
+                )
+            }
+
             state.query.isNotEmpty() && items.isEmpty() && !isLoading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -184,7 +222,7 @@ fun SearchScreen(
                         isFavorite = state.favoriteIds.contains(food.id),
                         onClickItem = { event(SearchEvent.ClickFood(it)) },
                         onToggleFavorite = { event(SearchEvent.ToggleFavorite(food.id)) },
-                        previewDrawable = getPreviewDrawable(index)
+                        previewDrawable = R.drawable.no_image
                     )
                 }
 
@@ -228,92 +266,119 @@ fun SearchHeader(
     onFavoritesClick: () -> Unit = {}
 ) {
     var localQuery by remember(query) { mutableStateOf(query) }
+    var showSuggestions by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(48.dp)
-                .background(Color.White, RoundedCornerShape(24.dp)),
-            contentAlignment = Alignment.CenterStart
-        ) {
+    // Show suggestions when typing 3+ characters
+    val showDropdown = showSuggestions && localQuery.length >= 3
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.padding(start = 16.dp)
-                )
-
-                Spacer(Modifier.width(8.dp))
-
-                BasicTextField(
-                    value = localQuery,
-                    onValueChange = {
-                        localQuery = it
-                        onQueryChanged(it)
-                    },
-                    singleLine = true,
-                    textStyle = TextStyle(
-                        color = Color.Black,
-                        fontSize = 14.sp,
-                        fontFamily = PoppinsFont
-                    ),
-                    cursorBrush = SolidColor(AppColor.Green),
-                    modifier = Modifier.weight(1f),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.CenterStart
-                        ) {
-                            if (localQuery.isEmpty()) {
-                                Text(
-                                    text = "Search food here...",
-                                    color = Color.Gray,
-                                    fontFamily = PoppinsFont,
-                                    fontSize = 14.sp
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
-
-                if (localQuery.isNotEmpty()) {
-                    IconButton(
-                        onClick = {
-                            localQuery = EMPTY_STRING
-                            onQueryChanged(EMPTY_STRING)
-                        }
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                        .background(Color.White, RoundedCornerShape(24.dp)),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxSize()
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = null
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = Color.Gray,
+                            modifier = Modifier.padding(start = 16.dp)
                         )
+
+                        Spacer(Modifier.width(8.dp))
+
+                        BasicTextField(
+                            value = localQuery,
+                            onValueChange = {
+                                localQuery = it
+                                onQueryChanged(it)
+                                showSuggestions = it.isNotEmpty()
+                            },
+                            singleLine = true,
+                            textStyle = TextStyle(
+                                color = Color.Black,
+                                fontSize = 14.sp,
+                                fontFamily = PoppinsFont
+                            ),
+                            cursorBrush = SolidColor(AppColor.Green),
+                            modifier = Modifier.weight(1f),
+                            decorationBox = { innerTextField ->
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (localQuery.isEmpty()) {
+                                        Text(
+                                            text = "Search food here...",
+                                            color = Color.Gray,
+                                            fontFamily = PoppinsFont,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            }
+                        )
+
+                        if (localQuery.isNotEmpty()) {
+                            IconButton(
+                                onClick = {
+                                    localQuery = EMPTY_STRING
+                                    onQueryChanged(EMPTY_STRING)
+                                    showSuggestions = false
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = null
+                                )
+                            }
+                        }
                     }
                 }
+
+                Spacer(Modifier.width(16.dp))
+
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                        .clickable { onFavoritesClick() }
+                        .padding(12.dp),
+                    tint = Color.Red
+                )
+            }
+
+            // Search suggestions dropdown
+            AnimatedVisibility(
+                visible = showDropdown,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                SearchSuggestionsDropdown(
+                    query = localQuery,
+                    suggestions = emptyList(),
+                    onSuggestionClick = { suggestion ->
+                        localQuery = suggestion
+                        onQueryChanged(suggestion)
+                        showSuggestions = false
+                    }
+                )
             }
         }
-
-        Spacer(Modifier.width(16.dp))
-
-        Icon(
-            imageVector = Icons.Default.Favorite,
-            contentDescription = null,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.White)
-                .clickable { onFavoritesClick() }
-                .padding(12.dp),
-            tint = Color.Red
-        )
     }
 }
 
@@ -420,16 +485,171 @@ fun SearchItem(
     }
 }
 
-fun getPreviewDrawable(index: Int): Int? = when (index) {
-    0 -> R.drawable.image_burger
-    1 -> R.drawable.image_pizza
-    2 -> R.drawable.image_platbread
-    3 -> R.drawable.image_cheese_burger
-    4 -> R.drawable.image_bakso
-    5 -> R.drawable.image_pempek
-    6 -> R.drawable.image_padang
-    7 -> R.drawable.image_sate
-    else -> null
+// ──────────────────────────────────────────────
+// Recent Searches Section
+// ──────────────────────────────────────────────
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun RecentSearchesSection(
+    recentSearches: List<String>,
+    onRecentSearchClicked: (String) -> Unit
+) {
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.TrendingUp,
+                contentDescription = null,
+                tint = Color.Gray,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(
+                text = "Recent Searches",
+                fontFamily = PoppinsFont,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = Color.DarkGray
+            )
+        }
+
+        Spacer(Modifier.height(10.dp))
+
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            recentSearches.forEach { keyword ->
+                AssistChip(
+                    onClick = { onRecentSearchClicked(keyword) },
+                    label = {
+                        Text(
+                            text = keyword,
+                            fontFamily = PoppinsFont,
+                            fontSize = 12.sp
+                        )
+                    },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = Color.White,
+                        labelColor = Color.DarkGray
+                    ),
+                    border = AssistChipDefaults.assistChipBorder(
+                        borderColor = Color.LightGray,
+                        enabled = true
+                    ),
+                    shape = RoundedCornerShape(20.dp)
+                )
+            }
+        }
+    }
+}
+
+// ──────────────────────────────────────────────
+// Search Suggestions Dropdown
+// ──────────────────────────────────────────────
+
+@Composable
+private fun SearchSuggestionsDropdown(
+    query: String,
+    suggestions: List<String>,
+    onSuggestionClick: (String) -> Unit
+) {
+    // Filter suggestions based on query
+    val filteredSuggestions = remember(query, suggestions) {
+        suggestions.filter { it.contains(query, ignoreCase = true) }
+    }
+
+    if (filteredSuggestions.isEmpty()) return
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)
+            .background(Color.White, RoundedCornerShape(12.dp))
+            .border(
+                width = 0.5.dp,
+                color = Color.LightGray,
+                shape = RoundedCornerShape(12.dp)
+            )
+            .padding(vertical = 4.dp)
+    ) {
+        filteredSuggestions.forEach { suggestion ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSuggestionClick(suggestion) }
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = Color.Gray,
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = suggestion,
+                    fontFamily = PoppinsFont,
+                    fontSize = 13.sp,
+                    color = Color.Black
+                )
+            }
+        }
+    }
+}
+
+// ──────────────────────────────────────────────
+// Category Filter Row
+// ──────────────────────────────────────────────
+
+@Composable
+private fun CategoryFilterRow(
+    selectedCategory: FoodCategory?,
+    onCategorySelected: (FoodCategory?) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // "Semua" option (deselect)
+        FilterChip(
+            selected = selectedCategory == null,
+            onClick = { onCategorySelected(null) },
+            label = {
+                Text(
+                    text = "Semua",
+                    fontFamily = PoppinsFont,
+                    fontSize = 13.sp,
+                    maxLines = 1
+                )
+            },
+            shape = RoundedCornerShape(20.dp)
+        )
+
+        FoodCategory.entries.forEach { category ->
+            FilterChip(
+                selected = selectedCategory == category,
+                onClick = { onCategorySelected(category) },
+                label = {
+                    Text(
+                        text = category.label,
+                        fontFamily = PoppinsFont,
+                        fontSize = 13.sp,
+                        maxLines = 1
+                    )
+                },
+                shape = RoundedCornerShape(20.dp)
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)

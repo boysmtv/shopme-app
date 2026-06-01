@@ -117,6 +117,7 @@ fun EditProfileScreen(
 
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAddAddress by remember { mutableStateOf(false) }
+    var showEditAddress by remember { mutableStateOf<String?>(null) }
     val sheetController = rememberSheetController()
 
     val customer = (state.customer as? LoadState.Success)?.data
@@ -221,6 +222,7 @@ fun EditProfileScreen(
                         AddressSection(
                             addresses = addresses,
                             onAdd = { showAddAddress = true },
+                            onEdit = { showEditAddress = it },
                             onDelete = { id ->
                                 event(EditProfileEvent.DeleteAddress(id))
                             },
@@ -277,6 +279,32 @@ fun EditProfileScreen(
                     showAddAddress = false
                 }
             )
+        }
+
+        showEditAddress?.let { addressId ->
+            val editingAddress = addresses.firstOrNull { it.id == addressId }
+            if (editingAddress != null) {
+                EditAddressSheet(
+                    controller = sheetController,
+                    address = editingAddress,
+                    villages = villages,
+                    onDismiss = { showEditAddress = null },
+                    onSave = { villageId, block, number, rt, rw, isDefault ->
+                        event(
+                            EditProfileEvent.UpdateAddress(
+                                id = addressId,
+                                villageId = villageId,
+                                block = block,
+                                number = number,
+                                rt = rt,
+                                rw = rw,
+                                isDefault = isDefault
+                            )
+                        )
+                        showEditAddress = null
+                    }
+                )
+            }
         }
     }
 }
@@ -339,6 +367,7 @@ fun PremiumHeader(
 fun AddressSection(
     addresses: List<Address>,
     onAdd: () -> Unit,
+    onEdit: (String) -> Unit,
     onDelete: (String) -> Unit,
     onSetDefault: (String) -> Unit
 ) {
@@ -421,6 +450,16 @@ fun AddressSection(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+
+                        TextButton(
+                            onClick = { onEdit(address.id) }
+                        ) {
+                            Text(
+                                text = "Edit",
+                                color = AppColor.Green,
+                                fontFamily = PoppinsFont
+                            )
+                        }
 
                         if (!address.isDefault) {
                             TextButton(
@@ -659,6 +698,158 @@ fun AddAddressSheet(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun EditAddressSheet(
+    controller: SheetController,
+    address: Address,
+    villages: List<Village>,
+    onDismiss: () -> Unit,
+    onSave: (String, String, String, String, String, Boolean) -> Unit
+) {
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = controller.sheetState,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        LaunchedEffect(Unit) {
+            controller.expand()
+        }
+
+        var selectedVillageId by rememberSaveable {
+            mutableStateOf(villages.firstOrNull { it.name == address.village }?.id)
+        }
+        val selectedVillage = villages.firstOrNull { it.id == selectedVillageId }
+
+        var block by rememberSaveable { mutableStateOf(address.block) }
+        var number by rememberSaveable { mutableStateOf(address.number) }
+        var rt by rememberSaveable { mutableStateOf(address.rt) }
+        var rw by rememberSaveable { mutableStateOf(address.rw) }
+        var isDefault by rememberSaveable { mutableStateOf(address.isDefault) }
+
+        val isValid =
+            selectedVillage != null &&
+                    block.isNotBlank() &&
+                    number.isNotBlank() &&
+                    rt.isNotBlank() &&
+                    rw.isNotBlank()
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .imePadding()
+                .padding(20.dp)
+        ) {
+
+            VillageDropdown(
+                villages = villages,
+                selectedVillage = selectedVillage,
+                onSelected = { selectedVillageId = it.id }
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            Row {
+                BaseSimpleFormField(
+                    label = "Blok",
+                    value = block,
+                    maxChar = 3,
+                    modifier = Modifier.weight(1f)
+                ) { block = it }
+
+                Spacer(Modifier.width(12.dp))
+
+                BaseSimpleFormField(
+                    label = "No",
+                    value = number,
+                    maxChar = 3,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.weight(1f)
+                ) { number = it }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            Row {
+
+                BaseSimpleFormField(
+                    label = "RT",
+                    value = rt,
+                    maxChar = 3,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.weight(1f)
+                ) { rt = it }
+
+                Spacer(Modifier.width(12.dp))
+
+                BaseSimpleFormField(
+                    label = "RW",
+                    value = rw,
+                    maxChar = 3,
+                    keyboardType = KeyboardType.Number,
+                    modifier = Modifier.weight(1f)
+                ) { rw = it }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .toggleable(
+                        value = isDefault,
+                        role = Role.Checkbox,
+                        onValueChange = { isDefault = it }
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Checkbox(
+                    checked = isDefault,
+                    onCheckedChange = null
+                )
+
+                Spacer(Modifier.width(8.dp))
+
+                Text(
+                    text = "Jadikan alamat utama",
+                    fontFamily = PoppinsFont
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Button(
+                enabled = isValid,
+                onClick = {
+                    onSave(
+                        selectedVillage!!.id,
+                        block,
+                        number,
+                        rt,
+                        rw,
+                        isDefault
+                    )
+                    controller.hide()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(50),
+                colors = ButtonDefaults.buttonColors(containerColor = AppColor.Green)
+            ) {
+                Text(
+                    "Simpan Perubahan",
+                    color = Color.White,
+                    fontFamily = PoppinsFont
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun VillageDropdown(
     villages: List<Village>,
     selectedVillage: Village?,
@@ -845,6 +1036,7 @@ fun EditProfileAddressTabPreview() {
                 AddressSection(
                     addresses = addresses(),
                     onAdd = {},
+                    onEdit = {},
                     onDelete = {},
                     onSetDefault = {}
                 )

@@ -35,6 +35,7 @@ sealed class NotifEvent {
 
 sealed class NotifEffect {
     object NavigateBack : NotifEffect()
+    data class NavigateToOrderDetail(val orderId: String) : NotifEffect()
 }
 
 sealed class NotifDialog {

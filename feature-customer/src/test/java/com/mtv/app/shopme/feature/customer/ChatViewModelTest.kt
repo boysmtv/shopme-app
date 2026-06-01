@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEvent
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
@@ -60,13 +61,10 @@ class ChatViewModelTest {
             Resource.Success(
                 PagedData(
                     content = listOf(
-                    ChatListItem(
+                    ChatMessage(
                         id = "conv-1",
-                        name = "Cafe Kopi Kita",
-                        lastMessage = "Pesanan sedang diproses",
+                        message = "Pesanan sedang diproses",
                         time = "10:30",
-                        unreadCount = 1,
-                        avatarUrl = null,
                         isFromUser = false
                     )
                     ),

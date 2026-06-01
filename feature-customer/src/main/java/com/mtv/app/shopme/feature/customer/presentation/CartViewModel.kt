@@ -16,6 +16,7 @@ import com.mtv.app.shopme.domain.param.CreateOrderParam
 import com.mtv.app.shopme.domain.param.VerifyPinParam
 import com.mtv.app.shopme.domain.usecase.CreateOrderUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteCartByCafeIdUseCase
+import com.mtv.app.shopme.domain.usecase.DeleteCartItemUseCase
 import com.mtv.app.shopme.domain.usecase.DeleteCartUseCase
 import com.mtv.app.shopme.domain.usecase.GetCartUseCase
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
@@ -49,6 +50,7 @@ class CartViewModel @Inject constructor(
     private val cartQuantityUseCase: UpdateCartQuantityUseCase,
     private val clearCartByCafeIdUseCase: DeleteCartByCafeIdUseCase,
     private val clearCartUseCase: DeleteCartUseCase,
+    private val deleteCartItemUseCase: DeleteCartItemUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<CartEvent, CartEffect>() {
 
@@ -75,6 +77,8 @@ class CartViewModel @Inject constructor(
             is CartEvent.ChangeQuantity -> changeQuantity(event)
 
             is CartEvent.ClearCartByCafe -> clearCartByCafe(event)
+
+            is CartEvent.DeleteCartItem -> deleteCartItem(event)
 
             is CartEvent.ClearCart -> clearCart()
         }
@@ -455,6 +459,23 @@ class CartViewModel @Inject constructor(
             },
             onSuccess = {
                 hideLoading()
+            },
+            onError = { error ->
+                showError(error)
+            }
+        )
+    }
+
+    private fun deleteCartItem(event: CartEvent.DeleteCartItem) {
+        observeDataFlow(
+            flow = deleteCartItemUseCase(event.cartId),
+            onLoad = {
+                showLoading()
+            },
+            onSuccess = {
+                hideLoading()
+                load()
+                emitEffect(CartEffect.ShowSnackbar("Item berhasil dihapus"))
             },
             onError = { error ->
                 showError(error)

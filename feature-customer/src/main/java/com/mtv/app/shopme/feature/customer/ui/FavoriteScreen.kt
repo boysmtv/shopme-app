@@ -30,6 +30,7 @@ import com.mtv.app.shopme.feature.customer.contract.FavoriteEvent
 import com.mtv.app.shopme.feature.customer.contract.FavoriteUiState
 import com.mtv.app.shopme.feature.customer.ui.shimmer.ShimmerSearchScreen
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.app.shopme.common.R
 
 @Composable
 fun FavoriteScreen(
@@ -80,7 +81,7 @@ fun FavoriteScreen(
                                 isFavorite = state.favoriteIds.contains(food.id),
                                 onClickItem = { event(FavoriteEvent.ClickFood(it)) },
                                 onToggleFavorite = { event(FavoriteEvent.ToggleFavorite(food.id)) },
-                                previewDrawable = getPreviewDrawable(index)
+                                previewDrawable = R.drawable.no_image
                             )
                         }
                     }

@@ -44,6 +44,10 @@ sealed class CartEvent {
         val cafeId: String
     ) : CartEvent()
 
+    data class DeleteCartItem(
+        val cartId: String
+    ) : CartEvent()
+
     object ClearCart : CartEvent()
 }
 

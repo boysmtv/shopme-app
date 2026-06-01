@@ -8,15 +8,15 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.based.core.network.utils.LoadState
 
 data class ChatUiState(
     val activeChatId: String = "",
     val chatName: String = "",
     val chatAvatarUrl: String? = null,
-    val chats: LoadState<List<ChatListItem>> = LoadState.Idle,
-    val optimisticMessages: List<ChatListItem> = emptyList(),
+    val chats: LoadState<List<ChatMessage>> = LoadState.Idle,
+    val optimisticMessages: List<ChatMessage> = emptyList(),
     val sendMessage: LoadState<Unit> = LoadState.Idle,
     val readAll: LoadState<Unit> = LoadState.Idle,
     val isRefreshing: Boolean = false,

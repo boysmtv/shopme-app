@@ -70,17 +70,25 @@ class OrderHistoryViewModel @Inject constructor(
     private fun toItem(order: Order): OrderHistoryItem = OrderHistoryItem(
         id = order.id,
         storeName = order.cafeName.ifBlank { order.cafeId },
-        title = order.items.firstOrNull()?.foodName?.ifBlank { "Pesanan" }.orEmpty().ifBlank { "Pesanan" },
+        title = order.items.let { items ->
+            when (items.size) {
+                0 -> "Pesanan"
+                1 -> items.first().foodName.ifBlank { "Pesanan" }
+                else -> "${items.first().foodName} + ${items.size - 1} lainnya"
+            }
+        },
         date = order.createdAt.substringBefore("T").ifBlank { "-" },
         price = order.totalPrice.toRupiah(),
         status = when (order.status) {
+            OrderStatus.UNPAID -> "BELUM DIBAYAR"
+            OrderStatus.ORDERED -> "DIPESAN"
+            OrderStatus.COOKING -> "DIMASAK"
+            OrderStatus.DELIVERING -> "DIKIRIM"
             OrderStatus.COMPLETED -> "SELESAI"
             OrderStatus.CANCELLED -> "BATAL"
-            else -> "DIPROSES"
         },
         totalItems = order.itemCount.takeIf { it > 0 } ?: order.items.sumOf { it.quantity },
-        paymentMethod = order.paymentMethod.displayLabel(),
-        deliveryType = "Delivery"
+        paymentMethod = order.paymentMethod.displayLabel()
     )
 
     private fun PaymentMethod.displayLabel(): String = when (this) {

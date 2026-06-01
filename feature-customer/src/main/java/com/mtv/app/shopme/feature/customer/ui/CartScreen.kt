@@ -40,11 +40,13 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -178,11 +180,28 @@ private class CartScreenState {
     var showPinSheet by mutableStateOf(false)
     var showSuccessDialog by mutableStateOf(false)
     var selectedPaymentMethod by mutableStateOf(PaymentMethod.CASH)
+    var showDeleteConfirmDialog by mutableStateOf(false)
+    var itemToDelete by mutableStateOf<Cart?>(null)
 
     fun closeCheckout() {
         showCheckoutSheet = false
         showPinSheet = false
         selectedPaymentMethod = PaymentMethod.CASH
+    }
+
+    fun requestDeleteItem(item: Cart) {
+        itemToDelete = item
+        showDeleteConfirmDialog = true
+    }
+
+    fun confirmDeleteItem() {
+        showDeleteConfirmDialog = false
+        itemToDelete = null
+    }
+
+    fun cancelDeleteItem() {
+        showDeleteConfirmDialog = false
+        itemToDelete = null
     }
 }
 
@@ -268,7 +287,8 @@ private fun CartMainContent(
                 cartItems = cartItems,
                 groupedByCafe = groupedByCafe,
                 event = event,
-                onNavigateToDetail = onNavigateToDetail
+                onNavigateToDetail = onNavigateToDetail,
+                screenState = screenState
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -361,7 +381,8 @@ private fun ColumnScope.CartListContent(
     cartItems: List<Cart>,
     groupedByCafe: Map<String, List<Cart>>,
     event: (CartEvent) -> Unit,
-    onNavigateToDetail: (String) -> Unit
+    onNavigateToDetail: (String) -> Unit,
+    screenState: CartScreenState
 ) {
     if (cartItems.isEmpty()) {
         EmptyCartView(
@@ -382,6 +403,9 @@ private fun ColumnScope.CartListContent(
                     onNavigateToDetail = onNavigateToDetail,
                     onDeleteFoodByCafe = {
                         event(CartEvent.ClearCartByCafe(it))
+                    },
+                    onRequestDeleteItem = { item ->
+                        screenState.requestDeleteItem(item)
                     }
                 )
             }
@@ -450,7 +474,8 @@ fun CafeGroupCard(
     event: (CartEvent) -> Unit,
     itemResponses: List<Cart>,
     onNavigateToDetail: (foodId: String) -> Unit,
-    onDeleteFoodByCafe: (cafeId: String) -> Unit
+    onDeleteFoodByCafe: (cafeId: String) -> Unit,
+    onRequestDeleteItem: (Cart) -> Unit = {}
 ) {
     val cafeSubtotal = itemResponses.grandTotal()
 
@@ -498,6 +523,9 @@ fun CafeGroupCard(
                             quantity = item.quantity + 1
                         )
                     )
+                },
+                onDeleteItem = {
+                    onRequestDeleteItem(item)
                 }
             )
 
@@ -596,7 +624,8 @@ fun CartItemRow(
     itemResponse: Cart,
     onFoodClick: () -> Unit,
     onMinusClick: () -> Unit,
-    onPlusClick: () -> Unit
+    onPlusClick: () -> Unit,
+    onDeleteItem: () -> Unit = {}
 ) {
     val isPreview = LocalInspectionMode.current
 
@@ -646,6 +675,18 @@ fun CartItemRow(
                 onPlusClick = onPlusClick
             )
         }
+
+        IconButton(
+            onClick = onDeleteItem,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Hapus item",
+                tint = Color.Red.copy(alpha = 0.7f),
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 
@@ -681,24 +722,17 @@ private fun CartItemImage(
 @Composable
 private fun CartItemTitleRow(
     name: String,
-    onFoodClick: () -> Unit
+    onFoodClick: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = name,
-            fontFamily = PoppinsFont,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp,
-            modifier = Modifier.clickable {
-                onFoodClick()
-            }
-        )
-
-        StatusStatItem(FoodStatus.READY)
-    }
+    Text(
+        text = name,
+        fontFamily = PoppinsFont,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        modifier = Modifier.clickable {
+            onFoodClick()
+        }
+    )
 }
 
 @Composable
@@ -897,6 +931,56 @@ private fun CartDialogs(
             onConfirm = {
                 screenState.showSuccessDialog = false
                 onNavigateToOrder()
+            }
+        )
+    }
+
+    if (screenState.showDeleteConfirmDialog && screenState.itemToDelete != null) {
+        AlertDialog(
+            onDismissRequest = {
+                screenState.cancelDeleteItem()
+            },
+            title = {
+                Text(
+                    text = "Hapus Item",
+                    fontFamily = PoppinsFont,
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            text = {
+                Text(
+                    text = "Apakah Anda yakin ingin menghapus \"${screenState.itemToDelete!!.name}\" dari keranjang?",
+                    fontFamily = PoppinsFont
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        event(CartEvent.DeleteCartItem(screenState.itemToDelete!!.id))
+                        screenState.confirmDeleteItem()
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red
+                    )
+                ) {
+                    Text(
+                        text = "Hapus",
+                        color = Color.White,
+                        fontFamily = PoppinsFont
+                    )
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = {
+                        screenState.cancelDeleteItem()
+                    }
+                ) {
+                    Text(
+                        text = "Batal",
+                        fontFamily = PoppinsFont
+                    )
+                }
             }
         )
     }

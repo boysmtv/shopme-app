@@ -18,7 +18,7 @@ import com.mtv.app.shopme.domain.usecase.ChatMessageMarkAsReadUseCase
 import com.mtv.app.shopme.domain.usecase.CreateChatMessageSendUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
-import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.feature.customer.contract.ChatEffect
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatUiState
@@ -187,13 +187,10 @@ class ChatViewModel @Inject constructor(
     private fun sendMessage(event: ChatEvent.SendMessage) {
         val activeChatId = _state.value.activeChatId.ifBlank { event.id }
         if (activeChatId.isBlank()) return
-        val localMessage = ChatListItem(
+        val localMessage = ChatMessage(
             id = "local-${System.currentTimeMillis()}",
-            name = "",
-            lastMessage = event.message,
+            message = event.message,
             time = currentChatTime(),
-            unreadCount = 0,
-            avatarUrl = null,
             isFromUser = true,
             isPending = true,
             isRead = false,

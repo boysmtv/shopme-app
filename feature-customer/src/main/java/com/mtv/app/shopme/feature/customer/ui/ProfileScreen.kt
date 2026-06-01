@@ -106,10 +106,10 @@ fun ProfileScreen(
         menuSummary?.completed ?: 0
     ).any { it > 0 }
     val orderMenus = listOf(
-        OrderMenu("Belum Bayar", Icons.Filled.AccountBalanceWallet, menuSummary?.unpaid ?: 0, "ORDERED"),
-        OrderMenu("Dipesan", Icons.Filled.Inventory, menuSummary?.ordered ?: activeOrderCount.takeUnless { hasMenuSummary } ?: 0, "ORDERED"),
-        OrderMenu("Dimasak", Icons.Filled.Inventory, menuSummary?.cooking ?: 0, "COOKING"),
-        OrderMenu("Dikirim", Icons.Filled.LocalShipping, menuSummary?.shipping ?: 0, "DELIVERING"),
+        OrderMenu("Belum Bayar", Icons.Filled.AccountBalanceWallet, (menuSummary?.unpaid ?: 0L).toInt(), "ORDERED"),
+        OrderMenu("Dipesan", Icons.Filled.Inventory, (menuSummary?.ordered ?: (activeOrderCount.takeUnless { hasMenuSummary } ?: 0).toLong()).toInt(), "ORDERED"),
+        OrderMenu("Dimasak", Icons.Filled.Inventory, (menuSummary?.cooking ?: 0L).toInt(), "COOKING"),
+        OrderMenu("Dikirim", Icons.Filled.LocalShipping, (menuSummary?.shipping ?: 0L).toInt(), "DELIVERING"),
     )
 
     when (val customerState = state.customer) {

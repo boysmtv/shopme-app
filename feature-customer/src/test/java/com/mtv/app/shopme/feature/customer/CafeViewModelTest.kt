@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
 import com.mtv.app.shopme.domain.usecase.AddFavoriteFoodUseCase
+import com.mtv.app.shopme.domain.usecase.CafeListUseCase
 import com.mtv.app.shopme.domain.usecase.EnsureChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetFavoriteFoodIdsUseCase
@@ -35,6 +36,7 @@ class CafeViewModelTest {
     private val getFavoriteFoodIdsUseCase: GetFavoriteFoodIdsUseCase = mockk()
     private val addFavoriteFoodUseCase: AddFavoriteFoodUseCase = mockk()
     private val removeFavoriteFoodUseCase: RemoveFavoriteFoodUseCase = mockk()
+    private val cafeListUseCase: CafeListUseCase = mockk()
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
@@ -64,8 +66,10 @@ class CafeViewModelTest {
         )
         every { getFoodsByCafeUseCase.invoke("cafe-1") } returns flowOf(Resource.Success(emptyList()))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+        every { cafeListUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = CafeViewModel(
+            cafeListUseCase = cafeListUseCase,
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
@@ -87,6 +91,7 @@ class CafeViewModelTest {
     @Test
     fun `click search should navigate to customer search`() = runTest {
         val vm = CafeViewModel(
+            cafeListUseCase = cafeListUseCase,
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,
@@ -109,6 +114,7 @@ class CafeViewModelTest {
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = CafeViewModel(
+            cafeListUseCase = cafeListUseCase,
             getCafeUseCase = getCafeUseCase,
             getFoodsByCafeUseCase = getFoodsByCafeUseCase,
             ensureChatConversationUseCase = ensureChatConversationUseCase,

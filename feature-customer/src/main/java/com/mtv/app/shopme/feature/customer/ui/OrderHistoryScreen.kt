@@ -78,10 +78,7 @@ fun OrderHistoryScreen(
     )
 
     val filteredOrders = remember(state.orders, state.selectedFilter) {
-        state.orders.filter {
-            state.selectedFilter == OrderStatusFilter.SEMUA ||
-                    it.status == state.selectedFilter.name
-        }
+        state.orders.filter { state.selectedFilter.matches(it.status) }
     }
 
     Box(
@@ -122,10 +119,13 @@ fun OrderHistoryScreen(
                             items(
                                 items = filteredOrders,
                                 key = { order -> order.id }
-                            ) { order ->
-                                ModernOrderCard(order) {
-                                    event(OrderHistoryEvent.ClickOrder(order))
-                                }
+                            )                             { order ->
+                                ModernOrderCard(
+                                    item = order,
+                                    onClick = { event(OrderHistoryEvent.ClickOrder(order)) },
+                                    onRatingClick = { event(OrderHistoryEvent.ClickOrder(order)) },
+                                    onReorderClick = { event(OrderHistoryEvent.ClickOrder(order)) }
+                                )
                             }
                         }
                     }
@@ -216,7 +216,7 @@ private fun ModernFilter(
             ) {
 
                 Text(
-                    text = filter.name.lowercase().replaceFirstChar { it.uppercase() },
+                    text = filter.label,
                     fontFamily = PoppinsFont,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
@@ -230,15 +230,19 @@ private fun ModernFilter(
 @Composable
 fun ModernOrderCard(
     item: OrderHistoryItem,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onRatingClick: () -> Unit = {},
+    onReorderClick: () -> Unit = {}
 ) {
 
     var expanded by remember { mutableStateOf(false) }
 
     val statusColor = when (item.status) {
         "SELESAI" -> Color(0xFF16A34A)
-        "DIPROSES" -> Color(0xFFF59E0B)
         "DIKIRIM" -> Color(0xFF2563EB)
+        "DIMASAK" -> Color(0xFFF59E0B)
+        "DIPESAN" -> Color(0xFFF97316)
+        "BELUM DIBAYAR" -> Color(0xFFEF4444)
         else -> Color(0xFFDC2626)
     }
 
@@ -302,7 +306,6 @@ fun ModernOrderCard(
             InfoRow("Tanggal", item.date)
             InfoRow("Items", "${item.totalItems} item")
             InfoRow("Pembayaran", item.paymentMethod)
-            InfoRow("Delivery", item.deliveryType)
 
             Spacer(Modifier.height(12.dp))
 
@@ -355,7 +358,7 @@ fun ModernOrderCard(
 
                         if (item.status == "SELESAI") {
                             OutlinedButton(
-                                onClick = { /* Rating */ },
+                                onClick = onRatingClick,
                                 shape = RoundedCornerShape(50)
                             ) {
                                 Text("Beri Rating")
@@ -364,7 +367,7 @@ fun ModernOrderCard(
                         }
 
                         Button(
-                            onClick = { /* Reorder */ },
+                            onClick = onReorderClick,
                             shape = RoundedCornerShape(50),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = AppColor.Green
@@ -382,7 +385,7 @@ fun ModernOrderCard(
 @Composable
 fun MiniTimeline(status: String) {
 
-    val steps = listOf("DIPROSES", "DIKIRIM", "SELESAI")
+    val steps = listOf("BELUM DIBAYAR", "DIPESAN", "DIMASAK", "DIKIRIM", "SELESAI")
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -540,8 +543,7 @@ fun OrderHistoryPreview() {
                     "Rp 25.000",
                     "SELESAI",
                     3,
-                    "E-Wallet",
-                    "Diantar"
+                    "E-Wallet"
                 )
             )
         ),

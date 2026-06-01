@@ -68,7 +68,7 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.data.mock.DataUiMock
-import com.mtv.app.shopme.domain.model.ChatListItem
+import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatUiState
 import com.mtv.based.core.network.utils.LoadState
@@ -217,12 +217,12 @@ fun ChatScreen(
                     }
                     items(
                         items = messages,
-                        key = { msg -> "${msg.id}-${msg.time}-${msg.lastMessage.hashCode()}" }
+                        key = { msg -> "${msg.id}-${msg.time}-${msg.message.hashCode()}" }
                     ) { msg ->
                         ChatBubble(
                             chatListItem = msg,
                             onRetry = {
-                                event(ChatEvent.RetryMessage(msg.id, msg.lastMessage))
+                                event(ChatEvent.RetryMessage(msg.id, msg.message))
                             }
                         )
                     }
@@ -301,7 +301,7 @@ fun ChatScreen(
 
 @Composable
 fun ChatBubble(
-    chatListItem: ChatListItem,
+    chatListItem: ChatMessage,
     onRetry: () -> Unit = {}
 ) {
     val bubbleColor = if (chatListItem.isFromUser) AppColor.Green else AppColor.GreenSoft
@@ -320,7 +320,7 @@ fun ChatBubble(
         ) {
             Column {
                 Text(
-                    text = chatListItem.lastMessage,
+                    text = chatListItem.message,
                     color = textColor,
                     fontFamily = PoppinsFont,
                     fontSize = 14.sp

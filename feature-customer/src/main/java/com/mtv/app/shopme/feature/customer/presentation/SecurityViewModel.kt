@@ -38,7 +38,7 @@ class SecurityViewModel @Inject constructor(
 
     override fun onEvent(event: SecurityEvent) {
         when (event) {
-            is SecurityEvent.Load -> {}
+            is SecurityEvent.Load -> _state.update { it.copy(loading = false) }
             is SecurityEvent.DismissDialog -> dismissDialog()
 
             is SecurityEvent.ToggleBiometric -> toggleBiometric(event.enabled)

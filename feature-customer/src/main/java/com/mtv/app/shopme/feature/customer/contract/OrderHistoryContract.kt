@@ -8,8 +8,22 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-enum class OrderStatusFilter {
-    SEMUA, SELESAI, DIPROSES, BATAL
+enum class OrderStatusFilter(val label: String) {
+    SEMUA("Semua"),
+    BELUM_DIBAYAR("Belum Dibayar"),
+    DIPROSES("Diproses"),
+    DIKIRIM("Dikirim"),
+    SELESAI("Selesai"),
+    BATAL("Batal");
+
+    fun matches(status: String): Boolean = when (this) {
+        SEMUA -> true
+        BELUM_DIBAYAR -> status == "BELUM DIBAYAR"
+        DIPROSES -> status == "DIPESAN" || status == "DIMASAK"
+        DIKIRIM -> status == "DIKIRIM"
+        SELESAI -> status == "SELESAI"
+        BATAL -> status == "BATAL"
+    }
 }
 
 data class OrderHistoryUiState(
@@ -43,6 +57,5 @@ data class OrderHistoryItem(
     val price: String,
     val status: String,
     val totalItems: Int,
-    val paymentMethod: String,
-    val deliveryType: String
+    val paymentMethod: String
 )

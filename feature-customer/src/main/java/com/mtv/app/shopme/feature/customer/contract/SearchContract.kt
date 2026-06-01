@@ -8,13 +8,8 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-import com.mtv.app.shopme.data.remote.api.ApiResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
-import com.mtv.app.shopme.data.remote.response.PageResponse
-import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
 data class SearchUiState(
