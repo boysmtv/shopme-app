@@ -18,6 +18,7 @@ import com.mtv.app.shopme.common.base.BaseScreen
 import com.mtv.app.shopme.feature.customer.contract.NotifEffect
 import com.mtv.app.shopme.feature.customer.contract.NotifEvent
 import com.mtv.app.shopme.feature.customer.presentation.NotifViewModel
+import com.mtv.app.shopme.common.navbar.customer.CustomerDestinations
 import com.mtv.app.shopme.feature.customer.ui.NotifScreen
 
 @Composable
@@ -53,5 +54,6 @@ private fun handleNotifEffect(
 ) {
     when (effect) {
         NotifEffect.NavigateBack -> nav.popBackStack()
+        is NotifEffect.NavigateToOrderDetail -> nav.navigate(CustomerDestinations.navigateToOrderDetail(effect.orderId))
     }
 }

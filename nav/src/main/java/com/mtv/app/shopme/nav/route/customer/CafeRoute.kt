@@ -67,5 +67,6 @@ private fun handleCafeEffect(
             context.startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
         is CafeEffect.NavigateToDetail -> CustomerNavActions.toDetail(nav, effect.id)
+        is CafeEffect.NavigateToCafeDetail -> CustomerNavActions.toCafe(nav, effect.cafeId)
     }
 }
