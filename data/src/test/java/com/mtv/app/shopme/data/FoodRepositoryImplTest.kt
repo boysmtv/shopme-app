@@ -3,11 +3,13 @@ package com.mtv.app.shopme.data
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.FoodEntity
+import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.data.remote.datasource.FoodRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.repository.FoodRepositoryImpl
+import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.SearchParam
@@ -21,6 +23,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import kotlinx.serialization.builtins.ListSerializer
 import org.threeten.bp.LocalDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -39,15 +42,20 @@ class FoodRepositoryImplTest {
 
     @Test
     fun `getFoods should emit cached foods first then refresh from backend`() = runTest {
-        coEvery { homeDao.getFoodsOnce() } returns listOf(
-            FoodEntity(
+        val cached = listOf(
+            foodResponse(
                 id = "cached-1",
                 name = "Cached Coffee",
-                price = 18000.0,
-                image = "cached-image",
-                cafeName = "Cached Cafe",
-                isActive = true
+                cafeName = "Cached Cafe"
             )
+        )
+        coEvery { homeDao.getPayloadOnce("food:list:home") } returns PayloadCacheEntity(
+            cacheKey = "food:list:home",
+            payload = PayloadCacheStore.json.encodeToString(
+                ListSerializer(FoodResponse.serializer()),
+                cached
+            ),
+            updatedAt = 1L
         )
         coEvery { remote.getFoods() } returns listOf(
             foodResponse(
@@ -69,8 +77,7 @@ class FoodRepositoryImplTest {
             awaitComplete()
         }
 
-        coVerify { homeDao.clearFoods() }
-        coVerify { homeDao.insertFoods(match { it.single().id == "remote-1" }) }
+        coVerify { homeDao.insertPayload(match { it.cacheKey == "food:list:home" }) }
     }
 
     @Test

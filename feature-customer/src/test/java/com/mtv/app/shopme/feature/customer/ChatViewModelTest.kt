@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+
 package com.mtv.app.shopme.feature.customer
 
 import androidx.lifecycle.SavedStateHandle
@@ -101,5 +103,62 @@ class ChatViewModelTest {
         }
 
         verify(exactly = 1) { realtimeGateway.release() }
+    }
+
+    @Test
+    fun `load should keep route chat id even when it is not the first cached conversation`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
+        every { getChatListUseCase.invoke(false) } returns flowOf(
+            Resource.Success(
+                ChatList(
+                    listOf(
+                        ChatListItem(
+                            id = "conv-1",
+                            name = "Cafe Lama",
+                            lastMessage = "Pesan lama",
+                            time = "09:00",
+                            unreadCount = 0,
+                            avatarUrl = null,
+                            isFromUser = false
+                        )
+                    )
+                )
+            )
+        )
+        every { getChatMessageUseCase.page("conv-2", false, -1, 30) } returns flowOf(
+            Resource.Success(
+                PagedData(
+                    content = listOf(
+                        ChatMessage(
+                            id = "msg-2",
+                            message = "Halo seller baru",
+                            time = "10:15",
+                            isFromUser = false
+                        )
+                    ),
+                    page = 0,
+                    last = true
+                )
+            )
+        )
+        every { markReadUseCase.invoke("conv-2", false) } returns flowOf(Resource.Success(Unit))
+
+        val vm = ChatViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("chatId" to "conv-2")),
+            chatListUseCase = getChatListUseCase,
+            chatMessageUseCase = getChatMessageUseCase,
+            chatSendMessageUseCase = sendUseCase,
+            chatMessageMarkAsReadUseCase = markReadUseCase,
+            realtimeGateway = realtimeGateway,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(ChatEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals("conv-2", vm.uiState.value.activeChatId)
+        assertEquals("", vm.uiState.value.chatName)
+        verify(atLeast = 1) { getChatMessageUseCase.page("conv-2", false, -1, 30) }
+        verify(atLeast = 1) { markReadUseCase.invoke("conv-2", false) }
     }
 }
