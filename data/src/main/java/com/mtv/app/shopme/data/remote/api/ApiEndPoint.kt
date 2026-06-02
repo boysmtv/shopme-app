@@ -183,18 +183,18 @@ object ApiEndPoint {
         object GetList : IApiEndPoint { override val path = "$API/$CHAT/list"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Get : IApiEndPoint { override val path = "$API/$CHAT"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object GetPage : IApiEndPoint { override val path = "$API/$CHAT/page"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
-        class EnsureConversation(cafeId: String) : IApiEndPoint {
-            override val path = "$API/$CHAT/conversation?cafeId=${cafeId.toQueryValue()}"
+        object EnsureConversation : IApiEndPoint {
+            override val path = "$API/$CHAT/conversation"
             override val method = HttpMethod.Post
             override val type = EndpointType.Json
         }
-        class EnsureOrderConversation(orderId: String) : IApiEndPoint {
-            override val path = "$API/$CHAT/conversation/order?orderId=${orderId.toQueryValue()}"
+        object EnsureOrderConversation : IApiEndPoint {
+            override val path = "$API/$CHAT/conversation/order"
             override val method = HttpMethod.Post
             override val type = EndpointType.Json
         }
-        class EnsureSellerConversation(orderId: String) : IApiEndPoint {
-            override val path = "$API/$CHAT/conversation/seller?orderId=${orderId.toQueryValue()}"
+        object EnsureSellerConversation : IApiEndPoint {
+            override val path = "$API/$CHAT/conversation/seller"
             override val method = HttpMethod.Post
             override val type = EndpointType.Json
         }

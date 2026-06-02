@@ -6,18 +6,18 @@ import org.junit.Test
 class ApiEndPointChatTest {
 
     @Test
-    fun `ensure conversation endpoints should encode identifiers in path query`() {
+    fun `ensure conversation endpoints should have correct paths`() {
         assertEquals(
-            "api/chat/conversation?cafeId=cafe-1",
-            ApiEndPoint.Chat.EnsureConversation("cafe-1").path
+            "api/chat/conversation",
+            ApiEndPoint.Chat.EnsureConversation.path
         )
         assertEquals(
-            "api/chat/conversation/order?orderId=order-1",
-            ApiEndPoint.Chat.EnsureOrderConversation("order-1").path
+            "api/chat/conversation/order",
+            ApiEndPoint.Chat.EnsureOrderConversation.path
         )
         assertEquals(
-            "api/chat/conversation/seller?orderId=order-1",
-            ApiEndPoint.Chat.EnsureSellerConversation("order-1").path
+            "api/chat/conversation/seller",
+            ApiEndPoint.Chat.EnsureSellerConversation.path
         )
     }
 }
