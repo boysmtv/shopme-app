@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Production: pin certificates and disallow cleartext -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.shopme.app</domain>
+        <!--
+        TODO: Add actual certificate pins for production
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">base64-encoded-cert-hash-1</pin>
+            <pin digest="SHA-256">base64-encoded-cert-hash-2</pin>
+        </pin-set>
+        -->
+    </domain-config>
+
+    <!-- MinIO / local dev: allow cleartext -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">192.168.0.0/16</domain>
+        <domain includeSubdomains="true">10.0.0.0/8</domain>
+    </domain-config>
+</network-security-config>

@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     id("com.google.gms.google-services")
     alias(libs.plugins.firebase.appdistribution)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -46,10 +47,16 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
-            if (hasCiSigning) {
-                signingConfig = signingConfigs.getByName("ciRelease")
+        }
+        release {
+            isMinifyEnabled = true
+            signingConfig = if (hasCiSigning) {
+                signingConfigs.getByName("ciRelease")
+            } else {
+                println("WARNING: No CI signing config found. Release build will be unsigned!")
+                null
             }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
 
@@ -174,6 +181,7 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth.interop)
     implementation(libs.firebase.messaging.ktx)
+    implementation(libs.firebase.crashlytics.ktx)
 
     /* =========================
      * Internal / Maven Local Libraries

@@ -14,6 +14,7 @@ firebaseAppDistribution = "5.2.0"
 firebaseAuthKtx = "24.0.1"
 firebaseBom = "33.5.1"
 firebaseCommonKtx = "21.0.0"
+firebaseCrashlytics = "19.4.1"
 foundation = "1.10.2"
 google-services = "4.4.0"
 gson = "2.10.1"
@@ -108,6 +109,7 @@ firebase-firestore-ktx = { module = "com.google.firebase:firebase-firestore-ktx"
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
 firebase-auth-interop = { module = "com.google.firebase:firebase-auth-interop"}
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 
 # --- Media & Utils ---
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
@@ -149,6 +151,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
