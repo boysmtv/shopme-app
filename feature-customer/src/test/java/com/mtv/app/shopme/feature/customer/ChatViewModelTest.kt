@@ -106,6 +106,70 @@ class ChatViewModelTest {
     }
 
     @Test
+    fun `send message should refresh metadata without duplicate chat fetching`() = runTest {
+        every { realtimeGateway.events } returns realtimeEvents
+        every { getChatListUseCase.invoke(false) } returns flowOf(
+            Resource.Success(
+                ChatList(
+                    listOf(
+                        ChatListItem(
+                            id = "conv-1",
+                            name = "Cafe Kopi Kita",
+                            lastMessage = "Pesanan sedang diproses",
+                            time = "10:30",
+                            unreadCount = 1,
+                            avatarUrl = null,
+                            isFromUser = false
+                        )
+                    )
+                )
+            )
+        )
+        every { getChatMessageUseCase.page("conv-1", false, -1, 30) } returns flowOf(
+            Resource.Success(
+                PagedData(
+                    content = listOf(
+                        ChatMessage(
+                            id = "msg-1",
+                            message = "Pesanan sedang diproses",
+                            time = "10:30",
+                            isFromUser = false
+                        )
+                    ),
+                    page = 0,
+                    last = true
+                )
+            )
+        )
+        every { getChatMessageUseCase.invoke(null, false) } returns flowOf(Resource.Success(emptyList()))
+        every { sendUseCase.invoke("conv-1", "Halo", false) } returns flowOf(Resource.Success(Unit))
+        every { markReadUseCase.invoke("conv-1", false) } returns flowOf(Resource.Success(Unit))
+
+        val vm = ChatViewModel(
+            savedStateHandle = SavedStateHandle(),
+            chatListUseCase = getChatListUseCase,
+            chatMessageUseCase = getChatMessageUseCase,
+            chatSendMessageUseCase = sendUseCase,
+            chatMessageMarkAsReadUseCase = markReadUseCase,
+            realtimeGateway = realtimeGateway,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(ChatEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals("conv-1", vm.uiState.value.activeChatId)
+
+        vm.onEvent(ChatEvent.SendMessage(id = "conv-1", message = "Halo"))
+        advanceUntilIdle()
+
+        assertEquals("conv-1", vm.uiState.value.activeChatId)
+        assertEquals(0, vm.uiState.value.optimisticMessages.size)
+        verify(atLeast = 1) { getChatListUseCase.invoke(false) }
+        verify(exactly = 1) { sendUseCase.invoke("conv-1", "Halo", false) }
+    }
+
+    @Test
     fun `load should keep route chat id even when it is not the first cached conversation`() = runTest {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(

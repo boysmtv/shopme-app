@@ -22,6 +22,7 @@ import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import java.math.BigDecimal
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
@@ -95,6 +96,55 @@ class DetailViewModelTest {
         advanceUntilIdle()
 
         assertEquals(DetailEffect.NavigateToChat("conv-1"), effect.await())
+    }
+
+    @Test
+    fun `chat clicked should show error when cafe id is blank`() = runTest {
+        every { foodDetailUseCase.invoke("food-1") } returns flowOf(
+            Resource.Success(
+                Food(
+                    id = "food-1",
+                    cafeId = "",
+                    name = "Es Kopi Susu",
+                    cafeName = "Shopme Cafe",
+                    cafeAddress = "Kemang",
+                    description = "Minuman",
+                    price = BigDecimal("18000"),
+                    category = FoodCategory.DRINK,
+                    status = FoodStatus.READY,
+                    quantity = 20,
+                    estimate = "15 menit",
+                    isActive = true,
+                    createdAt = LocalDateTime.parse("2026-05-11T10:00:00"),
+                    images = emptyList(),
+                    variants = emptyList()
+                )
+            )
+        )
+        every { foodSimilarUseCase.invoke("", 0, 6) } returns flowOf(
+            Resource.Success(PagedData(emptyList(), page = 0, last = true))
+        )
+        every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
+
+        val vm = DetailViewModel(
+            ensureChatConversationUseCase = ensureChatConversationUseCase,
+            customerUseCase = customerUseCase,
+            foodDetailUseCase = foodDetailUseCase,
+            foodSimilarUseCase = foodSimilarUseCase,
+            foodAddToCartUseCase = foodAddToCartUseCase,
+            getFavoriteFoodIdsUseCase = getFavoriteFoodIdsUseCase,
+            addFavoriteFoodUseCase = addFavoriteFoodUseCase,
+            removeFavoriteFoodUseCase = removeFavoriteFoodUseCase,
+            sessionManager = sessionManager,
+            savedStateHandle = SavedStateHandle(mapOf("foodId" to "food-1"))
+        )
+
+        vm.onEvent(DetailEvent.Load)
+        advanceUntilIdle()
+        vm.onEvent(DetailEvent.ChatClicked)
+        advanceUntilIdle()
+
+        verify(exactly = 0) { ensureChatConversationUseCase.invoke(any()) }
     }
 
     @Test

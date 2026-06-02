@@ -14,6 +14,7 @@ import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
+import com.mtv.app.shopme.feature.customer.ui.OrderFilter
 import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
@@ -90,6 +91,47 @@ class OrderViewModelTest {
 
         assertEquals(false, vm.uiState.value.isLoading)
         coVerify(exactly = 0) { sessionManager.forceLogout() }
+    }
+
+    @Test
+    fun `select filter should persist state after reload`() = runTest {
+        val orders = listOf(
+            Order(
+                id = "order-1",
+                cafeId = "cafe-1",
+                cafeName = "Kopi Kita",
+                totalPrice = 25000.0,
+                status = OrderStatus.ORDERED,
+                paymentMethod = PaymentMethod.TRANSFER,
+                paymentStatus = PaymentStatus.WAITING_UPLOAD
+            )
+        )
+        every { getOrdersUseCase.invoke(0, 20) } returns flowOf(
+            Resource.Success(PagedData(orders, 0, true))
+        )
+
+        val vm = OrderViewModel(
+            getOrdersUseCase = getOrdersUseCase,
+            confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
+            realtimeGateway = realtimeGateway,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(OrderEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals(OrderFilter.SEMUA, vm.uiState.value.selectedFilter)
+
+        vm.onEvent(OrderEvent.SelectFilter(OrderFilter.COOKING))
+        advanceUntilIdle()
+
+        assertEquals(OrderFilter.COOKING, vm.uiState.value.selectedFilter)
+
+        vm.onEvent(OrderEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals(OrderFilter.COOKING, vm.uiState.value.selectedFilter)
     }
 
     @Test
