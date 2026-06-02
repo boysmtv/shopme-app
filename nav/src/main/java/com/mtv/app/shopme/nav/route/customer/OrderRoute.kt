@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.nav.route.customer
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -21,6 +22,7 @@ import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
 import com.mtv.app.shopme.feature.customer.ui.OrderScreen
+import com.mtv.app.shopme.feature.customer.ui.resolveOrderFilter
 import com.mtv.app.shopme.nav.customer.CustomerNavActions
 
 @Composable
@@ -33,6 +35,12 @@ fun OrderRoute(
 
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     val baseUiState by vm.baseUiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(initialFilter) {
+        if (initialFilter.isNotBlank()) {
+            vm.onEvent(OrderEvent.SelectFilter(resolveOrderFilter(initialFilter)))
+        }
+    }
 
     BaseRoute(
         viewModel = vm,
@@ -47,7 +55,6 @@ fun OrderRoute(
                 OrderScreen(
                     state = uiState,
                     event = vm::onEvent,
-                    initialFilter = initialFilter
                 )
             }
         }

@@ -9,6 +9,7 @@
 package com.mtv.app.shopme.feature.customer.contract
 
 import com.mtv.app.shopme.domain.model.Order
+import com.mtv.app.shopme.feature.customer.ui.OrderFilter
 
 data class OrderUiState(
     val isLoading: Boolean = false,
@@ -17,7 +18,8 @@ data class OrderUiState(
     val currentPage: Int = 0,
     val isLastPage: Boolean = false,
     val orders: List<Order> = emptyList(),
-    val activeDialog: OrderDialog? = null
+    val activeDialog: OrderDialog? = null,
+    val selectedFilter: OrderFilter = OrderFilter.SEMUA
 )
 
 sealed class OrderEvent {
@@ -28,6 +30,7 @@ sealed class OrderEvent {
     object LoadMore : OrderEvent()
     data class ClickOrder(val orderId: String) : OrderEvent()
     data class ConfirmTransfer(val orderId: String) : OrderEvent()
+    data class SelectFilter(val filter: OrderFilter) : OrderEvent()
 
     object ClickBack : OrderEvent()
     object ClickChatList : OrderEvent()

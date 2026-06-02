@@ -62,6 +62,7 @@ class OrderViewModel @Inject constructor(
             is OrderEvent.LoadMore -> loadMoreOrders()
             is OrderEvent.ClickOrder -> emitEffect(OrderEffect.NavigateToDetail(event.orderId))
             is OrderEvent.ConfirmTransfer -> confirmTransfer(event.orderId)
+            is OrderEvent.SelectFilter -> _state.update { it.copy(selectedFilter = event.filter) }
             is OrderEvent.ClickChatList -> emitEffect(OrderEffect.NavigateToChatList)
             is OrderEvent.ClickChat -> openChat(event.orderId)
             is OrderEvent.ClickBack -> emitEffect(OrderEffect.NavigateBack)

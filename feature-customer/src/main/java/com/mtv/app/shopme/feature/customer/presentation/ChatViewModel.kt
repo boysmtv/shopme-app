@@ -204,7 +204,6 @@ class ChatViewModel @Inject constructor(
             },
             onSuccess = {
                 observeChatMetadata()
-                observeChat()
             },
             onError = {
                 _state.update { state ->

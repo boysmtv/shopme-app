@@ -74,11 +74,15 @@ class DetailViewModel @Inject constructor(
 
     private fun openChat() {
         val cafeId = (_state.value.food as? LoadState.Success)?.data?.cafeId.orEmpty()
-        if (cafeId.isBlank()) return
+        if (cafeId.isBlank()) {
+            showError(UiError.Validation(message = "Informasi toko tidak tersedia"))
+            return
+        }
 
         observeDataFlow(
             flow = ensureChatConversationUseCase(cafeId),
-            onSuccess = { emitEffect(DetailEffect.NavigateToChat(it)) }
+            onSuccess = { emitEffect(DetailEffect.NavigateToChat(it)) },
+            onError = { showError(it) }
         )
     }
 

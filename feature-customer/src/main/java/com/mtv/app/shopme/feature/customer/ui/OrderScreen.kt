@@ -45,11 +45,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,7 +79,7 @@ enum class OrderFilter {
     COMPLETED
 }
 
-internal fun resolveOrderFilter(name: String): OrderFilter =
+fun resolveOrderFilter(name: String): OrderFilter =
     OrderFilter.entries.firstOrNull { it.name == name.uppercase() } ?: OrderFilter.SEMUA
 
 internal fun filterOrders(
@@ -105,7 +101,6 @@ internal fun filterOrders(
 fun OrderScreen(
     state: OrderUiState,
     event: (OrderEvent) -> Unit,
-    initialFilter: String = ""
 ) {
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
@@ -113,10 +108,7 @@ fun OrderScreen(
     )
     val listState = rememberLazyListState()
 
-    var selectedFilterName by rememberSaveable(initialFilter) {
-        mutableStateOf(resolveOrderFilter(initialFilter).name)
-    }
-    val selectedFilter = resolveOrderFilter(selectedFilterName)
+    val selectedFilter = state.selectedFilter
     val filteredOrders = filterOrders(state.orders, selectedFilter)
 
     Box(
@@ -146,7 +138,7 @@ fun OrderScreen(
 
                     ModernOrderFilter(
                         selected = selectedFilter,
-                        onChange = { selectedFilterName = it.name }
+                        onChange = { event(OrderEvent.SelectFilter(it)) }
                     )
 
                     if (state.isLoading && state.orders.isEmpty()) {
