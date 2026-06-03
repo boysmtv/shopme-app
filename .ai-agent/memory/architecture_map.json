@@ -47,8 +47,13 @@
     "data/src/test/java/com/mtv/app/shopme/data/SellerRepositoryImplTest.kt",
     "data/src/test/java/com/mtv/app/shopme/data/ShopmeRealtimeGatewayImplTest.kt",
     "data/src/test/java/com/mtv/app/shopme/data/SplashMapperTest.kt",
+    "data/src/test/java/com/mtv/app/shopme/data/remote/api/ApiEndPointChatTest.kt",
     "domain/src/androidTest/java/com/mtv/app/shopme/domain/ExampleInstrumentedTest.kt",
     "domain/src/test/java/com/mtv/app/shopme/domain/ExampleUnitTest.kt",
+    "domain/src/test/java/com/mtv/app/shopme/domain/usecase/CartUseCaseTest.kt",
+    "domain/src/test/java/com/mtv/app/shopme/domain/usecase/ChatUseCaseTest.kt",
+    "domain/src/test/java/com/mtv/app/shopme/domain/usecase/OrderUseCaseTest.kt",
+    "domain/src/test/java/com/mtv/app/shopme/domain/usecase/ProfileUseCaseTest.kt",
     "feature-auth/src/androidTest/java/com/mtv/app/shopme/feature/auth/ExampleInstrumentedTest.kt",
     "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ChangePinViewModelTest.kt",
     "feature-auth/src/test/java/com/mtv/app/shopme/feature/auth/ExampleUnitTest.kt",
@@ -70,6 +75,7 @@
     "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/NotifViewModelTest.kt",
     "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/NotificationViewModelTest.kt",
     "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/OrderDetailViewModelTest.kt",
+    "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/OrderScreenLogicTest.kt",
     "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/OrderViewModelTest.kt",
     "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/SecurityViewModelTest.kt",
     "feature-customer/src/test/java/com/mtv/app/shopme/feature/customer/SettingsViewModelTest.kt",
@@ -93,7 +99,8 @@
     "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerProductListViewModelTest.kt",
     "feature-seller/src/test/java/com/mtv/app/shopme/feature/seller/SellerProfileViewModelTest.kt",
     "nav/src/androidTest/java/com/mtv/app/shopme/nav/ExampleInstrumentedTest.kt",
-    "nav/src/test/java/com/mtv/app/shopme/nav/ExampleUnitTest.kt"
+    "nav/src/test/java/com/mtv/app/shopme/nav/ExampleUnitTest.kt",
+    "nav/src/test/java/com/mtv/app/shopme/nav/customer/CustomerNavActionsTest.kt"
   ],
   "docs": [
     "fastlane/README.md",
@@ -103,6 +110,6 @@
     ".brief/brief.v3.md",
     ".brief/brief.v4.md"
   ],
-  "updated_at": "2026-06-01T13:04:40.636270+00:00",
-  "source_file_count": 588
+  "updated_at": "2026-06-03T11:40:40.350404+00:00",
+  "source_file_count": 595
 }

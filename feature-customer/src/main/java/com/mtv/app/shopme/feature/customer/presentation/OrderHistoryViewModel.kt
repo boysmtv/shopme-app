@@ -13,7 +13,7 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
-import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
+import com.mtv.app.shopme.domain.usecase.GetOrderHistoryUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem
@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class OrderHistoryViewModel @Inject constructor(
-    private val getOrdersUseCase: GetOrdersUseCase,
+    private val getOrdersUseCase: GetOrderHistoryUseCase,
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<OrderHistoryEvent, OrderHistoryEffect>() {
 

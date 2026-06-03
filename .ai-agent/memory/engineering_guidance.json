@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-01T13:04:41.071412+00:00",
+  "updated_at": "2026-06-03T11:40:40.806635+00:00",
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
   "final_project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
   "dominant_language": "kotlin",
@@ -7,7 +7,7 @@
   "languages": [
     {
       "language": "kotlin",
-      "file_count": 587,
+      "file_count": 594,
       "modeling_guidance": "Prefer enum class, sealed hierarchies, data classes, and explicit domain types over raw command strings.",
       "localization_guidance": "Separate CLI copy or UI strings from control flow so localization can evolve without rewriting logic.",
       "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",

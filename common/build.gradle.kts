@@ -34,7 +34,7 @@ val debugBaseUrl = resolveConfig(
 val releaseBaseUrl = resolveConfig(
     localKey = "shopme.releaseBaseUrl",
     envKey = "SHOPME_RELEASE_BASE_URL",
-    fallback = "https://api.prod.com/"
+    fallback = "https://api.dsrv-developer.my.id/"
 )
 val firebaseProjectId = resolveConfig(
     localKey = "shopme.firebaseProjectId",

@@ -100,11 +100,11 @@
   ],
   "final_status": "registered",
   "mode": "factory_managed",
-  "updated_at": "2026-06-01T13:04:41.071412+00:00",
+  "updated_at": "2026-06-03T11:40:40.806635+00:00",
   "source_fingerprint": {
-    "updated_at": "2026-06-01T13:04:41.186103+00:00",
-    "file_count": 637,
-    "digest": "73bae598ca2fec0d7f13c9916fd07f90cfa1760244b61ba3c266d522af49fc16",
+    "updated_at": "2026-06-03T11:40:40.931391+00:00",
+    "file_count": 645,
+    "digest": "87cc8edac68e70c457ece6dce0a78f680139ea2d57984f1e60e769d56ed0589e",
     "files": [
       {
         "path": ".brief/brief.2345.md",
@@ -188,8 +188,8 @@
       },
       {
         "path": "app/src/main/AndroidManifest.xml",
-        "hash": "dc410aad37f022a9628976745d89480f897355f84280dfd9586e76cf48b8ff2e",
-        "size_bytes": 1442
+        "hash": "b772c7d4ca56009a9852fbecc38b82a1f9b0168661d735211c2ea4de08f2d579",
+        "size_bytes": 1467
       },
       {
         "path": "app/src/main/java/com/mtv/app/shopme/MainActivity.kt",
@@ -310,6 +310,11 @@
         "path": "app/src/main/res/xml/data_extraction_rules.xml",
         "hash": "940f48fb2ba4d9ec5a55671126796fefa71661c0a5d7b434dc1e9be23da41690",
         "size_bytes": 569
+      },
+      {
+        "path": "app/src/main/res/xml/network_security_config.xml",
+        "hash": "dee43bb3d19c04b238e520d6abde1f586ab399060ee345ad23fab934a3e565c0",
+        "size_bytes": 883
       },
       {
         "path": "app/src/test/java/com/mtv/app/shopme/ExampleUnitTest.kt",
@@ -738,8 +743,8 @@
       },
       {
         "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-        "hash": "806d558b82a77d9f436fab2e01a8a2f03a6a8936882daa347a3949b8e432fa20",
-        "size_bytes": 18186
+        "hash": "a3540af4ab570c1eafddeffc5354dd9b73c1186860b6263df628584ec73b2f14",
+        "size_bytes": 18453
       },
       {
         "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiResponse.kt",
@@ -768,8 +773,8 @@
       },
       {
         "path": "data/src/main/java/com/mtv/app/shopme/data/remote/datasource/ChatRemoteDataSource.kt",
-        "hash": "8359a96fa7c5952ff6784780c85a3e0ddcacbf1d3be9a69102100bfbfd420d67",
-        "size_bytes": 4323
+        "hash": "c6c9e588c706a115be51dceb891d13abe0d212f68d3e32ae21c0b284ba3880e1",
+        "size_bytes": 4322
       },
       {
         "path": "data/src/main/java/com/mtv/app/shopme/data/remote/datasource/FoodRemoteDataSource.kt",
@@ -1253,8 +1258,8 @@
       },
       {
         "path": "data/src/test/java/com/mtv/app/shopme/data/FoodRepositoryImplTest.kt",
-        "hash": "087bfec944fe939b1bd773bb1d9dd5cdc8d79ac195950a238267aa9b73df3058",
-        "size_bytes": 5687
+        "hash": "d3001a2bd5cd8c61660d352ff97a52db85a56900a38be94a6a8f1223381a6bbd",
+        "size_bytes": 5967
       },
       {
         "path": "data/src/test/java/com/mtv/app/shopme/data/NotificationRepositoryImplTest.kt",
@@ -1290,6 +1295,11 @@
         "path": "data/src/test/java/com/mtv/app/shopme/data/SplashMapperTest.kt",
         "hash": "7c6461951a469e161227662895fb33b12528aec93e32d38dcb24ee831804aa6f",
         "size_bytes": 787
+      },
+      {
+        "path": "data/src/test/java/com/mtv/app/shopme/data/remote/api/ApiEndPointChatTest.kt",
+        "hash": "f2d3fe802288bb5633da0c45cf19eb169a5b5d0b8dbdebc12f9ddb27104b2eec",
+        "size_bytes": 611
       },
       {
         "path": "domain/src/androidTest/java/com/mtv/app/shopme/domain/ExampleInstrumentedTest.kt",
@@ -2147,6 +2157,26 @@
         "size_bytes": 365
       },
       {
+        "path": "domain/src/test/java/com/mtv/app/shopme/domain/usecase/CartUseCaseTest.kt",
+        "hash": "e9ea53f1c6ed31f651d1ed6b42b826410de5e9e901a21c47e00c25e0566febd7",
+        "size_bytes": 4978
+      },
+      {
+        "path": "domain/src/test/java/com/mtv/app/shopme/domain/usecase/ChatUseCaseTest.kt",
+        "hash": "85e6989bd9fac995f467a4a9c047d6f40e287c1ee124ee1ee10c7cb5c218607f",
+        "size_bytes": 5544
+      },
+      {
+        "path": "domain/src/test/java/com/mtv/app/shopme/domain/usecase/OrderUseCaseTest.kt",
+        "hash": "dc6f858fffec272744acf88e90dab88ee0fbcc1423091be78f5cc967c56c435f",
+        "size_bytes": 3984
+      },
+      {
+        "path": "domain/src/test/java/com/mtv/app/shopme/domain/usecase/ProfileUseCaseTest.kt",
+        "hash": "53288df1cc358389be96444d88ea55ea1437717465666f2f9ebfc49efe093540",
+        "size_bytes": 4865
+      },
+      {
         "path": "fastlane/README.md",
         "hash": "ec078938886cf7bebd13153106f8498a2c81754742514847e29fd00229012b39",
         "size_bytes": 1164
@@ -2158,7 +2188,7 @@
       },
       {
         "path": "fastlane/report.xml",
-        "hash": "1c0b82ccf0d8b32e484fe76c450943d0b9bf760f08931152529f98f06abc4d67",
+        "hash": "83e8bd91e7b5c35d8494fd9c93e619d87e0a0122935a0b0e1bc4ea5265b6dd5a",
         "size_bytes": 550
       },
       {
@@ -2208,8 +2238,8 @@
       },
       {
         "path": "feature-auth/src/main/java/com/mtv/app/shopme/feature/auth/presentation/LoginViewModel.kt",
-        "hash": "1264d4bb5c24fb34569540ffe9aa93dcab0897bcf0d6cc0eb90dc58c0dfe24a9",
-        "size_bytes": 4929
+        "hash": "b0889df89ef7e6971daa0ecd2a05e9395d587504874f1fc71270443b6df71893",
+        "size_bytes": 6044
       },
       {
         "path": "feature-auth/src/main/java/com/mtv/app/shopme/feature/auth/presentation/PasswordViewModel.kt",
@@ -2368,8 +2398,8 @@
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/OrderContract.kt",
-        "hash": "f7caad0d4ce4cf34353e07c911da2f330ec8487326fceda544cb94e0aa7598a8",
-        "size_bytes": 1329
+        "hash": "5cae1a402fa780daa91469f65a83881f34c82c39ce3b342f219d0ffa0af69e79",
+        "size_bytes": 1515
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/OrderDetailContract.kt",
@@ -2378,8 +2408,8 @@
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/OrderHistoryContract.kt",
-        "hash": "952cd25d16c1858adf825a22e588d0b70317d5f2440082fadc7ca78f8190783e",
-        "size_bytes": 1295
+        "hash": "e60d6b167ebc6251413061bc052d6edb84f4ad11db1579528ef24d440799737c",
+        "size_bytes": 1724
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/contract/ProfileContract.kt",
@@ -2428,13 +2458,13 @@
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/ChatViewModel.kt",
-        "hash": "0cce000e524b76c2b190fe28096421b907979ee08cf325eb927f991c09c919bf",
-        "size_bytes": 15056
+        "hash": "2cf510ad541b9df13e350b1f31a6af7b5b7ddd9b7e925b91f8b145346806043a",
+        "size_bytes": 14713
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/DetailViewModel.kt",
-        "hash": "8d34de2d45acd0f694faea438f177cb24b69f2c2fa42908b1d95ac856eabcbdb",
-        "size_bytes": 10223
+        "hash": "90b87b818b293f6c670f0642563b65b4201230a30f5f3e9ee49820a63c19656f",
+        "size_bytes": 10377
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/EditProfileViewModel.kt",
@@ -2473,13 +2503,13 @@
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/OrderHistoryViewModel.kt",
-        "hash": "063546a4c5d08f404992bda2c0dfaebe1e63098fd783fda1279138bb06f2adb5",
-        "size_bytes": 4498
+        "hash": "3c23568cf50558b06ecf95c13840ceb6567b8fe414e44e5905a34370beb82ec8",
+        "size_bytes": 4797
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/OrderViewModel.kt",
-        "hash": "8c8d52745048890d3c96790bb199bddee3bf320f0f0df48acdde02d6f140f747",
-        "size_bytes": 7147
+        "hash": "db9597640e3b9e057e79423ddb6065999ccd0cd2c57883e69bb7b0dbb9bda7d5",
+        "size_bytes": 7247
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/ProfileViewModel.kt",
@@ -2493,8 +2523,8 @@
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/SecurityViewModel.kt",
-        "hash": "1cc516e79a971799aae2643bdbf81da15b9a6ba11372ed26d277b21b03e90f59",
-        "size_bytes": 3516
+        "hash": "46011986519d58953138a94a0260e813302bf495db9b90ddc2347bfb2a93f25d",
+        "size_bytes": 3556
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/SettingsViewModel.kt",
@@ -2558,8 +2588,8 @@
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/NotifScreen.kt",
-        "hash": "6954b6429ec9bbb2ce90cb867208e9cc6c1bcb415d35fc578035638612b9af9e",
-        "size_bytes": 18353
+        "hash": "a0ba7677a179511ac94ee4adc102123ef54c7229b3bdb54f085221a5a19f1247",
+        "size_bytes": 18317
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/NotificationScreen.kt",
@@ -2573,44 +2603,14 @@
       },
       {
         "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderHistoryScreen.kt",
-        "hash": "89d74ffcfc914ed500ab4b977c09ee6746c08983714329e2920294305738967d",
-        "size_bytes": 18645
-      },
-      {
-        "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/OrderScreen.kt",
-        "hash": "d05eef85aa9f948b31ec307b7be12ccb765c90df9995b2d6872fb24ed3c58386",
-        "size_bytes": 23278
-      },
-      {
-        "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-        "hash": "7919ad5b3d6844539d15c34fa2882342c015110c6e13d3c63c79c57948d8f742",
-        "size_bytes": 20425
-      },
-      {
-        "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/SearchScreen.kt",
-        "hash": "ec0f8d8e400d79bd9bc447e491c015177cb8612d2d118805c712f4f3e8a65891",
-        "size_bytes": 27100
-      },
-      {
-        "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/SecurityScreen.kt",
-        "hash": "805ea914f52dabcb4a47cd97cb8a7c459ea94c2659e1f1c53d276224a0f7d5f9",
-        "size_bytes": 8953
-      },
-      {
-        "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/SettingsScreen.kt",
-        "hash": "8e7e7f5055184446e8583f22dd9dd9a87e49399950394c4347b6c34f0948e800",
-        "size_bytes": 13205
-      },
-      {
-        "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/SupportScreen.kt",
-        "hash": "0e4414db55d5c533fcd7cf43f858b7f7b42b4f18c08beaf377410ab77d21f9c9",
-        "size_bytes": 13364
+        "hash": "c8c816476dddc0135f2f74dab1a827353ac4508e7072b4751a650fe41433e1ef",
+        "size_bytes": 18890
       }
     ]
   },
   "registration": {
     "source": "project_registration",
     "actor": "",
-    "recorded_at": "2026-06-01T13:04:41.186103+00:00"
+    "recorded_at": "2026-06-03T11:40:40.931391+00:00"
   }
 }

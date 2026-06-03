@@ -55,12 +55,4 @@ class MediaRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun uploadImage(file: File, scope: String) =
-        request<ApiResponse<MediaUploadResponse>>(
-            endpoint = ApiEndPoint.Media.Upload,
-            body = mapOf(
-                "file" to file,
-                "scope" to scope
-            )
-        ).requireData()
 }

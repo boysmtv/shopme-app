@@ -229,12 +229,6 @@ object ApiEndPoint {
             override val type = EndpointType.Json
         }
 
-        object Upload : IApiEndPoint {
-            override val path = "$API/$MEDIA/upload"
-            override val method = HttpMethod.Post
-            override val type = EndpointType.Multipart
-        }
-
         class Download(variant: String, key: String) : IApiEndPoint {
             override val path = "$API/$MEDIA/$variant?key=$key"
             override val method = HttpMethod.Get
