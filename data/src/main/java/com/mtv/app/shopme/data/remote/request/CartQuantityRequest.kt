@@ -13,4 +13,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CartQuantityRequest(
     var quantity: Int,
+    var note: String? = null,
 )

@@ -153,7 +153,8 @@ fun CreateOrderParam.toRequest() = CreateOrderRequest(
 )
 
 fun CartQuantityParam.toRequest() = CartQuantityRequest(
-    quantity = quantity
+    quantity = quantity,
+    note = note
 )
 
 fun CartAddParam.toRequest() = FoodAddToCartRequest(

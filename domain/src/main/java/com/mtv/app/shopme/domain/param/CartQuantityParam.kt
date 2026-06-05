@@ -11,4 +11,5 @@ package com.mtv.app.shopme.domain.param
 data class CartQuantityParam(
     var cartId: String,
     var quantity: Int,
+    var note: String? = null,
 )

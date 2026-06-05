@@ -246,9 +246,6 @@ object ApiEndPoint {
 
     object Village {
         object Get : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
-        object Create : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
-        class Delete(id: String) : IApiEndPoint { override val path = "$API/$VILLAGE/$id"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
-        object Clear : IApiEndPoint { override val path = "$API/$VILLAGE"; override val method = HttpMethod.Delete; override val type = EndpointType.Json }
     }
     object Misc {
         object Splash : IApiEndPoint { override val path = "$API/splash"; override val method = HttpMethod.Post; override val type = EndpointType.Json }
