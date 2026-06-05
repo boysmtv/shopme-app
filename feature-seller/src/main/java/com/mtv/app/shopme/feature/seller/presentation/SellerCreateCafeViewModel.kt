@@ -69,6 +69,7 @@ class SellerCreateCafeViewModel @Inject constructor(
             is SellerCreateCafeEvent.ChangeRt -> update { copy(rt = event.value) }
             is SellerCreateCafeEvent.ChangeRw -> update { copy(rw = event.value) }
 
+            SellerCreateCafeEvent.UploadPhoto -> emitEffect(SellerCreateCafeEffect.OpenImagePicker)
             SellerCreateCafeEvent.PickLocation -> emitEffect(SellerCreateCafeEffect.OpenLocationPicker)
 
             SellerCreateCafeEvent.NextStep -> nextStep()

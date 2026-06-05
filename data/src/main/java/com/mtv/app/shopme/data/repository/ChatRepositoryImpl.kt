@@ -208,7 +208,7 @@ class ChatRepositoryImpl @Inject constructor(
     ): PagedData<ChatMessage> = PagedData(
         content = messages,
         page = page,
-        last = page <= 0
+        last = last
     )
 
     private fun String.normalizedChatTimeKey(): String =

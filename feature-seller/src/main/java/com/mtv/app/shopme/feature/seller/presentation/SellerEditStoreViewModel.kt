@@ -100,6 +100,7 @@ class SellerEditStoreViewModel @Inject constructor(
                 update { copy(selectedTab = event.index) }
 
             // IMAGE
+            SellerEditStoreEvent.UploadPhoto -> emitEffect(SellerEditStoreEffect.OpenImagePicker)
             is SellerEditStoreEvent.PhotoSelected ->
                 update { copy(storePhoto = event.uri) }
 
