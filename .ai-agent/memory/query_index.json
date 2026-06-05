@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
-  "updated_at": "2026-06-03T11:40:41.104436+00:00",
-  "entry_count": 4411,
+  "updated_at": "2026-06-05T06:27:49.101986+00:00",
+  "entry_count": 4390,
   "entries": [
     {
       "node_id": "project:root",
@@ -15747,30 +15747,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "object:Upload:data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "type": "Object",
-      "name": "Upload",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 231,
-      "aliases": [
-        "Upload",
-        "ApiEndPoint",
-        "domain_object"
-      ],
-      "tokens": [
-        "upload",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/api/apiendpoint.kt",
-        "apiendpoint",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
       "node_id": "class:Download:data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
       "type": "Class",
       "name": "Download",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 237,
+      "line": 231,
       "aliases": [
         "Download",
         "ApiEndPoint",
@@ -15790,7 +15771,7 @@
       "type": "Object",
       "name": "Address",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 244,
+      "line": 238,
       "aliases": [
         "Address",
         "ApiEndPoint",
@@ -15809,7 +15790,7 @@
       "type": "Class",
       "name": "SetDefault",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 249,
+      "line": 243,
       "aliases": [
         "SetDefault",
         "ApiEndPoint",
@@ -15829,7 +15810,7 @@
       "type": "Object",
       "name": "Village",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 252,
+      "line": 246,
       "aliases": [
         "Village",
         "ApiEndPoint",
@@ -15848,7 +15829,7 @@
       "type": "Object",
       "name": "Misc",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 259,
+      "line": 253,
       "aliases": [
         "Misc",
         "ApiEndPoint",
@@ -15867,7 +15848,7 @@
       "type": "Object",
       "name": "Splash",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 260,
+      "line": 254,
       "aliases": [
         "Splash",
         "ApiEndPoint",
@@ -15886,7 +15867,7 @@
       "type": "Object",
       "name": "Support",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 261,
+      "line": 255,
       "aliases": [
         "Support",
         "ApiEndPoint",
@@ -15905,7 +15886,7 @@
       "type": "Object",
       "name": "SupportChat",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 262,
+      "line": 256,
       "aliases": [
         "SupportChat",
         "ApiEndPoint",
@@ -15924,7 +15905,7 @@
       "type": "Object",
       "name": "SendSupportChat",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 263,
+      "line": 257,
       "aliases": [
         "SendSupportChat",
         "ApiEndPoint",
@@ -15943,7 +15924,7 @@
       "type": "Object",
       "name": "Admin",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 265,
+      "line": 259,
       "aliases": [
         "Admin",
         "ApiEndPoint",
@@ -15962,7 +15943,7 @@
       "type": "Object",
       "name": "Capabilities",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 267,
+      "line": 261,
       "aliases": [
         "Capabilities",
         "ApiEndPoint",
@@ -15981,7 +15962,7 @@
       "type": "Object",
       "name": "SecurityBoundaries",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 268,
+      "line": 262,
       "aliases": [
         "SecurityBoundaries",
         "ApiEndPoint",
@@ -44634,6 +44615,60 @@
       "confidence": 0.85
     },
     {
+      "node_id": "file:domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "type": "File",
+      "name": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "line": 0,
+      "aliases": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+        "GetOrderHistoryUseCase",
+        "domain_object"
+      ],
+      "tokens": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/usecase/getorderhistoryusecase.kt",
+        "getorderhistoryusecase",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:GetOrderHistoryUseCase:domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "type": "Class",
+      "name": "GetOrderHistoryUseCase",
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "line": 6,
+      "aliases": [
+        "GetOrderHistoryUseCase",
+        "domain_object"
+      ],
+      "tokens": [
+        "getorderhistoryusecase",
+        "class",
+        "domain/src/main/java/com/mtv/app/shopme/domain/usecase/getorderhistoryusecase.kt",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:getOrdersUseCase:domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt:8",
+      "type": "Field",
+      "name": "getOrdersUseCase",
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "line": 8,
+      "aliases": [
+        "getOrdersUseCase",
+        "GetOrderHistoryUseCase"
+      ],
+      "tokens": [
+        "getordersusecase",
+        "field",
+        "domain/src/main/java/com/mtv/app/shopme/domain/usecase/getorderhistoryusecase.kt",
+        "getorderhistoryusecase"
+      ],
+      "confidence": 0.85
+    },
+    {
       "node_id": "file:domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrdersUseCase.kt",
       "type": "File",
       "name": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrdersUseCase.kt",
@@ -63423,16 +63458,16 @@
       "confidence": 0.65
     },
     {
-      "node_id": "module:com.mtv.app.shopme.domain.usecase.GetOrdersUseCase",
+      "node_id": "module:com.mtv.app.shopme.domain.usecase.GetOrderHistoryUseCase",
       "type": "Module",
-      "name": "com.mtv.app.shopme.domain.usecase.GetOrdersUseCase",
+      "name": "com.mtv.app.shopme.domain.usecase.GetOrderHistoryUseCase",
       "path": "",
       "line": 0,
       "aliases": [
-        "com.mtv.app.shopme.domain.usecase.GetOrdersUseCase"
+        "com.mtv.app.shopme.domain.usecase.GetOrderHistoryUseCase"
       ],
       "tokens": [
-        "com.mtv.app.shopme.domain.usecase.getordersusecase",
+        "com.mtv.app.shopme.domain.usecase.getorderhistoryusecase",
         "module"
       ],
       "confidence": 0.65
@@ -63583,6 +63618,21 @@
         "model"
       ],
       "confidence": 0.85
+    },
+    {
+      "node_id": "module:com.mtv.app.shopme.domain.usecase.GetOrdersUseCase",
+      "type": "Module",
+      "name": "com.mtv.app.shopme.domain.usecase.GetOrdersUseCase",
+      "path": "",
+      "line": 0,
+      "aliases": [
+        "com.mtv.app.shopme.domain.usecase.GetOrdersUseCase"
+      ],
+      "tokens": [
+        "com.mtv.app.shopme.domain.usecase.getordersusecase",
+        "module"
+      ],
+      "confidence": 0.65
     },
     {
       "node_id": "module:com.mtv.app.shopme.feature.customer.contract.OrderEffect",
@@ -76413,451 +76463,6 @@
         "field",
         "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellereditstorecontract.kt",
         "sellereditstorecontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "file:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "File",
-      "name": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 0,
-      "aliases": [
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "module:com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING",
-      "type": "Module",
-      "name": "com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING",
-      "path": "",
-      "line": 0,
-      "aliases": [
-        "com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING"
-      ],
-      "tokens": [
-        "com.mtv.based.uicomponent.core.ui.util.constants.companion.error_string",
-        "module"
-      ],
-      "confidence": 0.65
-    },
-    {
-      "node_id": "class:SellerNotifUiState:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Class",
-      "name": "SellerNotifUiState",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 14,
-      "aliases": [
-        "SellerNotifUiState",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "sellernotifuistate",
-        "class",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:Load:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "Load",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 28,
-      "aliases": [
-        "Load",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "load",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:DismissDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "DismissDialog",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 29,
-      "aliases": [
-        "DismissDialog",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "dismissdialog",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:GetNotification:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "GetNotification",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 30,
-      "aliases": [
-        "GetNotification",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "getnotification",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:LoadMore:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "LoadMore",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 32,
-      "aliases": [
-        "LoadMore",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "loadmore",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:ClearNotification:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "ClearNotification",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 33,
-      "aliases": [
-        "ClearNotification",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "clearnotification",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "class:ClickNotification:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Class",
-      "name": "ClickNotification",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 34,
-      "aliases": [
-        "ClickNotification",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "clicknotification",
-        "class",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:ClickBack:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "ClickBack",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 36,
-      "aliases": [
-        "ClickBack",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "clickback",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:NavigateBack:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "NavigateBack",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 41,
-      "aliases": [
-        "NavigateBack",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "navigateback",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "class:NavigateToOrderDetail:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Class",
-      "name": "NavigateToOrderDetail",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 42,
-      "aliases": [
-        "NavigateToOrderDetail",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "navigatetoorderdetail",
-        "class",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "class:Error:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Class",
-      "name": "Error",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 46,
-      "aliases": [
-        "Error",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "error",
-        "class",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "object:Success:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "type": "Object",
-      "name": "Success",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 49,
-      "aliases": [
-        "Success",
-        "SellerNotifContract",
-        "domain_object"
-      ],
-      "tokens": [
-        "success",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract",
-        "domain_object"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:isLoading:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:16",
-      "type": "Field",
-      "name": "isLoading",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 16,
-      "aliases": [
-        "isLoading",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "isloading",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:notifications:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:18",
-      "type": "Field",
-      "name": "notifications",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 18,
-      "aliases": [
-        "notifications",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "notifications",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:notificationState:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:20",
-      "type": "Field",
-      "name": "notificationState",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 20,
-      "aliases": [
-        "notificationState",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "notificationstate",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:page:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:21",
-      "type": "Field",
-      "name": "page",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 21,
-      "aliases": [
-        "page",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "page",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:isLastPage:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:22",
-      "type": "Field",
-      "name": "isLastPage",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 22,
-      "aliases": [
-        "isLastPage",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "islastpage",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:isLoadingMore:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:23",
-      "type": "Field",
-      "name": "isLoadingMore",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 23,
-      "aliases": [
-        "isLoadingMore",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "isloadingmore",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:activeDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:24",
-      "type": "Field",
-      "name": "activeDialog",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 24,
-      "aliases": [
-        "activeDialog",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "activedialog",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:item:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:35",
-      "type": "Field",
-      "name": "item",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 35,
-      "aliases": [
-        "item",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "item",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:orderId:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:42",
-      "type": "Field",
-      "name": "orderId",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 42,
-      "aliases": [
-        "orderId",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "orderid",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:message:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:47",
-      "type": "Field",
-      "name": "message",
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "line": 47,
-      "aliases": [
-        "message",
-        "SellerNotifContract"
-      ],
-      "tokens": [
-        "message",
-        "field",
-        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
-        "sellernotifcontract"
       ],
       "confidence": 0.85
     },

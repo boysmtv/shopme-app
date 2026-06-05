@@ -1,6 +1,6 @@
 {
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
-  "file_count": 595,
+  "file_count": 596,
   "files": [
     {
       "path": "app/src/androidTest/java/com/mtv/app/shopme/ExampleInstrumentedTest.kt",
@@ -2530,109 +2530,104 @@
           "line": 226
         },
         {
-          "name": "Upload",
-          "kind": "object",
-          "line": 231
-        },
-        {
           "name": "Download",
           "kind": "class",
-          "line": 237
+          "line": 231
         },
         {
           "name": "Address",
           "kind": "object",
-          "line": 244
+          "line": 238
         },
         {
           "name": "Get",
           "kind": "object",
-          "line": 246
+          "line": 240
         },
         {
           "name": "Create",
           "kind": "object",
-          "line": 247
+          "line": 241
         },
         {
           "name": "Delete",
           "kind": "class",
-          "line": 248
+          "line": 242
         },
         {
           "name": "SetDefault",
           "kind": "class",
-          "line": 249
+          "line": 243
         },
         {
           "name": "Update",
           "kind": "class",
-          "line": 250
+          "line": 244
         },
         {
           "name": "Village",
           "kind": "object",
-          "line": 252
+          "line": 246
         },
         {
           "name": "Get",
           "kind": "object",
-          "line": 254
+          "line": 248
         },
         {
           "name": "Create",
           "kind": "object",
-          "line": 255
+          "line": 249
         },
         {
           "name": "Delete",
           "kind": "class",
-          "line": 256
+          "line": 250
         },
         {
           "name": "Clear",
           "kind": "object",
-          "line": 257
+          "line": 251
         },
         {
           "name": "Misc",
           "kind": "object",
-          "line": 259
+          "line": 253
         },
         {
           "name": "Splash",
           "kind": "object",
-          "line": 260
+          "line": 254
         },
         {
           "name": "Support",
           "kind": "object",
-          "line": 261
+          "line": 255
         },
         {
           "name": "SupportChat",
           "kind": "object",
-          "line": 262
+          "line": 256
         },
         {
           "name": "SendSupportChat",
           "kind": "object",
-          "line": 263
+          "line": 257
         },
         {
           "name": "Admin",
           "kind": "object",
-          "line": 265
+          "line": 259
         },
         {
           "name": "Capabilities",
           "kind": "object",
-          "line": 267
+          "line": 261
         },
         {
           "name": "SecurityBoundaries",
           "kind": "object",
-          "line": 268
+          "line": 262
         }
       ],
       "functions": [],
@@ -10409,6 +10404,25 @@
         {
           "name": "repository",
           "line": 7
+        }
+      ]
+    },
+    {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.usecase",
+      "classes": [
+        {
+          "name": "GetOrderHistoryUseCase",
+          "kind": "class",
+          "line": 6
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "getOrdersUseCase",
+          "line": 8
         }
       ]
     },
@@ -20912,5 +20926,5 @@
       ]
     }
   ],
-  "updated_at": "2026-06-03T11:40:40.116173+00:00"
+  "updated_at": "2026-06-05T06:27:48.163166+00:00"
 }

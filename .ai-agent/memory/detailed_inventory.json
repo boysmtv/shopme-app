@@ -1,9 +1,9 @@
 {
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
-  "file_count": 595,
+  "file_count": 596,
   "class_count": 500,
   "function_count": 500,
-  "data_member_count": 1911,
+  "data_member_count": 1912,
   "category_counts": {
     "test": 92,
     "function": 109,
@@ -3190,22 +3190,13 @@
       "line": 226
     },
     {
-      "name": "Upload",
-      "kind": "object",
-      "categories": [
-        "domain_object"
-      ],
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 231
-    },
-    {
       "name": "Download",
       "kind": "class",
       "categories": [
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 237
+      "line": 231
     },
     {
       "name": "Address",
@@ -3214,7 +3205,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 244
+      "line": 238
     },
     {
       "name": "Get",
@@ -3223,7 +3214,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 246
+      "line": 240
     },
     {
       "name": "Create",
@@ -3232,7 +3223,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 247
+      "line": 241
     },
     {
       "name": "Delete",
@@ -3241,7 +3232,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 248
+      "line": 242
     },
     {
       "name": "SetDefault",
@@ -3250,7 +3241,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 249
+      "line": 243
     },
     {
       "name": "Update",
@@ -3259,7 +3250,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 250
+      "line": 244
     },
     {
       "name": "Village",
@@ -3268,7 +3259,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 252
+      "line": 246
     },
     {
       "name": "Get",
@@ -3277,7 +3268,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 254
+      "line": 248
     },
     {
       "name": "Create",
@@ -3286,7 +3277,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 255
+      "line": 249
     },
     {
       "name": "Delete",
@@ -3295,7 +3286,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 256
+      "line": 250
     },
     {
       "name": "Clear",
@@ -3304,7 +3295,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 257
+      "line": 251
     },
     {
       "name": "Misc",
@@ -3313,7 +3304,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 259
+      "line": 253
     },
     {
       "name": "Splash",
@@ -3322,7 +3313,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 260
+      "line": 254
     },
     {
       "name": "Support",
@@ -3331,7 +3322,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 261
+      "line": 255
     },
     {
       "name": "SupportChat",
@@ -3340,7 +3331,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 262
+      "line": 256
     },
     {
       "name": "SendSupportChat",
@@ -3349,7 +3340,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 263
+      "line": 257
     },
     {
       "name": "Admin",
@@ -3358,7 +3349,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 265
+      "line": 259
     },
     {
       "name": "Capabilities",
@@ -3367,7 +3358,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 267
+      "line": 261
     },
     {
       "name": "SecurityBoundaries",
@@ -3376,7 +3367,7 @@
         "domain_object"
       ],
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 268
+      "line": 262
     },
     {
       "name": "ApiResponse",
@@ -5872,6 +5863,15 @@
       ],
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderDetailUseCase.kt",
       "line": 5
+    },
+    {
+      "name": "GetOrderHistoryUseCase",
+      "kind": "class",
+      "categories": [
+        "domain_object"
+      ],
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "line": 6
     },
     {
       "name": "GetOrdersUseCase",
@@ -15204,17 +15204,9 @@
           ]
         },
         {
-          "name": "Upload",
-          "kind": "object",
-          "line": 231,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
           "name": "Download",
           "kind": "class",
-          "line": 237,
+          "line": 231,
           "categories": [
             "domain_object"
           ]
@@ -15222,7 +15214,7 @@
         {
           "name": "Address",
           "kind": "object",
-          "line": 244,
+          "line": 238,
           "categories": [
             "domain_object"
           ]
@@ -15230,7 +15222,7 @@
         {
           "name": "Get",
           "kind": "object",
-          "line": 246,
+          "line": 240,
           "categories": [
             "domain_object"
           ]
@@ -15238,7 +15230,7 @@
         {
           "name": "Create",
           "kind": "object",
-          "line": 247,
+          "line": 241,
           "categories": [
             "domain_object"
           ]
@@ -15246,7 +15238,7 @@
         {
           "name": "Delete",
           "kind": "class",
-          "line": 248,
+          "line": 242,
           "categories": [
             "domain_object"
           ]
@@ -15254,7 +15246,7 @@
         {
           "name": "SetDefault",
           "kind": "class",
-          "line": 249,
+          "line": 243,
           "categories": [
             "domain_object"
           ]
@@ -15262,7 +15254,7 @@
         {
           "name": "Update",
           "kind": "class",
-          "line": 250,
+          "line": 244,
           "categories": [
             "domain_object"
           ]
@@ -15270,7 +15262,7 @@
         {
           "name": "Village",
           "kind": "object",
-          "line": 252,
+          "line": 246,
           "categories": [
             "domain_object"
           ]
@@ -15278,7 +15270,7 @@
         {
           "name": "Get",
           "kind": "object",
-          "line": 254,
+          "line": 248,
           "categories": [
             "domain_object"
           ]
@@ -15286,7 +15278,7 @@
         {
           "name": "Create",
           "kind": "object",
-          "line": 255,
+          "line": 249,
           "categories": [
             "domain_object"
           ]
@@ -15294,7 +15286,7 @@
         {
           "name": "Delete",
           "kind": "class",
-          "line": 256,
+          "line": 250,
           "categories": [
             "domain_object"
           ]
@@ -15302,7 +15294,7 @@
         {
           "name": "Clear",
           "kind": "object",
-          "line": 257,
+          "line": 251,
           "categories": [
             "domain_object"
           ]
@@ -15310,7 +15302,7 @@
         {
           "name": "Misc",
           "kind": "object",
-          "line": 259,
+          "line": 253,
           "categories": [
             "domain_object"
           ]
@@ -15318,7 +15310,7 @@
         {
           "name": "Splash",
           "kind": "object",
-          "line": 260,
+          "line": 254,
           "categories": [
             "domain_object"
           ]
@@ -15326,7 +15318,7 @@
         {
           "name": "Support",
           "kind": "object",
-          "line": 261,
+          "line": 255,
           "categories": [
             "domain_object"
           ]
@@ -15334,7 +15326,7 @@
         {
           "name": "SupportChat",
           "kind": "object",
-          "line": 262,
+          "line": 256,
           "categories": [
             "domain_object"
           ]
@@ -15342,7 +15334,7 @@
         {
           "name": "SendSupportChat",
           "kind": "object",
-          "line": 263,
+          "line": 257,
           "categories": [
             "domain_object"
           ]
@@ -15350,7 +15342,7 @@
         {
           "name": "Admin",
           "kind": "object",
-          "line": 265,
+          "line": 259,
           "categories": [
             "domain_object"
           ]
@@ -15358,7 +15350,7 @@
         {
           "name": "Capabilities",
           "kind": "object",
-          "line": 267,
+          "line": 261,
           "categories": [
             "domain_object"
           ]
@@ -15366,7 +15358,7 @@
         {
           "name": "SecurityBoundaries",
           "kind": "object",
-          "line": 268,
+          "line": 262,
           "categories": [
             "domain_object"
           ]
@@ -15374,8 +15366,8 @@
       ],
       "functions": [],
       "data_members": [],
-      "line_count": 273,
-      "size_bytes": 18453
+      "line_count": 267,
+      "size_bytes": 18239
     },
     {
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiResponse.kt",
@@ -15694,8 +15686,8 @@
       ],
       "functions": [],
       "data_members": [],
-      "line_count": 66,
-      "size_bytes": 2354
+      "line_count": 58,
+      "size_bytes": 2060
     },
     {
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/datasource/NotificationRemoteDataSource.kt",
@@ -26613,6 +26605,38 @@
       "size_bytes": 318
     },
     {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrderHistoryUseCase.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.usecase",
+      "categories": [
+        "domain_object"
+      ],
+      "imports": [
+        "com.mtv.app.shopme.domain.model.OrderStatus",
+        "com.mtv.app.shopme.domain.repository.OrderRepository",
+        "javax.inject.Inject"
+      ],
+      "classes": [
+        {
+          "name": "GetOrderHistoryUseCase",
+          "kind": "class",
+          "line": 6,
+          "categories": [
+            "domain_object"
+          ]
+        }
+      ],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "getOrdersUseCase",
+          "line": 8
+        }
+      ],
+      "line_count": 12,
+      "size_bytes": 413
+    },
+    {
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/usecase/GetOrdersUseCase.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.domain.usecase",
@@ -33732,7 +33756,7 @@
         "com.mtv.app.shopme.domain.model.Order",
         "com.mtv.app.shopme.domain.model.OrderStatus",
         "com.mtv.app.shopme.domain.model.PaymentMethod",
-        "com.mtv.app.shopme.domain.usecase.GetOrdersUseCase",
+        "com.mtv.app.shopme.domain.usecase.GetOrderHistoryUseCase",
         "com.mtv.app.shopme.feature.customer.contract.OrderHistoryEffect",
         "com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent",
         "com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem",
@@ -33773,7 +33797,7 @@
         }
       ],
       "line_count": 117,
-      "size_bytes": 4797
+      "size_bytes": 4809
     },
     {
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/presentation/OrderViewModel.kt",
@@ -39045,162 +39069,6 @@
       ],
       "line_count": 65,
       "size_bytes": 2130
-    },
-    {
-      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.feature.seller.contract",
-      "categories": [
-        "domain_object"
-      ],
-      "imports": [
-        "com.mtv.app.shopme.domain.model.SellerNotifItem",
-        "com.mtv.based.core.network.utils.ResourceFirebase",
-        "com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING"
-      ],
-      "classes": [
-        {
-          "name": "SellerNotifUiState",
-          "kind": "class",
-          "line": 14,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "Load",
-          "kind": "object",
-          "line": 28,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "DismissDialog",
-          "kind": "object",
-          "line": 29,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "GetNotification",
-          "kind": "object",
-          "line": 30,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "LoadMore",
-          "kind": "object",
-          "line": 32,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "ClearNotification",
-          "kind": "object",
-          "line": 33,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "ClickNotification",
-          "kind": "class",
-          "line": 34,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "ClickBack",
-          "kind": "object",
-          "line": 36,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "NavigateBack",
-          "kind": "object",
-          "line": 41,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "NavigateToOrderDetail",
-          "kind": "class",
-          "line": 42,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "Error",
-          "kind": "class",
-          "line": 46,
-          "categories": [
-            "domain_object"
-          ]
-        },
-        {
-          "name": "Success",
-          "kind": "object",
-          "line": 49,
-          "categories": [
-            "domain_object"
-          ]
-        }
-      ],
-      "functions": [],
-      "data_members": [
-        {
-          "name": "isLoading",
-          "line": 16
-        },
-        {
-          "name": "notifications",
-          "line": 18
-        },
-        {
-          "name": "notificationState",
-          "line": 20
-        },
-        {
-          "name": "page",
-          "line": 21
-        },
-        {
-          "name": "isLastPage",
-          "line": 22
-        },
-        {
-          "name": "isLoadingMore",
-          "line": 23
-        },
-        {
-          "name": "activeDialog",
-          "line": 24
-        },
-        {
-          "name": "item",
-          "line": 35
-        },
-        {
-          "name": "orderId",
-          "line": 42
-        },
-        {
-          "name": "message",
-          "line": 47
-        }
-      ],
-      "line_count": 51,
-      "size_bytes": 1516
     }
   ],
   "documents": [
@@ -39362,7 +39230,7 @@
     },
     {
       "path": "fastlane/report.xml",
-      "size_bytes": 550
+      "size_bytes": 5678
     },
     {
       "path": "fastlane/SETUP.md",
@@ -39390,7 +39258,7 @@
     },
     {
       "path": "gradle/libs.versions.toml",
-      "size_bytes": 8790
+      "size_bytes": 8789
     },
     {
       "path": "keystore/KEYSTORE_BASE64.txt",
@@ -39405,6 +39273,6 @@
       "size_bytes": 18099
     }
   ],
-  "symbol_index_updated_at": "2026-06-03T11:40:40.116173+00:00",
-  "updated_at": "2026-06-03T11:40:40.745633+00:00"
+  "symbol_index_updated_at": "2026-06-05T06:27:48.163166+00:00",
+  "updated_at": "2026-06-05T06:27:48.747205+00:00"
 }
