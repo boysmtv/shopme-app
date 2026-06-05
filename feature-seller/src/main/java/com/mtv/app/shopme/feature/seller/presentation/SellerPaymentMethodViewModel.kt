@@ -109,13 +109,13 @@ class SellerPaymentMethodViewModel @Inject constructor(
                 SellerPaymentMethodParam(
                     cashEnabled = state.cashEnabled,
                     bankEnabled = state.bankEnabled,
-                    bankNumber = state.bankNumber,
+                    bankNumber = if (state.bankEnabled) state.bankNumber else null,
                     ovoEnabled = state.ovoEnabled,
-                    ovoNumber = state.ovoNumber,
+                    ovoNumber = if (state.ovoEnabled) state.ovoNumber else null,
                     danaEnabled = state.danaEnabled,
-                    danaNumber = state.danaNumber,
+                    danaNumber = if (state.danaEnabled) state.danaNumber else null,
                     gopayEnabled = state.gopayEnabled,
-                    gopayNumber = state.gopayNumber
+                    gopayNumber = if (state.gopayEnabled) state.gopayNumber else null
                 )
             ),
             onState = { result ->

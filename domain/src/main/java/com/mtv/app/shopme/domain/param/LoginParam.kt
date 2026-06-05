@@ -10,5 +10,5 @@ package com.mtv.app.shopme.domain.param
 
 data class LoginParam(
     var email: String,
-    var password: String?
+    var password: String
 )

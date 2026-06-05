@@ -13,5 +13,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class VerifyPinRequest(
     var trxId: String,
-    var pin: String?
+    var pin: String
 )

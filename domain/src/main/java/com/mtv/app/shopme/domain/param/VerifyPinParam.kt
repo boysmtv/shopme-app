@@ -10,5 +10,5 @@ package com.mtv.app.shopme.domain.param
 
 data class VerifyPinParam(
     var token: String,
-    var pin: String?
+    var pin: String
 )
