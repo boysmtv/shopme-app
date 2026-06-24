@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
-  "updated_at": "2026-06-05T06:27:49.101986+00:00",
-  "entry_count": 4390,
+  "updated_at": "2026-06-06T03:35:49.975231+00:00",
+  "entry_count": 4470,
   "entries": [
     {
       "node_id": "project:root",
@@ -11615,11 +11615,26 @@
       "confidence": 0.65
     },
     {
-      "node_id": "function:fakeCustomerResponse:data/src/main/java/com/mtv/app/shopme/data/fake/FakeHomeData.kt:16",
+      "node_id": "module:com.mtv.app.shopme.domain.model.MemberStatus",
+      "type": "Module",
+      "name": "com.mtv.app.shopme.domain.model.MemberStatus",
+      "path": "",
+      "line": 0,
+      "aliases": [
+        "com.mtv.app.shopme.domain.model.MemberStatus"
+      ],
+      "tokens": [
+        "com.mtv.app.shopme.domain.model.memberstatus",
+        "module"
+      ],
+      "confidence": 0.65
+    },
+    {
+      "node_id": "function:fakeCustomerResponse:data/src/main/java/com/mtv/app/shopme/data/fake/FakeHomeData.kt:17",
       "type": "Function",
       "name": "fakeCustomerResponse",
       "path": "data/src/main/java/com/mtv/app/shopme/data/fake/FakeHomeData.kt",
-      "line": 16,
+      "line": 17,
       "aliases": [
         "fakeCustomerResponse",
         "FakeHomeData",
@@ -13580,7 +13595,7 @@
       "type": "Object",
       "name": "DataUiMock",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 30,
+      "line": 31,
       "aliases": [
         "DataUiMock",
         "domain_object"
@@ -13593,11 +13608,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:customer:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:32",
+      "node_id": "method:customer:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:33",
       "type": "Method",
       "name": "customer",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 32,
+      "line": 33,
       "aliases": [
         "customer",
         "DataUiMock",
@@ -13612,11 +13627,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:foods:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:61",
+      "node_id": "method:foods:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:62",
       "type": "Method",
       "name": "foods",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 61,
+      "line": 62,
       "aliases": [
         "foods",
         "DataUiMock",
@@ -13631,11 +13646,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:cafe:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:120",
+      "node_id": "method:cafe:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:121",
       "type": "Method",
       "name": "cafe",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 120,
+      "line": 121,
       "aliases": [
         "cafe",
         "DataUiMock",
@@ -13650,11 +13665,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:cart:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:140",
+      "node_id": "method:cart:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:141",
       "type": "Method",
       "name": "cart",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 140,
+      "line": 141,
       "aliases": [
         "cart",
         "DataUiMock",
@@ -13669,11 +13684,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:chatList:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:273",
+      "node_id": "method:chatList:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:274",
       "type": "Method",
       "name": "chatList",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 273,
+      "line": 274,
       "aliases": [
         "chatList",
         "DataUiMock",
@@ -13688,11 +13703,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:chatDetail:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:336",
+      "node_id": "method:chatDetail:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:337",
       "type": "Method",
       "name": "chatDetail",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 336,
+      "line": 337,
       "aliases": [
         "chatDetail",
         "DataUiMock",
@@ -13707,11 +13722,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:villages:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:383",
+      "node_id": "method:villages:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:384",
       "type": "Method",
       "name": "villages",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 383,
+      "line": 384,
       "aliases": [
         "villages",
         "DataUiMock",
@@ -13726,11 +13741,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:addresses:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:389",
+      "node_id": "method:addresses:data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt:390",
       "type": "Method",
       "name": "addresses",
       "path": "data/src/main/java/com/mtv/app/shopme/data/mock/DataUiMock.kt",
-      "line": 389,
+      "line": 390,
       "aliases": [
         "addresses",
         "DataUiMock",
@@ -15829,7 +15844,7 @@
       "type": "Object",
       "name": "Misc",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 253,
+      "line": 250,
       "aliases": [
         "Misc",
         "ApiEndPoint",
@@ -15848,7 +15863,7 @@
       "type": "Object",
       "name": "Splash",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 254,
+      "line": 251,
       "aliases": [
         "Splash",
         "ApiEndPoint",
@@ -15867,7 +15882,7 @@
       "type": "Object",
       "name": "Support",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 255,
+      "line": 252,
       "aliases": [
         "Support",
         "ApiEndPoint",
@@ -15886,7 +15901,7 @@
       "type": "Object",
       "name": "SupportChat",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 256,
+      "line": 253,
       "aliases": [
         "SupportChat",
         "ApiEndPoint",
@@ -15905,7 +15920,7 @@
       "type": "Object",
       "name": "SendSupportChat",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 257,
+      "line": 254,
       "aliases": [
         "SendSupportChat",
         "ApiEndPoint",
@@ -15924,7 +15939,7 @@
       "type": "Object",
       "name": "Admin",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 259,
+      "line": 256,
       "aliases": [
         "Admin",
         "ApiEndPoint",
@@ -15943,7 +15958,7 @@
       "type": "Object",
       "name": "Capabilities",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 261,
+      "line": 258,
       "aliases": [
         "Capabilities",
         "ApiEndPoint",
@@ -15962,7 +15977,7 @@
       "type": "Object",
       "name": "SecurityBoundaries",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-      "line": 262,
+      "line": 259,
       "aliases": [
         "SecurityBoundaries",
         "ApiEndPoint",
@@ -17847,59 +17862,6 @@
       "confidence": 0.85
     },
     {
-      "node_id": "file:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-      "type": "File",
-      "name": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-      "line": 0,
-      "aliases": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-        "CartInquiryRequest",
-        "dto"
-      ],
-      "tokens": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/cartinquiryrequest.kt",
-        "cartinquiryrequest",
-        "dto"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "dto:CartInquiryRequest:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-      "type": "Dto",
-      "name": "CartInquiryRequest",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-      "line": 14,
-      "aliases": [
-        "CartInquiryRequest",
-        "dto"
-      ],
-      "tokens": [
-        "cartinquiryrequest",
-        "dto",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/cartinquiryrequest.kt"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:cartId:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt:15",
-      "type": "Field",
-      "name": "cartId",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-      "line": 15,
-      "aliases": [
-        "cartId",
-        "CartInquiryRequest"
-      ],
-      "tokens": [
-        "cartid",
-        "field",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/cartinquiryrequest.kt",
-        "cartinquiryrequest"
-      ],
-      "confidence": 0.85
-    },
-    {
       "node_id": "file:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartQuantityRequest.kt",
       "type": "File",
       "name": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartQuantityRequest.kt",
@@ -17953,55 +17915,20 @@
       "confidence": 0.85
     },
     {
-      "node_id": "file:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-      "type": "File",
-      "name": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-      "line": 0,
-      "aliases": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-        "CartValidateRequest",
-        "dto"
-      ],
-      "tokens": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/cartvalidaterequest.kt",
-        "cartvalidaterequest",
-        "dto"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "dto:CartValidateRequest:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-      "type": "Dto",
-      "name": "CartValidateRequest",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-      "line": 14,
-      "aliases": [
-        "CartValidateRequest",
-        "dto"
-      ],
-      "tokens": [
-        "cartvalidaterequest",
-        "dto",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/cartvalidaterequest.kt"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:cartId:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt:15",
+      "node_id": "field:note:data/src/main/java/com/mtv/app/shopme/data/remote/request/CartQuantityRequest.kt:16",
       "type": "Field",
-      "name": "cartId",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-      "line": 15,
+      "name": "note",
+      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartQuantityRequest.kt",
+      "line": 16,
       "aliases": [
-        "cartId",
-        "CartValidateRequest"
+        "note",
+        "CartQuantityRequest"
       ],
       "tokens": [
-        "cartid",
+        "note",
         "field",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/request/cartvalidaterequest.kt",
-        "cartvalidaterequest"
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/cartquantityrequest.kt",
+        "cartquantityrequest"
       ],
       "confidence": 0.85
     },
@@ -18771,7 +18698,7 @@
       "type": "Dto",
       "name": "FoodOptionRequest",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodUpsertRequest.kt",
-      "line": 37,
+      "line": 38,
       "aliases": [
         "FoodOptionRequest",
         "FoodUpsertRequest",
@@ -18984,11 +18911,29 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:option:data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodUpsertRequest.kt:33",
+      "node_id": "field:id:data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodUpsertRequest.kt:32",
+      "type": "Field",
+      "name": "id",
+      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodUpsertRequest.kt",
+      "line": 32,
+      "aliases": [
+        "id",
+        "FoodUpsertRequest"
+      ],
+      "tokens": [
+        "id",
+        "field",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/foodupsertrequest.kt",
+        "foodupsertrequest"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:option:data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodUpsertRequest.kt:34",
       "type": "Field",
       "name": "option",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodUpsertRequest.kt",
-      "line": 33,
+      "line": 34,
       "aliases": [
         "option",
         "FoodUpsertRequest"
@@ -21067,59 +21012,6 @@
       "confidence": 0.85
     },
     {
-      "node_id": "file:data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-      "type": "File",
-      "name": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-      "line": 0,
-      "aliases": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-        "CartInquiryResponse",
-        "dto"
-      ],
-      "tokens": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/cartinquiryresponse.kt",
-        "cartinquiryresponse",
-        "dto"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "dto:CartInquiryResponse:data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-      "type": "Dto",
-      "name": "CartInquiryResponse",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-      "line": 6,
-      "aliases": [
-        "CartInquiryResponse",
-        "dto"
-      ],
-      "tokens": [
-        "cartinquiryresponse",
-        "dto",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/cartinquiryresponse.kt"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:cartId:data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt:7",
-      "type": "Field",
-      "name": "cartId",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-      "line": 7,
-      "aliases": [
-        "cartId",
-        "CartInquiryResponse"
-      ],
-      "tokens": [
-        "cartid",
-        "field",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/cartinquiryresponse.kt",
-        "cartinquiryresponse"
-      ],
-      "confidence": 0.85
-    },
-    {
       "node_id": "file:data/src/main/java/com/mtv/app/shopme/data/remote/response/CartItemResponse.kt",
       "type": "File",
       "name": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartItemResponse.kt",
@@ -21474,59 +21366,6 @@
         "field",
         "data/src/main/java/com/mtv/app/shopme/data/remote/response/cartitemvariantresponse.kt",
         "cartitemvariantresponse"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "file:data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-      "type": "File",
-      "name": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-      "line": 0,
-      "aliases": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-        "CartValidateResponse",
-        "dto"
-      ],
-      "tokens": [
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/cartvalidateresponse.kt",
-        "cartvalidateresponse",
-        "dto"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "dto:CartValidateResponse:data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-      "type": "Dto",
-      "name": "CartValidateResponse",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-      "line": 6,
-      "aliases": [
-        "CartValidateResponse",
-        "dto"
-      ],
-      "tokens": [
-        "cartvalidateresponse",
-        "dto",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/cartvalidateresponse.kt"
-      ],
-      "confidence": 0.85
-    },
-    {
-      "node_id": "field:cartId:data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt:7",
-      "type": "Field",
-      "name": "cartId",
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-      "line": 7,
-      "aliases": [
-        "cartId",
-        "CartValidateResponse"
-      ],
-      "tokens": [
-        "cartid",
-        "field",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/response/cartvalidateresponse.kt",
-        "cartvalidateresponse"
       ],
       "confidence": 0.85
     },
@@ -21982,7 +21821,7 @@
       "type": "Dto",
       "name": "CustomerResponse",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 14,
+      "line": 15,
       "aliases": [
         "CustomerResponse",
         "dto"
@@ -21999,7 +21838,7 @@
       "type": "Dto",
       "name": "StatsResponse",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 26,
+      "line": 27,
       "aliases": [
         "StatsResponse",
         "CustomerResponse",
@@ -22018,7 +21857,7 @@
       "type": "Dto",
       "name": "MenuSummaryResponse",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 33,
+      "line": 34,
       "aliases": [
         "MenuSummaryResponse",
         "CustomerResponse",
@@ -22033,11 +21872,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:name:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:15",
+      "node_id": "field:name:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:16",
       "type": "Field",
       "name": "name",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 15,
+      "line": 16,
       "aliases": [
         "name",
         "CustomerResponse"
@@ -22051,11 +21890,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:phone:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:16",
+      "node_id": "field:phone:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:17",
       "type": "Field",
       "name": "phone",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 16,
+      "line": 17,
       "aliases": [
         "phone",
         "CustomerResponse"
@@ -22069,11 +21908,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:email:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:17",
+      "node_id": "field:email:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:18",
       "type": "Field",
       "name": "email",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 17,
+      "line": 18,
       "aliases": [
         "email",
         "CustomerResponse"
@@ -22087,11 +21926,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:address:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:18",
+      "node_id": "field:address:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:19",
       "type": "Field",
       "name": "address",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 18,
+      "line": 19,
       "aliases": [
         "address",
         "CustomerResponse"
@@ -22105,11 +21944,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:photo:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:19",
+      "node_id": "field:photo:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:20",
       "type": "Field",
       "name": "photo",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 19,
+      "line": 20,
       "aliases": [
         "photo",
         "CustomerResponse"
@@ -22123,11 +21962,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:verified:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:20",
+      "node_id": "field:verified:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:21",
       "type": "Field",
       "name": "verified",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 20,
+      "line": 21,
       "aliases": [
         "verified",
         "CustomerResponse"
@@ -22141,11 +21980,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:stats:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:21",
+      "node_id": "field:stats:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:22",
       "type": "Field",
       "name": "stats",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 21,
+      "line": 22,
       "aliases": [
         "stats",
         "CustomerResponse"
@@ -22159,11 +21998,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:menuSummary:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:22",
+      "node_id": "field:menuSummary:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:23",
       "type": "Field",
       "name": "menuSummary",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 22,
+      "line": 23,
       "aliases": [
         "menuSummary",
         "CustomerResponse"
@@ -22177,11 +22016,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:totalOrders:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:27",
+      "node_id": "field:totalOrders:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:28",
       "type": "Field",
       "name": "totalOrders",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 27,
+      "line": 28,
       "aliases": [
         "totalOrders",
         "CustomerResponse"
@@ -22195,11 +22034,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:activeOrders:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:28",
+      "node_id": "field:activeOrders:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:29",
       "type": "Field",
       "name": "activeOrders",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 28,
+      "line": 29,
       "aliases": [
         "activeOrders",
         "CustomerResponse"
@@ -22213,11 +22052,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:membership:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:29",
+      "node_id": "field:membership:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:30",
       "type": "Field",
       "name": "membership",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 29,
+      "line": 30,
       "aliases": [
         "membership",
         "CustomerResponse"
@@ -22231,11 +22070,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:unpaid:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:34",
+      "node_id": "field:unpaid:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:35",
       "type": "Field",
       "name": "unpaid",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 34,
+      "line": 35,
       "aliases": [
         "unpaid",
         "CustomerResponse"
@@ -22249,11 +22088,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:ordered:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:35",
+      "node_id": "field:ordered:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:36",
       "type": "Field",
       "name": "ordered",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 35,
+      "line": 36,
       "aliases": [
         "ordered",
         "CustomerResponse"
@@ -22267,11 +22106,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:cooking:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:36",
+      "node_id": "field:cooking:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:37",
       "type": "Field",
       "name": "cooking",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 36,
+      "line": 37,
       "aliases": [
         "cooking",
         "CustomerResponse"
@@ -22285,11 +22124,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:shipping:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:37",
+      "node_id": "field:shipping:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:38",
       "type": "Field",
       "name": "shipping",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 37,
+      "line": 38,
       "aliases": [
         "shipping",
         "CustomerResponse"
@@ -22303,11 +22142,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:completed:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:38",
+      "node_id": "field:completed:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:39",
       "type": "Field",
       "name": "completed",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 38,
+      "line": 39,
       "aliases": [
         "completed",
         "CustomerResponse"
@@ -22321,11 +22160,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:cancelled:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:39",
+      "node_id": "field:cancelled:data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt:40",
       "type": "Field",
       "name": "cancelled",
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CustomerResponse.kt",
-      "line": 39,
+      "line": 40,
       "aliases": [
         "cancelled",
         "CustomerResponse"
@@ -32158,6 +31997,42 @@
       "confidence": 0.85
     },
     {
+      "node_id": "file:domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt",
+      "type": "File",
+      "name": "domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt",
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt",
+      "line": 0,
+      "aliases": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt",
+        "MemberStatus",
+        "model"
+      ],
+      "tokens": [
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/memberstatus.kt",
+        "memberstatus",
+        "model"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "enum:MemberStatus:domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt",
+      "type": "Enum",
+      "name": "MemberStatus",
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt",
+      "line": 6,
+      "aliases": [
+        "MemberStatus",
+        "model"
+      ],
+      "tokens": [
+        "memberstatus",
+        "enum",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/memberstatus.kt",
+        "model"
+      ],
+      "confidence": 0.85
+    },
+    {
       "node_id": "file:domain/src/main/java/com/mtv/app/shopme/domain/model/MenuSummary.kt",
       "type": "File",
       "name": "domain/src/main/java/com/mtv/app/shopme/domain/model/MenuSummary.kt",
@@ -37734,6 +37609,24 @@
       ],
       "tokens": [
         "quantity",
+        "field",
+        "domain/src/main/java/com/mtv/app/shopme/domain/param/cartquantityparam.kt",
+        "cartquantityparam"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:note:domain/src/main/java/com/mtv/app/shopme/domain/param/CartQuantityParam.kt:14",
+      "type": "Field",
+      "name": "note",
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/param/CartQuantityParam.kt",
+      "line": 14,
+      "aliases": [
+        "note",
+        "CartQuantityParam"
+      ],
+      "tokens": [
+        "note",
         "field",
         "domain/src/main/java/com/mtv/app/shopme/domain/param/cartquantityparam.kt",
         "cartquantityparam"
@@ -68832,7 +68725,7 @@
       "type": "Class",
       "name": "OrderMenu",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 449,
+      "line": 450,
       "aliases": [
         "OrderMenu",
         "ProfileScreen",
@@ -68848,11 +68741,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:ProfileScreen:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:88",
+      "node_id": "method:ProfileScreen:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:89",
       "type": "Method",
       "name": "ProfileScreen",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 88,
+      "line": 89,
       "aliases": [
         "ProfileScreen",
         "domain_object"
@@ -68866,11 +68759,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:HeaderProfile:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:297",
+      "node_id": "method:HeaderProfile:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:298",
       "type": "Method",
       "name": "HeaderProfile",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 297,
+      "line": 298,
       "aliases": [
         "HeaderProfile",
         "ProfileScreen",
@@ -68886,11 +68779,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:ProfileStat:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:382",
+      "node_id": "method:ProfileStat:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:383",
       "type": "Method",
       "name": "ProfileStat",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 382,
+      "line": 383,
       "aliases": [
         "ProfileStat",
         "ProfileScreen",
@@ -68906,11 +68799,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:ProfileMenuItem:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:399",
+      "node_id": "method:ProfileMenuItem:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:400",
       "type": "Method",
       "name": "ProfileMenuItem",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 399,
+      "line": 400,
       "aliases": [
         "ProfileMenuItem",
         "ProfileScreen",
@@ -68926,11 +68819,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "method:ProfileScreenPreview:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:459",
+      "node_id": "method:ProfileScreenPreview:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:460",
       "type": "Method",
       "name": "ProfileScreenPreview",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 459,
+      "line": 460,
       "aliases": [
         "ProfileScreenPreview",
         "ProfileScreen",
@@ -68946,11 +68839,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:title:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:451",
+      "node_id": "field:title:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:452",
       "type": "Field",
       "name": "title",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 451,
+      "line": 452,
       "aliases": [
         "title",
         "ProfileScreen"
@@ -68964,11 +68857,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:icon:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:452",
+      "node_id": "field:icon:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:453",
       "type": "Field",
       "name": "icon",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 452,
+      "line": 453,
       "aliases": [
         "icon",
         "ProfileScreen"
@@ -68982,11 +68875,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:count:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:453",
+      "node_id": "field:count:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:454",
       "type": "Field",
       "name": "count",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 453,
+      "line": 454,
       "aliases": [
         "count",
         "ProfileScreen"
@@ -69000,11 +68893,11 @@
       "confidence": 0.85
     },
     {
-      "node_id": "field:filter:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:454",
+      "node_id": "field:filter:feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt:455",
       "type": "Field",
       "name": "filter",
       "path": "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/ProfileScreen.kt",
-      "line": 454,
+      "line": 455,
       "aliases": [
         "filter",
         "ProfileScreen"
@@ -76467,6 +76360,1601 @@
       "confidence": 0.85
     },
     {
+      "node_id": "file:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "File",
+      "name": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 0,
+      "aliases": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "module:com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING",
+      "type": "Module",
+      "name": "com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING",
+      "path": "",
+      "line": 0,
+      "aliases": [
+        "com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING"
+      ],
+      "tokens": [
+        "com.mtv.based.uicomponent.core.ui.util.constants.companion.error_string",
+        "module"
+      ],
+      "confidence": 0.65
+    },
+    {
+      "node_id": "class:SellerNotifUiState:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Class",
+      "name": "SellerNotifUiState",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 14,
+      "aliases": [
+        "SellerNotifUiState",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "sellernotifuistate",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:Load:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "Load",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 28,
+      "aliases": [
+        "Load",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "load",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:DismissDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "DismissDialog",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 29,
+      "aliases": [
+        "DismissDialog",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "dismissdialog",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:GetNotification:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "GetNotification",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 30,
+      "aliases": [
+        "GetNotification",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "getnotification",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:LoadMore:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "LoadMore",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 32,
+      "aliases": [
+        "LoadMore",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "loadmore",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:ClearNotification:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "ClearNotification",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 33,
+      "aliases": [
+        "ClearNotification",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "clearnotification",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:ClickNotification:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Class",
+      "name": "ClickNotification",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 34,
+      "aliases": [
+        "ClickNotification",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "clicknotification",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:ClickBack:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "ClickBack",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 36,
+      "aliases": [
+        "ClickBack",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "clickback",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:NavigateBack:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "NavigateBack",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 41,
+      "aliases": [
+        "NavigateBack",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "navigateback",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:NavigateToOrderDetail:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Class",
+      "name": "NavigateToOrderDetail",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 42,
+      "aliases": [
+        "NavigateToOrderDetail",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "navigatetoorderdetail",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:Error:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Class",
+      "name": "Error",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 46,
+      "aliases": [
+        "Error",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "error",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:Success:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "type": "Object",
+      "name": "Success",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 49,
+      "aliases": [
+        "Success",
+        "SellerNotifContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "success",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isLoading:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:16",
+      "type": "Field",
+      "name": "isLoading",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 16,
+      "aliases": [
+        "isLoading",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "isloading",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:notifications:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:18",
+      "type": "Field",
+      "name": "notifications",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 18,
+      "aliases": [
+        "notifications",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "notifications",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:notificationState:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:20",
+      "type": "Field",
+      "name": "notificationState",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 20,
+      "aliases": [
+        "notificationState",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "notificationstate",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:page:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:21",
+      "type": "Field",
+      "name": "page",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 21,
+      "aliases": [
+        "page",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "page",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isLastPage:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:22",
+      "type": "Field",
+      "name": "isLastPage",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 22,
+      "aliases": [
+        "isLastPage",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "islastpage",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isLoadingMore:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:23",
+      "type": "Field",
+      "name": "isLoadingMore",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 23,
+      "aliases": [
+        "isLoadingMore",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "isloadingmore",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:activeDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:24",
+      "type": "Field",
+      "name": "activeDialog",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 24,
+      "aliases": [
+        "activeDialog",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "activedialog",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:item:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:35",
+      "type": "Field",
+      "name": "item",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 35,
+      "aliases": [
+        "item",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "item",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:orderId:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:42",
+      "type": "Field",
+      "name": "orderId",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 42,
+      "aliases": [
+        "orderId",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "orderid",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:message:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt:47",
+      "type": "Field",
+      "name": "message",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerNotifContract.kt",
+      "line": 47,
+      "aliases": [
+        "message",
+        "SellerNotifContract"
+      ],
+      "tokens": [
+        "message",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellernotifcontract.kt",
+        "sellernotifcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "file:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "File",
+      "name": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 0,
+      "aliases": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:SellerOrderUiState:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Class",
+      "name": "SellerOrderUiState",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 10,
+      "aliases": [
+        "SellerOrderUiState",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "sellerorderuistate",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:OrderSummary:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Class",
+      "name": "OrderSummary",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 23,
+      "aliases": [
+        "OrderSummary",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "ordersummary",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:Load:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Object",
+      "name": "Load",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 36,
+      "aliases": [
+        "Load",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "load",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:LoadMore:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Object",
+      "name": "LoadMore",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 37,
+      "aliases": [
+        "LoadMore",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "loadmore",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:DismissDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Object",
+      "name": "DismissDialog",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 38,
+      "aliases": [
+        "DismissDialog",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "dismissdialog",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:SelectFilter:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Class",
+      "name": "SelectFilter",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 39,
+      "aliases": [
+        "SelectFilter",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "selectfilter",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:ToggleOnline:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Object",
+      "name": "ToggleOnline",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 40,
+      "aliases": [
+        "ToggleOnline",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "toggleonline",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:ClickOrder:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Class",
+      "name": "ClickOrder",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 41,
+      "aliases": [
+        "ClickOrder",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "clickorder",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:NavigateToOrderDetail:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "type": "Class",
+      "name": "NavigateToOrderDetail",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 45,
+      "aliases": [
+        "NavigateToOrderDetail",
+        "SellerOrderContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "navigatetoorderdetail",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isLoading:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:12",
+      "type": "Field",
+      "name": "isLoading",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 12,
+      "aliases": [
+        "isLoading",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "isloading",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isRefreshing:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:13",
+      "type": "Field",
+      "name": "isRefreshing",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 13,
+      "aliases": [
+        "isRefreshing",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "isrefreshing",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isLoadingMore:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:14",
+      "type": "Field",
+      "name": "isLoadingMore",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 14,
+      "aliases": [
+        "isLoadingMore",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "isloadingmore",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:currentPage:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:15",
+      "type": "Field",
+      "name": "currentPage",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 15,
+      "aliases": [
+        "currentPage",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "currentpage",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isLastPage:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:16",
+      "type": "Field",
+      "name": "isLastPage",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 16,
+      "aliases": [
+        "isLastPage",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "islastpage",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:selectedFilter:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:18",
+      "type": "Field",
+      "name": "selectedFilter",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 18,
+      "aliases": [
+        "selectedFilter",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "selectedfilter",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isOnline:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:19",
+      "type": "Field",
+      "name": "isOnline",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 19,
+      "aliases": [
+        "isOnline",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "isonline",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:orders:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:21",
+      "type": "Field",
+      "name": "orders",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 21,
+      "aliases": [
+        "orders",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "orders",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:orderId:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:25",
+      "type": "Field",
+      "name": "orderId",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 25,
+      "aliases": [
+        "orderId",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "orderid",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:customerName:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:26",
+      "type": "Field",
+      "name": "customerName",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 26,
+      "aliases": [
+        "customerName",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "customername",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:total:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:27",
+      "type": "Field",
+      "name": "total",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 27,
+      "aliases": [
+        "total",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "total",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:date:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:28",
+      "type": "Field",
+      "name": "date",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 28,
+      "aliases": [
+        "date",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "date",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:time:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:29",
+      "type": "Field",
+      "name": "time",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 29,
+      "aliases": [
+        "time",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "time",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:paymentMethod:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:30",
+      "type": "Field",
+      "name": "paymentMethod",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 30,
+      "aliases": [
+        "paymentMethod",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "paymentmethod",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:status:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:31",
+      "type": "Field",
+      "name": "status",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 31,
+      "aliases": [
+        "status",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "status",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:location:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:32",
+      "type": "Field",
+      "name": "location",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 32,
+      "aliases": [
+        "location",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "location",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:value:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt:39",
+      "type": "Field",
+      "name": "value",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderContract.kt",
+      "line": 39,
+      "aliases": [
+        "value",
+        "SellerOrderContract"
+      ],
+      "tokens": [
+        "value",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerordercontract.kt",
+        "sellerordercontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "file:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "File",
+      "name": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 0,
+      "aliases": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:SellerOrderLineItem:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Class",
+      "name": "SellerOrderLineItem",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 12,
+      "aliases": [
+        "SellerOrderLineItem",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "sellerorderlineitem",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:SellerOrderDetailUiState:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Class",
+      "name": "SellerOrderDetailUiState",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 19,
+      "aliases": [
+        "SellerOrderDetailUiState",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "sellerorderdetailuistate",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:Load:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "Load",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 36,
+      "aliases": [
+        "Load",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "load",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:DismissDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "DismissDialog",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 37,
+      "aliases": [
+        "DismissDialog",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "dismissdialog",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:ChangeStatus:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Class",
+      "name": "ChangeStatus",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 38,
+      "aliases": [
+        "ChangeStatus",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "changestatus",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:SaveStatus:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "SaveStatus",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 39,
+      "aliases": [
+        "SaveStatus",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "savestatus",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:ClickCancelOrder:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "ClickCancelOrder",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 40,
+      "aliases": [
+        "ClickCancelOrder",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "clickcancelorder",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:SubmitCancelOrder:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "SubmitCancelOrder",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 41,
+      "aliases": [
+        "SubmitCancelOrder",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "submitcancelorder",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:DismissCancelDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "DismissCancelDialog",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 42,
+      "aliases": [
+        "DismissCancelDialog",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "dismisscanceldialog",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:ChangeCancelReason:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Class",
+      "name": "ChangeCancelReason",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 43,
+      "aliases": [
+        "ChangeCancelReason",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "changecancelreason",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:ClickChat:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "ClickChat",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 44,
+      "aliases": [
+        "ClickChat",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "clickchat",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:ClickBack:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "ClickBack",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 45,
+      "aliases": [
+        "ClickBack",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "clickback",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:NavigateBack:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "NavigateBack",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 49,
+      "aliases": [
+        "NavigateBack",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "navigateback",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "object:UpdateSuccess:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Object",
+      "name": "UpdateSuccess",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 50,
+      "aliases": [
+        "UpdateSuccess",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "updatesuccess",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "class:NavigateToChat:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "type": "Class",
+      "name": "NavigateToChat",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 51,
+      "aliases": [
+        "NavigateToChat",
+        "SellerOrderDetailContract",
+        "domain_object"
+      ],
+      "tokens": [
+        "navigatetochat",
+        "class",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract",
+        "domain_object"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:title:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:14",
+      "type": "Field",
+      "name": "title",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 14,
+      "aliases": [
+        "title",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "title",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:qty:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:15",
+      "type": "Field",
+      "name": "qty",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 15,
+      "aliases": [
+        "qty",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "qty",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:price:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:16",
+      "type": "Field",
+      "name": "price",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 16,
+      "aliases": [
+        "price",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "price",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:notes:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:17",
+      "type": "Field",
+      "name": "notes",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 17,
+      "aliases": [
+        "notes",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "notes",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isLoading:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:21",
+      "type": "Field",
+      "name": "isLoading",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 21,
+      "aliases": [
+        "isLoading",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "isloading",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:isRefreshing:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:22",
+      "type": "Field",
+      "name": "isRefreshing",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 22,
+      "aliases": [
+        "isRefreshing",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "isrefreshing",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:orderId:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:23",
+      "type": "Field",
+      "name": "orderId",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 23,
+      "aliases": [
+        "orderId",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "orderid",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:currentStatus:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:24",
+      "type": "Field",
+      "name": "currentStatus",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 24,
+      "aliases": [
+        "currentStatus",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "currentstatus",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:customerName:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:25",
+      "type": "Field",
+      "name": "customerName",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 25,
+      "aliases": [
+        "customerName",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "customername",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:customerAddress:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:26",
+      "type": "Field",
+      "name": "customerAddress",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 26,
+      "aliases": [
+        "customerAddress",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "customeraddress",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:paymentMethod:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:27",
+      "type": "Field",
+      "name": "paymentMethod",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 27,
+      "aliases": [
+        "paymentMethod",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "paymentmethod",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:paymentStatus:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:28",
+      "type": "Field",
+      "name": "paymentStatus",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 28,
+      "aliases": [
+        "paymentStatus",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "paymentstatus",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:total:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:29",
+      "type": "Field",
+      "name": "total",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 29,
+      "aliases": [
+        "total",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "total",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:items:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:30",
+      "type": "Field",
+      "name": "items",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 30,
+      "aliases": [
+        "items",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "items",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:showCancelDialog:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:31",
+      "type": "Field",
+      "name": "showCancelDialog",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 31,
+      "aliases": [
+        "showCancelDialog",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "showcanceldialog",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:cancelReason:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:32",
+      "type": "Field",
+      "name": "cancelReason",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 32,
+      "aliases": [
+        "cancelReason",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "cancelreason",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:status:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:38",
+      "type": "Field",
+      "name": "status",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 38,
+      "aliases": [
+        "status",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "status",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:reason:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:43",
+      "type": "Field",
+      "name": "reason",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 43,
+      "aliases": [
+        "reason",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "reason",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "node_id": "field:chatId:feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt:51",
+      "type": "Field",
+      "name": "chatId",
+      "path": "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/SellerOrderDetailContract.kt",
+      "line": 51,
+      "aliases": [
+        "chatId",
+        "SellerOrderDetailContract"
+      ],
+      "tokens": [
+        "chatid",
+        "field",
+        "feature-seller/src/main/java/com/mtv/app/shopme/feature/seller/contract/sellerorderdetailcontract.kt",
+        "sellerorderdetailcontract"
+      ],
+      "confidence": 0.85
+    },
+    {
       "node_id": "apiroute:add",
       "type": "ApiRoute",
       "name": "add",
@@ -76800,6 +78288,7 @@
         "entrypoints",
         "core/src/main/java/com/mtv/app/shopme/core/utils/resultflowfactory.kt",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/apiendpoint.kt",
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/createorderrequest.kt",
         "domain_functions",
         "core/src/main/java/com/mtv/app/shopme/core/utils/resultflowfactory.kt:createunit",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/caferepository.kt:createcafe",
@@ -77002,7 +78491,7 @@
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/apiendpoint.kt",
         "data/src/main/java/com/mtv/app/shopme/data/remote/request/foodbulkstatusrequest.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/model/foodstatus.kt",
-        "domain/src/main/java/com/mtv/app/shopme/domain/model/orderitemstatus.kt",
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/memberstatus.kt",
         "domain_functions",
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/sellerrepository.kt:updateorderstatus",
         "feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/ui/orderhistoryscreen.kt:statusbadge",

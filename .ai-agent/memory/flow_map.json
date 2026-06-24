@@ -46,7 +46,7 @@
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
         "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt",
-        "data/src/main/java/com/mtv/app/shopme/data/remote/api/ApiEndPoint.kt"
+        "data/src/main/java/com/mtv/app/shopme/data/remote/request/CreateOrderRequest.kt"
       ],
       "domain_functions": [
         "core/src/main/java/com/mtv/app/shopme/core/utils/ResultFlowFactory.kt:createUnit",
@@ -379,7 +379,7 @@
         "data/src/main/java/com/mtv/app/shopme/data/remote/request/FoodBulkStatusRequest.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
         "domain/src/main/java/com/mtv/app/shopme/domain/model/FoodStatus.kt",
-        "domain/src/main/java/com/mtv/app/shopme/domain/model/OrderItemStatus.kt"
+        "domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt"
       ],
       "domain_functions": [
         "domain/src/main/java/com/mtv/app/shopme/domain/repository/SellerRepository.kt:updateOrderStatus",
@@ -485,5 +485,5 @@
       "notes": []
     }
   ],
-  "updated_at": "2026-06-05T06:27:48.782204+00:00"
+  "updated_at": "2026-06-06T03:35:49.561900+00:00"
 }

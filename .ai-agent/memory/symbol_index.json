@@ -1,6 +1,6 @@
 {
   "project_root": "D:\\Work\\Pribadi\\AndroidProject\\shopme-app",
-  "file_count": 596,
+  "file_count": 593,
   "files": [
     {
       "path": "app/src/androidTest/java/com/mtv/app/shopme/ExampleInstrumentedTest.kt",
@@ -1903,7 +1903,7 @@
       "functions": [
         {
           "name": "fakeCustomerResponse",
-          "line": 16
+          "line": 17
         }
       ],
       "data_members": []
@@ -1964,41 +1964,41 @@
         {
           "name": "DataUiMock",
           "kind": "object",
-          "line": 30
+          "line": 31
         }
       ],
       "functions": [
         {
           "name": "customer",
-          "line": 32
+          "line": 33
         },
         {
           "name": "foods",
-          "line": 61
+          "line": 62
         },
         {
           "name": "cafe",
-          "line": 120
+          "line": 121
         },
         {
           "name": "cart",
-          "line": 140
+          "line": 141
         },
         {
           "name": "chatList",
-          "line": 273
+          "line": 274
         },
         {
           "name": "chatDetail",
-          "line": 336
+          "line": 337
         },
         {
           "name": "villages",
-          "line": 383
+          "line": 384
         },
         {
           "name": "addresses",
-          "line": 389
+          "line": 390
         }
       ],
       "data_members": []
@@ -2575,59 +2575,44 @@
           "line": 248
         },
         {
-          "name": "Create",
-          "kind": "object",
-          "line": 249
-        },
-        {
-          "name": "Delete",
-          "kind": "class",
-          "line": 250
-        },
-        {
-          "name": "Clear",
-          "kind": "object",
-          "line": 251
-        },
-        {
           "name": "Misc",
           "kind": "object",
-          "line": 253
+          "line": 250
         },
         {
           "name": "Splash",
           "kind": "object",
-          "line": 254
+          "line": 251
         },
         {
           "name": "Support",
           "kind": "object",
-          "line": 255
+          "line": 252
         },
         {
           "name": "SupportChat",
           "kind": "object",
-          "line": 256
+          "line": 253
         },
         {
           "name": "SendSupportChat",
           "kind": "object",
-          "line": 257
+          "line": 254
         },
         {
           "name": "Admin",
           "kind": "object",
-          "line": 259
+          "line": 256
         },
         {
           "name": "Capabilities",
           "kind": "object",
-          "line": 261
+          "line": 258
         },
         {
           "name": "SecurityBoundaries",
           "kind": "object",
-          "line": 262
+          "line": 259
         }
       ],
       "functions": [],
@@ -3120,25 +3105,6 @@
       ]
     },
     {
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartInquiryRequest.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.data.remote.request",
-      "classes": [
-        {
-          "name": "CartInquiryRequest",
-          "kind": "class",
-          "line": 14
-        }
-      ],
-      "functions": [],
-      "data_members": [
-        {
-          "name": "cartId",
-          "line": 15
-        }
-      ]
-    },
-    {
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartQuantityRequest.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.data.remote.request",
@@ -3154,25 +3120,10 @@
         {
           "name": "quantity",
           "line": 15
-        }
-      ]
-    },
-    {
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/request/CartValidateRequest.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.data.remote.request",
-      "classes": [
+        },
         {
-          "name": "CartValidateRequest",
-          "kind": "class",
-          "line": 14
-        }
-      ],
-      "functions": [],
-      "data_members": [
-        {
-          "name": "cartId",
-          "line": 15
+          "name": "note",
+          "line": 16
         }
       ]
     },
@@ -3403,7 +3354,7 @@
         {
           "name": "FoodOptionRequest",
           "kind": "class",
-          "line": 37
+          "line": 38
         }
       ],
       "functions": [],
@@ -3453,8 +3404,12 @@
           "line": 22
         },
         {
+          "name": "id",
+          "line": 32
+        },
+        {
           "name": "option",
-          "line": 33
+          "line": 34
         }
       ]
     },
@@ -4048,25 +4003,6 @@
       ]
     },
     {
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartInquiryResponse.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.data.remote.response",
-      "classes": [
-        {
-          "name": "CartInquiryResponse",
-          "kind": "class",
-          "line": 6
-        }
-      ],
-      "functions": [],
-      "data_members": [
-        {
-          "name": "cartId",
-          "line": 7
-        }
-      ]
-    },
-    {
       "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartItemResponse.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.data.remote.response",
@@ -4157,25 +4093,6 @@
         {
           "name": "price",
           "line": 23
-        }
-      ]
-    },
-    {
-      "path": "data/src/main/java/com/mtv/app/shopme/data/remote/response/CartValidateResponse.kt",
-      "language": "kotlin",
-      "package": "com.mtv.app.shopme.data.remote.response",
-      "classes": [
-        {
-          "name": "CartValidateResponse",
-          "kind": "class",
-          "line": 6
-        }
-      ],
-      "functions": [],
-      "data_members": [
-        {
-          "name": "cartId",
-          "line": 7
         }
       ]
     },
@@ -4312,88 +4229,88 @@
         {
           "name": "CustomerResponse",
           "kind": "class",
-          "line": 14
+          "line": 15
         },
         {
           "name": "StatsResponse",
           "kind": "class",
-          "line": 26
+          "line": 27
         },
         {
           "name": "MenuSummaryResponse",
           "kind": "class",
-          "line": 33
+          "line": 34
         }
       ],
       "functions": [],
       "data_members": [
         {
           "name": "name",
-          "line": 15
-        },
-        {
-          "name": "phone",
           "line": 16
         },
         {
-          "name": "email",
+          "name": "phone",
           "line": 17
         },
         {
-          "name": "address",
+          "name": "email",
           "line": 18
         },
         {
-          "name": "photo",
+          "name": "address",
           "line": 19
         },
         {
-          "name": "verified",
+          "name": "photo",
           "line": 20
         },
         {
-          "name": "stats",
+          "name": "verified",
           "line": 21
         },
         {
-          "name": "menuSummary",
+          "name": "stats",
           "line": 22
         },
         {
-          "name": "totalOrders",
-          "line": 27
+          "name": "menuSummary",
+          "line": 23
         },
         {
-          "name": "activeOrders",
+          "name": "totalOrders",
           "line": 28
         },
         {
-          "name": "membership",
+          "name": "activeOrders",
           "line": 29
         },
         {
-          "name": "unpaid",
-          "line": 34
+          "name": "membership",
+          "line": 30
         },
         {
-          "name": "ordered",
+          "name": "unpaid",
           "line": 35
         },
         {
-          "name": "cooking",
+          "name": "ordered",
           "line": 36
         },
         {
-          "name": "shipping",
+          "name": "cooking",
           "line": 37
         },
         {
-          "name": "completed",
+          "name": "shipping",
           "line": 38
         },
         {
-          "name": "cancelled",
+          "name": "completed",
           "line": 39
+        },
+        {
+          "name": "cancelled",
+          "line": 40
         }
       ]
     },
@@ -6861,6 +6778,20 @@
       ]
     },
     {
+      "path": "domain/src/main/java/com/mtv/app/shopme/domain/model/MemberStatus.kt",
+      "language": "kotlin",
+      "package": "com.mtv.app.shopme.domain.model",
+      "classes": [
+        {
+          "name": "MemberStatus",
+          "kind": "enum",
+          "line": 6
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
       "path": "domain/src/main/java/com/mtv/app/shopme/domain/model/MenuSummary.kt",
       "language": "kotlin",
       "package": "com.mtv.app.shopme.domain.model",
@@ -8375,6 +8306,10 @@
         {
           "name": "quantity",
           "line": 13
+        },
+        {
+          "name": "note",
+          "line": 14
         }
       ]
     },
@@ -15548,47 +15483,47 @@
         {
           "name": "OrderMenu",
           "kind": "class",
-          "line": 449
+          "line": 450
         }
       ],
       "functions": [
         {
           "name": "ProfileScreen",
-          "line": 88
+          "line": 89
         },
         {
           "name": "HeaderProfile",
-          "line": 297
+          "line": 298
         },
         {
           "name": "ProfileStat",
-          "line": 382
+          "line": 383
         },
         {
           "name": "ProfileMenuItem",
-          "line": 399
+          "line": 400
         },
         {
           "name": "ProfileScreenPreview",
-          "line": 459
+          "line": 460
         }
       ],
       "data_members": [
         {
           "name": "title",
-          "line": 451
-        },
-        {
-          "name": "icon",
           "line": 452
         },
         {
-          "name": "count",
+          "name": "icon",
           "line": 453
         },
         {
-          "name": "filter",
+          "name": "count",
           "line": 454
+        },
+        {
+          "name": "filter",
+          "line": 455
         }
       ]
     },
@@ -20926,5 +20861,5 @@
       ]
     }
   ],
-  "updated_at": "2026-06-05T06:27:48.163166+00:00"
+  "updated_at": "2026-06-06T03:35:48.793446+00:00"
 }
