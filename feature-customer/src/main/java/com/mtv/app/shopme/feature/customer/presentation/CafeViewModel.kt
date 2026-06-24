@@ -48,7 +48,7 @@ class CafeViewModel @Inject constructor(
     private val _state = MutableStateFlow(CafeUiState())
     val uiState = _state.asStateFlow()
 
-    private val cafeId: String = checkNotNull(savedStateHandle["cafeId"])
+    private val cafeId: String = savedStateHandle.get<String>("cafeId").orEmpty()
 
     override fun onEvent(event: CafeEvent) {
         when (event) {
@@ -93,6 +93,10 @@ class CafeViewModel @Inject constructor(
     }
 
     private fun load() {
+        if (cafeId.isBlank()) {
+            emitEffect(CafeEffect.NavigateBack)
+            return
+        }
         observeCafeList()
         observeCafe()
         observeFoods()

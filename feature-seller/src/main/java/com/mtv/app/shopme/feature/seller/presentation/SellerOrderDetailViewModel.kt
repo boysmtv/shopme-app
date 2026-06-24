@@ -33,7 +33,7 @@ class SellerOrderDetailViewModel @Inject constructor(
     private val ensureSellerChatConversationUseCase: EnsureSellerChatConversationUseCase,
 ) : BaseEventViewModel<SellerOrderDetailEvent, SellerOrderDetailEffect>() {
 
-    private val orderId: String = checkNotNull(savedStateHandle["orderId"])
+    private val orderId: String = savedStateHandle.get<String>("orderId").orEmpty()
     private val _state = MutableStateFlow(SellerOrderDetailUiState(orderId = orderId))
     val uiState = _state.asStateFlow()
 
@@ -57,6 +57,10 @@ class SellerOrderDetailViewModel @Inject constructor(
     }
 
     private fun load() {
+        if (orderId.isBlank()) {
+            emitEffect(SellerOrderDetailEffect.NavigateBack)
+            return
+        }
         observeDataFlow(
             flow = getSellerOrderDetailUseCase(orderId),
             onState = { state ->

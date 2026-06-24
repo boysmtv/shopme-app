@@ -12,12 +12,8 @@ import com.mtv.app.shopme.core.error.ApiException
 import com.mtv.app.shopme.data.remote.api.ApiResponse
 
 inline fun <reified T : Any> ApiResponse<T>.requireData(): T {
-    data?.let { return it }
-
-    if (T::class == Unit::class) {
-        @Suppress("UNCHECKED_CAST")
-        return Unit as T
+    return data ?: when (T::class) {
+        Unit::class -> Unit as T
+        else -> throw ApiException.EmptyBody()
     }
-
-    throw ApiException.EmptyBody()
 }

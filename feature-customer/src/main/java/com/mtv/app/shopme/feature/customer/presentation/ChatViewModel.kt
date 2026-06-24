@@ -35,9 +35,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -335,7 +334,7 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun currentChatTime(): String =
-        SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
+        LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
 
     private fun retainRealtime() {
         if (realtimeRetained) return

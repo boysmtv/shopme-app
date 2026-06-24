@@ -32,7 +32,7 @@ class OrderDetailViewModel @Inject constructor(
     private val sessionManager: SessionManager
 ) : BaseEventViewModel<OrderDetailEvent, OrderDetailEffect>() {
 
-    private val orderId: String = checkNotNull(savedStateHandle["orderId"])
+    private val orderId: String = savedStateHandle.get<String>("orderId").orEmpty()
     private val _state = MutableStateFlow(OrderDetailUiState(orderId = orderId))
     val uiState = _state.asStateFlow()
 
@@ -61,6 +61,10 @@ class OrderDetailViewModel @Inject constructor(
     }
 
     private fun load() {
+        if (orderId.isBlank()) {
+            emitEffect(OrderDetailEffect.NavigateBack)
+            return
+        }
         observeDataFlow(
             flow = getOrderDetailUseCase(orderId),
             onState = { state ->

@@ -54,7 +54,7 @@ class DetailViewModel @Inject constructor(
     private val _state = MutableStateFlow(DetailUiState())
     val uiState = _state.asStateFlow()
 
-    private val foodId: String = checkNotNull(savedStateHandle["foodId"])
+    private val foodId: String = savedStateHandle.get<String>("foodId").orEmpty()
     private var currentSimilarCafeId: String = ""
 
     override fun onEvent(event: DetailEvent) {
@@ -87,6 +87,10 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun loadDetail() {
+        if (foodId.isBlank()) {
+            emitEffect(DetailEffect.NavigateBack)
+            return
+        }
         observeFavorites()
         observeDataFlow(
             flow = foodDetailUseCase(foodId),
