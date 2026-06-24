@@ -152,31 +152,43 @@ class SellerChatDetailViewModel @Inject constructor(
             onState = { state ->
                 var nextActiveChatId = _state.value.activeChatId
                 _state.update {
-                    val messages = (state as? LoadState.Success)
-                        ?.data
-                        ?.content
-                        ?.map { item: ChatMessage ->
-                            SellerChatDetailMessage(
-                                message = item.message,
-                                isFromSeller = item.isFromUser,
-                                id = item.id,
-                                time = item.time,
-                                isPending = false,
-                                isRead = item.isRead
-                            )
-                        }
-                        .orEmpty()
+                    when (state) {
+                        is LoadState.Loading -> it.copy(
+                            isLoading = it.messages.isEmpty(),
+                            isRefreshing = it.messages.isNotEmpty()
+                        )
 
-                    it.copy(
-                        isLoading = state is LoadState.Loading && it.messages.isEmpty(),
-                        isRefreshing = state is LoadState.Loading && it.messages.isNotEmpty(),
-                        activeChatId = resolvedChatId,
-                        messages = if (messages.isNotEmpty()) messages else it.messages,
-                        chatPage = (state as? LoadState.Success)?.data?.page ?: it.chatPage,
-                        isFirstPage = (state as? LoadState.Success)?.data?.last ?: it.isFirstPage,
-                        isLoadingOlder = false
-                    ).also { nextState ->
-                        nextActiveChatId = nextState.activeChatId
+                        is LoadState.Success -> {
+                            val messages = state.data.content.map { item ->
+                                SellerChatDetailMessage(
+                                    message = item.message,
+                                    isFromSeller = item.isFromUser,
+                                    id = item.id,
+                                    time = item.time,
+                                    isPending = false,
+                                    isRead = item.isRead
+                                )
+                            }
+                            it.copy(
+                                isLoading = false,
+                                isRefreshing = false,
+                                activeChatId = resolvedChatId,
+                                messages = messages,
+                                chatPage = state.data.page,
+                                isFirstPage = state.data.page == 0,
+                                isLoadingOlder = false
+                            ).also { nextState ->
+                                nextActiveChatId = nextState.activeChatId
+                            }
+                        }
+
+                        is LoadState.Error -> it.copy(
+                            isLoading = false,
+                            isRefreshing = false,
+                            isLoadingOlder = false
+                        )
+
+                        else -> it
                     }
                 }
                 markAsReadIfNeeded(nextActiveChatId)
@@ -215,7 +227,7 @@ class SellerChatDetailViewModel @Inject constructor(
                             it.copy(
                                 messages = (older + it.messages).distinctBy { message -> message.id },
                                 chatPage = result.data.page,
-                                isFirstPage = result.data.last,
+                                isFirstPage = result.data.page == 0,
                                 isLoadingOlder = false
                             )
                         }
