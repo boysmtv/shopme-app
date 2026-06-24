@@ -8,8 +8,6 @@
 
 package com.mtv.app.shopme.data.remote.response
 
-import com.mtv.app.shopme.common.serializer.BigDecimalSerializer
-import java.math.BigDecimal
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,10 +16,7 @@ data class CafeResponse(
     val name: String,
     val phone: String,
     val description: String,
-
-    @Serializable(with = BigDecimalSerializer::class)
-    val minimalOrder: BigDecimal,
-
+    val minimalOrder: String,
     val openTime: String,
     val closeTime: String,
     val image: String,

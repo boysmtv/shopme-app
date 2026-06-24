@@ -8,6 +8,6 @@ data class ApiResponse<T>(
     val status: Int,
     val code: String,
     val message: String,
-    val traceId: String,
+    val traceId: String? = null,
     val data: T? = null
 )

@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.data.remote.request
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CafeAddRequest(
     val name: String,
     val phone: String = "",

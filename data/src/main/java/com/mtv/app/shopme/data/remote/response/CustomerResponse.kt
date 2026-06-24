@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.data.remote.response
 
+import com.mtv.app.shopme.domain.model.MemberStatus
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -26,7 +27,7 @@ data class CustomerResponse(
 data class StatsResponse(
     val totalOrders: Long,
     val activeOrders: Long,
-    val membership: String
+    val membership: MemberStatus
 )
 
 @Serializable

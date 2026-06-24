@@ -29,12 +29,14 @@ data class FoodImageRequest(
 
 @Serializable
 data class FoodVariantRequest(
+    val id: String? = null,
     val name: String,
     val option: List<FoodOptionRequest>? = null
 )
 
 @Serializable
 data class FoodOptionRequest(
+    val id: String? = null,
     val name: String,
     @Serializable(with = BigDecimalSerializer::class)
     val price: BigDecimal
