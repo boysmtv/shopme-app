@@ -18,6 +18,7 @@ import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
+import com.mtv.app.shopme.domain.model.MemberStatus
 import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.model.Stats
@@ -55,7 +56,7 @@ fun CustomerEntity.toDomain(): Customer = Customer(
     stats = Stats(
         totalOrders = totalOrders.toLong(),
         activeOrders = activeOrders.toLong(),
-        membership = membership
+        membership = safeParseMembership(membership)
     ),
     menuSummary = MenuSummary(
         unpaid = 0L,
@@ -103,7 +104,7 @@ fun Customer.toEntity(): CustomerEntity = CustomerEntity(
     verified = verified,
     totalOrders = (stats?.totalOrders ?: 0L).toInt(),
     activeOrders = (stats?.activeOrders ?: 0L).toInt(),
-    membership = stats?.membership.orEmpty(),
+    membership = stats?.membership?.name.orEmpty(),
     ordered = (menuSummary?.ordered ?: 0L).toInt(),
     cooking = (menuSummary?.cooking ?: 0L).toInt(),
     shipping = (menuSummary?.shipping ?: 0L).toInt(),
@@ -208,3 +209,6 @@ fun AppNotificationCacheEntity.toSellerNotification(): SellerNotifItem = SellerN
     time = createdAt.substringAfter("T", "").substringBefore("."),
     isRead = isRead
 )
+
+private fun safeParseMembership(value: String): MemberStatus =
+    runCatching { MemberStatus.valueOf(value.uppercase()) }.getOrDefault(MemberStatus.REGULER)

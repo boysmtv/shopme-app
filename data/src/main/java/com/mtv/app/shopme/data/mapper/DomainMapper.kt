@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.data.mapper
 
+import java.math.BigDecimal
 import com.mtv.app.shopme.data.remote.response.ChatListItemResponse
 import com.mtv.app.shopme.data.remote.response.ChatItem
 import com.mtv.app.shopme.data.remote.response.ChatResponse
@@ -50,6 +51,7 @@ import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.FoodOption
 import com.mtv.app.shopme.domain.model.FoodVariant
 import com.mtv.app.shopme.domain.model.Login
+import com.mtv.app.shopme.domain.model.MemberStatus
 import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.app.shopme.domain.model.NotificationPreferences
@@ -151,7 +153,7 @@ fun CafeResponse.toDomain(): Cafe = Cafe(
     name = name,
     phone = phone,
     description = description,
-    minimalOrder = minimalOrder,
+    minimalOrder = minimalOrder.toBigDecimalOrNull() ?: BigDecimal.ZERO,
     openTime = openTime,
     closeTime = closeTime,
     image = image,
@@ -223,6 +225,12 @@ fun StatsResponse.toDomain(): Stats = Stats(
     activeOrders = activeOrders,
     membership = membership
 )
+
+fun MemberStatus.toMembershipString(): String = when (this) {
+    MemberStatus.REGULER -> "Reguler"
+    MemberStatus.RUBY -> "Ruby"
+    MemberStatus.PLATINUM -> "Platinum"
+}
 
 fun MenuSummaryResponse.toDomain(): MenuSummary = MenuSummary(
     unpaid = unpaid,
