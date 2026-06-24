@@ -22,7 +22,7 @@ android {
         applicationId = "com.mtv.app.shopme"
         minSdk = 24
         targetSdk = 36
-        versionCode = 12
+        versionCode = 15
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -38,7 +38,7 @@ android {
     signingConfigs {
         if (hasCiSigning) {
             create("ciRelease") {
-                storeFile = file(ciKeystorePath!!)
+                storeFile = rootProject.file(ciKeystorePath!!)
                 storePassword = ciKeystorePassword
                 keyAlias = ciKeyAlias
                 keyPassword = ciKeyPassword

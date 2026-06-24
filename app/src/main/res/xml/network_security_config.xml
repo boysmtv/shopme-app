@@ -2,7 +2,7 @@
 <network-security-config>
     <!-- Production: pin certificates and disallow cleartext -->
     <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">api.shopme.app</domain>
+        <domain includeSubdomains="true">api.dsrv-developer.my.id</domain>
         <!--
         TODO: Add actual certificate pins for production
         <pin-set expiration="2027-01-01">
@@ -17,5 +17,6 @@
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">192.168.0.0/16</domain>
         <domain includeSubdomains="true">10.0.0.0/8</domain>
+        <domain includeSubdomains="false">192.168.100.50</domain>
     </domain-config>
 </network-security-config>
