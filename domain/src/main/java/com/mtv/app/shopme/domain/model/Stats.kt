@@ -11,5 +11,5 @@ package com.mtv.app.shopme.domain.model
 data class Stats(
     val totalOrders: Long,
     val activeOrders: Long,
-    val membership: String
+    val membership: MemberStatus
 )
