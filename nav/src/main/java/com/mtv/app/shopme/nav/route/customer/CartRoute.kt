@@ -26,7 +26,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mtv.app.shopme.common.base.BaseRoute
 import com.mtv.app.shopme.common.base.BaseScreen
-import com.mtv.app.shopme.feature.customer.contract.CartEffect
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.presentation.CartViewModel
 import com.mtv.app.shopme.feature.customer.ui.CartScreen
@@ -81,34 +80,3 @@ fun CartRoute(nav: NavController) {
     }
 }
 
-/**
- * Kept intentionally for backward compatibility with older route wiring.
- *
- * CartEffect is now handled inside CartScreen because Cart contains local UI effects:
- * - OpenPinSheet
- * - ShowSuccessDialog
- * - ShowSnackbar
- *
- * CartRoute should only provide navigation callbacks.
- */
-@Suppress("unused")
-private fun handleCartEffect(
-    nav: NavController,
-    effect: CartEffect
-) {
-    when (effect) {
-        CartEffect.OpenPinSheet -> Unit
-
-        CartEffect.ShowSuccessDialog -> Unit
-
-        is CartEffect.ShowSnackbar -> Unit
-
-        CartEffect.NavigateToOrder -> {
-            CustomerNavActions.toOrder(nav)
-        }
-
-        CartEffect.NavigateToEditProfile -> {
-            CustomerNavActions.toEditProfile(nav)
-        }
-    }
-}
