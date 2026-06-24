@@ -22,6 +22,7 @@ import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodOption
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.FoodVariant
+import com.mtv.app.shopme.domain.model.MemberStatus
 import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.domain.model.Village
@@ -47,7 +48,7 @@ object DataUiMock {
         stats = Stats(
             totalOrders = 120,
             activeOrders = 3,
-            membership = "Gold"
+            membership = MemberStatus.REGULER
         ),
         menuSummary = MenuSummary(
             unpaid = 1,

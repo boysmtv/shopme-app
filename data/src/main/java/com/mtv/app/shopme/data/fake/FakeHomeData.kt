@@ -13,6 +13,7 @@ import com.mtv.app.shopme.data.remote.response.AddressResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
+import com.mtv.app.shopme.domain.model.MemberStatus
 
 fun fakeCustomerResponse(): CustomerResponse {
     return CustomerResponse(
@@ -33,7 +34,7 @@ fun fakeCustomerResponse(): CustomerResponse {
         stats = StatsResponse(
             totalOrders = 120,
             activeOrders = 3,
-            membership = "Gold"
+            membership = MemberStatus.REGULER
         ),
         menuSummary = MenuSummaryResponse(
             ordered = 10,
