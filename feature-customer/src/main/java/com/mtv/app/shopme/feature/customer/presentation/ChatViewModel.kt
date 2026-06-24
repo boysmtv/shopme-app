@@ -92,7 +92,6 @@ class ChatViewModel @Inject constructor(
     private fun load() {
         retainRealtime()
         observeChatMetadata()
-        observeChat()
     }
 
     private fun observeChatMetadata() {
@@ -161,7 +160,7 @@ class ChatViewModel @Inject constructor(
                             else -> it.chats
                         },
                         chatPage = (state as? com.mtv.based.core.network.utils.LoadState.Success)?.data?.page ?: it.chatPage,
-                        isFirstPage = (state as? com.mtv.based.core.network.utils.LoadState.Success)?.data?.last ?: it.isFirstPage,
+                        isFirstPage = (state as? com.mtv.based.core.network.utils.LoadState.Success)?.data?.page == 0,
                         optimisticMessages = if (state is com.mtv.based.core.network.utils.LoadState.Success) {
                             emptyList()
                         } else {
@@ -294,7 +293,7 @@ class ChatViewModel @Inject constructor(
                             it.copy(
                                 chats = com.mtv.based.core.network.utils.LoadState.Success(merged),
                                 chatPage = result.data.page,
-                                isFirstPage = result.data.last,
+                                isFirstPage = result.data.page == 0,
                                 isLoadingOlder = false
                             )
                         }

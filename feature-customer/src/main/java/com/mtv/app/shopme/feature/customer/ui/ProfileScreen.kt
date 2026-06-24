@@ -77,6 +77,7 @@ import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.MenuSummary
+import com.mtv.app.shopme.domain.model.MemberStatus
 import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
@@ -372,7 +373,7 @@ fun HeaderProfile(
             ) {
                 ProfileStat((customer?.stats?.totalOrders ?: 0).toString(), "Pesanan")
                 ProfileStat((customer?.stats?.activeOrders ?: 0).toString(), "Aktif")
-                ProfileStat(customer?.stats?.membership.orEmpty().ifBlank { "-" }, "Member")
+                ProfileStat(customer?.stats?.membership?.name.orEmpty().ifBlank { "-" }, "Member")
             }
         }
     }
@@ -491,7 +492,7 @@ fun ProfileScreenPreview() {
                             stats = Stats(
                                 totalOrders = 24,
                                 activeOrders = 2,
-                                membership = "GOLD"
+                                membership = MemberStatus.REGULER
                             ),
                             menuSummary = MenuSummary(
                                 ordered = 12,
