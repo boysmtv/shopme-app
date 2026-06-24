@@ -66,7 +66,7 @@ class CafeRepositoryImplTest {
         name = name,
         phone = "08123",
         description = "Cafe desc",
-        minimalOrder = BigDecimal(15000),
+        minimalOrder = "15000",
         openTime = "08:00",
         closeTime = "22:00",
         image = "https://cdn.local/$id.jpg",

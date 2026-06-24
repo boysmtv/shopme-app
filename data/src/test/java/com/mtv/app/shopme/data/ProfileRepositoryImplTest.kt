@@ -12,6 +12,7 @@ import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.data.repository.ProfileRepositoryImpl
 import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
+import com.mtv.app.shopme.domain.model.MemberStatus
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
@@ -162,7 +163,7 @@ class ProfileRepositoryImplTest {
         stats = StatsResponse(
             totalOrders = 10,
             activeOrders = 2,
-            membership = "Platinum"
+            membership = MemberStatus.PLATINUM
         ),
         menuSummary = MenuSummaryResponse(
             ordered = 2,
