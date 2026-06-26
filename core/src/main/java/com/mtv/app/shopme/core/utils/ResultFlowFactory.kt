@@ -1,15 +1,6 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: ResultFlowFactory.kt
- *
- * Last modified by Dedy Wijaya on 25/03/26 13.17
- */
-
 package com.mtv.app.shopme.core.utils
 
-import com.mtv.app.shopme.core.error.ErrorMapper
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +9,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class ResultFlowFactory @Inject constructor(
-    private val errorMapper: ErrorMapper
-) {
+class ResultFlowFactory @Inject constructor() {
 
     fun <T> create(
         block: suspend () -> T
@@ -30,7 +19,7 @@ class ResultFlowFactory @Inject constructor(
         emit(Resource.Success(result))
     }.catch { throwable ->
         if (throwable is CancellationException) throw throwable
-        emit(Resource.Error(errorMapper.map(throwable)))
+        emit(Resource.Error(throwable))
     }.flowOn(Dispatchers.IO)
 
     fun createUnit(
