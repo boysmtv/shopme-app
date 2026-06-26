@@ -9,7 +9,6 @@
 package com.mtv.app.shopme.app
 
 import android.app.Application
-import com.google.firebase.FirebaseApp
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import coil.ImageLoader
@@ -28,7 +27,6 @@ class BaseApplication : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
-        FirebaseApp.initializeApp(this)
         offlineMutationSyncManager.start()
     }
 

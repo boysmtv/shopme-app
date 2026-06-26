@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
 import com.mtv.app.shopme.feature.customer.ui.OrderScreen
-import com.mtv.app.shopme.feature.customer.ui.resolveOrderFilter
+import com.mtv.app.shopme.feature.customer.contract.resolveOrderFilter
 import com.mtv.app.shopme.nav.customer.CustomerNavActions
 
 @Composable

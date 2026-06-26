@@ -62,7 +62,7 @@ class NotificationServices : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         repository.saveStatus(token.isEmpty())
         repository.saveToken(token)
-        Log.e("LOG_BOYS_FCM", "Token-onNewToken: $token")
+        if (BuildConfig.DEBUG) Log.d("LOG_BOYS_FCM", "Token-onNewToken: $token")
     }
 }
 

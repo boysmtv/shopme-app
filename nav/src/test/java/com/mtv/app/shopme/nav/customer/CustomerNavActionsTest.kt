@@ -9,6 +9,7 @@ import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class CustomerNavActionsTest {
@@ -23,7 +24,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toLogin(nav)
 
         verify { nav.navigate(capture(route), capture(opts)) }
-        assert(route.captured == AuthDestinations.LOGIN_GRAPH)
+        assertEquals(AuthDestinations.LOGIN_GRAPH, route.captured)
     }
 
     @Test
@@ -33,7 +34,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toHome(nav)
 
         verify { nav.navigate(capture(route), any<NavOptionsBuilder.() -> Unit>()) }
-        assert(route.captured == CustomerDestinations.HOME_GRAPH)
+        assertEquals(CustomerDestinations.HOME_GRAPH, route.captured)
     }
 
     @Test
@@ -43,7 +44,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toRegister(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == AuthDestinations.REGISTER_GRAPH)
+        assertEquals(AuthDestinations.REGISTER_GRAPH, route.captured)
     }
 
     @Test
@@ -53,7 +54,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toForgetPassword(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == AuthDestinations.RESET_GRAPH)
+        assertEquals(AuthDestinations.RESET_GRAPH, route.captured)
     }
 
     @Test
@@ -63,7 +64,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toSearch(nav)
 
         verify { nav.navigate(capture(route), any<NavOptionsBuilder.() -> Unit>()) }
-        assert(route.captured == CustomerBottomNavItem.Search.route)
+        assertEquals(CustomerBottomNavItem.Search.route, route.captured)
     }
 
     @Test
@@ -73,7 +74,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toSearch(nav, "kopi")
 
         verify { nav.navigate(capture(route), any<NavOptionsBuilder.() -> Unit>()) }
-        assert(route.captured == "SEARCH/kopi")
+        assertEquals("SEARCH/kopi", route.captured)
     }
 
     @Test
@@ -83,7 +84,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toSearch(nav, "   ")
 
         verify { nav.navigate(capture(route), any<NavOptionsBuilder.() -> Unit>()) }
-        assert(route.captured == CustomerBottomNavItem.Search.route)
+        assertEquals(CustomerBottomNavItem.Search.route, route.captured)
     }
 
     @Test
@@ -93,7 +94,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toCart(nav)
 
         verify { nav.navigate(capture(route), any<NavOptionsBuilder.() -> Unit>()) }
-        assert(route.captured == CustomerBottomNavItem.Cart.route)
+        assertEquals(CustomerBottomNavItem.Cart.route, route.captured)
     }
 
     @Test
@@ -103,7 +104,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toSeller(nav)
 
         verify { nav.navigate(capture(route), any<NavOptionsBuilder.() -> Unit>()) }
-        assert(route.captured == SellerDestinations.SELLER_GRAPH)
+        assertEquals(SellerDestinations.SELLER_GRAPH, route.captured)
     }
 
     @Test
@@ -113,7 +114,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toNotif(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.NOTIF_GRAPH)
+        assertEquals(CustomerDestinations.NOTIF_GRAPH, route.captured)
     }
 
     @Test
@@ -123,7 +124,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toOrder(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.ORDER_GRAPH)
+        assertEquals(CustomerDestinations.ORDER_GRAPH, route.captured)
     }
 
     @Test
@@ -133,7 +134,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toOrder(nav, "DELIVERING")
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == "ORDER_GRAPH/DELIVERING")
+        assertEquals("ORDER_GRAPH/DELIVERING", route.captured)
     }
 
     @Test
@@ -143,7 +144,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toOrder(nav, "   ")
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.ORDER_GRAPH)
+        assertEquals(CustomerDestinations.ORDER_GRAPH, route.captured)
     }
 
     @Test
@@ -153,7 +154,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toChat(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.CHAT_GRAPH)
+        assertEquals(CustomerDestinations.CHAT_GRAPH, route.captured)
     }
 
     @Test
@@ -163,7 +164,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toChat(nav, "chat-1")
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == "CHAT_GRAPH/chat-1")
+        assertEquals("CHAT_GRAPH/chat-1", route.captured)
     }
 
     @Test
@@ -173,7 +174,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toChat(nav, null)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.CHAT_GRAPH)
+        assertEquals(CustomerDestinations.CHAT_GRAPH, route.captured)
     }
 
     @Test
@@ -183,7 +184,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toEditProfile(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.EDIT_PROFILE_GRAPH)
+        assertEquals(CustomerDestinations.EDIT_PROFILE_GRAPH, route.captured)
     }
 
     @Test
@@ -193,7 +194,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toOrderHistory(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.ORDER_HISTORY_GRAPH)
+        assertEquals(CustomerDestinations.ORDER_HISTORY_GRAPH, route.captured)
     }
 
     @Test
@@ -203,7 +204,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toFavorites(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.FAVORITES_GRAPH)
+        assertEquals(CustomerDestinations.FAVORITES_GRAPH, route.captured)
     }
 
     @Test
@@ -213,7 +214,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toSettings(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.SETTINGS_GRAPH)
+        assertEquals(CustomerDestinations.SETTINGS_GRAPH, route.captured)
     }
 
     @Test
@@ -223,7 +224,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toHelpCenter(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == CustomerDestinations.HELP_GRAPH)
+        assertEquals(CustomerDestinations.HELP_GRAPH, route.captured)
     }
 
     @Test
@@ -233,7 +234,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toTnc(nav)
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == SellerDestinations.SELLER_CREATE_TNC_GRAPH)
+        assertEquals(SellerDestinations.SELLER_CREATE_TNC_GRAPH, route.captured)
     }
 
     @Test
@@ -243,7 +244,7 @@ class CustomerNavActionsTest {
         CustomerNavActions.toDetail(nav, "food-1")
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == "DETAIL_GRAPH_WITH_ID/food-1")
+        assertEquals("DETAIL_GRAPH_WITH_ID/food-1", route.captured)
     }
 
     @Test
@@ -253,6 +254,6 @@ class CustomerNavActionsTest {
         CustomerNavActions.toCafe(nav, "cafe-1")
 
         verify { nav.navigate(capture(route)) }
-        assert(route.captured == "CAFE_GRAPH_WITH_ID/cafe-1")
+        assertEquals("CAFE_GRAPH_WITH_ID/cafe-1", route.captured)
     }
 }

@@ -49,7 +49,7 @@ fun Context.showNotification(
         }
         .build()
 
-    notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+    notificationManager.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notification)
 }
 
 private fun NotificationDeepLink.toPendingIntent(context: Context): PendingIntent? {

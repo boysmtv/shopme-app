@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavItem
@@ -38,6 +39,7 @@ import com.mtv.app.shopme.common.navbar.seller.SellerDestinations
 import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
 import com.mtv.app.shopme.common.notification.NotificationDeepLink
 import com.mtv.app.shopme.common.navbar.auth.AuthDestinations
+import com.mtv.app.shopme.R
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.SessionManager
 
@@ -107,7 +109,7 @@ fun AppNavigation(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text("Anda ingin keluar?") },
+            title = { Text(stringResource(R.string.dialog_exit_title)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -115,12 +117,12 @@ fun AppNavigation(
                         (context as? Activity)?.finish()
                     }
                 ) {
-                    Text("Keluar")
+                    Text(stringResource(R.string.dialog_exit_confirm))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showExitDialog = false }) {
-                    Text("Batal")
+                    Text(stringResource(R.string.dialog_exit_cancel))
                 }
             }
         )
