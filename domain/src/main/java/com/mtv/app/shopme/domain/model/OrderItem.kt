@@ -8,12 +8,10 @@
 
 package com.mtv.app.shopme.domain.model
 
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
-
 data class OrderItem(
-    val id: String = EMPTY_STRING,
-    val foodId: String = EMPTY_STRING,
-    val foodName: String = EMPTY_STRING,
+    val id: String = "",
+    val foodId: String = "",
+    val foodName: String = "",
     val quantity: Int = 0,
     val price: Double = 0.0,
     val notes: String? = null,

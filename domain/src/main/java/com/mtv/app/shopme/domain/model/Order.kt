@@ -8,22 +8,20 @@
 
 package com.mtv.app.shopme.domain.model
 
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
-
 data class Order(
-    val id: String = EMPTY_STRING,
-    val customerId: String = EMPTY_STRING,
-    val customerName: String = EMPTY_STRING,
-    val cafeId: String = EMPTY_STRING,
-    val cafeName: String = EMPTY_STRING,
+    val id: String = "",
+    val customerId: String = "",
+    val customerName: String = "",
+    val cafeId: String = "",
+    val cafeName: String = "",
     val items: List<OrderItem> = emptyList(),
     val itemCount: Int = 0,
     val totalPrice: Double = 0.0,
     val status: OrderStatus = OrderStatus.ORDERED,
     val paymentStatus: PaymentStatus = PaymentStatus.UNPAID,
     val timestamp: Long = System.currentTimeMillis(),
-    val createdAt: String = EMPTY_STRING,
-    val deliveryAddress: String = EMPTY_STRING,
+    val createdAt: String = "",
+    val deliveryAddress: String = "",
     val paymentMethod: PaymentMethod = PaymentMethod.TRANSFER,
     val transferConfirmationAvailable: Boolean = false,
     val timeline: List<OrderTimeline> = emptyList()

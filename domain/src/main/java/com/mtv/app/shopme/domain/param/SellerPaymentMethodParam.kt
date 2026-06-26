@@ -4,6 +4,7 @@ data class SellerPaymentMethodParam(
     val cashEnabled: Boolean,
     val bankEnabled: Boolean,
     val bankNumber: String?,
+    val bankType: String? = null,
     val ovoEnabled: Boolean,
     val ovoNumber: String?,
     val danaEnabled: Boolean,

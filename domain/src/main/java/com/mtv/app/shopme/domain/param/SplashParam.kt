@@ -8,14 +8,11 @@
 
 package com.mtv.app.shopme.domain.param
 
-import com.mtv.based.core.provider.utils.device.DeviceInfo
-
 data class SplashParam(
     val deviceId: String,
     val platform: String,
     val fcmToken: String?,
     val appVersionName: String,
     val appVersionCode: Long,
-    val deviceInfo: DeviceInfo,
     val createdAt: String
 )

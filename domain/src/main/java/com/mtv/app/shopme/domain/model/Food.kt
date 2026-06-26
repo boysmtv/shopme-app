@@ -9,7 +9,6 @@
 package com.mtv.app.shopme.domain.model
 
 import java.math.BigDecimal
-import org.threeten.bp.LocalDateTime
 
 data class Food(
     val id: String,
@@ -24,7 +23,7 @@ data class Food(
     val quantity: Long,
     val estimate: String,
     val isActive: Boolean,
-    val createdAt: LocalDateTime,
+    val createdAt: Long,
     val images: List<String>,
     val variants: List<FoodVariant>
 )
