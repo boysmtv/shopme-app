@@ -8,9 +8,11 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import android.content.Intent
 import android.content.pm.PackageManager
 
+@Immutable
 data class SupportUiState(
     val isLoading: Boolean = false,
     val phone: String = "",

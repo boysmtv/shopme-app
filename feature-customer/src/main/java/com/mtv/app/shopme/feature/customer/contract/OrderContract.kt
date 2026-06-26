@@ -8,9 +8,10 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.Order
-import com.mtv.app.shopme.feature.customer.ui.OrderFilter
 
+@Immutable
 data class OrderUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,

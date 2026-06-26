@@ -8,9 +8,11 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.NotificationItem
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class NotifUiState(
     val localNotification: List<NotificationItem> = emptyList(),
     val notificationState: LoadState<String> = LoadState.Loading,

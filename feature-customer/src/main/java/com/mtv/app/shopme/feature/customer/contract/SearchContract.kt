@@ -8,10 +8,12 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
+@Immutable
 data class SearchUiState(
     val query: String = "",
     val foods: LoadState<List<SearchFood>> = LoadState.Idle,

@@ -1,7 +1,9 @@
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.Order
 
+@Immutable
 data class OrderDetailUiState(
     val isLoading: Boolean = false,
     val orderId: String = "",

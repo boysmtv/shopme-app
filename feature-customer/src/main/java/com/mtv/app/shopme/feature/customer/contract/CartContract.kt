@@ -8,10 +8,12 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class CartUiState(
     val cartItems: LoadState<List<Cart>> = LoadState.Idle,
     val isRefreshing: Boolean = false,

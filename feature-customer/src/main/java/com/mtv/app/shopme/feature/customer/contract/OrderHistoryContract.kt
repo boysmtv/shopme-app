@@ -8,28 +8,12 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
-enum class OrderStatusFilter(val label: String) {
-    SEMUA("Semua"),
-    BELUM_DIBAYAR("Belum Dibayar"),
-    DIPROSES("Diproses"),
-    DIKIRIM("Dikirim"),
-    SELESAI("Selesai"),
-    BATAL("Batal");
+import androidx.compose.runtime.Immutable
 
-    fun matches(status: String): Boolean = when (this) {
-        SEMUA -> true
-        BELUM_DIBAYAR -> status == "BELUM DIBAYAR"
-        DIPROSES -> status == "DIPESAN" || status == "DIMASAK"
-        DIKIRIM -> status == "DIKIRIM"
-        SELESAI -> status == "SELESAI"
-        BATAL -> status == "BATAL"
-    }
-}
-
+@Immutable
 data class OrderHistoryUiState(
     val loading: Boolean = false,
-
-    val selectedFilter: OrderStatusFilter = OrderStatusFilter.SEMUA,
+    val selectedFilter: OrderFilter = OrderFilter.SEMUA,
     val orders: List<OrderHistoryItem> = emptyList()
 )
 
@@ -38,7 +22,7 @@ sealed class OrderHistoryEvent {
     object DismissDialog : OrderHistoryEvent()
 
     object Refresh : OrderHistoryEvent()
-    data class ChangeFilter(val filter: OrderStatusFilter) : OrderHistoryEvent()
+    data class ChangeFilter(val filter: OrderFilter) : OrderHistoryEvent()
     data class ClickOrder(val item: OrderHistoryItem) : OrderHistoryEvent()
 
     object ClickBack : OrderHistoryEvent()

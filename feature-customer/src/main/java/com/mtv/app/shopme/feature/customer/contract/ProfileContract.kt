@@ -8,9 +8,11 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class ProfileUiState(
     val customer: LoadState<Customer> = LoadState.Idle,
     val isRefreshing: Boolean = false

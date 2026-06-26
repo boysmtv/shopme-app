@@ -8,11 +8,13 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.CartVariant
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class DetailUiState(
     val food: LoadState<Food> = LoadState.Idle,
     val similarFoods: LoadState<List<Food>> = LoadState.Idle,

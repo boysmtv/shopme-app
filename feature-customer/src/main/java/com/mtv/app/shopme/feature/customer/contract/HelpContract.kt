@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class HelpUiState(
     val faq: List<HelpFaq> = emptyList(),
     val isLoading: Boolean = false

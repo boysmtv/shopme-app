@@ -8,8 +8,10 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class ChatSupportUiState(
     val isLoading: Boolean = false,
     val title: String = "",

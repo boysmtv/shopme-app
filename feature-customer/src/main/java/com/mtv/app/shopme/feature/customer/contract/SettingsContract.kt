@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SettingsUiState(
     val isLoading: Boolean = false,
 

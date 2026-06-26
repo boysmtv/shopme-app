@@ -1,8 +1,10 @@
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.SearchFood
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class FavoriteUiState(
     val foods: LoadState<List<SearchFood>> = LoadState.Idle,
     val favoriteIds: Set<String> = emptySet()

@@ -8,11 +8,13 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Village
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class EditProfileUiState(
     val customer: LoadState<Customer> = LoadState.Idle,
     val addresses: LoadState<List<Address>> = LoadState.Idle,

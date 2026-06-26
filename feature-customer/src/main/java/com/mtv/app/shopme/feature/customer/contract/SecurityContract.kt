@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.feature.customer.contract
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SecurityUiState(
     val loading: Boolean = false,
     val biometricEnabled: Boolean = false
