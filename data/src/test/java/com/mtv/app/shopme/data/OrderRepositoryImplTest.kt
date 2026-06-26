@@ -3,7 +3,6 @@ package com.mtv.app.shopme.data
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.OrderRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.OrderSummaryItemResponse
@@ -13,7 +12,7 @@ import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -30,13 +29,10 @@ class OrderRepositoryImplTest {
 
     private val remote: OrderRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
-    private val errorMapper: ErrorMapper = mockk(relaxed = true)
-
     private val repository = OrderRepositoryImpl(
         remoteDataSource = remote,
-        resultFlow = ResultFlowFactory(errorMapper),
+        resultFlow = ResultFlowFactory(),
         homeDao = homeDao,
-        errorMapper = errorMapper
     )
 
     @Test

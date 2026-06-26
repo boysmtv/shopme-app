@@ -3,14 +3,13 @@ package com.mtv.app.shopme.data
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.SellerRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
 import com.mtv.app.shopme.data.repository.SellerRepositoryImpl
 import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -24,14 +23,12 @@ class SellerRepositoryImplTest {
 
     private val remote: SellerRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
-    private val errorMapper: ErrorMapper = mockk(relaxed = true)
     private val syncManager: OfflineMutationSyncManager = mockk(relaxed = true)
 
     private val repository = SellerRepositoryImpl(
         remote = remote,
-        resultFlow = ResultFlowFactory(errorMapper),
+        resultFlow = ResultFlowFactory(),
         homeDao = homeDao,
-        errorMapper = errorMapper,
         syncManager = syncManager
     )
 

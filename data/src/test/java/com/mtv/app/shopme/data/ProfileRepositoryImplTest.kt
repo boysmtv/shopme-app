@@ -3,7 +3,6 @@ package com.mtv.app.shopme.data
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.ProfileRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.AddressResponse
@@ -14,11 +13,9 @@ import com.mtv.app.shopme.data.repository.ProfileRepositoryImpl
 import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.domain.model.MemberStatus
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -30,14 +27,12 @@ class ProfileRepositoryImplTest {
 
     private val remote: ProfileRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
-    private val errorMapper: ErrorMapper = mockk()
     private val syncManager: OfflineMutationSyncManager = mockk(relaxed = true)
 
     private val repository = ProfileRepositoryImpl(
         remote = remote,
-        resultFlow = ResultFlowFactory(errorMapper),
+        resultFlow = ResultFlowFactory(),
         homeDao = homeDao,
-        errorMapper = errorMapper,
         syncManager = syncManager
     )
 
@@ -108,16 +103,14 @@ class ProfileRepositoryImplTest {
     }
 
     @Test
-    fun `getCustomer should emit mapped error when cache is empty and backend fails`() = runTest {
-        val mappedError = mockk<UiError>(relaxed = true)
+    fun `getCustomer should emit error when cache is empty and backend fails`() = runTest {
         coEvery { homeDao.getCustomerOnce() } returns null
         coEvery { remote.getCustomer() } throws IllegalStateException("backend down")
-        every { errorMapper.map(any()) } returns mappedError
 
         repository.getCustomer().test {
             assertEquals(Resource.Loading, awaitItem())
             val error = awaitItem() as Resource.Error
-            assertEquals(mappedError, error.error)
+            assertEquals("backend down", error.throwable?.message)
             awaitComplete()
         }
     }

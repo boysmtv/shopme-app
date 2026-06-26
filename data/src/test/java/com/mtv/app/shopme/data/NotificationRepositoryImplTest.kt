@@ -3,17 +3,14 @@ package com.mtv.app.shopme.data
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.NotificationRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.AppNotificationResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
 import com.mtv.app.shopme.data.repository.NotificationRepositoryImpl
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -25,13 +22,10 @@ class NotificationRepositoryImplTest {
 
     private val remote: NotificationRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
-    private val errorMapper: ErrorMapper = mockk()
-
     private val repository = NotificationRepositoryImpl(
         remote = remote,
-        resultFlow = ResultFlowFactory(errorMapper),
+        resultFlow = ResultFlowFactory(),
         homeDao = homeDao,
-        errorMapper = errorMapper
     )
 
     @Test
@@ -75,16 +69,14 @@ class NotificationRepositoryImplTest {
     }
 
     @Test
-    fun `getSellerNotifications should emit mapped error when cache empty and backend fails`() = runTest {
-        val mappedError = mockk<UiError>(relaxed = true)
+    fun `getSellerNotifications should emit error when cache empty and backend fails`() = runTest {
         coEvery { homeDao.getNotificationsOnce("seller") } returns emptyList()
         coEvery { remote.getNotifications() } throws IllegalStateException("backend down")
-        every { errorMapper.map(any()) } returns mappedError
 
         repository.getSellerNotifications().test {
             assertEquals(Resource.Loading, awaitItem())
             val error = awaitItem() as Resource.Error
-            assertEquals(mappedError, error.error)
+            assertEquals("backend down", error.throwable?.message)
             awaitComplete()
         }
     }
