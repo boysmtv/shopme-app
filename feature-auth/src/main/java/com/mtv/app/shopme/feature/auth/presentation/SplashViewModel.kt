@@ -9,7 +9,6 @@
 package com.mtv.app.shopme.feature.auth.presentation
 
 import com.mtv.app.shopme.common.Constant.PLATFORM
-import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.SPLASH_RESPONSE
 import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
@@ -26,7 +25,6 @@ import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.device.DeviceInfoProvider
 import com.mtv.based.core.provider.utils.device.InstallationIdProvider
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
@@ -36,13 +34,11 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.Base64
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
     private val securePrefs: SecurePrefs,
     private val installationIdProvider: InstallationIdProvider,
-    private val deviceInfoProvider: DeviceInfoProvider,
     private val appInfoProvider: AppInfoProvider,
     private val splashUseCase: GetSplashUseCase
 ) : BaseEventViewModel<SplashEvent, SplashEffect>() {
@@ -65,7 +61,6 @@ class SplashViewModel @Inject constructor(
                     fcmToken = securePrefs.getString(FCM_TOKEN),
                     appVersionName = appInfoProvider.versionName,
                     appVersionCode = appInfoProvider.versionCode,
-                    deviceInfo = deviceInfoProvider.getAllDeviceInfo(),
                     platform = PLATFORM,
                     createdAt = System.currentTimeMillis().toString()
                 )
@@ -131,32 +126,7 @@ class SplashViewModel @Inject constructor(
     }
 
     private fun resolveSavedRole(): String {
-        val savedRole = securePrefs.getString(USER_ROLE).orEmpty()
-        if (savedRole.isNotBlank()) return savedRole
-
-        val decodedRole = securePrefs.getString(ACCESS_TOKEN).orEmpty().decodeJwtRole()
-        if (decodedRole.isNotBlank()) {
-            securePrefs.putString(USER_ROLE, decodedRole.uppercase())
-        }
-        return decodedRole
-    }
-
-    private fun String.decodeJwtRole(): String {
-        val payload = split('.').getOrNull(1).orEmpty()
-        if (payload.isBlank()) return ""
-
-        return runCatching {
-            val normalizedPayload = payload
-                .replace('-', '+')
-                .replace('_', '/')
-                .let { value -> value + "=".repeat((4 - value.length % 4) % 4) }
-            val json = String(Base64.getDecoder().decode(normalizedPayload), Charsets.UTF_8)
-            Regex(""""role"\s*:\s*"([^"]+)"""")
-                .find(json)
-                ?.groupValues
-                ?.getOrNull(1)
-                .orEmpty()
-        }.getOrDefault("")
+        return securePrefs.getString(USER_ROLE).orEmpty()
     }
 
 }

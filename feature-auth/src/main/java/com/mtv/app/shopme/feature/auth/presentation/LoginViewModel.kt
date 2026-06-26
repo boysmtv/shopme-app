@@ -8,7 +8,6 @@
 
 package com.mtv.app.shopme.feature.auth.presentation
 
-import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.common.ConstantPreferences.ACCESS_TOKEN
 import com.mtv.app.shopme.common.ConstantPreferences.REMEMBERED_LOGIN_EMAIL
 import com.mtv.app.shopme.common.ConstantPreferences.USER_ROLE
@@ -17,7 +16,6 @@ import com.mtv.app.shopme.domain.param.LoginParam
 import com.mtv.app.shopme.domain.usecase.GetLoginUseCase
 import com.mtv.app.shopme.feature.auth.contract.*
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -25,10 +23,8 @@ import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 
 @HiltViewModel
@@ -79,66 +75,68 @@ class LoginViewModel @Inject constructor(
         val submittedEmail = snapshot.email
         val submittedPassword = snapshot.password
 
-        viewModelScope.launch {
-            loginUseCase(
+        if (submittedEmail.isBlank()) {
+            _state.update { it.copy(login = LoadState.Error(UiError.Validation(message = "Email tidak boleh kosong"))) }
+            return
+        }
+        if (submittedPassword.isBlank()) {
+            _state.update { it.copy(login = LoadState.Error(UiError.Validation(message = "Password tidak boleh kosong"))) }
+            return
+        }
+
+        observeDataFlow(
+            flow = loginUseCase(
                 LoginParam(
                     email = submittedEmail,
                     password = submittedPassword
                 )
-            ).collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _state.update {
-                            it.copy(
-                                email = submittedEmail,
-                                password = submittedPassword,
-                                login = LoadState.Loading
-                            )
-                        }
-                    }
-
-                    is Resource.Success -> {
-                        _state.update {
-                            it.copy(
-                                email = submittedEmail,
-                                password = submittedPassword,
-                                login = LoadState.Success(resource.data)
-                            )
-                        }
-                        securePrefs.putString(
-                            REMEMBERED_LOGIN_EMAIL,
-                            if (snapshot.rememberEmail) submittedEmail else ""
-                        )
-                        securePrefs.putString(
-                            ACCESS_TOKEN,
-                            resource.data.accessToken
-                        )
-                        securePrefs.putString(
-                            USER_ROLE,
-                            resource.data.role.uppercase()
-                        )
-                        if (resource.data.role.equals("SELLER", ignoreCase = true)) {
-                            emitEffect(LoginEffect.NavigateToSellerDashboard)
-                        } else {
-                            emitEffect(LoginEffect.NavigateToHome)
-                        }
-                    }
-
-                    is Resource.Error -> {
-                        _state.update {
-                            it.copy(
-                                email = submittedEmail,
-                                password = submittedPassword,
-                                login = LoadState.Error(resource.error)
-                            )
-                        }
-                        showError(resource.error)
-                    }
-
-                    else -> Unit
+            ),
+            onLoad = {
+                _state.update {
+                    it.copy(
+                        email = submittedEmail,
+                        password = submittedPassword,
+                        login = LoadState.Loading
+                    )
                 }
+            },
+            onSuccess = { data ->
+                _state.update {
+                    it.copy(
+                        email = submittedEmail,
+                        password = submittedPassword,
+                        login = LoadState.Success(data)
+                    )
+                }
+                securePrefs.putString(
+                    REMEMBERED_LOGIN_EMAIL,
+                    if (snapshot.rememberEmail) submittedEmail else ""
+                )
+                securePrefs.putString(
+                    ACCESS_TOKEN,
+                    data.accessToken
+                )
+                securePrefs.putString(
+                    USER_ROLE,
+                    data.role.uppercase()
+                )
+                if (data.role.equals("SELLER", ignoreCase = true)) {
+                    emitEffect(LoginEffect.NavigateToSellerDashboard)
+                } else {
+                    emitEffect(LoginEffect.NavigateToHome)
+                }
+            },
+            onError = { uiError ->
+                _state.update {
+                    it.copy(
+                        email = submittedEmail,
+                        password = submittedPassword,
+                        login = LoadState.Error(uiError)
+                    )
+                }
+                showError(uiError)
             }
-        }
+        )
     }
 
     private fun showError(error: UiError) {
@@ -152,6 +150,22 @@ class LoginViewModel @Inject constructor(
                 onPrimary = { dismissDialog() }
             )
         )
+    }
+
+    private fun mapThrowableToUiError(throwable: Throwable?): UiError {
+        return when (throwable) {
+            is com.mtv.app.shopme.core.error.ApiException.Unauthorized ->
+                UiError.Unauthorized(message = throwable.message ?: "")
+            is com.mtv.app.shopme.core.error.ApiException.Forbidden ->
+                UiError.Forbidden(message = throwable.message ?: "")
+            is com.mtv.app.shopme.core.error.ApiException.Validation ->
+                UiError.Validation(message = throwable.message ?: "")
+            is java.io.IOException ->
+                UiError.Network(message = throwable.message ?: "")
+            else -> UiError.Unknown(
+                message = throwable?.message ?: com.mtv.based.core.network.utils.ErrorMessages.GENERIC_ERROR
+            )
+        }
     }
 
 }
