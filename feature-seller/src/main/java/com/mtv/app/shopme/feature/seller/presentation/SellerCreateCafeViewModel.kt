@@ -22,7 +22,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -179,29 +179,36 @@ class SellerCreateCafeViewModel @Inject constructor(
 
         return when (val result = uploadMediaUseCase(reference, scope).first { it !is Resource.Loading }) {
             is Resource.Success -> result.data.originalUrl
-            is Resource.Error -> throw IllegalStateException(result.error.message)
+            is Resource.Error -> throw result.throwable ?: IllegalStateException("Upload failed")
             else -> reference
         }
     }
 
     private fun attachAddress(villageId: String) {
-        observeDataFlow(
-            flow = getSellerProfileUseCase(),
-            onState = { profileState ->
-                if (profileState is LoadState.Success) {
-                    val cafeId = profileState.data.cafeId
-                    if (cafeId.isNullOrBlank()) {
-                        _state.update { it.copy(isLoading = false) }
-                        showError(UiError.Unknown(message = "Cafe seller belum tersedia"))
-                    } else {
+        viewModelScope.launch {
+            when (val profileResult = getSellerProfileUseCase().first { it !is Resource.Loading }) {
+                is Resource.Success -> {
+                    val cafeId = profileResult.data.cafeId
+                    if (!cafeId.isNullOrBlank()) {
                         upsertAddress(cafeId, villageId)
+                    } else {
+                        _state.update { it.copy(isLoading = false) }
+                        showError(UiError.Unknown(message = "Gagal mendapatkan data cafe"))
                     }
-                } else {
-                    _state.update { it.copy(isLoading = profileState is LoadState.Loading) }
                 }
-            },
-            onError = ::showError
-        )
+                is Resource.Error -> {
+                    _state.update { it.copy(isLoading = false) }
+                    showError(
+                        profileResult.throwable?.let {
+                            UiError.Unknown(message = it.message ?: "Gagal mendapatkan data cafe")
+                        } ?: UiError.Unknown(message = "Gagal mendapatkan data cafe")
+                    )
+                }
+                else -> {
+                    _state.update { it.copy(isLoading = false) }
+                }
+            }
+        }
     }
 
     private fun upsertAddress(cafeId: String, villageId: String) {

@@ -161,7 +161,7 @@ class SellerChatDetailViewModel @Inject constructor(
                             val messages = state.data.content.map { item ->
                                 SellerChatDetailMessage(
                                     message = item.message,
-                                    isFromSeller = item.isFromUser,
+                                    isFromSeller = !item.isFromUser,
                                     id = item.id,
                                     time = item.time,
                                     isPending = false,
@@ -216,7 +216,7 @@ class SellerChatDetailViewModel @Inject constructor(
                             val older = result.data.content.map { item: ChatMessage ->
                                 SellerChatDetailMessage(
                                     message = item.message,
-                                    isFromSeller = item.isFromUser,
+                                    isFromSeller = !item.isFromUser,
                                     id = item.id,
                                     time = item.time,
                                     isPending = false,

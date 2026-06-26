@@ -18,6 +18,8 @@ import com.mtv.app.shopme.domain.usecase.GetSellerOrderDetailUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerOrderStatusUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.based.core.network.utils.LoadState
+import com.mtv.based.core.network.utils.UiError
+import com.mtv.based.core.provider.utils.SessionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +33,7 @@ class SellerOrderDetailViewModel @Inject constructor(
     private val updateSellerOrderStatusUseCase: UpdateSellerOrderStatusUseCase,
     private val cancelSellerOrderUseCase: CancelSellerOrderUseCase,
     private val ensureSellerChatConversationUseCase: EnsureSellerChatConversationUseCase,
+    private val sessionManager: SessionManager,
 ) : BaseEventViewModel<SellerOrderDetailEvent, SellerOrderDetailEffect>() {
 
     private val orderId: String = savedStateHandle.get<String>("orderId").orEmpty()
@@ -70,12 +73,23 @@ class SellerOrderDetailViewModel @Inject constructor(
                     } else {
                         it.copy(
                             isLoading = state is LoadState.Loading && it.items.isEmpty(),
-                            isRefreshing = state is LoadState.Loading && it.items.isNotEmpty()
+                            isRefreshing = state is LoadState.Loading && it.items.isNotEmpty(),
+                            errorMessage = null
                         )
                     }
                 }
             },
-            onError = {}
+            onError = { error ->
+                _state.update { it.copy(isLoading = false, isRefreshing = false) }
+                handleSessionError(
+                    error = error,
+                    sessionManager = sessionManager,
+                    beforeLogout = { _state.update { it.copy(isLoading = false) } },
+                    onOtherError = { uiError ->
+                        _state.update { it.copy(errorMessage = uiError.message) }
+                    }
+                )
+            }
         )
     }
 
@@ -87,7 +101,16 @@ class SellerOrderDetailViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = state is LoadState.Loading, isRefreshing = false) }
                 if (state is LoadState.Success) emitEffect(SellerOrderDetailEffect.UpdateSuccess)
             },
-            onError = {}
+            onError = { error ->
+                handleSessionError(
+                    error = error,
+                    sessionManager = sessionManager,
+                    beforeLogout = { _state.update { it.copy(isLoading = false) } },
+                    onOtherError = { uiError ->
+                        _state.update { it.copy(isLoading = false, errorMessage = uiError.message) }
+                    }
+                )
+            }
         )
     }
 
@@ -108,7 +131,16 @@ class SellerOrderDetailViewModel @Inject constructor(
                 _state.update { it.copy(showCancelDialog = false, cancelReason = "") }
                 load()
             },
-            onError = {}
+            onError = { error ->
+                handleSessionError(
+                    error = error,
+                    sessionManager = sessionManager,
+                    beforeLogout = { _state.update { it.copy(isLoading = false) } },
+                    onOtherError = { uiError ->
+                        _state.update { it.copy(isLoading = false, errorMessage = uiError.message) }
+                    }
+                )
+            }
         )
     }
 
@@ -121,7 +153,16 @@ class SellerOrderDetailViewModel @Inject constructor(
                     emitEffect(SellerOrderDetailEffect.NavigateToChat(state.data))
                 }
             },
-            onError = {}
+            onError = { error ->
+                handleSessionError(
+                    error = error,
+                    sessionManager = sessionManager,
+                    beforeLogout = { _state.update { it.copy(isLoading = false) } },
+                    onOtherError = { uiError ->
+                        _state.update { it.copy(isLoading = false, errorMessage = uiError.message) }
+                    }
+                )
+            }
         )
     }
 

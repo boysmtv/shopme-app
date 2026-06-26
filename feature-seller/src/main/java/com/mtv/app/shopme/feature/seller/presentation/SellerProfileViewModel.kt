@@ -13,6 +13,7 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.app.shopme.feature.seller.firebase.SellerNotificationRepository
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
@@ -31,6 +32,7 @@ import kotlinx.coroutines.flow.update
 class SellerProfileViewModel @Inject constructor(
     private val sessionManager: SessionManager,
     private val securePrefs: SecurePrefs,
+    private val sellerNotificationRepository: SellerNotificationRepository,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val updateSellerAvailabilityUseCase: UpdateSellerAvailabilityUseCase
 ) : BaseEventViewModel<SellerStoreEvent, SellerStoreEffect>() {
@@ -126,6 +128,7 @@ class SellerProfileViewModel @Inject constructor(
     }
 
     private fun logout() {
+        sellerNotificationRepository.clearAll()
         val rememberedEmail = securePrefs.getString(REMEMBERED_LOGIN_EMAIL).orEmpty()
         sessionManager.logout()
         if (rememberedEmail.isNotBlank()) {

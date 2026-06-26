@@ -24,7 +24,7 @@ import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerEditStoreUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
@@ -75,6 +75,8 @@ class SellerEditStoreViewModel @Inject constructor(
 
             is SellerEditStoreEvent.ChangeStoreOpen ->
                 update { copy(storeOpen = event.value) }
+            is SellerEditStoreEvent.ChangeStoreClose ->
+                update { copy(storeClose = event.value) }
 
             is SellerEditStoreEvent.ChangeDescription ->
                 update { copy(description = event.value) }
@@ -163,6 +165,7 @@ class SellerEditStoreViewModel @Inject constructor(
                     if (state is LoadState.Success) {
                         closeTime = state.data.closeTime
                         it.copy(
+                            storeClose = state.data.closeTime,
                             isLoading = false,
                             storeName = state.data.name,
                             phone = state.data.phone,
@@ -273,7 +276,7 @@ class SellerEditStoreViewModel @Inject constructor(
 
         return when (val result = uploadMediaUseCase(reference, scope).first { it !is Resource.Loading }) {
             is Resource.Success -> result.data.originalUrl
-            is Resource.Error -> throw IllegalStateException(result.error.message)
+            is Resource.Error -> throw result.throwable ?: IllegalStateException("Upload failed")
             else -> reference
         }
     }

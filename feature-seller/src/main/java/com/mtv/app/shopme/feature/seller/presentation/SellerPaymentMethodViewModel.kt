@@ -51,6 +51,8 @@ class SellerPaymentMethodViewModel @Inject constructor(
 
             is SellerPaymentMethodEvent.ChangeBank ->
                 update { copy(bankNumber = event.value) }
+            is SellerPaymentMethodEvent.ChangeBankType ->
+                update { copy(bankType = event.value) }
 
             is SellerPaymentMethodEvent.ToggleOvo ->
                 update { copy(ovoEnabled = event.value) }
@@ -110,6 +112,7 @@ class SellerPaymentMethodViewModel @Inject constructor(
                     cashEnabled = state.cashEnabled,
                     bankEnabled = state.bankEnabled,
                     bankNumber = if (state.bankEnabled) state.bankNumber else null,
+                    bankType = if (state.bankEnabled) state.bankType else null,
                     ovoEnabled = state.ovoEnabled,
                     ovoNumber = if (state.ovoEnabled) state.ovoNumber else null,
                     danaEnabled = state.danaEnabled,
@@ -166,7 +169,7 @@ class SellerPaymentMethodViewModel @Inject constructor(
                     } else {
                         it.copy(isLoading = result is LoadState.Loading)
                     }
-                }
+            }
             },
             onError = ::showError
         )
