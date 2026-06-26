@@ -14,11 +14,11 @@ import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.usecase.GetOrderHistoryUseCase
+import com.mtv.app.shopme.feature.customer.contract.OrderFilter
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryUiState
-import com.mtv.app.shopme.feature.customer.contract.OrderStatusFilter
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError

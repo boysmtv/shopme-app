@@ -30,7 +30,7 @@ import com.mtv.app.shopme.feature.customer.contract.EditProfileUiState
 import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import com.mtv.based.core.provider.utils.dialog.UiDialog
 import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
@@ -152,7 +152,7 @@ class EditProfileViewModel @Inject constructor(
 
         return when (val result = uploadMediaUseCase(reference, scope).first { it !is Resource.Loading }) {
             is Resource.Success -> result.data.originalUrl
-            is Resource.Error -> throw IllegalStateException(result.error.message)
+            is Resource.Error -> throw IllegalStateException(result.throwable?.message ?: "Unknown error")
             else -> reference
         }
     }
