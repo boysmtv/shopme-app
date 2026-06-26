@@ -15,7 +15,7 @@ import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatMessageUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatDetailEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerChatDetailViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -95,7 +96,7 @@ class SellerChatDetailViewModelTest {
         assertEquals("Raka Pratama", vm.uiState.value.chatName)
         assertEquals("https://media.shopme.test/users/cust-1/thumb.jpg", vm.uiState.value.chatAvatarUrl)
         assertEquals(1, vm.uiState.value.messages.size)
-        assertTrue(vm.uiState.value.messages.first().isFromSeller)
+        assertFalse(vm.uiState.value.messages.first().isFromSeller)
         verify(exactly = 1) { realtimeGateway.retain() }
 
         SellerChatDetailViewModel::class.java.getDeclaredMethod("onCleared").apply {

@@ -13,13 +13,15 @@ import com.mtv.app.shopme.domain.usecase.GetSellerOrderDetailUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerOrderStatusUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderDetailEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerOrderDetailViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.every
 import io.mockk.mockk
+import java.io.IOException
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -63,5 +65,133 @@ class SellerOrderDetailViewModelTest {
 
         assertEquals("Dedy", vm.uiState.value.customerName)
         assertEquals("Kemang Blok A/12, RT 01/RW 02", vm.uiState.value.customerAddress)
+    }
+
+    @Test
+    fun `load should handle error from order detail usecase`() = runTest {
+        every { detailUseCase.invoke("order-1") } returns flowOf(Resource.Error(IOException("Not found")))
+
+        val vm = SellerOrderDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
+            getSellerOrderDetailUseCase = detailUseCase,
+            updateSellerOrderStatusUseCase = updateUseCase,
+            cancelSellerOrderUseCase = cancelUseCase,
+            ensureSellerChatConversationUseCase = ensureSellerChatConversationUseCase
+        )
+
+        vm.onEvent(SellerOrderDetailEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals("", vm.uiState.value.customerName)
+        assertEquals("", vm.uiState.value.customerAddress)
+    }
+
+    @Test
+    fun `status update should succeed`() = runTest {
+        every { detailUseCase.invoke("order-1") } returns flowOf(
+            Resource.Success(
+                Order(
+                    id = "order-1",
+                    customerId = "cust-1",
+                    customerName = "Dedy",
+                    cafeId = "cafe-1",
+                    cafeName = "Shopme Cafe",
+                    deliveryAddress = "Kemang",
+                    totalPrice = 25000.0,
+                    status = OrderStatus.ORDERED,
+                    paymentMethod = PaymentMethod.CASH,
+                    paymentStatus = PaymentStatus.UNPAID
+                )
+            )
+        )
+        every { updateUseCase.invoke("order-1", OrderStatus.CONFIRMED) } returns flowOf(Resource.Success(Unit))
+
+        val vm = SellerOrderDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
+            getSellerOrderDetailUseCase = detailUseCase,
+            updateSellerOrderStatusUseCase = updateUseCase,
+            cancelSellerOrderUseCase = cancelUseCase,
+            ensureSellerChatConversationUseCase = ensureSellerChatConversationUseCase
+        )
+
+        vm.onEvent(SellerOrderDetailEvent.Load)
+        advanceUntilIdle()
+
+        vm.onEvent(SellerOrderDetailEvent.ChangeStatus(OrderStatus.CONFIRMED))
+        vm.onEvent(SellerOrderDetailEvent.SaveStatus)
+        advanceUntilIdle()
+
+        assertEquals(OrderStatus.CONFIRMED, vm.uiState.value.currentStatus)
+    }
+
+    @Test
+    fun `status update should handle error`() = runTest {
+        every { detailUseCase.invoke("order-1") } returns flowOf(
+            Resource.Success(
+                Order(
+                    id = "order-1",
+                    customerId = "cust-1",
+                    customerName = "Dedy",
+                    cafeId = "cafe-1",
+                    cafeName = "Shopme Cafe",
+                    deliveryAddress = "Kemang",
+                    totalPrice = 25000.0,
+                    status = OrderStatus.ORDERED,
+                    paymentMethod = PaymentMethod.CASH,
+                    paymentStatus = PaymentStatus.UNPAID
+                )
+            )
+        )
+        every { updateUseCase.invoke("order-1", OrderStatus.CONFIRMED) } returns flowOf(Resource.Error(IOException("Update failed")))
+
+        val vm = SellerOrderDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
+            getSellerOrderDetailUseCase = detailUseCase,
+            updateSellerOrderStatusUseCase = updateUseCase,
+            cancelSellerOrderUseCase = cancelUseCase,
+            ensureSellerChatConversationUseCase = ensureSellerChatConversationUseCase
+        )
+
+        vm.onEvent(SellerOrderDetailEvent.Load)
+        advanceUntilIdle()
+
+        vm.onEvent(SellerOrderDetailEvent.ChangeStatus(OrderStatus.CONFIRMED))
+        vm.onEvent(SellerOrderDetailEvent.SaveStatus)
+        advanceUntilIdle()
+    }
+
+    @Test
+    fun `cancel order flow should update state`() = runTest {
+        every { detailUseCase.invoke("order-1") } returns flowOf(
+            Resource.Success(
+                Order(
+                    id = "order-1",
+                    customerId = "cust-1",
+                    customerName = "Dedy",
+                    cafeId = "cafe-1",
+                    cafeName = "Shopme Cafe",
+                    deliveryAddress = "Kemang",
+                    totalPrice = 25000.0,
+                    status = OrderStatus.ORDERED,
+                    paymentMethod = PaymentMethod.CASH,
+                    paymentStatus = PaymentStatus.UNPAID
+                )
+            )
+        )
+        every { cancelUseCase.invoke("order-1", any()) } returns flowOf(Resource.Success(Unit))
+
+        val vm = SellerOrderDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
+            getSellerOrderDetailUseCase = detailUseCase,
+            updateSellerOrderStatusUseCase = updateUseCase,
+            cancelSellerOrderUseCase = cancelUseCase,
+            ensureSellerChatConversationUseCase = ensureSellerChatConversationUseCase
+        )
+
+        vm.onEvent(SellerOrderDetailEvent.Load)
+        advanceUntilIdle()
+
+        vm.onEvent(SellerOrderDetailEvent.ClickCancelOrder)
+        assertTrue(vm.uiState.value.showCancelDialog)
     }
 }

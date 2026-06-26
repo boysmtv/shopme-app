@@ -10,7 +10,7 @@ import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerChatListEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerChatListViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk

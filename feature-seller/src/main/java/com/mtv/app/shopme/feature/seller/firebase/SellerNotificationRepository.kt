@@ -8,11 +8,14 @@
 
 package com.mtv.app.shopme.feature.seller.firebase
 
-import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.ConstantPreferences.FCM_SELLER_NOTIFICATION
+import com.mtv.app.shopme.common.ConstantPreferences.FCM_STATUS
+import com.mtv.app.shopme.common.ConstantPreferences.FCM_TOKEN
 import com.mtv.app.shopme.domain.model.SellerNotifItem
+import com.mtv.based.core.provider.utils.SecurePrefs
+import javax.inject.Inject
 
-class SellerNotificationRepository(
+class SellerNotificationRepository @Inject constructor(
     private val securePrefs: SecurePrefs
 ) {
 
@@ -30,5 +33,11 @@ class SellerNotificationRepository(
             FCM_SELLER_NOTIFICATION,
             Array<SellerNotifItem>::class.java
         )?.toList() ?: emptyList()
+    }
+
+    fun clearAll() {
+        securePrefs.putObject(FCM_SELLER_NOTIFICATION, emptyArray<SellerNotifItem>())
+        securePrefs.putBoolean(FCM_STATUS, false)
+        securePrefs.putString(FCM_TOKEN, "")
     }
 }

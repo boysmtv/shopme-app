@@ -7,7 +7,7 @@ import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerAvailabilityUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerProfileViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every

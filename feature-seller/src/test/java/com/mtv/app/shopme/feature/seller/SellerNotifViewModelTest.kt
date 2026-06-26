@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.usecase.GetSellerNotificationsUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerNotifEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerNotifViewModel
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

@@ -8,7 +8,7 @@ import com.mtv.app.shopme.domain.usecase.GetSupportCenterUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeTncEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerCreateCafeTncViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk

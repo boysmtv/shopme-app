@@ -12,8 +12,8 @@ import com.mtv.app.shopme.domain.usecase.UpsertCafeAddressUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerCreateCafeEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerCreateCafeViewModel
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.core.error.ApiException
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.coVerify
 import io.mockk.every
@@ -81,7 +81,7 @@ class SellerCreateCafeViewModelTest {
     @Test
     fun `unauthorized village load should force logout`() = runTest {
         every { getVillageUseCase.invoke() } returns flowOf(
-            Resource.Error(UiError.Unauthorized("Session expired"))
+            Resource.Error(throwable = ApiException.Unauthorized("Session expired"))
         )
 
         val vm = SellerCreateCafeViewModel(

@@ -14,7 +14,7 @@ import com.mtv.app.shopme.domain.usecase.GetProductStatsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerProductListViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk

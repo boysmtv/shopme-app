@@ -18,7 +18,7 @@ import com.mtv.app.shopme.domain.usecase.UpdateFoodUseCase
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEffect
 import com.mtv.app.shopme.feature.seller.contract.SellerProductFormEvent
 import com.mtv.app.shopme.feature.seller.presentation.SellerProductFormViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
