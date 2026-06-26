@@ -25,7 +25,7 @@ def firebase_distribution_options(options)
   {
     app_id: required_env!("FIREBASE_APP_ID"),
     service_credentials_file: firebase_service_credentials_file!,
-    groups: options[:groups] || ENV["FIREBASE_APP_DISTRIBUTION_GROUPS"] || "internal-tester",
+    groups: options[:groups] || ENV["FIREBASE_APP_DISTRIBUTION_GROUPS"] || "internal-testers",
     release_notes: options[:notes] || ENV["FIREBASE_RELEASE_NOTES"] || "Shopme Android Fastlane release"
   }
 end
@@ -149,6 +149,13 @@ end
 
 desc "Unified deployment lane with menu (Like MtouParentApp)"
 lane :deploy do |options|
+  # In CI (no TTY), skip interactive menu, deploy release directly
+  unless $stdin.tty?
+    UI.message("CI environment detected — skipping interactive menu, deploying release APK")
+    firebase(format: "APK", notes: "CI automated deployment")
+    next
+  end
+
   loop do
     UI.message("Which one do you want to deploy?")
     UI.message("1. Release (Production)")

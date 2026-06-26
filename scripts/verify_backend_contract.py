@@ -12,10 +12,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-BUYER_EMAIL = os.environ.get("BUYER_EMAIL", "raka.pratama@shopme.local")
-BUYER_PASSWORD = os.environ.get("BUYER_PASSWORD", "Demo123!")
-SELLER_EMAIL = os.environ.get("SELLER_EMAIL", "ayu.lestari@shopme.local")
-SELLER_PASSWORD = os.environ.get("SELLER_PASSWORD", "Demo123!")
+BUYER_EMAIL = os.environ.get("BUYER_EMAIL")
+BUYER_PASSWORD = os.environ.get("BUYER_PASSWORD")
+SELLER_EMAIL = os.environ.get("SELLER_EMAIL")
+SELLER_PASSWORD = os.environ.get("SELLER_PASSWORD")
 
 
 @dataclass(frozen=True)
