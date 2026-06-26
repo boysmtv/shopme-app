@@ -5,19 +5,10 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.hilt.android) apply false
     alias(libs.plugins.kotlinx.serialization) apply false
-    alias(libs.plugins.maven.publish)
-    alias(libs.plugins.signing)
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.firebase.appdistribution) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
-    id("com.google.gms.google-services") version "4.4.4" apply false
+    alias(libs.plugins.google.services) apply false
 }
 
-subprojects {
-    configurations.configureEach {
-        if (name.contains("debug", ignoreCase = true)) {
-            exclude(group = "com.github.chuckerteam.chucker", module = "library-no-op")
-        }
-    }
-}

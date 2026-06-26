@@ -2,8 +2,6 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.maven.publish)
-    alias(libs.plugins.signing)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
@@ -34,7 +32,7 @@ val debugBaseUrl = resolveConfig(
 val releaseBaseUrl = resolveConfig(
     localKey = "shopme.releaseBaseUrl",
     envKey = "SHOPME_RELEASE_BASE_URL",
-    fallback = "https://api.dsrv-developer.my.id/"
+    fallback = "http://192.168.1.104:8080/"
 )
 val firebaseProjectId = resolveConfig(
     localKey = "shopme.firebaseProjectId",
@@ -57,7 +55,6 @@ android {
         minSdk = 24
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
         buildConfigField("String", "FIREBASE_PROJECT_ID", "\"$firebaseProjectId\"")
         buildConfigField("String", "FIREBASE_DEFAULT_COLLECTION", "\"$firebaseDefaultCollection\"")
     }
@@ -153,7 +150,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.material.icons.extended)

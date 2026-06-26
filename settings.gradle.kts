@@ -9,7 +9,6 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
-        google()
 
         mavenLocal()
         maven {
@@ -30,7 +29,6 @@ pluginManagement {
                     ?: System.getenv("GITHUB_TOKEN")
             }
         }
-        //maven("https://jitpack.io")
     }
 }
 dependencyResolutionManagement {
@@ -41,7 +39,6 @@ dependencyResolutionManagement {
         google()
 
         mavenLocal()
-        //maven("https://jitpack.io")
     }
 }
 

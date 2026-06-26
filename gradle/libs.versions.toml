@@ -1,6 +1,5 @@
 [versions]
 agp = "8.13.2"
-animation = "1.10.2"
 appcompat = "1.7.1"
 coilCompose = "2.7.0"
 composeBom = "2026.01.01"
@@ -15,7 +14,7 @@ firebaseAuthKtx = "24.0.1"
 firebaseBom = "33.5.1"
 firebaseCommonKtx = "21.0.0"
 firebaseCrashlytics = "3.0.7"
-foundation = "1.10.2"
+
 google-services = "4.4.0"
 gson = "2.10.1"
 hilt = "2.51"
@@ -29,21 +28,21 @@ ktor = "2.3.5"
 lifecycleRuntimeKtx = "2.10.0"
 lifecycleViewModelKtx = "2.10.0"
 material = "1.13.0"
-material3 = "1.4.0"
-materialVersion = "1.6.7"
+
 moshi = "1.15.0"
 mtvCore = "1.0.0"
 navigationCompose = "2.8.0"
+youtubePlayer = "12.1.0"
 okhttp = "4.11.0"
 retrofit = "2.9.0"
 room = "2.6.1"
 threetenabp = "1.4.6"
-uiTooling = "1.10.1"
-uiToolingPreview = "1.10.1"
+
 mockk = "1.13.10"
 turbine = "1.1.0"
 coroutinesTest = "1.7.3"
 chucker = "4.0.0"
+robolectric = "4.13"
 
 [libraries]
 
@@ -57,20 +56,19 @@ androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifec
 
 # --- Compose BOM & UI ---
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
-androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
-androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
-androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 
 # --- Material ---
-androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
-androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+androidx-compose-material = { module = "androidx.compose.material:material" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
-material3 = { group = "androidx.compose.material3", name = "material3" }
-
 # --- Navigation ---
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
@@ -115,12 +113,13 @@ firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref = "threetenabp" }
 exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
-core-youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "core" }
+core-youtube-player = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtubePlayer" }
 
 # --- Room ---
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 
 # --- Testing ---
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -135,6 +134,7 @@ turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine
 
 # --- Coroutines Test ---
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 
 # --- MTV Core Libraries ---
 mtv-core-network = { group = "com.mtv.based.core", name = "network", version.ref = "mtvCore" }
@@ -157,5 +157,4 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerialization" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-maven-publish = { id = "maven-publish" }
-signing = { id = "signing" }
+

@@ -1,4 +1,11 @@
 import com.google.firebase.appdistribution.gradle.firebaseAppDistribution
+import org.gradle.api.GradleException
+
+configurations {
+    named("debugImplementation") {
+        exclude(group = "com.github.chuckerteam.chucker", module = "library-no-op")
+    }
+}
 
 plugins {
     alias(libs.plugins.android.application)
@@ -7,7 +14,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.firebase.crashlytics)
 }
@@ -22,8 +29,8 @@ android {
         applicationId = "com.mtv.app.shopme"
         minSdk = 24
         targetSdk = 36
-        versionCode = 15
-        versionName = "1.0"
+        versionCode = 16
+        versionName = "1.0.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -52,10 +59,12 @@ android {
         }
         release {
             isMinifyEnabled = true
+            val isReleaseBuild = gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }
             signingConfig = if (hasCiSigning) {
                 signingConfigs.getByName("ciRelease")
+            } else if (isReleaseBuild) {
+                throw GradleException("No CI signing config found. Set SHOPME_KEYSTORE_PATH, SHOPME_KEYSTORE_PASSWORD, SHOPME_KEY_ALIAS, and SHOPME_KEY_PASSWORD environment variables.")
             } else {
-                println("WARNING: No CI signing config found. Release build will be unsigned!")
                 null
             }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -87,7 +96,7 @@ android {
     buildFeatures {
         buildConfig = true
         compose = true
-        viewBinding = true
+        viewBinding = false
     }
 }
 
@@ -160,7 +169,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.material.icons.extended)
