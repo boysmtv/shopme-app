@@ -7,6 +7,7 @@ data class SellerPaymentMethodResponse(
     val cashEnabled: Boolean,
     val bankEnabled: Boolean,
     val bankNumber: String? = null,
+    val bankType: String? = null,
     val ovoEnabled: Boolean,
     val ovoNumber: String? = null,
     val danaEnabled: Boolean,

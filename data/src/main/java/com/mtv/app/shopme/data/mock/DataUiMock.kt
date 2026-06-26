@@ -27,7 +27,6 @@ import com.mtv.app.shopme.domain.model.MenuSummary
 import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.domain.model.Village
 import java.math.BigDecimal
-import org.threeten.bp.LocalDateTime
 
 object DataUiMock {
     fun customer() = Customer(
@@ -74,7 +73,7 @@ object DataUiMock {
             quantity = 10,
             estimate = "15-20 menit",
             isActive = index % 2 == 0,
-            createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
+            createdAt = java.time.Instant.parse("2024-01-01T00:00:00Z").toEpochMilli(),
             images = emptyList(),
 
             variants = listOf(
