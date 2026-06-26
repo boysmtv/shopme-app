@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
@@ -17,6 +18,7 @@ enum class ResetStage {
     PASSWORD
 }
 
+@Immutable
 data class ResetUiState(
     val email: String = EMPTY_STRING,
     val otp: String = EMPTY_STRING,

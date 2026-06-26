@@ -8,10 +8,12 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.Login
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
+@Immutable
 data class LoginUiState(
     val email: String = EMPTY_STRING,
     val password: String = EMPTY_STRING,

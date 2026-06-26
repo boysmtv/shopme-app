@@ -8,9 +8,11 @@
 
 package com.mtv.app.shopme.feature.auth.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.based.core.network.utils.LoadState
 
+@Immutable
 data class SplashUiState(
     val splash: LoadState<Splash> = LoadState.Loading,
     val blockingState: SplashBlockingState? = null,
