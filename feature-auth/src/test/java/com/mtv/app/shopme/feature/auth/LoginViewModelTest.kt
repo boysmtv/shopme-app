@@ -5,8 +5,8 @@ import com.mtv.app.shopme.domain.usecase.GetLoginUseCase
 import com.mtv.app.shopme.feature.auth.contract.LoginEvent
 import com.mtv.app.shopme.feature.auth.presentation.LoginViewModel
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.domain.model.Resource
+import com.mtv.app.shopme.core.error.ApiException
 import com.mtv.based.core.provider.utils.SecurePrefs
 import io.mockk.every
 import io.mockk.mockk
@@ -30,7 +30,7 @@ class LoginViewModelTest {
     fun `invalid credentials should keep login inputs`() = runTest {
         every {
             loginUseCase.invoke(LoginParam("buyer.demo@shopme.local", "wrongpass"))
-        } returns flowOf(Resource.Error(UiError.Unauthorized("Credential salah")))
+        } returns flowOf(Resource.Error(throwable = ApiException.Unauthorized(message = "Credential salah")))
 
         val vm = LoginViewModel(securePrefs, loginUseCase)
 

@@ -10,10 +10,8 @@ import com.mtv.app.shopme.feature.auth.contract.SplashBlockingState
 import com.mtv.app.shopme.feature.auth.contract.SplashEffect
 import com.mtv.app.shopme.feature.auth.contract.SplashEvent
 import com.mtv.app.shopme.feature.auth.presentation.SplashViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.device.DeviceInfo
-import com.mtv.based.core.provider.utils.device.DeviceInfoProvider
 import com.mtv.based.core.provider.utils.device.InstallationIdProvider
 import io.mockk.every
 import io.mockk.mockk
@@ -32,7 +30,6 @@ class SplashViewModelTest {
 
     private val securePrefs: SecurePrefs = mockk(relaxed = true)
     private val installationIdProvider: InstallationIdProvider = mockk()
-    private val deviceInfoProvider: DeviceInfoProvider = mockk()
     private val appInfoProvider: AppInfoProvider = mockk()
     private val splashUseCase: GetSplashUseCase = mockk()
 
@@ -139,30 +136,6 @@ class SplashViewModelTest {
         every { securePrefs.getString(USER_ROLE) } returns savedRole
         every { appInfoProvider.versionName } returns "1.0.0"
         every { appInfoProvider.versionCode } returns 1
-        every { deviceInfoProvider.getAllDeviceInfo() } returns DeviceInfo(
-            androidId = "android-id",
-            brand = "brand",
-            manufacturer = "manufacturer",
-            model = "model",
-            device = "device",
-            hardware = "hardware",
-            supportedAbis = "arm64-v8a",
-            sdkVersion = 34,
-            androidVersion = "14",
-            screenWidth = 1080,
-            screenHeight = 2400,
-            densityDpi = 440,
-            locale = "id_ID",
-            timezone = "Asia/Jakarta",
-            batteryLevel = 80,
-            networkType = "wifi",
-            freeStorageMb = 1024,
-            freeRamMb = 2048,
-            appVersionName = "1.0.0",
-            appVersionCode = 1,
-            firstInstallTime = 1,
-            lastUpdateTime = 1
-        )
         every {
             splashUseCase.invoke(any<SplashParam>())
         } returns flowOf(Resource.Success(splash))
@@ -170,7 +143,6 @@ class SplashViewModelTest {
         return SplashViewModel(
             securePrefs = securePrefs,
             installationIdProvider = installationIdProvider,
-            deviceInfoProvider = deviceInfoProvider,
             appInfoProvider = appInfoProvider,
             splashUseCase = splashUseCase
         )

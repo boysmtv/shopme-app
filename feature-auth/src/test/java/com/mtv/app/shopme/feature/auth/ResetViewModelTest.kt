@@ -10,7 +10,7 @@ import com.mtv.app.shopme.feature.auth.contract.ResetEffect
 import com.mtv.app.shopme.feature.auth.contract.ResetEvent
 import com.mtv.app.shopme.feature.auth.contract.ResetStage
 import com.mtv.app.shopme.feature.auth.presentation.ResetViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.async
