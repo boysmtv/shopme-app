@@ -26,11 +26,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.DoneAll
 import androidx.compose.material.icons.filled.Refresh
@@ -78,7 +80,7 @@ fun SellerChatScreen(
 ) {
     val messages = state.messages
     val messageInput = state.currentMessage
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
     var canLoadOlder by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
@@ -91,8 +93,8 @@ fun SellerChatScreen(
     }
     val presenceColor = if (state.isPeerOnline) Color(0xFF4CAF50) else Color.Gray
 
-    LaunchedEffect(messages.lastOrNull()?.id, state.isLoadingOlder) {
-        if (messages.isNotEmpty() && !state.isLoadingOlder) {
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.lastIndex)
             canLoadOlder = true
         }
@@ -232,7 +234,7 @@ fun SellerChatScreen(
                     .width(64.dp)
                     .background(AppColor.Blue, RoundedCornerShape(20.dp))
             ) {
-                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send", tint = Color.White)
+                Icon(Icons.Filled.Send, contentDescription = "Send", tint = Color.White)
             }
             }
         }
@@ -317,7 +319,7 @@ private fun SellerChatDeliveryCheck(
     val tint = if (isRead && !isPending) Color(0xFF34B7F1) else Color(0xFFE0E0E0)
     Icon(
         imageVector = icon,
-        contentDescription = null,
+        contentDescription = if (isPending) "Sent" else "Read",
         tint = tint,
         modifier = Modifier.size(14.dp)
     )

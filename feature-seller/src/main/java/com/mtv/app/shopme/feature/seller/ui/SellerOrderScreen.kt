@@ -25,7 +25,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -74,7 +76,7 @@ fun SellerOrderScreen(
         refreshing = state.isRefreshing,
         onRefresh = { event(SellerOrderEvent.Load) }
     )
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
     val canLoadMore = !state.isLoading && !state.isLoadingMore && !state.isLastPage
 
     LaunchedEffect(listState, canLoadMore) {
@@ -263,7 +265,7 @@ fun SellerOrderHeader(
 
                 Icon(
                     imageVector = Icons.Default.Receipt,
-                    contentDescription = null,
+                    contentDescription = "Receipt",
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
@@ -366,7 +368,7 @@ fun ModernOrderCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocationOn,
-                            contentDescription = null,
+                            contentDescription = "Location",
                             tint = Color.Gray,
                             modifier = Modifier.size(14.dp)
                         )
@@ -387,7 +389,7 @@ fun ModernOrderCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.CalendarToday,
-                        contentDescription = null,
+                        contentDescription = "Date",
                         tint = Color.Gray,
                         modifier = Modifier.size(14.dp)
                     )
@@ -396,7 +398,7 @@ fun ModernOrderCard(
                     Spacer(Modifier.width(12.dp))
                     Icon(
                         Icons.Default.Payment,
-                        contentDescription = null,
+                        contentDescription = "Payment",
                         tint = Color.Gray,
                         modifier = Modifier.size(14.dp)
                     )

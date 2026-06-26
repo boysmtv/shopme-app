@@ -375,7 +375,7 @@ fun ModernOrderItemCompact(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Default.CalendarToday,
-                        contentDescription = null,
+                        contentDescription = "Date",
                         tint = Color.Gray,
                         modifier = Modifier.size(14.dp)
                     )
@@ -384,7 +384,7 @@ fun ModernOrderItemCompact(
                     Spacer(Modifier.width(12.dp))
                     Icon(
                         Icons.Default.Payment,
-                        contentDescription = null,
+                        contentDescription = "Payment",
                         tint = Color.Gray,
                         modifier = Modifier.size(14.dp)
                     )
@@ -486,7 +486,7 @@ fun NotificationBadge(
     ) {
         Icon(
             imageVector = Icons.Default.Notifications,
-            contentDescription = null,
+            contentDescription = "Notifications",
             tint = AppColor.White,
             modifier = Modifier
                 .size(38.dp)

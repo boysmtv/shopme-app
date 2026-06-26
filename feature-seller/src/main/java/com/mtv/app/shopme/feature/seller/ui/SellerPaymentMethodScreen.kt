@@ -23,8 +23,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -87,10 +88,10 @@ fun SellerPaymentMethodScreen(
             shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
             colors = CardDefaults.cardColors(containerColor = AppColor.WhiteSoft)
         ) {
-
+            val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
             Column(
                 modifier = Modifier
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .padding(horizontal = 20.dp, vertical = 24.dp)
             ) {
 
@@ -122,9 +123,8 @@ fun SellerPaymentMethodScreen(
                 ) {
 
                     BankDropdown(
-                        onSelected = {
-                            // optional kalau mau simpan bank type
-                        }
+                        selectedBank = state.bankType,
+                        onSelected = { event(SellerPaymentMethodEvent.ChangeBankType(it)) }
                     )
 
                     Spacer(Modifier.height(12.dp))
@@ -358,11 +358,12 @@ fun formatAccountNumber(input: String): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BankDropdown(
+    selectedBank: String = "BCA",
     onSelected: (String) -> Unit
 ) {
 
     var expanded by remember { mutableStateOf(false) }
-    var selectedBank by remember { mutableStateOf("BCA") }
+    var localSelectedBank by remember { mutableStateOf(selectedBank) }
 
     val banks = listOf("BCA", "BRI", "Mandiri", "BNI")
 
@@ -395,7 +396,7 @@ fun BankDropdown(
                 DropdownMenuItem(
                     text = { Text(it) },
                     onClick = {
-                        selectedBank = it
+                        localSelectedBank = it
                         expanded = false
                         onSelected(it)
                     }
@@ -422,7 +423,7 @@ fun SellerPaymentHeader(
 
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null,
+                contentDescription = "Back",
                 tint = Color.White
             )
         }

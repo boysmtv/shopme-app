@@ -126,7 +126,7 @@ fun SellerProductFormScreen(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
+                            contentDescription = "Back"
                         )
                     }
                 },
@@ -136,7 +136,7 @@ fun SellerProductFormScreen(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Help,
-                            contentDescription = null
+                            contentDescription = "Help"
                         )
                     }
                 },
@@ -285,7 +285,7 @@ fun SellerProductFormScreen(
                                                 ) {
                                                     Icon(
                                                         Icons.Default.Close,
-                                                        contentDescription = null,
+                                                        contentDescription = "Close",
                                                         tint = Color.White,
                                                         modifier = Modifier.size(14.dp)
                                                     )
@@ -298,7 +298,7 @@ fun SellerProductFormScreen(
                                                 ) {
                                                     Icon(
                                                         Icons.Default.Add,
-                                                        contentDescription = null,
+                                                        contentDescription = "Add",
                                                         tint = Color.Gray
                                                     )
 
@@ -906,11 +906,11 @@ fun ModernOutlinedField(
         },
         leadingIcon = icon?.let {
             {
-                Icon(
-                    imageVector = it,
-                    contentDescription = null,
-                    tint = AppColor.Blue
-                )
+            Icon(
+                imageVector = it,
+                contentDescription = "Input",
+                tint = AppColor.Blue
+            )
             }
         },
         keyboardOptions = KeyboardOptions(

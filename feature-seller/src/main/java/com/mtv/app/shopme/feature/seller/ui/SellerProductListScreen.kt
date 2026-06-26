@@ -9,8 +9,8 @@
 package com.mtv.app.shopme.feature.seller.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +25,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -97,7 +99,7 @@ fun SellerProductListScreen(
             lowStock = state.products.count { it.stock <= 5 }
         )
     }
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
     val canLoadMore = !state.isLoading && !state.isLoadingMore && !state.isLastPage
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
@@ -249,6 +251,7 @@ private fun ProductSearchAndFilters(
         state.categoryFilter != null ||
         state.statusFilter != null ||
         state.activeFilter != null
+    val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
 
     Column(
         modifier = Modifier
@@ -263,7 +266,7 @@ private fun ProductSearchAndFilters(
             singleLine = true,
             shape = RoundedCornerShape(14.dp),
             leadingIcon = {
-                Icon(Icons.Default.Search, contentDescription = null, tint = AppColor.Blue)
+                Icon(Icons.Default.Search, contentDescription = "Search", tint = AppColor.Blue)
             },
             label = { Text("Cari produk") },
             keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -279,7 +282,7 @@ private fun ProductSearchAndFilters(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
+                .horizontalScroll(scrollState),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             FilterChip(
@@ -307,7 +310,7 @@ private fun ProductSearchAndFilters(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
+                .horizontalScroll(scrollState),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             FoodCategory.entries.forEach { category ->
@@ -541,7 +544,7 @@ fun ModernProductItem(
                 IconButton(onClick = onEdit) {
                     Icon(
                         Icons.Default.Edit,
-                        contentDescription = null,
+                        contentDescription = "Edit",
                         tint = Color.Gray
                     )
                 }
@@ -549,7 +552,7 @@ fun ModernProductItem(
                 IconButton(onClick = onDelete) {
                     Icon(
                         Icons.Default.DeleteOutline,
-                        contentDescription = null,
+                        contentDescription = "Delete",
                         tint = Color.Red
                     )
                 }
@@ -607,7 +610,7 @@ fun EmptyProductState(
         ) {
             Icon(
                 imageVector = Icons.Default.Inventory2,
-                contentDescription = null,
+                contentDescription = "Products",
                 tint = AppColor.Blue,
                 modifier = Modifier.size(48.dp)
             )

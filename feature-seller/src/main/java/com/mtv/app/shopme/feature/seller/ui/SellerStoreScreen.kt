@@ -66,7 +66,7 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.SmartImage
-import com.mtv.app.shopme.domain.model.ProfileMenuItem
+import com.mtv.app.shopme.common.ProfileMenuItem
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreUiState
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
@@ -160,7 +160,7 @@ fun SellerStoreScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            items(menuItems) { item ->
+            items(menuItems, key = { it.title }) { item ->
                 ProfileMenuItem(
                     item = item
                 )
@@ -270,7 +270,7 @@ fun ProfileMenuItem(
             ) {
                 Icon(
                     item.icon,
-                    contentDescription = null,
+                    contentDescription = item.title,
                     tint = AppColor.Blue
                 )
             }
@@ -294,7 +294,7 @@ fun ProfileMenuItem(
 
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
+                contentDescription = "Next",
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }

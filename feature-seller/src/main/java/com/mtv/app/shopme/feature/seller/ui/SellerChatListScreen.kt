@@ -99,7 +99,7 @@ fun SellerChatListScreen(
                 }
 
                 IconButton(onClick = { event(SellerChatListEvent.ClickClearAll) }) {
-                    Icon(Icons.Default.DeleteOutline, contentDescription = null)
+                    Icon(Icons.Default.DeleteOutline, contentDescription = "Delete")
                 }
             }
 

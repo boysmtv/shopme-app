@@ -469,7 +469,7 @@ fun ReviewItem(
 
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = label,
             tint = AppColor.Blue
         )
 
@@ -550,7 +550,7 @@ fun CafeProfilePhotoUpload(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = null,
+                        contentDescription = "Close",
                         tint = Color.White,
                         modifier = Modifier.size(14.dp)
                     )
@@ -564,7 +564,7 @@ fun CafeProfilePhotoUpload(
 
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = null,
+                        contentDescription = "Add",
                         tint = Color.Gray,
                         modifier = Modifier.size(30.dp)
                     )

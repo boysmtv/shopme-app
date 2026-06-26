@@ -17,8 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,6 +50,7 @@ fun SellerCreateCafeTncScreen(
 ) {
 
     val isValid = state.terms.isNotEmpty() && state.terms.all { it.checked }
+    val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
 
     Column(
         modifier = Modifier
@@ -59,7 +61,7 @@ fun SellerCreateCafeTncScreen(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .padding(24.dp)
         ) {
             if (state.isLoading && state.terms.isEmpty()) {

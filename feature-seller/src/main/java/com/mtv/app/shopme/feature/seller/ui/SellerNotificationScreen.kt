@@ -117,7 +117,7 @@ fun SellerNotificationScreen(
                         items = state.notifications,
                         key = { _, item -> listOf(item.orderId, item.title, item.date, item.time, item.message).joinToString("|") }
                     ) { index, item ->
-                        if (index >= state.notifications.lastIndex - 2) {
+                        if (state.notifications.size >= 3 && index >= state.notifications.lastIndex - 2) {
                             event(SellerNotifEvent.LoadMore)
                         }
                         SellerNotificationItemCard(

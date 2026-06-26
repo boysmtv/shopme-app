@@ -28,7 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -268,7 +268,7 @@ fun SellerOrderDetailHeader(
                 .background(AppColor.BlueSoft, CircleShape)
         ) {
             Icon(
-                Icons.AutoMirrored.Filled.Chat,
+                Icons.Filled.Chat,
                 contentDescription = "Chat customer",
                 tint = AppColor.Blue
             )
