@@ -7,7 +7,7 @@ import com.mtv.app.shopme.domain.model.SellerPaymentMethod
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.model.SellerProfile
 import com.mtv.app.shopme.domain.param.SellerPaymentMethodParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface SellerRepository {

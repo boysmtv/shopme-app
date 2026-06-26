@@ -18,7 +18,7 @@ import com.mtv.app.shopme.domain.param.DiscoveryParam
 import com.mtv.app.shopme.domain.param.FoodBulkStatusParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface FoodRepository {

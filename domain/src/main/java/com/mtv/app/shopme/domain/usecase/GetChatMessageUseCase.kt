@@ -11,7 +11,7 @@ package com.mtv.app.shopme.domain.usecase
 import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.repository.ChatRepository
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 

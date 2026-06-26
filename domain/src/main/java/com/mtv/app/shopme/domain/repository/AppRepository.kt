@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.param.SplashParam
 import com.mtv.app.shopme.domain.model.SupportChat
 import com.mtv.app.shopme.domain.model.Splash
 import com.mtv.app.shopme.domain.model.SupportCenter
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface AppRepository {

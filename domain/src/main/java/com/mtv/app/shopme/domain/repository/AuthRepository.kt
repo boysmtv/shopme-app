@@ -9,7 +9,7 @@ import com.mtv.app.shopme.domain.param.LoginParam
 import com.mtv.app.shopme.domain.param.ResetPasswordParam
 import com.mtv.app.shopme.domain.param.RegisterParam
 import com.mtv.app.shopme.domain.param.VerifyOtpParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {

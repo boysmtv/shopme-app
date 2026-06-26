@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.PagedData
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {

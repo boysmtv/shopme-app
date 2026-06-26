@@ -15,7 +15,7 @@ import com.mtv.app.shopme.domain.param.CartClearByCafeParam
 import com.mtv.app.shopme.domain.param.CartQuantityParam
 import com.mtv.app.shopme.domain.param.CreateOrderParam
 import com.mtv.app.shopme.domain.param.VerifyPinParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface CartRepository {

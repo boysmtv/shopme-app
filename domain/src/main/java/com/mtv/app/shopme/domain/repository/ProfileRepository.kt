@@ -19,7 +19,7 @@ import com.mtv.app.shopme.domain.param.AddressDeleteParam
 import com.mtv.app.shopme.domain.param.AddressUpdateParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface ProfileRepository {

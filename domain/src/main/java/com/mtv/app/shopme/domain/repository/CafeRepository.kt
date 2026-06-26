@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.model.Cafe
 import com.mtv.app.shopme.domain.model.CafeAddress
 import com.mtv.app.shopme.domain.param.CafeAddParam
 import com.mtv.app.shopme.domain.param.CafeAddressUpsertParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface CafeRepository {
