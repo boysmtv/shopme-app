@@ -1,10 +1,12 @@
+@file:OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+
 package com.mtv.app.shopme.data
 
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
+import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.core.database.entity.FoodEntity
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.data.remote.datasource.FoodRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.PageResponse
@@ -13,12 +15,11 @@ import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.SearchParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import java.math.BigDecimal
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -26,18 +27,14 @@ import org.junit.Test
 import kotlinx.serialization.builtins.ListSerializer
 import org.threeten.bp.LocalDateTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class FoodRepositoryImplTest {
 
     private val remote: FoodRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
-    private val errorMapper: ErrorMapper = mockk(relaxed = true)
-
     private val repository = FoodRepositoryImpl(
         remote = remote,
-        resultFlow = mockk(relaxed = true),
+        resultFlow = ResultFlowFactory(),
         homeDao = homeDao,
-        errorMapper = errorMapper
     )
 
     @Test

@@ -1,10 +1,11 @@
+@file:OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+
 package com.mtv.app.shopme.data
 
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.CartRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
@@ -14,37 +15,36 @@ import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
 import com.mtv.app.shopme.data.repository.CartRepositoryImpl
 import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
+import com.mtv.app.shopme.data.sync.PendingMutationAction
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.CartAddParam
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+
 import java.math.BigDecimal
 import java.io.IOException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.builtins.ListSerializer
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.LocalDateTime
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class CartRepositoryImplTest {
 
     private val remote: CartRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
-    private val errorMapper: ErrorMapper = mockk(relaxed = true)
-    private val syncManager: OfflineMutationSyncManager = mockk(relaxed = true)
+    private val syncManager: OfflineMutationSyncManager = mockk()
 
     private val repository = CartRepositoryImpl(
         remote = remote,
-        resultFlow = ResultFlowFactory(errorMapper),
+        resultFlow = ResultFlowFactory(),
         homeDao = homeDao,
-        errorMapper = errorMapper,
         syncManager = syncManager
     )
 
@@ -82,7 +82,8 @@ class CartRepositoryImplTest {
     fun `addCart should patch local cache when offline and food detail cache exists`() = runTest {
         val currentCart = listOf(cartResponse(id = "cart-1", name = "Cached Latte"))
         val foodDetail = foodResponse()
-        coEvery { remote.addCart(any<CartAddParam>()) } throws IOException("offline")
+        every { syncManager.enqueue(match<PendingMutationAction> { true }) } returns Unit
+        coEvery { remote.addCart(match<CartAddParam> { true }) } throws IOException("offline")
         coEvery { homeDao.getPayloadOnce("cart:list") } returns PayloadCacheEntity(
             cacheKey = "cart:list",
             payload = PayloadCacheStore.json.encodeToString(

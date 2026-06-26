@@ -3,14 +3,13 @@ package com.mtv.app.shopme.data
 import app.cash.turbine.test
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.remote.datasource.CafeRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.CafeAddressResponse
 import com.mtv.app.shopme.data.remote.response.CafeResponse
 import com.mtv.app.shopme.data.repository.CafeRepositoryImpl
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -25,13 +24,10 @@ class CafeRepositoryImplTest {
 
     private val remote: CafeRemoteDataSource = mockk()
     private val homeDao: HomeDao = mockk(relaxed = true)
-    private val errorMapper: ErrorMapper = mockk(relaxed = true)
-
     private val repository = CafeRepositoryImpl(
         remote = remote,
-        resultFlow = ResultFlowFactory(errorMapper),
+        resultFlow = ResultFlowFactory(),
         homeDao = homeDao,
-        errorMapper = errorMapper
     )
 
     @Test
