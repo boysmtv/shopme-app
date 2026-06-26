@@ -19,6 +19,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
+// TODO(B5): These are smoke/delegation tests that verify use cases delegate to the repository.
+// Add business-logic tests if any use case performs non-trivial transformations.
 @OptIn(ExperimentalCoroutinesApi::class)
 class CartUseCaseTest {
 
