@@ -24,3 +24,20 @@
 -dontwarn org.slf4j.impl.StaticLoggerBinder
 -dontwarn org.slf4j.impl.StaticMDCBinder
 -dontwarn org.slf4j.impl.StaticMarkerBinder
+
+# kotlinx.serialization
+-keepattributes *Annotation*, InnerClasses
+-keepclassmembers class kotlinx.serialization.json.** { *** Companion; }
+-keep,includedescriptorclasses class com.mtv.app.shopme.**$$serializer { *; }
+-keepclassmembers class com.mtv.app.shopme.** { *** Companion; }
+-keep,includedescriptorclasses class com.mtv.based.**$$serializer { *; }
+
+# Hilt ViewModels
+-keepclassmembers class * extends androidx.lifecycle.ViewModel { <init>(...); }
+
+# Compose
+-keepclasseswithmembers class androidx.compose.** { *; }
+
+# Coroutines - required for R8
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
