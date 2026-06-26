@@ -8,9 +8,11 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 
+@Immutable
 data class SellerDashboardUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,

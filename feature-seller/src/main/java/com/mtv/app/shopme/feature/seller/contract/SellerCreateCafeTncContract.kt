@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SellerCreateCafeTncUiState(
     val isLoading: Boolean = false,
     val title: String = "",
@@ -16,6 +19,7 @@ data class SellerCreateCafeTncUiState(
     val terms: List<SellerCreateCafeTncItemUiState> = emptyList()
 )
 
+@Immutable
 data class SellerCreateCafeTncItemUiState(
     val id: String,
     val title: String,

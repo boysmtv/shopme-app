@@ -8,6 +8,7 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.OrderStatus
 
 data class SellerOrderLineItem(
@@ -17,6 +18,7 @@ data class SellerOrderLineItem(
     val notes: String = ""
 )
 
+@Immutable
 data class SellerOrderDetailUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -29,7 +31,8 @@ data class SellerOrderDetailUiState(
     val total: String = "",
     val items: List<SellerOrderLineItem> = emptyList(),
     val showCancelDialog: Boolean = false,
-    val cancelReason: String = ""
+    val cancelReason: String = "",
+    val errorMessage: String? = null
 )
 
 sealed class SellerOrderDetailEvent {

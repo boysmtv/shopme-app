@@ -8,10 +8,12 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.SellerNotifItem
 import com.mtv.based.core.network.utils.ResourceFirebase
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.ERROR_STRING
 
+@Immutable
 data class SellerNotifUiState(
     val isLoading: Boolean = false,
 

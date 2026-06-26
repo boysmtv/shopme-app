@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SellerPaymentMethodUiState(
     val isLoading: Boolean = false,
 
@@ -15,6 +18,7 @@ data class SellerPaymentMethodUiState(
 
     val bankEnabled: Boolean = false,
     val bankNumber: String = "",
+    val bankType: String = "BCA",
 
     val ovoEnabled: Boolean = false,
     val ovoNumber: String = "",
@@ -34,6 +38,7 @@ sealed class SellerPaymentMethodEvent {
 
     data class ToggleBank(val value: Boolean) : SellerPaymentMethodEvent()
     data class ChangeBank(val value: String) : SellerPaymentMethodEvent()
+    data class ChangeBankType(val value: String) : SellerPaymentMethodEvent()
 
     data class ToggleOvo(val value: Boolean) : SellerPaymentMethodEvent()
     data class ChangeOvo(val value: String) : SellerPaymentMethodEvent()

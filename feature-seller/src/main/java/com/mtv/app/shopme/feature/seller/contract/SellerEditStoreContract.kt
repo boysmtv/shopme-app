@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SellerEditStoreUiState(
     val isLoading: Boolean = false,
 
@@ -17,6 +20,7 @@ data class SellerEditStoreUiState(
     val phone: String = "",
     val minOrder: String = "",
     val storeOpen: String = "",
+    val storeClose: String = "",
     val description: String = "",
     val storePhoto: String? = null,
 
@@ -37,6 +41,7 @@ sealed class SellerEditStoreEvent {
     data class ChangePhone(val value: String) : SellerEditStoreEvent()
     data class ChangeMinOrder(val value: String) : SellerEditStoreEvent()
     data class ChangeStoreOpen(val value: String) : SellerEditStoreEvent()
+    data class ChangeStoreClose(val value: String) : SellerEditStoreEvent()
     data class ChangeDescription(val value: String) : SellerEditStoreEvent()
 
     // ADDRESS

@@ -8,11 +8,13 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
 import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.domain.model.ProductStats
 
+@Immutable
 data class SellerProductListUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,

@@ -8,6 +8,9 @@
 
 package com.mtv.app.shopme.feature.seller.contract
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SellerChatDetailUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
