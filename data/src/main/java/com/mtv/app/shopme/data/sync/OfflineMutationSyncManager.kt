@@ -5,6 +5,7 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
+import com.mtv.app.shopme.core.database.AppDatabase
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toEntity
@@ -24,21 +25,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @Singleton
 class OfflineMutationSyncManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val homeDao: HomeDao,
+    private val database: AppDatabase,
     private val profileRemoteDataSource: ProfileRemoteDataSource,
     private val cartRemoteDataSource: CartRemoteDataSource,
     private val sellerRemoteDataSource: SellerRemoteDataSource
 ) {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val store = PendingMutationStore(homeDao)
+    private val store = PendingMutationStore(homeDao, database)
+    private val flushMutex = Mutex()
     private val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
     @Volatile private var started = false
-    @Volatile private var syncing = false
 
     fun start() {
         if (started) return
@@ -75,9 +79,8 @@ class OfflineMutationSyncManager @Inject constructor(
     }
 
     private suspend fun flushPending() {
-        if (syncing || !isOnline()) return
-        syncing = true
-        try {
+        if (!isOnline()) return
+        flushMutex.withLock {
             store.list().forEach { record ->
                 try {
                     when (val action = record.action) {
@@ -97,13 +100,11 @@ class OfflineMutationSyncManager @Inject constructor(
                     val nextAttempt = record.entity.attemptCount + 1
                     store.markFailed(record.entity.id, nextAttempt, throwable.message)
                     if (throwable.isRetryableNetworkFailure()) {
-                        return
+                        return@withLock
                     }
                     store.delete(record.entity.id)
                 }
             }
-        } finally {
-            syncing = false
         }
     }
 

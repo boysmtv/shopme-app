@@ -1,11 +1,14 @@
 package com.mtv.app.shopme.data.sync
 
+import com.mtv.app.shopme.core.database.AppDatabase
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.PendingMutationEntity
+import androidx.room.withTransaction
 import kotlinx.serialization.json.Json
 
 class PendingMutationStore(
-    private val homeDao: HomeDao
+    private val homeDao: HomeDao,
+    private val database: AppDatabase
 ) {
 
     private val json = Json {
@@ -15,18 +18,20 @@ class PendingMutationStore(
     }
 
     suspend fun enqueue(action: PendingMutationAction) {
-        val now = System.currentTimeMillis()
-        dedupe(action)
-        homeDao.insertPendingMutation(
-            PendingMutationEntity(
-                actionType = action::class.simpleName.orEmpty(),
-                payload = json.encodeToString(PendingMutationAction.serializer(), action),
-                createdAt = now,
-                updatedAt = now,
-                attemptCount = 0,
-                lastError = null
+        database.withTransaction {
+            val now = System.currentTimeMillis()
+            dedupe(action)
+            homeDao.insertPendingMutation(
+                PendingMutationEntity(
+                    actionType = action::class.simpleName.orEmpty(),
+                    payload = json.encodeToString(PendingMutationAction.serializer(), action),
+                    createdAt = now,
+                    updatedAt = now,
+                    attemptCount = 0,
+                    lastError = null
+                )
             )
-        )
+        }
     }
 
     private suspend fun dedupe(action: PendingMutationAction) {
