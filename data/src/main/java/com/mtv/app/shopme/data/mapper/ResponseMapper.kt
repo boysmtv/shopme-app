@@ -32,7 +32,7 @@ private fun Food.toResponse(): FoodResponse = FoodResponse(
     quantity = quantity,
     estimate = estimate,
     isActive = isActive,
-    createdAt = createdAt,
+        createdAt = org.threeten.bp.Instant.ofEpochMilli(createdAt).atZone(org.threeten.bp.ZoneId.of("UTC")).toLocalDateTime(),
     images = images,
     variants = variants.map { it.toResponse() }
 )

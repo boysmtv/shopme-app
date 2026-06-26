@@ -262,7 +262,7 @@ fun FoodResponse.toDomain(): Food = Food(
     quantity = quantity,
     estimate = estimate,
     isActive = isActive,
-    createdAt = createdAt,
+        createdAt = createdAt.atZone(org.threeten.bp.ZoneId.of("UTC")).toInstant().toEpochMilli(),
     images = images,
     variants = variants.map { it.toDomain() }
 )
@@ -362,6 +362,7 @@ fun SellerPaymentMethodResponse.toDomain(): SellerPaymentMethod = SellerPaymentM
     cashEnabled = cashEnabled,
     bankEnabled = bankEnabled,
     bankNumber = bankNumber.orEmpty(),
+
     ovoEnabled = ovoEnabled,
     ovoNumber = ovoNumber.orEmpty(),
     danaEnabled = danaEnabled,

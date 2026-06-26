@@ -109,6 +109,7 @@ fun SellerPaymentMethodParam.toRequest() = SellerPaymentMethodRequest(
     cashEnabled = cashEnabled,
     bankEnabled = bankEnabled,
     bankNumber = bankNumber,
+    bankType = bankType,
     ovoEnabled = ovoEnabled,
     ovoNumber = ovoNumber,
     danaEnabled = danaEnabled,

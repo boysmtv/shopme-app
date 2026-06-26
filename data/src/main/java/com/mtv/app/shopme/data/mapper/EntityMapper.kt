@@ -25,10 +25,8 @@ import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.SellerNotifItem
-import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 import java.math.BigDecimal
 import kotlin.text.ifEmpty
-import org.threeten.bp.LocalDateTime
 
 /* =========================================================
  * ENTITY → DOMAIN
@@ -70,18 +68,18 @@ fun CustomerEntity.toDomain(): Customer = Customer(
 
 fun FoodEntity.toDomain(): Food = Food(
     id = id,
-    cafeId = EMPTY_STRING,
+    cafeId = "",
     name = name,
     cafeName = cafeName,
-    cafeAddress = EMPTY_STRING,
-    description = EMPTY_STRING,
+    cafeAddress = "",
+    description = "",
     price = BigDecimal.valueOf(price),
     category = FoodCategory.FOOD,
     status = FoodStatus.UNKNOWN,
     quantity = 0,
-    estimate = EMPTY_STRING,
+    estimate = "",
     isActive = isActive,
-    createdAt = LocalDateTime.parse("1970-01-01T00:00:00"),
+    createdAt = java.time.Instant.parse("1970-01-01T00:00:00Z").toEpochMilli(),
     images = listOf(image),
     variants = emptyList()
 )
