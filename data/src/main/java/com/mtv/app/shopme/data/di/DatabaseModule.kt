@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.mtv.app.shopme.core.database.AppDatabase
 import com.mtv.app.shopme.core.database.AppDatabaseMigrations
+import com.mtv.app.shopme.core.database.dao.CartDao
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import dagger.Module
 import dagger.Provides
@@ -23,9 +24,15 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "shopme.db"
-        ).addMigrations(*AppDatabaseMigrations.ALL).build()
+        ).addMigrations(*AppDatabaseMigrations.ALL)
+            .fallbackToDestructiveMigration()
+            .build()
 
     @Provides
     @Singleton
     fun provideHomeDao(database: AppDatabase): HomeDao = database.homeDao()
+
+    @Provides
+    @Singleton
+    fun provideCartDao(database: AppDatabase): CartDao = database.cartDao()
 }
