@@ -17,6 +17,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
+// TODO(B1): Extract to common test module (duplicated across feature-auth, feature-customer, feature-seller)
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
     private val dispatcher: TestDispatcher = StandardTestDispatcher()

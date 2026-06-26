@@ -15,7 +15,7 @@ import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.CafeEffect
 import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.presentation.CafeViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk

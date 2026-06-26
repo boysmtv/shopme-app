@@ -11,7 +11,7 @@ import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
 import com.mtv.app.shopme.feature.customer.presentation.ChatListViewModel
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk

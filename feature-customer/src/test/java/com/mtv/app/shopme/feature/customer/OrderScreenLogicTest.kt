@@ -2,9 +2,9 @@ package com.mtv.app.shopme.feature.customer
 
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
-import com.mtv.app.shopme.feature.customer.ui.OrderFilter
-import com.mtv.app.shopme.feature.customer.ui.filterOrders
-import com.mtv.app.shopme.feature.customer.ui.resolveOrderFilter
+import com.mtv.app.shopme.feature.customer.contract.OrderFilter
+import com.mtv.app.shopme.feature.customer.contract.filterOrders
+import com.mtv.app.shopme.feature.customer.contract.resolveOrderFilter
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

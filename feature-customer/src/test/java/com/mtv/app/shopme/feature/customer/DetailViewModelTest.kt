@@ -18,7 +18,7 @@ import com.mtv.app.shopme.domain.usecase.RemoveFavoriteFoodUseCase
 import com.mtv.app.shopme.feature.customer.contract.DetailEffect
 import com.mtv.app.shopme.feature.customer.contract.DetailEvent
 import com.mtv.app.shopme.feature.customer.presentation.DetailViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk
@@ -32,7 +32,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.threeten.bp.LocalDateTime
+
 
 class DetailViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
@@ -64,7 +64,7 @@ class DetailViewModelTest {
                     quantity = 20,
                     estimate = "15 menit",
                     isActive = true,
-                    createdAt = LocalDateTime.parse("2026-05-11T10:00:00"),
+                    createdAt = 1715414400000L,
                     images = emptyList(),
                     variants = emptyList()
                 )
@@ -115,7 +115,7 @@ class DetailViewModelTest {
                     quantity = 20,
                     estimate = "15 menit",
                     isActive = true,
-                    createdAt = LocalDateTime.parse("2026-05-11T10:00:00"),
+                    createdAt = 1715414400000L,
                     images = emptyList(),
                     variants = emptyList()
                 )

@@ -12,7 +12,7 @@ import com.mtv.app.shopme.domain.usecase.GetSupportChatUseCase
 import com.mtv.app.shopme.domain.usecase.SendSupportChatMessageUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatSupportEvent
 import com.mtv.app.shopme.feature.customer.presentation.ChatSupportViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every
 import io.mockk.mockk

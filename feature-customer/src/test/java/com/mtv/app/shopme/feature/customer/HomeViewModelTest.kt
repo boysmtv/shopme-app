@@ -14,7 +14,7 @@ import com.mtv.app.shopme.feature.customer.contract.HomeEffect
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.presentation.HomeViewModel
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -60,7 +60,7 @@ class HomeViewModelTest {
     fun `should keep successful foods state even if customer request fails`() = runTest {
         val foods = listOf(fakeFood())
 
-        coEvery { customerUseCase() } returns flowOf(Resource.Error(mockk(relaxed = true)))
+        coEvery { customerUseCase() } returns flowOf(Resource.Error(throwable = Exception("error")))
         coEvery { discoveryFoodUseCase(any()) } returns flowOf(Resource.Success(PagedData(foods, page = 0, last = true)))
         coEvery { getFavoriteFoodIdsUseCase() } returns flowOf(Resource.Success(emptyList()))
 

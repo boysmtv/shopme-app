@@ -8,8 +8,8 @@ import com.mtv.app.shopme.domain.usecase.GetNotificationPreferencesUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateNotificationPreferencesUseCase
 import com.mtv.app.shopme.feature.customer.contract.NotificationEvent
 import com.mtv.app.shopme.feature.customer.presentation.NotificationViewModel
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.core.error.ApiException
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.coVerify
 import io.mockk.every
@@ -108,7 +108,7 @@ class NotificationViewModelTest {
     @Test
     fun `unauthorized notification load should force logout`() = runTest {
         every { getNotificationPreferencesUseCase.invoke() } returns flowOf(
-            Resource.Error(UiError.Unauthorized("Session expired"))
+            Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )
 
         val vm = NotificationViewModel(

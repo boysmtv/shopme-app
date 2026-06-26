@@ -6,7 +6,7 @@ import com.mtv.app.shopme.domain.usecase.DeleteAccountUseCase
 import com.mtv.app.shopme.feature.customer.contract.SecurityEffect
 import com.mtv.app.shopme.feature.customer.contract.SecurityEvent
 import com.mtv.app.shopme.feature.customer.presentation.SecurityViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SecurePrefs
 import io.mockk.every
 import io.mockk.mockk

@@ -6,7 +6,7 @@ import com.mtv.app.shopme.domain.model.NotificationPreferences
 import com.mtv.app.shopme.domain.usecase.GetNotificationPreferencesUseCase
 import com.mtv.app.shopme.feature.customer.contract.SettingsEvent
 import com.mtv.app.shopme.feature.customer.presentation.SettingsViewModel
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.every

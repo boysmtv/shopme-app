@@ -14,9 +14,9 @@ import com.mtv.app.shopme.domain.usecase.GetOrdersUseCase
 import com.mtv.app.shopme.feature.customer.contract.OrderEffect
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
 import com.mtv.app.shopme.feature.customer.presentation.OrderViewModel
-import com.mtv.app.shopme.feature.customer.ui.OrderFilter
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.feature.customer.contract.OrderFilter
+import com.mtv.app.shopme.core.error.ApiException
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.coVerify
 import io.mockk.every
@@ -76,7 +76,7 @@ class OrderViewModelTest {
 
     @Test
     fun `forbidden order error should not force logout`() = runTest {
-        every { getOrdersUseCase.invoke(0, 20) } returns flowOf(Resource.Error(UiError.Forbidden("Access denied")))
+        every { getOrdersUseCase.invoke(0, 20) } returns flowOf(Resource.Error(throwable = ApiException.Forbidden(message = "Access denied")))
 
         val vm = OrderViewModel(
             getOrdersUseCase = getOrdersUseCase,

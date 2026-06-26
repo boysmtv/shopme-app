@@ -8,8 +8,8 @@ import com.mtv.app.shopme.domain.model.SupportFaq
 import com.mtv.app.shopme.domain.usecase.GetSupportCenterUseCase
 import com.mtv.app.shopme.feature.customer.contract.HelpEvent
 import com.mtv.app.shopme.feature.customer.presentation.HelpViewModel
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.core.error.ApiException
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.coVerify
 import io.mockk.every
@@ -42,7 +42,7 @@ class HelpViewModelTest {
     @Test
     fun `unauthorized help load should force logout`() = runTest {
         every { getSupportCenterUseCase.invoke() } returns flowOf(
-            Resource.Error(UiError.Unauthorized("Session expired"))
+            Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )
 
         val vm = HelpViewModel(getSupportCenterUseCase, sessionManager)

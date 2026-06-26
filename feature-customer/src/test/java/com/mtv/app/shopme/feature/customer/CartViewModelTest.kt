@@ -20,8 +20,8 @@ import com.mtv.app.shopme.domain.usecase.UpdateCartQuantityUseCase
 import com.mtv.app.shopme.feature.customer.contract.CartEvent
 import com.mtv.app.shopme.feature.customer.presentation.CartViewModel
 import com.mtv.based.core.network.utils.LoadState
-import com.mtv.based.core.network.utils.Resource
-import com.mtv.based.core.network.utils.UiError
+import com.mtv.app.shopme.core.error.ApiException
+import com.mtv.app.shopme.domain.model.Resource
 import com.mtv.based.core.provider.utils.SessionManager
 import io.mockk.coVerify
 import io.mockk.every
@@ -97,7 +97,7 @@ class CartViewModelTest {
             Resource.Success(SessionToken("trx-1"))
         )
         every { verifyPinUseCase.invoke(any()) } returns flowOf(
-            Resource.Error(UiError.Unauthorized("Invalid PIN"))
+            Resource.Error(throwable = ApiException.Unauthorized(message = "Invalid PIN"))
         )
 
         val vm = CartViewModel(
