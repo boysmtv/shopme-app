@@ -65,9 +65,14 @@ import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.Cafe
+import com.mtv.app.shopme.domain.model.CafeAddress
 import com.mtv.app.shopme.domain.model.Food
+import com.mtv.app.shopme.domain.model.FoodCategory
+import com.mtv.app.shopme.domain.model.FoodStatus
+import java.math.BigDecimal
+
+
 import com.mtv.app.shopme.feature.customer.contract.CafeEvent
 import com.mtv.app.shopme.feature.customer.contract.CafeUiState
 import com.mtv.based.core.network.utils.LoadState
@@ -404,7 +409,7 @@ fun CafeToolbar(
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
+            contentDescription = "Back",
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
@@ -428,7 +433,7 @@ fun CafeToolbar(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = null,
+                    contentDescription = "Search",
                     tint = Color.Gray
                 )
                 Spacer(Modifier.width(8.dp))
@@ -462,7 +467,7 @@ fun CafeHeader(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 SmartImage(
                     model = cafe?.image,
-                    contentDescription = null,
+                    contentDescription = "",
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(20.dp)),
@@ -512,7 +517,7 @@ fun CafeHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
+                    contentDescription = "Cart",
                     tint = AppColor.Green,
                     modifier = Modifier.size(16.dp)
                 )
@@ -586,7 +591,7 @@ fun ActionButton(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = text,
             tint = textColor,
             modifier = Modifier.size(18.dp)
         )
@@ -626,7 +631,7 @@ fun CafeFoodItem(
                 Box {
                     SmartImage(
                         model = item.images.firstOrNull(),
-                        contentDescription = null,
+                        contentDescription = "",
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(100.dp),
@@ -660,7 +665,7 @@ fun CafeFoodItem(
 
                 Icon(
                     imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
+                    contentDescription = "Favorite",
                     tint = if (isFavorite) Color.Red else Color.White,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -700,7 +705,7 @@ fun CafeFoodItem(
 
                     Icon(
                         imageVector = Icons.Default.Favorite,
-                        contentDescription = null,
+                        contentDescription = "Favorite",
                         tint = if (isFavorite) Color.Red else AppColor.Green,
                         modifier = Modifier
                             .size(18.dp)
@@ -721,8 +726,65 @@ fun CafeFoodItem(
 fun CafeScreenPreview() {
     CafeScreen(
         state = CafeUiState(
-            cafe = LoadState.Success(DataUiMock.cafe()),
-            foods = LoadState.Success(DataUiMock.foods())
+            cafe = LoadState.Success(
+                Cafe(
+                    id = "cafe1",
+                    name = "Kopi Tugu Senja",
+                    phone = "08123456789",
+                    description = "Cafe yang nyaman dengan suasana pedesaan dan pemandangan sawah yang indah.",
+                    minimalOrder = BigDecimal(15000),
+                    openTime = "08:00",
+                    closeTime = "22:00",
+                    image = "",
+                    isActive = true,
+                    address = CafeAddress(
+                        id = "addr1",
+                        name = "Puri Lestari",
+                        block = "H2",
+                        number = "21",
+                        rt = "012",
+                        rw = "002"
+                    )
+                )
+            ),
+            foods = LoadState.Success(
+                listOf(
+                    Food(
+                        id = "1",
+                        cafeId = "cafe1",
+                        name = "Nasi Goreng Kampung",
+                        cafeName = "Kopi Tugu Senja",
+                        cafeAddress = "Puri Lestari Blok H2/21",
+                        description = "Nasi goreng kampung dengan bumbu tradisional",
+                        price = BigDecimal(25000),
+                        category = FoodCategory.FOOD,
+                        status = FoodStatus.READY,
+                        quantity = 10,
+                        estimate = "15-20 menit",
+                        isActive = true,
+                        createdAt = System.currentTimeMillis(),
+                        images = emptyList(),
+                        variants = emptyList()
+                    ),
+                    Food(
+                        id = "2",
+                        cafeId = "cafe1",
+                        name = "Es Kopi Susu Aren",
+                        cafeName = "Kopi Tugu Senja",
+                        cafeAddress = "Puri Lestari Blok H2/21",
+                        description = "Kopi susu dengan gula aren asli",
+                        price = BigDecimal(18000),
+                        category = FoodCategory.DRINK,
+                        status = FoodStatus.READY,
+                        quantity = 20,
+                        estimate = "5-10 menit",
+                        isActive = true,
+                        createdAt = System.currentTimeMillis(),
+                        images = emptyList(),
+                        variants = emptyList()
+                    )
+                )
+            ),
         ),
         event = {}
     )

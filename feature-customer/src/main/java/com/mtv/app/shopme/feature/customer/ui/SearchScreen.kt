@@ -31,8 +31,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -101,7 +103,7 @@ fun SearchScreen(
     state: SearchUiState,
     event: (SearchEvent) -> Unit
 ) {
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
     val items = (state.foods as? LoadState.Success)?.data ?: emptyList()
     val isLoading = state.foods is LoadState.Loading
     val canLoadMore = !state.isLoadingMore && !state.isLastPage && state.foods is LoadState.Success
@@ -290,7 +292,7 @@ fun SearchHeader(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = null,
+                            contentDescription = "Search",
                             tint = Color.Gray,
                             modifier = Modifier.padding(start = 16.dp)
                         )
@@ -340,7 +342,7 @@ fun SearchHeader(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,
-                                    contentDescription = null
+                                    contentDescription = "Clear"
                                 )
                             }
                         }
@@ -351,7 +353,7 @@ fun SearchHeader(
 
                 Icon(
                     imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
+                    contentDescription = "Favorites",
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
@@ -413,7 +415,7 @@ fun SearchItem(
             Box {
                 SmartImage(
                     model = food.image,
-                    contentDescription = null,
+                    contentDescription = "",
                     modifier = imageModifier,
                     contentScale = ContentScale.Crop,
                     placeholder = painterResource(previewDrawable ?: R.drawable.no_image),
@@ -422,7 +424,7 @@ fun SearchItem(
 
                 Icon(
                     imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
+                    contentDescription = "Favorite",
                     tint = if (isFavorite) Color.Red else Color.White,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -462,7 +464,7 @@ fun SearchItem(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Default.Home,
-                        contentDescription = null,
+                        contentDescription = "Home",
                         tint = AppColor.Green,
                         modifier = Modifier.size(16.dp)
                     )
@@ -503,7 +505,7 @@ private fun RecentSearchesSection(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.TrendingUp,
-                contentDescription = null,
+                contentDescription = "Trending",
                 tint = Color.Gray,
                 modifier = Modifier.size(18.dp)
             )
@@ -588,7 +590,7 @@ private fun SearchSuggestionsDropdown(
             ) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = null,
+                    contentDescription = "Search",
                     tint = Color.Gray,
                     modifier = Modifier.size(16.dp)
                 )
@@ -613,10 +615,11 @@ private fun CategoryFilterRow(
     selectedCategory: FoodCategory?,
     onCategorySelected: (FoodCategory?) -> Unit
 ) {
+    val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+            .horizontalScroll(scrollState),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // "Semua" option (deselect)

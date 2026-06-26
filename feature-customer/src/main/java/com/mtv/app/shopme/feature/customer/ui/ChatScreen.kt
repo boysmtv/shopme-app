@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -67,7 +69,6 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
-import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.feature.customer.contract.ChatEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatUiState
@@ -88,7 +89,7 @@ fun ChatScreen(
     var userMessage by remember { mutableStateOf(EMPTY_STRING) }
 
     val messages = (state.chats as? LoadState.Success)?.data.orEmpty() + state.optimisticMessages
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
     var canLoadOlder by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
@@ -134,7 +135,7 @@ fun ChatScreen(
 
             SmartImage(
                 model = state.chatAvatarUrl,
-                contentDescription = null,
+                contentDescription = "",
                 modifier = Modifier
                     .size(40.dp)
                     .aspectRatio(1f)
@@ -381,7 +382,7 @@ private fun ChatDeliveryCheck(
     val tint = if (isRead && !isPending) Color(0xFF34B7F1) else Color(0xFFE0E0E0)
     Icon(
         imageVector = icon,
-        contentDescription = null,
+        contentDescription = if (isPending) "Sent" else "Read",
         tint = tint,
         modifier = Modifier.size(14.dp)
     )
@@ -392,7 +393,24 @@ private fun ChatDeliveryCheck(
 fun ChatScreenPreview() {
     ChatScreen(
         state = ChatUiState(
-            chats = LoadState.Success(DataUiMock.chatDetail())
+            chats = LoadState.Success(
+                listOf(
+                    com.mtv.app.shopme.domain.model.ChatMessage(
+                        id = "1",
+                        message = "Halo, saya ingin pesan nasi goreng",
+                        time = "10:30",
+                        isFromUser = true,
+                        isRead = true
+                    ),
+                    com.mtv.app.shopme.domain.model.ChatMessage(
+                        id = "2",
+                        message = "Baik, ada yang ingin ditanyakan?",
+                        time = "10:31",
+                        isFromUser = false,
+                        isRead = true
+                    )
+                )
+            )
         ),
         event = {}
     )

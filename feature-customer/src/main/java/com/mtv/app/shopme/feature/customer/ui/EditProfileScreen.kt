@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -90,11 +90,8 @@ import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.base.BaseSimpleFormField
-import com.mtv.app.shopme.data.mock.DataUiMock
-import com.mtv.app.shopme.data.mock.DataUiMock.addresses
-import com.mtv.app.shopme.data.mock.DataUiMock.customer
-import com.mtv.app.shopme.data.mock.DataUiMock.villages
 import com.mtv.app.shopme.domain.model.Address
+import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Village
 import com.mtv.app.shopme.feature.customer.contract.EditProfileDialog
 import com.mtv.app.shopme.feature.customer.contract.EditProfileEvent
@@ -377,7 +374,7 @@ fun AddressSection(
         contentPadding = PaddingValues(bottom = 20.dp)
     ) {
 
-        items(addresses) { address ->
+        items(addresses, key = { it.id }) { address ->
 
             Card(
                 modifier = Modifier
@@ -405,7 +402,7 @@ fun AddressSection(
 
                         Icon(
                             imageVector = Icons.Default.LocationOn,
-                            contentDescription = null,
+                            contentDescription = "Location",
                             tint = Color(0xFF2E7D32)
                         )
 
@@ -500,7 +497,7 @@ fun AddressSection(
 
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = null
+                    contentDescription = "Add"
                 )
 
                 Spacer(modifier = Modifier.width(6.dp))
@@ -582,11 +579,12 @@ fun AddAddressSheet(
                     number.isNotBlank() &&
                     rt.isNotBlank() &&
                     rw.isNotBlank()
+        val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .imePadding()
                 .padding(20.dp)
         ) {
@@ -734,11 +732,12 @@ fun EditAddressSheet(
                     number.isNotBlank() &&
                     rt.isNotBlank() &&
                     rw.isNotBlank()
+        val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .imePadding()
                 .padding(20.dp)
         ) {
@@ -881,7 +880,7 @@ fun VillageDropdown(
             trailingIcon = {
                 Icon(
                     Icons.Filled.ArrowDropDown,
-                    contentDescription = null,
+                    contentDescription = "Dropdown",
                     modifier = Modifier.rotate(rotation)
                 )
             }
@@ -991,9 +990,55 @@ fun rememberSheetController(): SheetController {
 fun EditProfileScreenPreview() {
     EditProfileScreen(
         state = EditProfileUiState(
-            customer = LoadState.Success(customer()),
-            addresses = LoadState.Success(addresses()),
-            villages = LoadState.Success(villages())
+            customer = LoadState.Success(
+                Customer(
+                    name = "Dedy Wijaya",
+                    phone = "08158844424",
+                    email = "boys.mtv@gmail.com",
+                    address = Address(
+                        id = "89a3c44a-b9c7-412f-83fd-f4f1ed66c6da",
+                        village = "Puri Lestari",
+                        block = "H2",
+                        number = "21",
+                        rt = "012",
+                        rw = "002",
+                        isDefault = true
+                    ),
+                    photo = "",
+                    verified = true,
+                    stats = null,
+                    menuSummary = null
+                )
+            ),
+            addresses = LoadState.Success(
+                listOf(
+                    Address(
+                        id = "89a3c44a-b9c7-412f-83fd-f4f1ed66c6da",
+                        village = "Puri Lestari",
+                        block = "H2",
+                        number = "21",
+                        rt = "012",
+                        rw = "002",
+                        isDefault = true
+                    ),
+                    Address(
+                        id = "b7d5f33a-c8d6-423e-91ae-f2e0cd77b8e1",
+                        village = "Villa Anggrek",
+                        block = "A1",
+                        number = "15",
+                        rt = "005",
+                        rw = "003",
+                        isDefault = false
+                    )
+                )
+            ),
+            villages = LoadState.Success(
+                listOf(
+                    Village(id = "v1", name = "Puri Lestari"),
+                    Village(id = "v2", name = "Villa Anggrek"),
+                    Village(id = "v3", name = "Green Garden")
+                )
+            )
         ),
         event = {}
     )
@@ -1034,7 +1079,26 @@ fun EditProfileAddressTabPreview() {
                 Spacer(Modifier.height(16.dp))
 
                 AddressSection(
-                    addresses = addresses(),
+                    addresses = listOf(
+                        Address(
+                            id = "89a3c44a-b9c7-412f-83fd-f4f1ed66c6da",
+                            village = "Puri Lestari",
+                            block = "H2",
+                            number = "21",
+                            rt = "012",
+                            rw = "002",
+                            isDefault = true
+                        ),
+                        Address(
+                            id = "b7d5f33a-c8d6-423e-91ae-f2e0cd77b8e1",
+                            village = "Villa Anggrek",
+                            block = "A1",
+                            number = "15",
+                            rt = "005",
+                            rw = "003",
+                            isDefault = false
+                        )
+                    ),
                     onAdd = {},
                     onEdit = {},
                     onDelete = {},
@@ -1060,7 +1124,11 @@ fun AddAddressSheetPreview() {
 
         AddAddressSheet(
             controller = controller,
-            villages = villages(),
+            villages = listOf(
+                Village(id = "v1", name = "Puri Lestari"),
+                Village(id = "v2", name = "Villa Anggrek"),
+                Village(id = "v3", name = "Green Garden")
+            ),
             onDismiss = {},
             onSave = { _, _, _, _, _, _ -> }
         )

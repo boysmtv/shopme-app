@@ -24,8 +24,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Help
@@ -70,10 +71,6 @@ import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
-import com.mtv.app.shopme.data.remote.response.AddressResponse
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
-import com.mtv.app.shopme.data.remote.response.StatsResponse
 import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.MenuSummary
@@ -91,7 +88,7 @@ fun ProfileScreen(
     event: (ProfileEvent) -> Unit
 ) {
     val customer = (state.customer as? LoadState.Success)?.data
-    val scrollState = rememberScrollState()
+    val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = { event(ProfileEvent.Load) }
@@ -206,7 +203,7 @@ fun ProfileScreen(
 
                                         Icon(
                                             imageVector = menu.icon,
-                                            contentDescription = null,
+                                            contentDescription = "Menu",
                                             tint = AppColor.Green,
                                             modifier = Modifier.size(28.dp)
                                         )
@@ -309,7 +306,7 @@ fun HeaderProfile(
             Box {
                 Image(
                     painter = painterResource(R.drawable.image_burger),
-                    contentDescription = null,
+                    contentDescription = "",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(80.dp)
@@ -417,7 +414,7 @@ fun ProfileMenuItem(
 
             Icon(
                 imageVector = icon,
-                contentDescription = null,
+                contentDescription = title,
                 tint = if (isLogout) Color.Red else AppColor.Green,
                 modifier = Modifier.size(22.dp)
             )
@@ -436,7 +433,7 @@ fun ProfileMenuItem(
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
+                contentDescription = "Navigate",
                 tint = if (isLogout) Color.Red else AppColor.Gray
             )
         }

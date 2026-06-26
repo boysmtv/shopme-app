@@ -126,7 +126,7 @@ fun ChatSupportScreen(
                 }
             }
 
-            items(state.messages) { message ->
+            items(state.messages, key = { it.id }) { message ->
                 ChatBubbleSuper(message)
             }
 

@@ -42,7 +42,6 @@ import androidx.navigation.compose.rememberNavController
 import com.mtv.app.shopme.common.*
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
-import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.*
 import com.mtv.app.shopme.feature.customer.contract.HomeEvent
 import com.mtv.app.shopme.feature.customer.contract.HomeUiState
@@ -308,7 +307,7 @@ private fun EmptyState() {
 
             Icon(
                 imageVector = Icons.Default.Fastfood,
-                contentDescription = null,
+                contentDescription = "Food",
                 tint = Color.Gray
             )
 
@@ -534,7 +533,7 @@ private fun HomePromoBanner() {
 
             Image(
                 painter = painterResource(id = R.drawable.ic_location_white),
-                contentDescription = null,
+                contentDescription = "",
                 modifier = Modifier.size(90.dp),
                 contentScale = ContentScale.Fit
             )
@@ -583,7 +582,7 @@ fun CategoryItem(
             .clickable { onClick() }
             .padding(12.dp)
     ) {
-        Icon(icon, contentDescription = null, tint = AppColor.Green)
+        Icon(icon, contentDescription = title, tint = AppColor.Green)
         Spacer(Modifier.height(6.dp))
         Text(title, fontFamily = PoppinsFont, fontSize = 11.sp)
     }
@@ -617,7 +616,7 @@ fun SearchFoodCard(
 
                 Icon(
                     imageVector = Icons.Default.Favorite,
-                    contentDescription = null,
+                    contentDescription = "Favorite",
                     tint = if (isFavorite) Color.Red else Color.White,
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -667,7 +666,37 @@ fun SearchFoodCard(
 fun HomeScreenPreview() {
 
     val state = HomeUiState(
-        customer = LoadState.Success(DataUiMock.customer()),
+        customer = LoadState.Success(
+            Customer(
+                name = "Dedy Wijaya",
+                phone = "08158844424",
+                email = "boys.mtv@gmail.com",
+                address = Address(
+                    id = "89a3c44a-b9c7-412f-83fd-f4f1ed66c6da",
+                    village = "Puri Lestari",
+                    block = "H2",
+                    number = "21",
+                    rt = "012",
+                    rw = "002",
+                    isDefault = true
+                ),
+                photo = "",
+                verified = true,
+                stats = Stats(
+                    totalOrders = 24,
+                    activeOrders = 2,
+                    membership = MemberStatus.REGULER
+                ),
+                menuSummary = MenuSummary(
+                    ordered = 12,
+                    cooking = 2,
+                    shipping = 1,
+                    completed = 9,
+                    unpaid = 1,
+                    cancelled = 2
+                )
+            )
+        ),
         foods = LoadState.Success(
             listOf(
                 SearchFood("1", "Nasi Goreng Kampung", BigDecimal(24000), "", "Kopi Tugu Senja"),

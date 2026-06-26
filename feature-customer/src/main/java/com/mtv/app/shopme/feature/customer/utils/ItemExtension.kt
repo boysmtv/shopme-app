@@ -102,7 +102,7 @@ fun StatItem(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = text,
             tint = AppColor.Green,
             modifier = Modifier.size(16.dp)
         )

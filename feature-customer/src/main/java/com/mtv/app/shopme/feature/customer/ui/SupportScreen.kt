@@ -279,7 +279,7 @@ private fun HeroSupportCard(onClick: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = null,
+                    contentDescription = "Chat",
                     tint = AppColor.Green,
                     modifier = Modifier.size(34.dp)
                 )
@@ -328,7 +328,7 @@ private fun HeroSupportCard(onClick: () -> Unit) {
 
                 Icon(
                     Icons.AutoMirrored.Filled.Chat,
-                    contentDescription = null,
+                    contentDescription = "Chat",
                     tint = Color.White,
                     modifier = Modifier.size(16.dp)
                 )

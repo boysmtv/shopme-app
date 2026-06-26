@@ -26,7 +26,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -86,8 +88,8 @@ import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.Food
+import com.mtv.app.shopme.domain.model.FoodCategory
 import com.mtv.app.shopme.domain.model.FoodOption
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.param.CartAddVariantParam
@@ -109,7 +111,7 @@ fun DetailScreen(
 ) {
     val food = (state.food as? LoadState.Success)?.data
     val similarFoods = (state.similarFoods as? LoadState.Success)?.data.orEmpty()
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
 
     var showSheet by remember { mutableStateOf(false) }
 
@@ -208,7 +210,7 @@ fun DetailScreen(
 
                     item {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.PriceChange, null, tint = AppColor.Green)
+                            Icon(Icons.Default.PriceChange, "", tint = AppColor.Green)
                             Spacer(Modifier.width(4.dp))
                             Text(
                                 text = food?.price?.toRupiah() ?: "",
@@ -346,7 +348,7 @@ fun AddToCartBar(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = null,
+                contentDescription = "Chat",
                 tint = Color.White,
                 modifier = Modifier.size(20.dp)
             )
@@ -374,7 +376,7 @@ fun AddToCartBar(
         ) {
             Icon(
                 imageVector = Icons.Default.ShoppingCart,
-                contentDescription = null,
+                contentDescription = "Cart",
                 tint = Color.White,
                 modifier = Modifier.size(20.dp)
             )
@@ -404,7 +406,7 @@ fun DetailHeader(
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
+            contentDescription = "Back",
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
@@ -429,7 +431,7 @@ fun DetailHeader(
 
         Icon(
             imageVector = Icons.Filled.Favorite,
-            contentDescription = null,
+            contentDescription = "Favorite",
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
@@ -465,7 +467,7 @@ fun DetailImage(
 
             SmartImage(
                 model = displayImages[page],
-                contentDescription = null,
+                contentDescription = "",
                 modifier = Modifier
                     .fillMaxSize()
                     .clip(RoundedCornerShape(8.dp)),
@@ -525,7 +527,7 @@ fun DetailLocation(
         ) {
             Icon(
                 imageVector = Icons.Default.Home,
-                contentDescription = null,
+                contentDescription = "Home",
                 tint = AppColor.Green
             )
             Spacer(modifier = Modifier.width(4.dp))
@@ -540,7 +542,7 @@ fun DetailLocation(
         Spacer(modifier = Modifier.width(8.dp))
         Icon(
             imageVector = Icons.Default.LocationOn,
-            contentDescription = null,
+            contentDescription = "Location",
             tint = AppColor.Green
         )
         Spacer(modifier = Modifier.width(4.dp))
@@ -697,7 +699,7 @@ fun VariantBottomSheetContent(
             IconButton(onClick = onClose) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = null,
+                    contentDescription = "Close",
                     tint = AppColor.Green
                 )
             }
@@ -838,7 +840,7 @@ fun VariantBottomSheetContent(
             } else {
                 Icon(
                     imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
+                    contentDescription = "Cart",
                     tint = Color.White
                 )
             }
@@ -981,8 +983,63 @@ fun PriceRow(
 fun DetailScreenPreview() {
     DetailScreen(
         state = DetailUiState(
-            food = LoadState.Success(DataUiMock.foods().first()),
-            similarFoods = LoadState.Success(DataUiMock.foods()),
+            food = LoadState.Success(
+                Food(
+                    id = "food1",
+                    cafeId = "cafe1",
+                    name = "Nasi Goreng Kampung",
+                    cafeName = "Kopi Tugu Senja",
+                    cafeAddress = "Puri Lestari Blok H2/21",
+                    description = "Nasi goreng kampung dengan bumbu tradisional yang lezat",
+                    price = BigDecimal(25000),
+                    category = FoodCategory.FOOD,
+                    status = FoodStatus.READY,
+                    quantity = 10,
+                    estimate = "15-20 menit",
+                    isActive = true,
+                        createdAt = System.currentTimeMillis(),
+                        images = emptyList(),
+                        variants = emptyList()
+                    )
+                ),
+                similarFoods = LoadState.Success(
+                    listOf(
+                        Food(
+                            id = "food2",
+                            cafeId = "cafe1",
+                            name = "Es Kopi Susu Aren",
+                            cafeName = "Kopi Tugu Senja",
+                            cafeAddress = "Puri Lestari Blok H2/21",
+                            description = "Kopi susu dengan gula aren asli",
+                            price = BigDecimal(18000),
+                            category = FoodCategory.DRINK,
+                            status = FoodStatus.READY,
+                            quantity = 20,
+                            estimate = "5-10 menit",
+                            isActive = true,
+                            createdAt = System.currentTimeMillis(),
+                            images = emptyList(),
+                            variants = emptyList()
+                        ),
+                        Food(
+                            id = "food3",
+                            cafeId = "cafe1",
+                            name = "Mie Goreng Special",
+                            cafeName = "Kopi Tugu Senja",
+                            cafeAddress = "Puri Lestari Blok H2/21",
+                            description = "Mie goreng dengan topping special",
+                            price = BigDecimal(30000),
+                            category = FoodCategory.FOOD,
+                            status = FoodStatus.READY,
+                            quantity = 15,
+                            estimate = "10-15 menit",
+                            isActive = true,
+                            createdAt = System.currentTimeMillis(),
+                        images = emptyList(),
+                        variants = emptyList()
+                    )
+                )
+            ),
             addToCartState = LoadState.Success(Unit)
         ),
         event = {}
@@ -1007,7 +1064,23 @@ fun VariantBottomSheetMockPreview() {
         ) {
 
             VariantBottomSheetContent(
-                food = DataUiMock.foods().first(),
+                food = Food(
+                    id = "food1",
+                    cafeId = "cafe1",
+                    name = "Nasi Goreng Kampung",
+                    cafeName = "Kopi Tugu Senja",
+                    cafeAddress = "Puri Lestari Blok H2/21",
+                    description = "Nasi goreng kampung dengan bumbu tradisional yang lezat",
+                    price = BigDecimal(25000),
+                    category = FoodCategory.FOOD,
+                    status = FoodStatus.READY,
+                    quantity = 10,
+                    estimate = "15-20 menit",
+                    isActive = true,
+                    createdAt = System.currentTimeMillis(),
+                    images = emptyList(),
+                    variants = emptyList()
+                ),
                 onAddToCart = { _, _, _ -> },
                 onClose = {}
             )

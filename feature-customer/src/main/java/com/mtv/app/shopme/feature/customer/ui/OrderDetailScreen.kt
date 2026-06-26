@@ -14,8 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -104,10 +105,11 @@ fun OrderDetailScreen(
                     }
                 }
             } else {
+                val scrollState = rememberSaveable(saver = ScrollState.Saver, init = { ScrollState(0) })
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(scrollState)
                         .padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -251,7 +253,7 @@ private fun OrderDetailHeader(
     ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = null,
+            contentDescription = "Back",
             tint = Color.White,
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
@@ -274,7 +276,7 @@ private fun OrderDetailHeader(
         }
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Chat,
-            contentDescription = null,
+            contentDescription = "Chat",
             tint = Color.White,
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))

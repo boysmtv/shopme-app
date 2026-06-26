@@ -64,7 +64,7 @@ import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryEvent
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryItem
 import com.mtv.app.shopme.feature.customer.contract.OrderHistoryUiState
-import com.mtv.app.shopme.feature.customer.contract.OrderStatusFilter
+import com.mtv.app.shopme.feature.customer.contract.OrderFilter
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -158,7 +158,7 @@ private fun ModernTopBar(onBack: () -> Unit) {
                 .clickable { onBack() },
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = Color.White)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "", tint = Color.White)
         }
 
         Spacer(Modifier.width(14.dp))
@@ -182,8 +182,8 @@ private fun ModernTopBar(onBack: () -> Unit) {
 
 @Composable
 private fun ModernFilter(
-    selected: OrderStatusFilter,
-    onSelect: (OrderStatusFilter) -> Unit
+    selected: OrderFilter,
+    onSelect: (OrderFilter) -> Unit
 ) {
 
     Row(
@@ -194,7 +194,7 @@ private fun ModernFilter(
             .background(AppColor.GreenSoft),
     ) {
 
-        OrderStatusFilter.entries.forEach { filter ->
+        OrderFilter.entries.forEach { filter ->
 
             val selectedState = selected == filter
 
@@ -274,7 +274,7 @@ fun ModernOrderCard(
 
                 Icon(
                     Icons.AutoMirrored.Filled.ReceiptLong,
-                    contentDescription = null,
+                    contentDescription = "Receipt",
                     tint = AppColor.Green,
                     modifier = Modifier.size(26.dp)
                 )
@@ -462,7 +462,7 @@ fun ModernEmpty() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
-                contentDescription = null,
+                contentDescription = "Receipt",
                 tint = AppColor.Gray,
                 modifier = Modifier.size(70.dp)
             )
@@ -533,7 +533,7 @@ fun OrderHistoryPreview() {
     OrderHistoryScreen(
         state = OrderHistoryUiState(
             loading = false,
-            selectedFilter = OrderStatusFilter.SEMUA,
+            selectedFilter = OrderFilter.SEMUA,
             orders = listOf(
                 OrderHistoryItem(
                     "1",

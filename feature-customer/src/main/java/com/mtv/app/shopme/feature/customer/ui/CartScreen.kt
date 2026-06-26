@@ -85,7 +85,6 @@ import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.Cart
 import com.mtv.app.shopme.domain.model.FoodStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
@@ -560,7 +559,7 @@ private fun CafeGroupHeader(
         ) {
             Icon(
                 imageVector = Icons.Default.Home,
-                contentDescription = null,
+                contentDescription = "Home",
                 tint = AppColor.Green,
                 modifier = Modifier.size(24.dp)
             )
@@ -577,7 +576,7 @@ private fun CafeGroupHeader(
 
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = null,
+            contentDescription = "Delete",
             tint = AppColor.Green,
             modifier = Modifier
                 .size(24.dp)
@@ -698,7 +697,7 @@ private fun CartItemImage(
     if (isPreview) {
         Image(
             painter = painterResource(R.drawable.image_burger),
-            contentDescription = null,
+            contentDescription = "",
             modifier = Modifier
                 .size(50.dp)
                 .clip(RoundedCornerShape(4.dp)),
@@ -813,7 +812,7 @@ private fun QuantityMinusButton(
     ) {
         Icon(
             imageVector = if (isDeleteMode) Icons.Default.Delete else Icons.Default.Remove,
-            contentDescription = null,
+            contentDescription = if (isDeleteMode) "Delete" else "Remove",
             tint = if (isDeleteMode) Color.Red else AppColor.Gray,
             modifier = Modifier
                 .size(if (isDeleteMode) 16.dp else 18.dp)
@@ -835,7 +834,7 @@ private fun QuantityPlusButton(
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = null,
+            contentDescription = "Add",
             tint = Color.White,
             modifier = Modifier
                 .size(18.dp)
@@ -857,7 +856,7 @@ fun EmptyCartView(
     ) {
         Icon(
             imageVector = Icons.Default.ShoppingCart,
-            contentDescription = null,
+            contentDescription = "Cart",
             tint = AppColor.Gray,
             modifier = Modifier.size(64.dp)
         )
@@ -1112,7 +1111,7 @@ private fun CheckoutIcon() {
     ) {
         Icon(
             imageVector = Icons.Default.ShoppingCart,
-            contentDescription = null,
+            contentDescription = "Cart",
             tint = AppColor.Green,
             modifier = Modifier.size(36.dp)
         )
@@ -1418,7 +1417,7 @@ private fun PinKeypadButton(
             KEY_DELETE -> {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = null,
+                    contentDescription = "Delete",
                     tint = AppColor.Gray.copy(alpha = 0.8f),
                     modifier = Modifier.size(20.dp)
                 )
@@ -1519,7 +1518,7 @@ private fun SuccessIcon() {
     ) {
         Icon(
             imageVector = Icons.Default.ShoppingCart,
-            contentDescription = null,
+            contentDescription = "Cart",
             tint = AppColor.Green,
             modifier = Modifier.size(42.dp)
         )
@@ -1572,7 +1571,36 @@ fun CartScreenPreview() {
         ) {
             CartScreen(
                 state = CartUiState(
-                    cartItems = LoadState.Success(DataUiMock.cart())
+                    cartItems = LoadState.Success(
+                        listOf(
+                            Cart(
+                                id = "cart1",
+                                customerId = "cust1",
+                                foodId = "food1",
+                                cafeId = "cafe1",
+                                cafeName = "Kopi Tugu Senja",
+                                name = "Nasi Goreng Kampung",
+                                image = "",
+                                price = BigDecimal(25000),
+                                quantity = 2,
+                                notes = "Pedas",
+                                variants = emptyList()
+                            ),
+                            Cart(
+                                id = "cart2",
+                                customerId = "cust1",
+                                foodId = "food2",
+                                cafeId = "cafe1",
+                                cafeName = "Kopi Tugu Senja",
+                                name = "Es Kopi Susu Aren",
+                                image = "",
+                                price = BigDecimal(18000),
+                                quantity = 1,
+                                notes = "Less ice",
+                                variants = emptyList()
+                            )
+                        )
+                    )
                 ),
                 effectFlow = emptyFlow(),
                 event = {}

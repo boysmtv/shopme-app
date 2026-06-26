@@ -61,7 +61,6 @@ import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.shimmerBrush
 import com.mtv.app.shopme.common.navbar.customer.CustomerBottomNavigationBar
-import com.mtv.app.shopme.data.mock.DataUiMock
 import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
@@ -118,7 +117,7 @@ fun ChatListScreen(
                 IconButton(onClick = { event(ChatListEvent.ClickClearAll) }) {
                     Icon(
                         imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = null,
+                        contentDescription = "Delete",
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -373,7 +372,7 @@ fun ChatAvatar(
 
         SmartImage(
             model = avatarUrl,
-            contentDescription = null,
+            contentDescription = "",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(imageRes)
@@ -400,7 +399,26 @@ fun ChatListScreenPreview() {
             ChatListScreen(
                 state = ChatListUiState(
                     chatListState = LoadState.Success(
-                        DataUiMock.chatList()
+                        ChatList(
+                            chatList = listOf(
+                                ChatListItem(
+                                    id = "chat1",
+                                    name = "Kopi Tugu Senja",
+                                    lastMessage = "Baik, pesanan akan segera diproses",
+                                    time = "10:30",
+                                    unreadCount = 2,
+                                    avatarUrl = null
+                                ),
+                                ChatListItem(
+                                    id = "chat2",
+                                    name = "Warung Makan Sari",
+                                    lastMessage = "Terima kasih sudah memesan",
+                                    time = "09:15",
+                                    unreadCount = 0,
+                                    avatarUrl = null
+                                )
+                            )
+                        )
                     )
                 ),
                 event = { }

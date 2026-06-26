@@ -9,8 +9,6 @@
 package com.mtv.app.shopme.feature.customer.utils
 
 import com.mtv.app.shopme.common.toRupiah
-import com.mtv.app.shopme.data.remote.response.CustomerResponse
-import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.domain.model.Customer
 import com.mtv.app.shopme.domain.model.Food
 import java.math.BigDecimal

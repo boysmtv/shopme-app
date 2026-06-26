@@ -24,7 +24,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
@@ -68,33 +70,11 @@ import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PaymentMethod
 import com.mtv.app.shopme.domain.model.PaymentStatus
 import com.mtv.app.shopme.feature.customer.contract.OrderEvent
+import com.mtv.app.shopme.feature.customer.contract.OrderFilter
 import com.mtv.app.shopme.feature.customer.contract.OrderUiState
+import com.mtv.app.shopme.feature.customer.contract.filterOrders
+import com.mtv.app.shopme.feature.customer.contract.resolveOrderFilter
 import kotlinx.coroutines.flow.distinctUntilChanged
-
-enum class OrderFilter {
-    SEMUA,
-    ORDERED,
-    COOKING,
-    DELIVERING,
-    COMPLETED
-}
-
-fun resolveOrderFilter(name: String): OrderFilter =
-    OrderFilter.entries.firstOrNull { it.name == name.uppercase() } ?: OrderFilter.SEMUA
-
-internal fun filterOrders(
-    orders: List<Order>,
-    selectedFilter: OrderFilter
-): List<Order> =
-    orders.filter {
-        when (selectedFilter) {
-            OrderFilter.SEMUA -> true
-            OrderFilter.ORDERED -> it.status == OrderStatus.UNPAID || it.status == OrderStatus.ORDERED
-            OrderFilter.COOKING -> it.status == OrderStatus.COOKING
-            OrderFilter.DELIVERING -> it.status == OrderStatus.DELIVERING
-            OrderFilter.COMPLETED -> it.status == OrderStatus.COMPLETED
-        }
-    }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -106,7 +86,7 @@ fun OrderScreen(
         refreshing = state.isRefreshing,
         onRefresh = { event(OrderEvent.Reload) }
     )
-    val listState = rememberLazyListState()
+    val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
 
     val selectedFilter = state.selectedFilter
     val filteredOrders = filterOrders(state.orders, selectedFilter)
@@ -324,7 +304,7 @@ private fun ModernOrderTopBar(
         ) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null,
+                contentDescription = "Back",
                 tint = Color.White,
                 modifier = Modifier.clickable { onBack() }
             )
@@ -349,7 +329,7 @@ private fun ModernOrderTopBar(
 
         Icon(
             Icons.AutoMirrored.Filled.Chat,
-            contentDescription = null,
+            contentDescription = "Chat",
             tint = Color.White,
             modifier = Modifier.clickable { onChat() }
         )

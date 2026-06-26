@@ -87,7 +87,7 @@ fun HelpScreen(
             IconButton(onClick = { event(HelpEvent.ClickBack) }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
+                    contentDescription = "Back",
                     tint = Color.White
                 )
             }
@@ -144,7 +144,7 @@ fun HelpScreen(
                     )
                 }
 
-                items(state.faq) { faq ->
+                items(state.faq, key = { it.question }) { faq ->
                     HelpFaqItem(
                         faq = faq,
                         onToggle = { event(HelpEvent.ToggleFaq(faq)) }
@@ -254,7 +254,7 @@ fun HelpFaqItem(
 
                 Icon(
                     Icons.Default.ExpandMore,
-                    contentDescription = null,
+                    contentDescription = "Expand",
                     modifier = Modifier.rotate(rotation.value),
                     tint = AppColor.Green
                 )
