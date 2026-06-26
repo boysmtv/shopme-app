@@ -9,7 +9,6 @@
 package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.database.dao.HomeDao
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.remote.datasource.CafeRemoteDataSource
@@ -19,7 +18,7 @@ import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.param.CafeAddParam
 import com.mtv.app.shopme.domain.param.CafeAddressUpsertParam
 import com.mtv.app.shopme.domain.repository.CafeRepository
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -29,7 +28,6 @@ class CafeRepositoryImpl @Inject constructor(
     private val remote: CafeRemoteDataSource,
     private val resultFlow: ResultFlowFactory,
     private val homeDao: HomeDao,
-    private val errorMapper: ErrorMapper
 ) : CafeRepository {
 
     override fun getCafe(id: String) =
@@ -56,7 +54,7 @@ class CafeRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteCafe.toDomain()))
             } catch (throwable: Throwable) {
                 if (cached == null) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -96,7 +94,7 @@ class CafeRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteAddress.toDomain()))
             } catch (throwable: Throwable) {
                 if (cached == null) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)

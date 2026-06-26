@@ -1,7 +1,6 @@
 package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.database.dao.HomeDao
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toRequest
@@ -17,20 +16,18 @@ import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.param.SellerPaymentMethodParam
 import com.mtv.app.shopme.domain.repository.SellerRepository
-import com.mtv.based.core.network.utils.Resource
-import java.io.IOException
+import com.mtv.app.shopme.domain.model.Resource
+import com.mtv.app.shopme.data.utils.isRetryableOfflineWrite
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.builtins.ListSerializer
 
 class SellerRepositoryImpl @Inject constructor(
     private val remote: SellerRemoteDataSource,
     private val resultFlow: ResultFlowFactory,
     private val homeDao: HomeDao,
-    private val errorMapper: ErrorMapper,
     private val syncManager: OfflineMutationSyncManager
 ) : SellerRepository {
 
@@ -57,7 +54,7 @@ class SellerRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteProfile.toDomain()))
             } catch (throwable: Throwable) {
                 if (cached == null) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -85,7 +82,7 @@ class SellerRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remotePayment.toDomain()))
             } catch (throwable: Throwable) {
                 if (cached == null) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -113,7 +110,7 @@ class SellerRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteOrders.map { it.toDomain() }))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -133,7 +130,7 @@ class SellerRepositoryImpl @Inject constructor(
                     )
                 )
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -161,7 +158,7 @@ class SellerRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteOrder.toDomain()))
             } catch (throwable: Throwable) {
                 if (cached == null) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -197,7 +194,7 @@ class SellerRepositoryImpl @Inject constructor(
                     patchSellerAvailability(isOnline)
                     emit(Resource.Success(requireSellerProfileFromCache()))
                 } else {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -217,7 +214,7 @@ class SellerRepositoryImpl @Inject constructor(
                     patchSellerPaymentMethods(param)
                     emit(Resource.Success(requireSellerPaymentMethodsFromCache()))
                 } else {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -264,6 +261,7 @@ class SellerRepositoryImpl @Inject constructor(
                 cashEnabled = param.cashEnabled,
                 bankEnabled = param.bankEnabled,
                 bankNumber = param.bankNumber,
+                bankType = param.bankType,
                 ovoEnabled = param.ovoEnabled,
                 ovoNumber = param.ovoNumber,
                 danaEnabled = param.danaEnabled,
@@ -301,7 +299,4 @@ class SellerRepositoryImpl @Inject constructor(
             danaEnabled = false,
             gopayEnabled = false
         ).toDomain()
-
-    private fun Throwable.isRetryableOfflineWrite(): Boolean =
-        this is IOException || this is TimeoutCancellationException
 }

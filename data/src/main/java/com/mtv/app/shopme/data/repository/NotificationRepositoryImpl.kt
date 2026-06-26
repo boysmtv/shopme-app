@@ -1,7 +1,6 @@
 package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.database.dao.HomeDao
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toCustomerNotification
 import com.mtv.app.shopme.data.mapper.toEntity
@@ -9,7 +8,7 @@ import com.mtv.app.shopme.data.mapper.toSellerNotification
 import com.mtv.app.shopme.data.remote.datasource.NotificationRemoteDataSource
 import com.mtv.app.shopme.domain.model.PagedData
 import com.mtv.app.shopme.domain.repository.NotificationRepository
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -19,7 +18,6 @@ class NotificationRepositoryImpl @Inject constructor(
     private val remote: NotificationRemoteDataSource,
     private val resultFlow: ResultFlowFactory,
     private val homeDao: HomeDao,
-    private val errorMapper: ErrorMapper
 ) : NotificationRepository {
 
     override fun getCustomerNotifications() =
@@ -42,7 +40,7 @@ class NotificationRepositoryImpl @Inject constructor(
                 emit(Resource.Success(mapped))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -82,7 +80,7 @@ class NotificationRepositoryImpl @Inject constructor(
                 )
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -103,7 +101,7 @@ class NotificationRepositoryImpl @Inject constructor(
                 emit(Resource.Success(mapped))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -139,7 +137,7 @@ class NotificationRepositoryImpl @Inject constructor(
                 )
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)

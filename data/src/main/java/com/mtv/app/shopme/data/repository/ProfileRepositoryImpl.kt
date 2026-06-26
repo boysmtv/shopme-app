@@ -10,7 +10,6 @@ package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.mapper.toSearchDomain
@@ -26,20 +25,19 @@ import com.mtv.app.shopme.domain.param.AddressDeleteParam
 import com.mtv.app.shopme.domain.param.AddressUpdateParam
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.param.NotificationPreferencesParam
+import com.mtv.app.shopme.data.utils.isRetryableOfflineWrite
 import com.mtv.app.shopme.domain.repository.ProfileRepository
-import com.mtv.based.core.network.utils.Resource
-import java.io.IOException
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.TimeoutCancellationException
+
 
 class ProfileRepositoryImpl @Inject constructor(
     private val remote: ProfileRemoteDataSource,
     private val resultFlow: ResultFlowFactory,
     private val homeDao: HomeDao,
-    private val errorMapper: ErrorMapper,
     private val syncManager: OfflineMutationSyncManager
 ) : ProfileRepository {
 
@@ -57,7 +55,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteCustomer))
             } catch (throwable: Throwable) {
                 if (cached == null) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -77,7 +75,7 @@ class ProfileRepositoryImpl @Inject constructor(
                     patchCustomerCache(param)
                     emit(Resource.Success(Unit))
                 } else {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -115,7 +113,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 refreshCustomerCache()
                 emit(Resource.Success(Unit))
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -127,7 +125,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 refreshCustomerCache()
                 emit(Resource.Success(Unit))
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -139,7 +137,7 @@ class ProfileRepositoryImpl @Inject constructor(
                 refreshCustomerCache()
                 emit(Resource.Success(Unit))
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -195,7 +193,4 @@ class ProfileRepositoryImpl @Inject constructor(
         val remoteCustomer = remote.getCustomer().toDomain()
         homeDao.insertCustomer(remoteCustomer.toEntity())
     }
-
-    private fun Throwable.isRetryableOfflineWrite(): Boolean =
-        this is IOException || this is TimeoutCancellationException
 }

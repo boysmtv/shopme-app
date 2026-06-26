@@ -9,7 +9,6 @@
 package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.database.dao.HomeDao
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toRequest
@@ -28,13 +27,12 @@ import com.mtv.app.shopme.domain.repository.CartRepository
 import com.mtv.app.shopme.data.sync.OfflineMutationSyncManager
 import com.mtv.app.shopme.data.sync.PendingMutationAction
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
-import com.mtv.based.core.network.utils.Resource
-import java.io.IOException
+import com.mtv.app.shopme.data.utils.isRetryableOfflineWrite
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.serialization.builtins.ListSerializer
 import java.math.BigDecimal
 
@@ -42,7 +40,6 @@ class CartRepositoryImpl @Inject constructor(
     private val remote: CartRemoteDataSource,
     private val resultFlow: ResultFlowFactory,
     private val homeDao: HomeDao,
-    private val errorMapper: ErrorMapper,
     private val syncManager: OfflineMutationSyncManager
 ) : CartRepository {
 
@@ -69,7 +66,7 @@ class CartRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteCart.map { it.toDomain() }))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -89,7 +86,7 @@ class CartRepositoryImpl @Inject constructor(
                     patchCartAdd(param)
                     emit(Resource.Success(Unit))
                 } else {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -112,7 +109,7 @@ class CartRepositoryImpl @Inject constructor(
                     patchCartQuantity(param.cartId, param.quantity)
                     emit(Resource.Success(Unit))
                 } else {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -130,7 +127,7 @@ class CartRepositoryImpl @Inject constructor(
                     overwriteCartCache(emptyList())
                     emit(Resource.Success(Unit))
                 } else {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -148,7 +145,7 @@ class CartRepositoryImpl @Inject constructor(
                     patchCartClearByCafe(param.cafeId)
                     emit(Resource.Success(Unit))
                 } else {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -177,7 +174,7 @@ class CartRepositoryImpl @Inject constructor(
                 patchCartItemDelete(cartId)
                 emit(Resource.Success(Unit))
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -278,9 +275,6 @@ class CartRepositoryImpl @Inject constructor(
             value = items
         )
     }
-
-    private fun Throwable.isRetryableOfflineWrite(): Boolean =
-        this is IOException || this is TimeoutCancellationException
 
     private fun foodDetailCacheKey(id: String) = "food:detail:$id"
 }

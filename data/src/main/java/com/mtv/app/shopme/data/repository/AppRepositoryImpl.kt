@@ -14,11 +14,13 @@ import com.mtv.app.shopme.data.remote.datasource.AppRemoteDataSource
 import com.mtv.app.shopme.data.remote.request.SplashRequest
 import com.mtv.app.shopme.domain.param.SplashParam
 import com.mtv.app.shopme.domain.repository.AppRepository
+import com.mtv.based.core.provider.utils.device.DeviceInfoProvider
 import javax.inject.Inject
 
 class AppRepositoryImpl @Inject constructor(
     private val remote: AppRemoteDataSource,
-    private val resultFlow: ResultFlowFactory
+    private val resultFlow: ResultFlowFactory,
+    private val deviceInfoProvider: DeviceInfoProvider
 ) : AppRepository {
 
     override fun getSplash(param: SplashParam) =
@@ -29,7 +31,7 @@ class AppRepositoryImpl @Inject constructor(
                     fcmToken = param.fcmToken,
                     appVersionName = param.appVersionName,
                     appVersionCode = param.appVersionCode,
-                    deviceInfo = param.deviceInfo,
+                    deviceInfo = deviceInfoProvider.getAllDeviceInfo(),
                     platform = param.platform,
                     createdAt = param.createdAt
                 )

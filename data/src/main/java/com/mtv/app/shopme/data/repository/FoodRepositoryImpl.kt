@@ -9,7 +9,6 @@
 package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.database.dao.HomeDao
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toCacheEntity
 import com.mtv.app.shopme.data.mapper.toDomain
@@ -29,7 +28,7 @@ import com.mtv.app.shopme.domain.param.FoodBulkStatusParam
 import com.mtv.app.shopme.domain.param.FoodUpsertParam
 import com.mtv.app.shopme.domain.param.SearchParam
 import com.mtv.app.shopme.domain.repository.FoodRepository
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +39,6 @@ class FoodRepositoryImpl @Inject constructor(
     private val remote: FoodRemoteDataSource,
     private val resultFlow: ResultFlowFactory,
     private val homeDao: HomeDao,
-    private val errorMapper: ErrorMapper
 ) : FoodRepository {
 
     override fun getFoods() =
@@ -67,7 +65,7 @@ class FoodRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteFoods.map { it.toDomain() }))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -100,7 +98,7 @@ class FoodRepositoryImpl @Inject constructor(
                     )
                 )
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -133,7 +131,7 @@ class FoodRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteFood.toDomain()))
             } catch (throwable: Throwable) {
                 if (cached == null) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -177,7 +175,7 @@ class FoodRepositoryImpl @Inject constructor(
                 )
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -197,7 +195,7 @@ class FoodRepositoryImpl @Inject constructor(
                     )
                 )
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -244,7 +242,7 @@ class FoodRepositoryImpl @Inject constructor(
                     )
                 )
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 
@@ -263,7 +261,7 @@ class FoodRepositoryImpl @Inject constructor(
                     )
                 )
             } catch (throwable: Throwable) {
-                emit(Resource.Error(errorMapper.map(throwable)))
+                emit(Resource.Error(throwable))
             }
         }.flowOn(Dispatchers.IO)
 

@@ -9,7 +9,6 @@
 package com.mtv.app.shopme.data.repository
 
 import com.mtv.app.shopme.core.database.dao.HomeDao
-import com.mtv.app.shopme.core.error.ErrorMapper
 import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toChatMessage
 import com.mtv.app.shopme.data.mapper.toDomain
@@ -24,7 +23,7 @@ import com.mtv.app.shopme.domain.repository.ChatRepository
 import com.mtv.app.shopme.domain.model.ChatListItem
 import com.mtv.app.shopme.domain.model.ChatMessage
 import com.mtv.app.shopme.domain.model.PagedData
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -34,7 +33,6 @@ class ChatRepositoryImpl @Inject constructor(
     private val remote: ChatRemoteDataSource,
     private val resultFlow: ResultFlowFactory,
     private val homeDao: HomeDao,
-    private val errorMapper: ErrorMapper
 ) : ChatRepository {
 
     override fun getChatList(asSeller: Boolean) =
@@ -55,7 +53,7 @@ class ChatRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteChatList))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -92,7 +90,7 @@ class ChatRepositoryImpl @Inject constructor(
                 emit(Resource.Success(remoteChats))
             } catch (throwable: Throwable) {
                 if (cached.isEmpty()) {
-                    emit(Resource.Error(errorMapper.map(throwable)))
+                    emit(Resource.Error(throwable))
                 }
             }
         }.flowOn(Dispatchers.IO)
@@ -131,7 +129,7 @@ class ChatRepositoryImpl @Inject constructor(
             )
             emit(Resource.Success(response.toPagedDomain(messages)))
         } catch (throwable: Throwable) {
-            emit(Resource.Error(errorMapper.map(throwable)))
+            emit(Resource.Error(throwable))
         }
     }.flowOn(Dispatchers.IO)
 
