@@ -25,6 +25,73 @@ object AppDatabaseMigrations {
             db.execSQL("DROP TABLE IF EXISTS `pending_mutation`")
             db.execSQL(
                 """
+                CREATE TABLE IF NOT EXISTS `customer` (
+                    `id` TEXT NOT NULL,
+                    `name` TEXT NOT NULL,
+                    `phone` TEXT NOT NULL,
+                    `email` TEXT NOT NULL,
+                    `addressVillage` TEXT NOT NULL,
+                    `addressBlock` TEXT NOT NULL,
+                    `addressNumber` TEXT NOT NULL,
+                    `addressRt` TEXT NOT NULL,
+                    `addressRw` TEXT NOT NULL,
+                    `photo` TEXT NOT NULL,
+                    `verified` INTEGER NOT NULL,
+                    `totalOrders` INTEGER NOT NULL,
+                    `activeOrders` INTEGER NOT NULL,
+                    `membership` TEXT NOT NULL,
+                    `ordered` INTEGER NOT NULL,
+                    `cooking` INTEGER NOT NULL,
+                    `shipping` INTEGER NOT NULL,
+                    `completed` INTEGER NOT NULL,
+                    `cancelled` INTEGER NOT NULL,
+                    `updatedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `food` (
+                    `id` TEXT NOT NULL,
+                    `name` TEXT NOT NULL,
+                    `price` REAL NOT NULL,
+                    `image` TEXT NOT NULL,
+                    `cafeName` TEXT NOT NULL,
+                    `isActive` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `cart` (
+                    `id` TEXT NOT NULL,
+                    `foodId` TEXT NOT NULL,
+                    `cafeId` TEXT NOT NULL,
+                    `cafeName` TEXT NOT NULL,
+                    `name` TEXT NOT NULL,
+                    `image` TEXT NOT NULL,
+                    `price` TEXT NOT NULL,
+                    `quantity` INTEGER NOT NULL,
+                    `notes` TEXT NOT NULL,
+                    `updatedAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `cart_variant` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `cartId` TEXT NOT NULL,
+                    `optionName` TEXT NOT NULL,
+                    `price` TEXT NOT NULL
+                )
+                """.trimIndent()
+            )
+            db.execSQL(
+                """
                 CREATE TABLE IF NOT EXISTS `chat_list_cache` (
                     `cacheKey` TEXT NOT NULL,
                     `scope` TEXT NOT NULL,
@@ -102,13 +169,85 @@ object AppDatabaseMigrations {
                 """.trimIndent()
             )
             createChatMessageCache(db)
+            ensureEntityTables(db)
         }
     }
 
     private fun migration8To9() = object : Migration(8, 9) {
         override fun migrate(db: SupportSQLiteDatabase) {
             createChatMessageCache(db)
+            ensureEntityTables(db)
         }
+    }
+
+    private fun ensureEntityTables(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `customer` (
+                `id` TEXT NOT NULL,
+                `name` TEXT NOT NULL,
+                `phone` TEXT NOT NULL,
+                `email` TEXT NOT NULL,
+                `addressVillage` TEXT NOT NULL,
+                `addressBlock` TEXT NOT NULL,
+                `addressNumber` TEXT NOT NULL,
+                `addressRt` TEXT NOT NULL,
+                `addressRw` TEXT NOT NULL,
+                `photo` TEXT NOT NULL,
+                `verified` INTEGER NOT NULL,
+                `totalOrders` INTEGER NOT NULL,
+                `activeOrders` INTEGER NOT NULL,
+                `membership` TEXT NOT NULL,
+                `ordered` INTEGER NOT NULL,
+                `cooking` INTEGER NOT NULL,
+                `shipping` INTEGER NOT NULL,
+                `completed` INTEGER NOT NULL,
+                `cancelled` INTEGER NOT NULL,
+                `updatedAt` INTEGER NOT NULL,
+                PRIMARY KEY(`id`)
+            )
+            """.trimIndent()
+        )
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `food` (
+                `id` TEXT NOT NULL,
+                `name` TEXT NOT NULL,
+                `price` REAL NOT NULL,
+                `image` TEXT NOT NULL,
+                `cafeName` TEXT NOT NULL,
+                `isActive` INTEGER NOT NULL,
+                PRIMARY KEY(`id`)
+            )
+            """.trimIndent()
+        )
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `cart` (
+                `id` TEXT NOT NULL,
+                `foodId` TEXT NOT NULL,
+                `cafeId` TEXT NOT NULL,
+                `cafeName` TEXT NOT NULL,
+                `name` TEXT NOT NULL,
+                `image` TEXT NOT NULL,
+                `price` TEXT NOT NULL,
+                `quantity` INTEGER NOT NULL,
+                `notes` TEXT NOT NULL,
+                `updatedAt` INTEGER NOT NULL,
+                PRIMARY KEY(`id`)
+            )
+            """.trimIndent()
+        )
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `cart_variant` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `cartId` TEXT NOT NULL,
+                `optionName` TEXT NOT NULL,
+                `price` TEXT NOT NULL
+            )
+            """.trimIndent()
+        )
     }
 
     private fun createChatMessageCache(db: SupportSQLiteDatabase) {

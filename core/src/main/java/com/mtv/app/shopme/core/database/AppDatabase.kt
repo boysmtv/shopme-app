@@ -10,8 +10,11 @@ package com.mtv.app.shopme.core.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.mtv.app.shopme.core.database.dao.CartDao
 import com.mtv.app.shopme.core.database.dao.HomeDao
 import com.mtv.app.shopme.core.database.entity.AppNotificationCacheEntity
+import com.mtv.app.shopme.core.database.entity.CartEntity
+import com.mtv.app.shopme.core.database.entity.CartVariantEntity
 import com.mtv.app.shopme.core.database.entity.ChatListCacheEntity
 import com.mtv.app.shopme.core.database.entity.ChatMessageCacheEntity
 import com.mtv.app.shopme.core.database.entity.CustomerEntity
@@ -20,10 +23,11 @@ import com.mtv.app.shopme.core.database.entity.PendingMutationEntity
 import com.mtv.app.shopme.core.database.entity.PayloadCacheEntity
 
 @Database(
-    entities = [CustomerEntity::class, FoodEntity::class, ChatListCacheEntity::class, ChatMessageCacheEntity::class, AppNotificationCacheEntity::class, PayloadCacheEntity::class, PendingMutationEntity::class],
+    entities = [CustomerEntity::class, FoodEntity::class, CartEntity::class, CartVariantEntity::class, ChatListCacheEntity::class, ChatMessageCacheEntity::class, AppNotificationCacheEntity::class, PayloadCacheEntity::class, PendingMutationEntity::class],
     version = 9,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun homeDao(): HomeDao
+    abstract fun cartDao(): CartDao
 }
