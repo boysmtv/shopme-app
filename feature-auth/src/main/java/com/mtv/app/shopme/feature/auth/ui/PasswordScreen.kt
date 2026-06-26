@@ -206,7 +206,7 @@ private fun PasswordField(
         value = value,
         onValueChange = onChange,
         leadingIcon = {
-            Icon(Icons.Outlined.Lock, contentDescription = null)
+            Icon(Icons.Outlined.Lock, contentDescription = "Password")
         },
         trailingIcon = {
             IconButton(onClick = onToggle) {
@@ -215,7 +215,7 @@ private fun PasswordField(
                         Icons.Outlined.Visibility
                     else
                         Icons.Outlined.VisibilityOff,
-                    contentDescription = null,
+                    contentDescription = if (visible) "Hide password" else "Show password",
                     tint = AppColor.Gray
                 )
             }

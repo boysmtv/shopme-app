@@ -29,6 +29,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -132,7 +135,7 @@ fun ResetScreen(
                                 title = "Email",
                                 value = state.email,
                                 placeholder = "Enter your email",
-                                leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = null) },
+                                leadingIcon = { Icon(Icons.Outlined.Email, contentDescription = "Email") },
                                 onValueChange = { event(ResetEvent.OnEmailChange(it)) }
                             )
                         }
@@ -142,7 +145,7 @@ fun ResetScreen(
                                 title = "OTP Code",
                                 value = state.otp,
                                 placeholder = "Enter OTP code",
-                                leadingIcon = { Icon(Icons.Outlined.Key, contentDescription = null) },
+                                leadingIcon = { Icon(Icons.Outlined.Key, contentDescription = "OTP") },
                                 onValueChange = { event(ResetEvent.OnOtpChange(it)) }
                             )
                         }
@@ -152,8 +155,9 @@ fun ResetScreen(
                                 title = "New Password",
                                 value = state.newPassword,
                                 placeholder = "Enter new password",
-                                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
-                                onValueChange = { event(ResetEvent.OnNewPasswordChange(it)) }
+                                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = "New password") },
+                                onValueChange = { event(ResetEvent.OnNewPasswordChange(it)) },
+                                isPassword = true
                             )
 
                             Spacer(Modifier.height(16.dp))
@@ -162,8 +166,9 @@ fun ResetScreen(
                                 title = "Confirm Password",
                                 value = state.confirmPassword,
                                 placeholder = "Confirm new password",
-                                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
-                                onValueChange = { event(ResetEvent.OnConfirmPasswordChange(it)) }
+                                leadingIcon = { Icon(Icons.Outlined.Lock, contentDescription = "Confirm password") },
+                                onValueChange = { event(ResetEvent.OnConfirmPasswordChange(it)) },
+                                isPassword = true
                             )
                         }
                     }
@@ -224,7 +229,8 @@ private fun ResetField(
     value: String,
     placeholder: String,
     leadingIcon: @Composable () -> Unit,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false
 ) {
     Text(title, fontFamily = PoppinsFont)
     Spacer(Modifier.height(8.dp))
@@ -241,7 +247,9 @@ private fun ResetField(
             )
         },
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp)
+        shape = RoundedCornerShape(14.dp),
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else androidx.compose.ui.text.input.VisualTransformation.None,
+        keyboardOptions = if (isPassword) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default
     )
 }
 

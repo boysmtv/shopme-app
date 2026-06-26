@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
@@ -41,7 +40,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -101,7 +99,7 @@ fun LoginScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.image_cafe_3),
-                    contentDescription = null,
+                    contentDescription = "",
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -157,7 +155,7 @@ fun LoginScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Outlined.Email,
-                                contentDescription = null,
+                                contentDescription = "Email",
                                 tint = AppColor.Gray
                             )
                         },
@@ -201,7 +199,7 @@ fun LoginScreen(
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Outlined.Lock,
-                                contentDescription = null,
+                                contentDescription = "Password",
                                 tint = AppColor.Gray
                             )
                         },
@@ -212,7 +210,7 @@ fun LoginScreen(
                                         Icons.Outlined.Visibility
                                     else
                                         Icons.Outlined.VisibilityOff,
-                                    contentDescription = null,
+                                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
                                     tint = AppColor.Gray
                                 )
                             }
@@ -293,37 +291,6 @@ fun LoginScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // Divider
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        HorizontalDivider(modifier = Modifier.weight(1f))
-                        Text(
-                            "  Or sign in with  ",
-                            fontSize = 12.sp,
-                            fontFamily = PoppinsFont,
-                            color = AppColor.Gray
-                        )
-                        HorizontalDivider(modifier = Modifier.weight(1f))
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
-                    // Social Login
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-
-                        SocialButton(R.drawable.icon_google)
-                        Spacer(Modifier.width(22.dp))
-                        SocialButton(R.drawable.icon_facebook)
-                        Spacer(Modifier.width(22.dp))
-                        SocialButton(R.drawable.icon_apple)
-                    }
-
-                    Spacer(Modifier.height(16.dp))
-
                     // Sign Up
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -362,23 +329,6 @@ fun LoginScreen(
                 LoadingV2()
             }
         }
-    }
-}
-
-@Composable
-private fun SocialButton(icon: Int) {
-    Box(
-        modifier = Modifier
-            .size(54.dp)
-            .clip(CircleShape)
-            .background(AppColor.GreenSoft),
-        contentAlignment = Alignment.Center
-    ) {
-        Image(
-            painter = painterResource(id = icon),
-            contentDescription = null,
-            modifier = Modifier.size(28.dp)
-        )
     }
 }
 

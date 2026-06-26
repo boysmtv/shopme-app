@@ -150,7 +150,7 @@ fun RegisterScreen(
                         value = state.name,
                         onValueChange = { event(RegisterEvent.OnNameChange(it)) },
                         leadingIcon = {
-                            Icon(Icons.Outlined.People, contentDescription = null)
+                            Icon(Icons.Outlined.People, contentDescription = "Name")
                         },
                         placeholder = {
                             Text(
@@ -173,7 +173,7 @@ fun RegisterScreen(
                         value = state.email,
                         onValueChange = { event(RegisterEvent.OnEmailChange(it)) },
                         leadingIcon = {
-                            Icon(Icons.Outlined.Email, contentDescription = null)
+                            Icon(Icons.Outlined.Email, contentDescription = "Email")
                         },
                         placeholder = {
                             Text(
@@ -195,7 +195,7 @@ fun RegisterScreen(
                         value = state.password,
                         onValueChange = { event(RegisterEvent.OnPasswordChange(it)) },
                         leadingIcon = {
-                            Icon(Icons.Outlined.Lock, contentDescription = null)
+                            Icon(Icons.Outlined.Lock, contentDescription = "Password")
                         },
                         trailingIcon = {
                             IconButton(
@@ -206,7 +206,7 @@ fun RegisterScreen(
                                         Icons.Outlined.Visibility
                                     else
                                         Icons.Outlined.VisibilityOff,
-                                    contentDescription = null,
+                                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
                                     tint = AppColor.Gray
                                 )
                             }
