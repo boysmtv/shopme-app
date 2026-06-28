@@ -16,7 +16,8 @@ import com.mtv.app.shopme.domain.model.ChatList
 import com.mtv.app.shopme.domain.usecase.ClearChatListUseCase
 import com.mtv.app.shopme.domain.usecase.GetChatListUseCase
 import com.mtv.app.shopme.feature.customer.contract.ChatListEffect
-import com.mtv.app.shopme.feature.customer.contract.ChatListEffect.*
+import com.mtv.app.shopme.feature.customer.contract.ChatListEffect.NavigateBack
+import com.mtv.app.shopme.feature.customer.contract.ChatListEffect.NavigateToChat
 import com.mtv.app.shopme.feature.customer.contract.ChatListEvent
 import com.mtv.app.shopme.feature.customer.contract.ChatListUiState
 import com.mtv.based.core.network.utils.ErrorMessages

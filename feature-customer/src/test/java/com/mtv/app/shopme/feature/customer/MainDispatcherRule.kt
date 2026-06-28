@@ -1,11 +1,3 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: MainDispatcherRule.kt
- *
- * Last modified by Dedy Wijaya on 23/03/26 20.26
- */
-
 package com.mtv.app.shopme.feature.customer
 
 import kotlinx.coroutines.Dispatchers
@@ -17,12 +9,10 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-// TODO(B1): Extract to common test module (duplicated across feature-auth, feature-customer, feature-seller)
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
     private val dispatcher: TestDispatcher = StandardTestDispatcher()
 ) : TestWatcher() {
-
     override fun starting(description: Description) {
         Dispatchers.setMain(dispatcher)
     }

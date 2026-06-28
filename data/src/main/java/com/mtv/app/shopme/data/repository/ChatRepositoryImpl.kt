@@ -159,7 +159,7 @@ class ChatRepositoryImpl @Inject constructor(
     override fun readAllMessage(id: String, asSeller: Boolean) =
         resultFlow.create {
             remote.readAll(
-                body = ChatMessageMarkAsReadRequest(id, ""),
+                body = ChatMessageMarkAsReadRequest(id, "read"),
                 asSeller = asSeller
             )
         }
