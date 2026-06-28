@@ -56,7 +56,7 @@ class OrderDetailViewModel @Inject constructor(
         observeDataFlow(
             flow = ensureOrderChatConversationUseCase(orderId),
             onSuccess = { emitEffect(OrderDetailEffect.NavigateToChat(it)) },
-            onError = { showError(it) }
+            onError = { showError(it, onRetry = { openChat() }) }
         )
     }
 
@@ -70,7 +70,11 @@ class OrderDetailViewModel @Inject constructor(
             onState = { state ->
                 _state.update {
                     if (state is LoadState.Success) {
-                        it.copy(isLoading = false, order = state.data)
+                        it.copy(
+                            isLoading = false,
+                            order = state.data,
+                            canConfirmTransfer = state.data.transferConfirmationAvailable
+                        )
                     } else {
                         it.copy(isLoading = state is LoadState.Loading)
                     }
@@ -119,7 +123,7 @@ class OrderDetailViewModel @Inject constructor(
         )
     }
 
-    private fun showError(error: UiError) {
+    private fun showError(error: UiError, onRetry: (() -> Unit)? = null) {
         handleSessionError(
             error = error,
             sessionManager = sessionManager,
@@ -130,9 +134,11 @@ class OrderDetailViewModel @Inject constructor(
                     state = DialogStateV1(
                         type = DialogType.ERROR,
                         title = ErrorMessages.GENERIC_ERROR,
-                        message = it.message
+                        message = it.message,
+                        secondaryButtonText = if (onRetry != null) "Coba Lagi" else null
                     ),
-                    onPrimary = { dismissDialog() }
+                    onPrimary = { dismissDialog() },
+                    onSecondary = if (onRetry != null) { { dismissDialog(); onRetry() } } else null
                 )
             )
         }

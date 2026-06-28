@@ -426,6 +426,13 @@ fun ModernOrderCard(
                 fontSize = 12.sp,
                 color = AppColor.Gray
             )
+            if (order.createdAt.isNotBlank()) {
+                Text(
+                    "Waktu: ${order.createdAt}",
+                    fontSize = 12.sp,
+                    color = AppColor.Gray
+                )
+            }
 
             Spacer(Modifier.height(12.dp))
 

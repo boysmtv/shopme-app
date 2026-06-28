@@ -103,7 +103,7 @@ class SellerPaymentMethodViewModelTest {
     @Test
     fun `unauthorized seller payment load should force logout`() = runTest {
         every { getSellerPaymentMethodsUseCase.invoke() } returns flowOf(
-            Resource.Error(throwable = ApiException.Unauthorized("Session expired"))
+            Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )
 
         val vm = SellerPaymentMethodViewModel(

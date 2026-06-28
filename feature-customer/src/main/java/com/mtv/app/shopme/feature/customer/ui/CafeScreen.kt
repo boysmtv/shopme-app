@@ -232,7 +232,7 @@ fun CafeScreen(
                     Spacer(Modifier.height(12.dp))
                 }
 
-                if (state.foods is LoadState.Loading && foods.isEmpty()) {
+                if (state.foods is LoadState.Loading) {
                     gridItems(
                         data = List(6) { it },
                         columnCount = 2,

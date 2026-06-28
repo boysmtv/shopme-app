@@ -5,9 +5,10 @@ package com.mtv.app.shopme.feature.customer
 import com.mtv.app.shopme.common.ConstantPreferences
 import com.mtv.app.shopme.domain.model.Address
 import com.mtv.app.shopme.domain.model.Customer
-import com.mtv.app.shopme.domain.model.SellerProfile
+import com.mtv.app.shopme.domain.model.MemberStatus
+import com.mtv.app.shopme.domain.model.MenuSummary
+import com.mtv.app.shopme.domain.model.Stats
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
-import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.customer.contract.ProfileEffect
 import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
 import com.mtv.app.shopme.feature.customer.presentation.ProfileViewModel
@@ -34,7 +35,6 @@ class ProfileViewModelTest {
     private val securePrefs: SecurePrefs = mockk(relaxed = true)
     private val sessionManager: SessionManager = mockk(relaxed = true)
     private val customerUseCase: GetCustomerUseCase = mockk()
-    private val getSellerProfileUseCase: GetSellerProfileUseCase = mockk()
 
     private val sampleCustomer = Customer(
         name = "John",
@@ -62,7 +62,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
 
         vm.onEvent(ProfileEvent.Load)
@@ -81,7 +80,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
 
         vm.onEvent(ProfileEvent.Load)
@@ -96,7 +94,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
         val effect = async { vm.effect.first() }
 
@@ -112,7 +109,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
         val effect = async { vm.effect.first() }
 
@@ -128,7 +124,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
         val effect = async { vm.effect.first() }
 
@@ -144,7 +139,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
         val effect = async { vm.effect.first() }
 
@@ -160,7 +154,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
         val effect = async { vm.effect.first() }
 
@@ -176,7 +169,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
         val effect = async { vm.effect.first() }
 
@@ -187,6 +179,53 @@ class ProfileViewModelTest {
     }
 
     @Test
+    fun `load should set order count from customer profile data`() = runTest {
+        val customerWithStats = sampleCustomer.copy(
+            stats = Stats(
+                totalOrders = 10,
+                activeOrders = 3,
+                membership = MemberStatus.REGULER
+            ),
+            menuSummary = MenuSummary(
+                unpaid = 1,
+                ordered = 2,
+                cooking = 0,
+                shipping = 0,
+                completed = 7,
+                cancelled = 0
+            )
+        )
+        every { customerUseCase.invoke() } returns flowOf(Resource.Success(customerWithStats))
+        val vm = ProfileViewModel(
+            securePrefs = securePrefs,
+            sessionManager = sessionManager,
+            customerUseCase = customerUseCase,
+        )
+
+        vm.onEvent(ProfileEvent.Load)
+        advanceUntilIdle()
+
+        val customer = (vm.uiState.value.customer as LoadState.Success).data
+        assertEquals(3L, customer.stats?.activeOrders)
+        assertEquals(10L, customer.stats?.totalOrders)
+    }
+
+    @Test
+    fun `click order with filter should emit navigate to order with correct filter`() = runTest {
+        val vm = ProfileViewModel(
+            securePrefs = securePrefs,
+            sessionManager = sessionManager,
+            customerUseCase = customerUseCase,
+        )
+        val effect = async { vm.effect.first() }
+
+        vm.onEvent(ProfileEvent.ClickOrder(filter = "DIKIRIM"))
+        advanceUntilIdle()
+
+        assertEquals(ProfileEffect.NavigateToOrder(filter = "DIKIRIM"), effect.await())
+    }
+
+    @Test
     fun `logout should clear prefs and emit navigate to login`() = runTest {
         every { securePrefs.getString(ConstantPreferences.REMEMBERED_LOGIN_EMAIL) } returns "john@mail.com"
 
@@ -194,7 +233,6 @@ class ProfileViewModelTest {
             securePrefs = securePrefs,
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
         )
         val effect = async { vm.effect.first() }
 
@@ -204,45 +242,5 @@ class ProfileViewModelTest {
         verify(exactly = 1) { securePrefs.clear() }
         verify(exactly = 1) { securePrefs.putString(ConstantPreferences.REMEMBERED_LOGIN_EMAIL, "john@mail.com") }
         assertEquals(ProfileEffect.NavigateToLogin, effect.await())
-    }
-
-    @Test
-    fun `check tnc when seller profile has cafe should navigate to seller`() = runTest {
-        every { getSellerProfileUseCase.invoke() } returns flowOf(
-            Resource.Success(SellerProfile(hasCafe = true, sellerName = "Kopi Kita", email = "", phone = "", storeName = "", storeAddress = "", isOnline = false))
-        )
-
-        val vm = ProfileViewModel(
-            securePrefs = securePrefs,
-            sessionManager = sessionManager,
-            customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
-        )
-        val effect = async { vm.effect.first() }
-
-        vm.onEvent(ProfileEvent.ClickCheckTncCafe)
-        advanceUntilIdle()
-
-        assertEquals(ProfileEffect.NavigateToSeller, effect.await())
-    }
-
-    @Test
-    fun `check tnc when seller has no cafe should navigate to tnc`() = runTest {
-        every { getSellerProfileUseCase.invoke() } returns flowOf(
-            Resource.Success(SellerProfile(hasCafe = false, sellerName = "", email = "", phone = "", storeName = "", storeAddress = "", isOnline = false))
-        )
-
-        val vm = ProfileViewModel(
-            securePrefs = securePrefs,
-            sessionManager = sessionManager,
-            customerUseCase = customerUseCase,
-            getSellerProfileUseCase = getSellerProfileUseCase
-        )
-        val effect = async { vm.effect.first() }
-
-        vm.onEvent(ProfileEvent.ClickCheckTncCafe)
-        advanceUntilIdle()
-
-        assertEquals(ProfileEffect.NavigateToTnc, effect.await())
     }
 }

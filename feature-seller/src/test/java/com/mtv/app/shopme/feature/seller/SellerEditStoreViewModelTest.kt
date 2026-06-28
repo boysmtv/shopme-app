@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -124,7 +125,7 @@ class SellerEditStoreViewModelTest {
                     id = "cafe-1", name = "Shopme Cafe", phone = "0812",
                     description = "Best shop", minimalOrder = BigDecimal("15000"),
                     openTime = "08:00", closeTime = "22:00",
-                    image = null, isActive = true,
+                    image = "https://example.com/image.jpg", isActive = true,
                     address = CafeAddress("addr-1", "Kemang", "A", "12", "01", "02")
                 )
             )
@@ -181,7 +182,7 @@ class SellerEditStoreViewModelTest {
         advanceUntilIdle()
         advanceUntilIdle()
 
-        assertTrue(vm.uiState.value.isLoading)
+        assertFalse(vm.uiState.value.isLoading)
     }
 
     @Test
@@ -202,7 +203,7 @@ class SellerEditStoreViewModelTest {
                     id = "cafe-1", name = "Shopme Cafe", phone = "0812",
                     description = "Best shop", minimalOrder = BigDecimal("15000"),
                     openTime = "08:00", closeTime = "22:00",
-                    image = null, isActive = true,
+                    image = "https://example.com/image.jpg", isActive = true,
                     address = CafeAddress("addr-1", "Kemang", "A", "12", "01", "02")
                 )
             )

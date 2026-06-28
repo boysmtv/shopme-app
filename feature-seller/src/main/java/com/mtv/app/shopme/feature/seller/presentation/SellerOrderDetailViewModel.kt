@@ -17,9 +17,13 @@ import com.mtv.app.shopme.domain.usecase.EnsureSellerChatConversationUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrderDetailUseCase
 import com.mtv.app.shopme.domain.usecase.UpdateSellerOrderStatusUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
+import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SessionManager
+import com.mtv.based.core.provider.utils.dialog.UiDialog
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -159,7 +163,19 @@ class SellerOrderDetailViewModel @Inject constructor(
                     sessionManager = sessionManager,
                     beforeLogout = { _state.update { it.copy(isLoading = false) } },
                     onOtherError = { uiError ->
-                        _state.update { it.copy(isLoading = false, errorMessage = uiError.message) }
+                        _state.update { it.copy(isLoading = false) }
+                        setDialog(
+                            UiDialog.Center(
+                                state = DialogStateV1(
+                                    type = DialogType.ERROR,
+                                    title = ErrorMessages.GENERIC_ERROR,
+                                    message = uiError.message,
+                                    secondaryButtonText = "Coba Lagi"
+                                ),
+                                onPrimary = { dismissDialog() },
+                                onSecondary = { dismissDialog(); openChat() }
+                            )
+                        )
                     }
                 )
             }

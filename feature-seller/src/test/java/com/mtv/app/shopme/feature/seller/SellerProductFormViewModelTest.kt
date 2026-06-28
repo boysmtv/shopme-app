@@ -31,7 +31,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.threeten.bp.LocalDateTime
 import java.math.BigDecimal
 
 class SellerProductFormViewModelTest {
@@ -76,7 +75,7 @@ class SellerProductFormViewModelTest {
                     quantity = 10,
                     estimate = "10 min",
                     isActive = true,
-                    createdAt = LocalDateTime.of(2026, 5, 10, 8, 0),
+                    createdAt = 1777350400000L,
                     images = listOf("https://cdn.example.com/latte.png"),
                     variants = emptyList()
                 )

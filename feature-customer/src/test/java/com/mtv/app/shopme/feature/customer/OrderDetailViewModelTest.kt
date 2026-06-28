@@ -116,6 +116,68 @@ class OrderDetailViewModelTest {
     }
 
     @Test
+    fun `confirm transfer gate should be true when transferConfirmationAvailable is true`() = runTest {
+        every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
+            Resource.Success(
+                Order(
+                    id = "order-1",
+                    cafeId = "cafe-1",
+                    totalPrice = 25000.0,
+                    status = OrderStatus.ORDERED,
+                    paymentMethod = PaymentMethod.TRANSFER,
+                    paymentStatus = PaymentStatus.WAITING_CONFIRMATION,
+                    transferConfirmationAvailable = true
+                )
+            )
+        )
+
+        val vm = OrderDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
+            getOrderDetailUseCase = getOrderDetailUseCase,
+            confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            cancelOrderUseCase = cancelOrderUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(OrderDetailEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals(true, vm.uiState.value.canConfirmTransfer)
+    }
+
+    @Test
+    fun `confirm transfer gate should be false when transferConfirmationAvailable is false`() = runTest {
+        every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
+            Resource.Success(
+                Order(
+                    id = "order-1",
+                    cafeId = "cafe-1",
+                    totalPrice = 25000.0,
+                    status = OrderStatus.ORDERED,
+                    paymentMethod = PaymentMethod.TRANSFER,
+                    paymentStatus = PaymentStatus.WAITING_CONFIRMATION,
+                    transferConfirmationAvailable = false
+                )
+            )
+        )
+
+        val vm = OrderDetailViewModel(
+            savedStateHandle = SavedStateHandle(mapOf("orderId" to "order-1")),
+            getOrderDetailUseCase = getOrderDetailUseCase,
+            confirmOrderTransferUseCase = confirmOrderTransferUseCase,
+            cancelOrderUseCase = cancelOrderUseCase,
+            ensureOrderChatConversationUseCase = ensureOrderChatConversationUseCase,
+            sessionManager = sessionManager
+        )
+
+        vm.onEvent(OrderDetailEvent.Load)
+        advanceUntilIdle()
+
+        assertEquals(false, vm.uiState.value.canConfirmTransfer)
+    }
+
+    @Test
     fun `click chat should ensure scoped conversation from loaded order`() = runTest {
         every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(

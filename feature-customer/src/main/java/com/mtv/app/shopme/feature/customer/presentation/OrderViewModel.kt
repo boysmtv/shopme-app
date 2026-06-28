@@ -76,7 +76,7 @@ class OrderViewModel @Inject constructor(
             onSuccess = { emitEffect(OrderEffect.NavigateToChat(it)) },
             onError = { error ->
                 _state.update { it.copy(isLoading = false) }
-                showError(error)
+                showError(error, onRetry = { openChat(orderId) })
             }
         )
     }
@@ -145,7 +145,7 @@ class OrderViewModel @Inject constructor(
         )
     }
 
-    private fun showError(error: UiError) {
+    private fun showError(error: UiError, onRetry: (() -> Unit)? = null) {
         handleSessionError(
             error = error,
             sessionManager = sessionManager,
@@ -156,9 +156,11 @@ class OrderViewModel @Inject constructor(
                     state = DialogStateV1(
                         type = DialogType.ERROR,
                         title = ErrorMessages.GENERIC_ERROR,
-                        message = it.message
+                        message = it.message,
+                        secondaryButtonText = if (onRetry != null) "Coba Lagi" else null
                     ),
-                    onPrimary = { dismissDialog() }
+                    onPrimary = { dismissDialog() },
+                    onSecondary = if (onRetry != null) { { dismissDialog(); onRetry() } } else null
                 )
             )
         }

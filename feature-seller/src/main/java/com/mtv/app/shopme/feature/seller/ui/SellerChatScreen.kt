@@ -86,16 +86,21 @@ fun SellerChatScreen(
         refreshing = state.isRefreshing,
         onRefresh = { event(SellerChatDetailEvent.Load) }
     )
-    val presenceText = if (state.isPeerOnline) {
-        "Customer online"
-    } else {
-        "Customer offline"
+    val presenceText = when {
+        state.isPeerOnline -> "Online"
+        state.peerLastSeenAt.isNotBlank() -> "Last seen ${state.peerLastSeenAt}"
+        else -> "Offline"
     }
     val presenceColor = if (state.isPeerOnline) Color(0xFF4CAF50) else Color.Gray
 
+    var hasInitiallyScrolled by remember { mutableStateOf(false) }
+
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.lastIndex)
+            if (!hasInitiallyScrolled) {
+                hasInitiallyScrolled = true
+                listState.animateScrollToItem(messages.lastIndex)
+            }
             canLoadOlder = true
         }
     }

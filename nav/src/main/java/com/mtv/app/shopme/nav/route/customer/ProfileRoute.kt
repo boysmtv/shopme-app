@@ -69,8 +69,6 @@ private fun handleProfileEffect(
         ProfileEffect.NavigateToSettings -> CustomerNavActions.toSettings(nav)
         ProfileEffect.NavigateToHelpCenter -> CustomerNavActions.toHelpCenter(nav)
         is ProfileEffect.NavigateToOrder -> CustomerNavActions.toOrder(nav, effect.filter)
-        ProfileEffect.NavigateToTnc -> CustomerNavActions.toTnc(nav)
-        ProfileEffect.NavigateToSeller -> CustomerNavActions.toSeller(nav)
         ProfileEffect.NavigateToLogin -> CustomerNavActions.toLogin(nav)
     }
 }

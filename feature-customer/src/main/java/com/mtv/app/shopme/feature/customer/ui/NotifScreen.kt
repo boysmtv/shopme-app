@@ -161,7 +161,7 @@ fun NotifScreen(
                         items = state.localNotification,
                         key = { _, item -> listOf(item.title, item.signatureDate, item.signatureTime, item.message).joinToString("|") }
                     ) { index, item ->
-                        if (index >= state.localNotification.lastIndex - 2) {
+                        if (index >= state.localNotification.lastIndex - 2 && state.localNotification.lastIndex >= 3) {
                             event(NotifEvent.LoadMore)
                         }
                         val isLocalRead = localReadIds.contains(
@@ -353,7 +353,7 @@ fun NotificationItemCard(
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
-                    text = item.signatureDate,
+                    text = listOfNotNull(item.signatureDate, item.signatureTime).filter { it.isNotBlank() }.joinToString(" "),
                     style = MaterialTheme.typography.labelSmall,
                     color = Color.Gray
                 )

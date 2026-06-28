@@ -21,6 +21,7 @@ data class SellerEditStoreUiState(
     val minOrder: String = "",
     val storeOpen: String = "",
     val storeClose: String = "",
+    val closeTime: String = "",
     val description: String = "",
     val storePhoto: String? = null,
 
@@ -42,6 +43,7 @@ sealed class SellerEditStoreEvent {
     data class ChangeMinOrder(val value: String) : SellerEditStoreEvent()
     data class ChangeStoreOpen(val value: String) : SellerEditStoreEvent()
     data class ChangeStoreClose(val value: String) : SellerEditStoreEvent()
+    data class ChangeCloseTime(val value: String) : SellerEditStoreEvent()
     data class ChangeDescription(val value: String) : SellerEditStoreEvent()
 
     // ADDRESS

@@ -63,6 +63,7 @@ class SellerProfileViewModelTest {
         val vm = SellerProfileViewModel(
             sessionManager = sessionManager,
             securePrefs = securePrefs,
+            sellerNotificationRepository = mockk(relaxed = true),
             getSellerProfileUseCase = getProfileUseCase,
             updateSellerAvailabilityUseCase = updateAvailabilityUseCase
         )

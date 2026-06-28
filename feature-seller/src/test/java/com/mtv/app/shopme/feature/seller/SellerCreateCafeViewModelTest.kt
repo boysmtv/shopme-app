@@ -81,7 +81,7 @@ class SellerCreateCafeViewModelTest {
     @Test
     fun `unauthorized village load should force logout`() = runTest {
         every { getVillageUseCase.invoke() } returns flowOf(
-            Resource.Error(throwable = ApiException.Unauthorized("Session expired"))
+            Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )
 
         val vm = SellerCreateCafeViewModel(

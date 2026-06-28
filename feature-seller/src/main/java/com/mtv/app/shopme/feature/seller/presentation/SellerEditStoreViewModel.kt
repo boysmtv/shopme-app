@@ -55,7 +55,6 @@ class SellerEditStoreViewModel @Inject constructor(
     val uiState = _state.asStateFlow()
     private var villages: List<Village> = emptyList()
     private var cafeId: String? = null
-    private var closeTime: String = ""
 
     override fun onEvent(event: SellerEditStoreEvent) {
         when (event) {
@@ -76,7 +75,10 @@ class SellerEditStoreViewModel @Inject constructor(
             is SellerEditStoreEvent.ChangeStoreOpen ->
                 update { copy(storeOpen = event.value) }
             is SellerEditStoreEvent.ChangeStoreClose ->
-                update { copy(storeClose = event.value) }
+                update { copy(storeClose = event.value, closeTime = event.value) }
+
+            is SellerEditStoreEvent.ChangeCloseTime ->
+                update { copy(closeTime = event.value, storeClose = event.value) }
 
             is SellerEditStoreEvent.ChangeDescription ->
                 update { copy(description = event.value) }
@@ -163,8 +165,8 @@ class SellerEditStoreViewModel @Inject constructor(
             onState = { state ->
                 _state.update {
                     if (state is LoadState.Success) {
-                        closeTime = state.data.closeTime
                         it.copy(
+                            closeTime = state.data.closeTime,
                             storeClose = state.data.closeTime,
                             isLoading = false,
                             storeName = state.data.name,
@@ -253,7 +255,7 @@ class SellerEditStoreViewModel @Inject constructor(
                         description = state.description,
                         minimalOrder = state.minOrder,
                         openTime = state.storeOpen,
-                        closeTime = closeTime.ifBlank { state.storeOpen },
+                        closeTime = state.closeTime.ifBlank { state.storeOpen },
                         image = imageReference.orEmpty(),
                         isActive = true
                     )

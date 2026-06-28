@@ -16,6 +16,10 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -24,10 +28,14 @@ class BaseApplication : Application(), ImageLoaderFactory {
     @Inject
     lateinit var offlineMutationSyncManager: OfflineMutationSyncManager
 
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
     override fun onCreate() {
         super.onCreate()
         AndroidThreeTen.init(this)
-        offlineMutationSyncManager.start()
+        applicationScope.launch(Dispatchers.IO) {
+            offlineMutationSyncManager.start()
+        }
     }
 
     override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)

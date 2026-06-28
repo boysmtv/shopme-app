@@ -9,7 +9,8 @@ data class OrderDetailUiState(
     val orderId: String = "",
     val order: Order? = null,
     val showCancelDialog: Boolean = false,
-    val cancelReason: String = ""
+    val cancelReason: String = "",
+    val canConfirmTransfer: Boolean = false
 )
 
 sealed class OrderDetailEvent {

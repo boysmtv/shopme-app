@@ -11,7 +11,6 @@ package com.mtv.app.shopme.feature.customer.presentation
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.common.ConstantPreferences.REMEMBERED_LOGIN_EMAIL
 import com.mtv.app.shopme.domain.usecase.GetCustomerUseCase
-import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.feature.customer.contract.ProfileEffect
 import com.mtv.app.shopme.feature.customer.contract.ProfileEvent
 import com.mtv.app.shopme.feature.customer.contract.ProfileUiState
@@ -34,7 +33,6 @@ class ProfileViewModel @Inject constructor(
     private val securePrefs: SecurePrefs,
     private val sessionManager: SessionManager,
     private val customerUseCase: GetCustomerUseCase,
-    private val getSellerProfileUseCase: GetSellerProfileUseCase,
 ) : BaseEventViewModel<ProfileEvent, ProfileEffect>() {
 
     private val _state = MutableStateFlow(ProfileUiState())
@@ -50,7 +48,6 @@ class ProfileViewModel @Inject constructor(
             is ProfileEvent.ClickSettings -> emitEffect(ProfileEffect.NavigateToSettings)
             is ProfileEvent.ClickHelpCenter -> emitEffect(ProfileEffect.NavigateToHelpCenter)
             is ProfileEvent.ClickOrder -> emitEffect(ProfileEffect.NavigateToOrder(event.filter))
-            is ProfileEvent.ClickCheckTncCafe -> handleCheckTnc()
             is ProfileEvent.ClickLogout -> logout()
         }
     }
@@ -80,19 +77,6 @@ class ProfileViewModel @Inject constructor(
                 _state.update { it.copy(isRefreshing = false) }
                 showError(it)
             }
-        )
-    }
-
-    private fun handleCheckTnc() {
-        observeDataFlow(
-            flow = getSellerProfileUseCase(),
-            onState = { state ->
-                if (state is LoadState.Success) {
-                    if (state.data.hasCafe) emitEffect(ProfileEffect.NavigateToSeller)
-                    else emitEffect(ProfileEffect.NavigateToTnc)
-                }
-            },
-            onError = { emitEffect(ProfileEffect.NavigateToTnc) }
         )
     }
 

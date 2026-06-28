@@ -67,7 +67,7 @@ class CafeViewModel @Inject constructor(
     private fun openChat() {
         observeDataFlow(
             flow = ensureChatConversationUseCase(cafeId),
-            onError = { showError(it) },
+            onError = { showError(it, onRetry = { openChat() }) },
             onSuccess = { emitEffect(CafeEffect.NavigateToChat(it)) }
         )
     }
@@ -153,16 +153,18 @@ class CafeViewModel @Inject constructor(
         )
     }
 
-    private fun showError(error: UiError) {
+    private fun showError(error: UiError, onRetry: (() -> Unit)? = null) {
         handleSessionError(error, sessionManager) {
             setDialog(
                 UiDialog.Center(
                     state = DialogStateV1(
                         type = DialogType.ERROR,
                         title = ErrorMessages.GENERIC_ERROR,
-                        message = it.message
+                        message = it.message,
+                        secondaryButtonText = if (onRetry != null) "Coba Lagi" else null
                     ),
-                    onPrimary = { dismissDialog() }
+                    onPrimary = { dismissDialog() },
+                    onSecondary = if (onRetry != null) { { dismissDialog(); onRetry() } } else null
                 )
             )
         }

@@ -276,6 +276,15 @@ fun StoreInformationSection(
         Spacer(Modifier.height(16.dp))
 
         BaseSimpleFormField(
+            label = "Jam Tutup",
+            value = state.closeTime
+        ) {
+            event(SellerEditStoreEvent.ChangeCloseTime(it))
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        BaseSimpleFormField(
             label = "Description",
             value = state.description,
         ) {

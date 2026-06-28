@@ -240,21 +240,28 @@ private fun HomeContent(
 
 @Composable
 private fun PaginationFoodShimmer() {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        PaginationGridCardShimmer()
+        PaginationGridCardShimmer(
+            modifier = Modifier.weight(1f)
+        )
+        PaginationGridCardShimmer(
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
 @Composable
-private fun PaginationGridCardShimmer() {
+private fun PaginationGridCardShimmer(
+    modifier: Modifier = Modifier
+) {
     val brush = shimmerBrush()
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(6.dp)
     ) {

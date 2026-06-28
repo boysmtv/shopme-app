@@ -21,13 +21,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.mtv.app.shopme.common.shimmerBrush
 
@@ -81,73 +78,5 @@ fun ShimmerHomeHeaderSkeleton() {
                 .clip(CircleShape)
                 .background(brush)
         )
-    }
-}
-
-@Composable
-fun ShimmerFoodSkeletonGrid() {
-    val brush = shimmerBrush()
-
-    Column {
-        repeat(3) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                repeat(2) {
-                    ShimmerFoodCardSkeleton(
-                        brush = brush,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-            Spacer(Modifier.height(16.dp))
-        }
-    }
-}
-
-@Composable
-private fun ShimmerFoodCardSkeleton(
-    brush: Brush,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(6.dp)
-    ) {
-        Column {
-
-            // Image placeholder
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .background(brush)
-            )
-
-            Column(Modifier.padding(12.dp)) {
-
-                // Name placeholder
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .height(14.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-
-                Spacer(Modifier.height(6.dp))
-
-                // Price placeholder
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
-                        .height(12.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(brush)
-                )
-            }
-        }
     }
 }

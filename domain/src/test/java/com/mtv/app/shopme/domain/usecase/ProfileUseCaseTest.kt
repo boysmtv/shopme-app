@@ -3,7 +3,7 @@ package com.mtv.app.shopme.domain.usecase
 import app.cash.turbine.test
 import com.mtv.app.shopme.domain.param.CustomerUpdateParam
 import com.mtv.app.shopme.domain.repository.ProfileRepository
-import com.mtv.based.core.network.utils.Resource
+import com.mtv.app.shopme.domain.model.Resource
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk

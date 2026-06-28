@@ -29,7 +29,6 @@ sealed class ProfileEvent {
     object ClickHelpCenter : ProfileEvent()
     data class ClickOrder(val filter: String = "") : ProfileEvent()
 
-    object ClickCheckTncCafe : ProfileEvent()
     object ClickLogout : ProfileEvent()
 }
 
@@ -40,7 +39,5 @@ sealed class ProfileEffect {
     object NavigateToSettings : ProfileEffect()
     object NavigateToHelpCenter : ProfileEffect()
     data class NavigateToOrder(val filter: String = "") : ProfileEffect()
-    object NavigateToTnc : ProfileEffect()
-    object NavigateToSeller : ProfileEffect()
     object NavigateToLogin : ProfileEffect()
 }

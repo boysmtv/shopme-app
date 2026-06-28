@@ -265,20 +265,32 @@ fun DetailScreen(
                       }
 
                       if (state.similarIsLoadingMore) {
+                          item(key = "similar-loading-more-1") {
+                              SimilarItemShimmer()
+                          }
+                          item(key = "similar-loading-more-2") {
+                              Spacer(Modifier.height(12.dp))
+                              SimilarItemShimmer()
+                          }
+                      }
+
+                      if (!state.similarIsLoadingMore && !state.similarIsLastPage && state.similarFoods is LoadState.Success) {
                           item {
                               Box(
                                   modifier = Modifier
                                       .fillMaxWidth()
-                                      .padding(vertical = 12.dp),
+                                      .padding(vertical = 8.dp)
+                                      .clickable { event(DetailEvent.LoadMoreSimilar) },
                                   contentAlignment = Alignment.Center
                               ) {
-                                  CircularProgressIndicator(
-                                      modifier = Modifier.size(28.dp),
+                                  Text(
+                                      text = "Muat lainnya",
                                       color = AppColor.Green,
-                                      strokeWidth = 2.dp
+                                      fontFamily = PoppinsFont,
+                                      fontWeight = FontWeight.Medium,
+                                      fontSize = 14.sp
                                   )
                               }
-                              Spacer(Modifier.height(12.dp))
                           }
                       }
                   }
