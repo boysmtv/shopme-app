@@ -28,7 +28,7 @@ class HelpViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should reflect backend faq`() = runTest {
+    fun `load should reflect backend faq`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(supportCenter()))
 
         val vm = HelpViewModel(getSupportCenterUseCase, sessionManager)
@@ -40,7 +40,7 @@ class HelpViewModelTest {
     }
 
     @Test
-    fun `unauthorized help load should force logout`() = runTest {
+    fun `unauthorized help load should force logout`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(
             Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )

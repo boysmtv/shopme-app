@@ -68,7 +68,7 @@ class EditProfileViewModelTest {
     )
 
     @Test
-    fun `load should fetch customer addresses and villages`() = runTest {
+    fun `load should fetch customer addresses and villages`() = runTest(dispatcherRule.testDispatcher) {
         every { customerUseCase.invoke() } returns flowOf(Resource.Success(sampleCustomer))
         every { addressUseCase.invoke() } returns flowOf(Resource.Success(emptyList<Address>()))
         every { villageUseCase.invoke() } returns flowOf(Resource.Success(emptyList<Village>()))
@@ -94,7 +94,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `update profile should succeed when photo reference is already a URL`() = runTest {
+    fun `update profile should succeed when photo reference is already a URL`() = runTest(dispatcherRule.testDispatcher) {
         every {
             customerUpdateUseCase.invoke(
                 CustomerUpdateParam(name = "John Updated", phone = "08987654321", photo = "http://img.url", fcmToken = null)
@@ -127,7 +127,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `click back should emit navigate back effect`() = runTest {
+    fun `click back should emit navigate back effect`() = runTest(dispatcherRule.testDispatcher) {
         val vm = EditProfileViewModel(
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,
@@ -149,7 +149,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `load error should handle gracefully`() = runTest {
+    fun `load error should handle gracefully`() = runTest(dispatcherRule.testDispatcher) {
         every { customerUseCase.invoke() } returns flowOf(Resource.Error(throwable = RuntimeException("Network error")))
         every { addressUseCase.invoke() } returns flowOf(Resource.Success(emptyList<Address>()))
         every { villageUseCase.invoke() } returns flowOf(Resource.Success(emptyList<Village>()))
@@ -173,7 +173,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `dismiss active dialog should clear it`() = runTest {
+    fun `dismiss active dialog should clear it`() = runTest(dispatcherRule.testDispatcher) {
         val vm = EditProfileViewModel(
             sessionManager = sessionManager,
             customerUseCase = customerUseCase,

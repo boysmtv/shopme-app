@@ -31,7 +31,7 @@ class SellerPaymentMethodViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should populate seller payment methods from backend`() = runTest {
+    fun `load should populate seller payment methods from backend`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerPaymentMethodsUseCase.invoke() } returns flowOf(
             Resource.Success(
                 SellerPaymentMethod(
@@ -63,7 +63,7 @@ class SellerPaymentMethodViewModelTest {
     }
 
     @Test
-    fun `save should persist backend payment methods and emit success`() = runTest {
+    fun `save should persist backend payment methods and emit success`() = runTest(dispatcherRule.testDispatcher) {
         every { updateSellerPaymentMethodsUseCase.invoke(any()) } returns flowOf(
             Resource.Success(
                 SellerPaymentMethod(
@@ -101,7 +101,7 @@ class SellerPaymentMethodViewModelTest {
     }
 
     @Test
-    fun `unauthorized seller payment load should force logout`() = runTest {
+    fun `unauthorized seller payment load should force logout`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerPaymentMethodsUseCase.invoke() } returns flowOf(
             Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )

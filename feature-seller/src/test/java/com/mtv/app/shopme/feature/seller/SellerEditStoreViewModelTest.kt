@@ -46,7 +46,7 @@ class SellerEditStoreViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should populate store from backend cafe data`() = runTest {
+    fun `load should populate store from backend cafe data`() = runTest(dispatcherRule.testDispatcher) {
         every { getVillageUseCase.invoke() } returns flowOf(Resource.Success(listOf(Village("v-1", "Kemang"))))
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
@@ -103,7 +103,7 @@ class SellerEditStoreViewModelTest {
     }
 
     @Test
-    fun `save should update store and address`() = runTest {
+    fun `save should update store and address`() = runTest(dispatcherRule.testDispatcher) {
         every { getVillageUseCase.invoke() } returns flowOf(Resource.Success(listOf(Village("v-1", "Kemang"))))
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
@@ -154,7 +154,7 @@ class SellerEditStoreViewModelTest {
     }
 
     @Test
-    fun `load should handle error when cafe data fails`() = runTest {
+    fun `load should handle error when cafe data fails`() = runTest(dispatcherRule.testDispatcher) {
         every { getVillageUseCase.invoke() } returns flowOf(Resource.Success(listOf(Village("v-1", "Kemang"))))
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
@@ -186,7 +186,7 @@ class SellerEditStoreViewModelTest {
     }
 
     @Test
-    fun `photo upload should emit OpenImagePicker effect and update state`() = runTest {
+    fun `photo upload should emit OpenImagePicker effect and update state`() = runTest(dispatcherRule.testDispatcher) {
         every { getVillageUseCase.invoke() } returns flowOf(Resource.Success(listOf(Village("v-1", "Kemang"))))
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(

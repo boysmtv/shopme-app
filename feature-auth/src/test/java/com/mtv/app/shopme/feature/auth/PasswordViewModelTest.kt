@@ -25,7 +25,7 @@ class PasswordViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
     private val useCase: ChangePasswordUseCase = mockk()
 
-    @Test fun `change password should call backend usecase`() = runTest {
+    @Test fun `change password should call backend usecase`() = runTest(dispatcherRule.testDispatcher) {
         every { useCase.invoke(ChangePasswordParam("oldpass", "newpass")) } returns flowOf(Resource.Success(Unit))
         val vm = PasswordViewModel(useCase)
         vm.onEvent(PasswordEvent.OnCurrentPasswordChange("oldpass"))
@@ -36,7 +36,7 @@ class PasswordViewModelTest {
         assertTrue(vm.uiState.value.changePassword is com.mtv.based.core.network.utils.LoadState.Success)
     }
 
-    @Test fun `back click should navigate back`() = runTest {
+    @Test fun `back click should navigate back`() = runTest(dispatcherRule.testDispatcher) {
         val vm = PasswordViewModel(useCase)
         val effect = async { vm.effect.first() }
 
@@ -47,7 +47,7 @@ class PasswordViewModelTest {
     }
 
     @Test
-    fun `change password should show validation error on mismatch`() = runTest {
+    fun `change password should show validation error on mismatch`() = runTest(dispatcherRule.testDispatcher) {
         val vm = PasswordViewModel(useCase)
         vm.onEvent(PasswordEvent.OnCurrentPasswordChange("oldpass"))
         vm.onEvent(PasswordEvent.OnNewPasswordChange("newpass"))
@@ -59,7 +59,7 @@ class PasswordViewModelTest {
     }
 
     @Test
-    fun `change password should handle Unauthorized error`() = runTest {
+    fun `change password should handle Unauthorized error`() = runTest(dispatcherRule.testDispatcher) {
         every { useCase.invoke(ChangePasswordParam("oldpass", "newpass")) } returns flowOf(Resource.Error(ApiException.Unauthorized()))
         val vm = PasswordViewModel(useCase)
         vm.onEvent(PasswordEvent.OnCurrentPasswordChange("oldpass"))
@@ -71,7 +71,7 @@ class PasswordViewModelTest {
     }
 
     @Test
-    fun `change password should handle network error`() = runTest {
+    fun `change password should handle network error`() = runTest(dispatcherRule.testDispatcher) {
         every { useCase.invoke(ChangePasswordParam("oldpass", "newpass")) } returns flowOf(Resource.Error(IOException("No internet")))
         val vm = PasswordViewModel(useCase)
         vm.onEvent(PasswordEvent.OnCurrentPasswordChange("oldpass"))

@@ -37,7 +37,7 @@ class SellerOrderDetailViewModelTest {
     private val sessionManager: com.mtv.based.core.provider.utils.SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should expose delivery address from backend order detail`() = runTest {
+    fun `load should expose delivery address from backend order detail`() = runTest(dispatcherRule.testDispatcher) {
         every { detailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -72,7 +72,7 @@ class SellerOrderDetailViewModelTest {
     }
 
     @Test
-    fun `load should handle error from order detail usecase`() = runTest {
+    fun `load should handle error from order detail usecase`() = runTest(dispatcherRule.testDispatcher) {
         every { detailUseCase.invoke("order-1") } returns flowOf(Resource.Error(IOException("Not found")))
 
         val vm = SellerOrderDetailViewModel(
@@ -92,7 +92,7 @@ class SellerOrderDetailViewModelTest {
     }
 
     @Test
-    fun `status update should succeed`() = runTest {
+    fun `status update should succeed`() = runTest(dispatcherRule.testDispatcher) {
         every { detailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -131,7 +131,7 @@ class SellerOrderDetailViewModelTest {
     }
 
     @Test
-    fun `status update should handle error`() = runTest {
+    fun `status update should handle error`() = runTest(dispatcherRule.testDispatcher) {
         every { detailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -168,7 +168,7 @@ class SellerOrderDetailViewModelTest {
     }
 
     @Test
-    fun `cancel order flow should update state`() = runTest {
+    fun `cancel order flow should update state`() = runTest(dispatcherRule.testDispatcher) {
         every { detailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -204,7 +204,7 @@ class SellerOrderDetailViewModelTest {
     }
 
     @Test
-    fun `chat with successful conversation resolution should navigate to chat with conversation id`() = runTest {
+    fun `chat with successful conversation resolution should navigate to chat with conversation id`() = runTest(dispatcherRule.testDispatcher) {
         every { ensureSellerChatConversationUseCase.invoke("order-1") } returns flowOf(Resource.Success("chat-1"))
 
         val vm = SellerOrderDetailViewModel(
@@ -223,7 +223,7 @@ class SellerOrderDetailViewModelTest {
     }
 
     @Test
-    fun `chat with failed conversation resolution should show error`() = runTest {
+    fun `chat with failed conversation resolution should show error`() = runTest(dispatcherRule.testDispatcher) {
         every { ensureSellerChatConversationUseCase.invoke("order-1") } returns flowOf(Resource.Error(IOException("Chat failed")))
 
         val vm = SellerOrderDetailViewModel(

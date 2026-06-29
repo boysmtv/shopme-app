@@ -34,7 +34,7 @@ class SellerNotifViewModelTest {
     private val sessionManager = mockk<com.mtv.based.core.provider.utils.SessionManager>(relaxed = true)
 
     @Test
-    fun `seller realtime notification should prepend locally without refetch`() = runTest {
+    fun `seller realtime notification should prepend locally without refetch`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getSellerNotificationsUseCase.invoke(0, 20) } returns flowOf(
             Resource.Success(

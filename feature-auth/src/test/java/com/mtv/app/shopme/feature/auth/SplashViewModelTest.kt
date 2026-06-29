@@ -34,7 +34,7 @@ class SplashViewModelTest {
     private val splashUseCase: GetSplashUseCase = mockk()
 
     @Test
-    fun `load should block navigation when maintenance mode active`() = runTest {
+    fun `load should block navigation when maintenance mode active`() = runTest(dispatcherRule.testDispatcher) {
         val vm = viewModel(
             splash = Splash(
                 isAuthenticated = true,
@@ -59,7 +59,7 @@ class SplashViewModelTest {
     }
 
     @Test
-    fun `load should block navigation when backend requires force update`() = runTest {
+    fun `load should block navigation when backend requires force update`() = runTest(dispatcherRule.testDispatcher) {
         val vm = viewModel(
             splash = Splash(
                 isAuthenticated = true,
@@ -82,7 +82,7 @@ class SplashViewModelTest {
     }
 
     @Test
-    fun `load should navigate home when authenticated and not blocked`() = runTest {
+    fun `load should navigate home when authenticated and not blocked`() = runTest(dispatcherRule.testDispatcher) {
         val vm = viewModel(
             splash = Splash(
                 isAuthenticated = true,
@@ -106,7 +106,7 @@ class SplashViewModelTest {
     }
 
     @Test
-    fun `load should navigate seller dashboard when saved role is seller`() = runTest {
+    fun `load should navigate seller dashboard when saved role is seller`() = runTest(dispatcherRule.testDispatcher) {
         val vm = viewModel(
             splash = Splash(
                 isAuthenticated = true,

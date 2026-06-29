@@ -27,7 +27,7 @@ class SecurityViewModelTest {
     private val deleteAccountUseCase: DeleteAccountUseCase = mockk()
 
     @Test
-    fun `logout all device should clear local session and emit logout success`() = runTest {
+    fun `logout all device should clear local session and emit logout success`() = runTest(dispatcherRule.testDispatcher) {
         val vm = SecurityViewModel(
             securePrefs = securePrefs,
             deleteAccountUseCase = deleteAccountUseCase
@@ -42,7 +42,7 @@ class SecurityViewModelTest {
     }
 
     @Test
-    fun `delete account should call backend then clear local session`() = runTest {
+    fun `delete account should call backend then clear local session`() = runTest(dispatcherRule.testDispatcher) {
         every { deleteAccountUseCase.invoke() } returns flowOf(Resource.Success(Unit))
 
         val vm = SecurityViewModel(

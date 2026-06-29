@@ -28,7 +28,7 @@ class SellerProfileViewModelTest {
     private val updateAvailabilityUseCase: UpdateSellerAvailabilityUseCase = mockk()
 
     @Test
-    fun `toggle online should persist backend state`() = runTest {
+    fun `toggle online should persist backend state`() = runTest(dispatcherRule.testDispatcher) {
         every { getProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
                 SellerProfile(

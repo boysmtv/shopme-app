@@ -41,7 +41,7 @@ class OrderViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `confirm transfer should call backend flow and reload orders`() = runTest {
+    fun `confirm transfer should call backend flow and reload orders`() = runTest(dispatcherRule.testDispatcher) {
         val orders = listOf(
             Order(
                 id = "order-1",
@@ -75,7 +75,7 @@ class OrderViewModelTest {
     }
 
     @Test
-    fun `forbidden order error should not force logout`() = runTest {
+    fun `forbidden order error should not force logout`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrdersUseCase.invoke(0, 20) } returns flowOf(Resource.Error(throwable = ApiException.Forbidden(message = "Access denied")))
 
         val vm = OrderViewModel(
@@ -94,7 +94,7 @@ class OrderViewModelTest {
     }
 
     @Test
-    fun `select filter should persist state after reload`() = runTest {
+    fun `select filter should persist state after reload`() = runTest(dispatcherRule.testDispatcher) {
         val orders = listOf(
             Order(
                 id = "order-1",
@@ -135,7 +135,7 @@ class OrderViewModelTest {
     }
 
     @Test
-    fun `click chat should ensure conversation for selected order`() = runTest {
+    fun `click chat should ensure conversation for selected order`() = runTest(dispatcherRule.testDispatcher) {
         every { ensureOrderChatConversationUseCase.invoke("order-1") } returns flowOf(Resource.Success("conv-1"))
 
         val vm = OrderViewModel(

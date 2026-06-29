@@ -42,7 +42,7 @@ class CafeViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `click whatsapp should emit backend powered whatsapp effect`() = runTest {
+    fun `click whatsapp should emit backend powered whatsapp effect`() = runTest(dispatcherRule.testDispatcher) {
         every { getCafeUseCase.invoke("cafe-1") } returns flowOf(
             Resource.Success(
                 Cafe(
@@ -91,7 +91,7 @@ class CafeViewModelTest {
     }
 
     @Test
-    fun `click search should navigate to customer search`() = runTest {
+    fun `click search should navigate to customer search`() = runTest(dispatcherRule.testDispatcher) {
         val vm = CafeViewModel(
             cafeListUseCase = cafeListUseCase,
             getCafeUseCase = getCafeUseCase,
@@ -111,7 +111,7 @@ class CafeViewModelTest {
     }
 
     @Test
-    fun `click chat should ensure scoped conversation then navigate to that chat`() = runTest {
+    fun `click chat should ensure scoped conversation then navigate to that chat`() = runTest(dispatcherRule.testDispatcher) {
         every { ensureChatConversationUseCase.invoke("cafe-1") } returns flowOf(Resource.Success("conv-1"))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 

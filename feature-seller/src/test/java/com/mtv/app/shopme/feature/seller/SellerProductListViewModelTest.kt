@@ -36,7 +36,7 @@ class SellerProductListViewModelTest {
     private val deleteFoodUseCase: DeleteFoodUseCase = mockk(relaxed = true)
 
     @Test
-    fun `load should read seller products from backend cafe`() = runTest {
+    fun `load should read seller products from backend cafe`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
                 SellerProfile(
@@ -100,7 +100,7 @@ class SellerProductListViewModelTest {
     }
 
     @Test
-    fun `search and filters should reload first page with selected params`() = runTest {
+    fun `search and filters should reload first page with selected params`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
                 SellerProfile(

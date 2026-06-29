@@ -34,7 +34,7 @@ class SupportViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `open whatsapp should emit backend whatsapp intent`() = runTest {
+    fun `open whatsapp should emit backend whatsapp intent`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(supportCenter()))
 
         val vm = SupportViewModel(getSupportCenterUseCase, sessionManager)
@@ -51,7 +51,7 @@ class SupportViewModelTest {
     }
 
     @Test
-    fun `open email should emit backend mailto intent`() = runTest {
+    fun `open email should emit backend mailto intent`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(supportCenter()))
 
         val vm = SupportViewModel(getSupportCenterUseCase, sessionManager)

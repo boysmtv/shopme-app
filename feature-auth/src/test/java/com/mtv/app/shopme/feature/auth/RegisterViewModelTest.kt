@@ -29,7 +29,7 @@ class RegisterViewModelTest {
     private val registerUseCase: GetRegisterUseCase = mockk()
 
     @Test
-    fun `successful registration should update state and show success dialog`() = runTest {
+    fun `successful registration should update state and show success dialog`() = runTest(dispatcherRule.testDispatcher) {
         every {
             registerUseCase.invoke(RegisterParam("John", "john@mail.com", "pass123"))
         } returns flowOf(Resource.Success(Register(success = true)))
@@ -46,7 +46,7 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun `registration failure should show error state and dialog`() = runTest {
+    fun `registration failure should show error state and dialog`() = runTest(dispatcherRule.testDispatcher) {
         every {
             registerUseCase.invoke(RegisterParam("John", "john@mail.com", "pass123"))
         } returns flowOf(Resource.Error(throwable = ApiException.Validation("Email already taken")))
@@ -63,7 +63,7 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun `login click should emit navigate to login effect`() = runTest {
+    fun `login click should emit navigate to login effect`() = runTest(dispatcherRule.testDispatcher) {
         val vm = RegisterViewModel(registerUseCase)
         val effect = async { vm.effect.first() }
 
@@ -74,7 +74,7 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun `dismiss dialog should clear dialogs`() = runTest {
+    fun `dismiss dialog should clear dialogs`() = runTest(dispatcherRule.testDispatcher) {
         val vm = RegisterViewModel(registerUseCase)
 
         vm.onEvent(RegisterEvent.DismissDialog)

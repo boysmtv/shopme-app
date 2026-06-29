@@ -38,7 +38,7 @@ class SellerCreateCafeViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `create cafe should create cafe and address then navigate success`() = runTest {
+    fun `create cafe should create cafe and address then navigate success`() = runTest(dispatcherRule.testDispatcher) {
         every { getVillageUseCase.invoke() } returns flowOf(Resource.Success(listOf(Village("v-1", "Kemang"))))
         every { createCafeUseCase.invoke(any()) } returns flowOf(Resource.Success(Unit))
         every { getSellerProfileUseCase.invoke() } returns flowOf(
@@ -79,7 +79,7 @@ class SellerCreateCafeViewModelTest {
     }
 
     @Test
-    fun `unauthorized village load should force logout`() = runTest {
+    fun `unauthorized village load should force logout`() = runTest(dispatcherRule.testDispatcher) {
         every { getVillageUseCase.invoke() } returns flowOf(
             Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )

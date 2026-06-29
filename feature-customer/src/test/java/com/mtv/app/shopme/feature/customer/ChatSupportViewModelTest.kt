@@ -22,10 +22,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.RobolectricTestRunner
-
-@RunWith(RobolectricTestRunner::class)
 class ChatSupportViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
 
@@ -35,7 +31,7 @@ class ChatSupportViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should hydrate metadata and backend chat messages`() = runTest {
+    fun `load should hydrate metadata and backend chat messages`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(supportCenter()))
         every { getSupportChatUseCase.invoke() } returns flowOf(Resource.Success(initialChat()))
 
@@ -54,7 +50,7 @@ class ChatSupportViewModelTest {
     }
 
     @Test
-    fun `send message should update conversation from backend`() = runTest {
+    fun `send message should update conversation from backend`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(supportCenter()))
         every { getSupportChatUseCase.invoke() } returns flowOf(Resource.Success(initialChat()))
         every { sendSupportChatMessageUseCase.invoke("butuh bantuan order") } returns flowOf(

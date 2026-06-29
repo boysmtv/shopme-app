@@ -33,7 +33,7 @@ class SellerChatListViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should request seller chat list and expose mapped items`() = runTest {
+    fun `load should request seller chat list and expose mapped items`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { useCase.invoke(true) } returns flowOf(
             Resource.Success(
@@ -63,7 +63,7 @@ class SellerChatListViewModelTest {
     }
 
     @Test
-    fun `clear should remove all seller chats from state`() = runTest {
+    fun `clear should remove all seller chats from state`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { useCase.invoke(true) } returns flowOf(
             Resource.Success(
@@ -94,7 +94,7 @@ class SellerChatListViewModelTest {
     }
 
     @Test
-    fun `load should keep empty success state when seller has no chats`() = runTest {
+    fun `load should keep empty success state when seller has no chats`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { useCase.invoke(true) } returns flowOf(
             Resource.Success(ChatList(chatList = emptyList()))
@@ -109,7 +109,7 @@ class SellerChatListViewModelTest {
     }
 
     @Test
-    fun `seller realtime message should update existing conversation without refetch`() = runTest {
+    fun `seller realtime message should update existing conversation without refetch`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { useCase.invoke(true) } returns flowOf(
             Resource.Success(
@@ -148,7 +148,7 @@ class SellerChatListViewModelTest {
     }
 
     @Test
-    fun `seller realtime read should clear unread count locally`() = runTest {
+    fun `seller realtime read should clear unread count locally`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { useCase.invoke(true) } returns flowOf(
             Resource.Success(

@@ -36,7 +36,7 @@ class SellerDashboardViewModelTest {
     private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
 
     @Test
-    fun `load should reflect backend profile orders and unread notification count`() = runTest {
+    fun `load should reflect backend profile orders and unread notification count`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
                 SellerProfile(
@@ -93,7 +93,7 @@ class SellerDashboardViewModelTest {
     }
 
     @Test
-    fun `click order detail should emit navigation effect with order id`() = runTest {
+    fun `click order detail should emit navigation effect with order id`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
         every { getSellerOrdersUseCase.invoke(0, 20, null) } returns flowOf(Resource.Success(PagedData(emptyList(), 0, true)))
         every { getUnreadNotificationCountUseCase.invoke() } returns flowOf(Resource.Success(0))
@@ -114,7 +114,7 @@ class SellerDashboardViewModelTest {
     }
 
     @Test
-    fun `change filter and sort should update dashboard ui state`() = runTest {
+    fun `change filter and sort should update dashboard ui state`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerProfileUseCase.invoke() } returns flowOf(Resource.Success(defaultProfile()))
         every { getSellerOrdersUseCase.invoke(0, 20, null) } returns flowOf(Resource.Success(PagedData(emptyList(), 0, true)))
         every { getUnreadNotificationCountUseCase.invoke() } returns flowOf(Resource.Success(0))

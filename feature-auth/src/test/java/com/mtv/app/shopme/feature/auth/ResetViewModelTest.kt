@@ -30,7 +30,7 @@ class ResetViewModelTest {
     private val resetPasswordUseCase: ResetPasswordUseCase = mockk()
 
     @Test
-    fun `reset should send otp and move to otp stage`() = runTest {
+    fun `reset should send otp and move to otp stage`() = runTest(dispatcherRule.testDispatcher) {
         every { forgotPasswordUseCase.invoke(ForgotPasswordParam("dedy@mail.com")) } returns flowOf(Resource.Success(Unit))
         val vm = ResetViewModel(forgotPasswordUseCase, verifyOtpUseCase, resetPasswordUseCase)
 
@@ -42,7 +42,7 @@ class ResetViewModelTest {
     }
 
     @Test
-    fun `reset should verify otp and move to password stage`() = runTest {
+    fun `reset should verify otp and move to password stage`() = runTest(dispatcherRule.testDispatcher) {
         every { forgotPasswordUseCase.invoke(ForgotPasswordParam("dedy@mail.com")) } returns flowOf(Resource.Success(Unit))
         every { verifyOtpUseCase.invoke(VerifyOtpParam("dedy@mail.com", "123456")) } returns flowOf(Resource.Success(Unit))
         val vm = ResetViewModel(forgotPasswordUseCase, verifyOtpUseCase, resetPasswordUseCase)
@@ -58,7 +58,7 @@ class ResetViewModelTest {
     }
 
     @Test
-    fun `back should move between recovery stages before leaving screen`() = runTest {
+    fun `back should move between recovery stages before leaving screen`() = runTest(dispatcherRule.testDispatcher) {
         every { forgotPasswordUseCase.invoke(ForgotPasswordParam("dedy@mail.com")) } returns flowOf(Resource.Success(Unit))
         every { verifyOtpUseCase.invoke(VerifyOtpParam("dedy@mail.com", "123456")) } returns flowOf(Resource.Success(Unit))
         val vm = ResetViewModel(forgotPasswordUseCase, verifyOtpUseCase, resetPasswordUseCase)
@@ -79,7 +79,7 @@ class ResetViewModelTest {
     }
 
     @Test
-    fun `reset password stage should navigate back on success`() = runTest {
+    fun `reset password stage should navigate back on success`() = runTest(dispatcherRule.testDispatcher) {
         every { forgotPasswordUseCase.invoke(ForgotPasswordParam("dedy@mail.com")) } returns flowOf(Resource.Success(Unit))
         every { verifyOtpUseCase.invoke(VerifyOtpParam("dedy@mail.com", "123456")) } returns flowOf(Resource.Success(Unit))
         every { resetPasswordUseCase.invoke(ResetPasswordParam("dedy@mail.com", "newpass")) } returns flowOf(Resource.Success(Unit))

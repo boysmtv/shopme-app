@@ -39,7 +39,7 @@ class OrderDetailViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should expose backend order detail`() = runTest {
+    fun `load should expose backend order detail`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -84,7 +84,7 @@ class OrderDetailViewModelTest {
     }
 
     @Test
-    fun `confirm transfer should reload latest order detail`() = runTest {
+    fun `confirm transfer should reload latest order detail`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -116,7 +116,7 @@ class OrderDetailViewModelTest {
     }
 
     @Test
-    fun `confirm transfer gate should be true when transferConfirmationAvailable is true`() = runTest {
+    fun `confirm transfer gate should be true when transferConfirmationAvailable is true`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -147,7 +147,7 @@ class OrderDetailViewModelTest {
     }
 
     @Test
-    fun `confirm transfer gate should be false when transferConfirmationAvailable is false`() = runTest {
+    fun `confirm transfer gate should be false when transferConfirmationAvailable is false`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(
@@ -178,7 +178,7 @@ class OrderDetailViewModelTest {
     }
 
     @Test
-    fun `click chat should ensure scoped conversation from loaded order`() = runTest {
+    fun `click chat should ensure scoped conversation from loaded order`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrderDetailUseCase.invoke("order-1") } returns flowOf(
             Resource.Success(
                 Order(

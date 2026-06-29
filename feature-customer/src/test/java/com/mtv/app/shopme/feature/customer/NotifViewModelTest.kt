@@ -33,7 +33,7 @@ class NotifViewModelTest {
     private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
 
     @Test
-    fun `realtime notification should prepend locally without refetch`() = runTest {
+    fun `realtime notification should prepend locally without refetch`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getNotificationsUseCase.invoke(0, 20) } returns flowOf(
             Resource.Success(

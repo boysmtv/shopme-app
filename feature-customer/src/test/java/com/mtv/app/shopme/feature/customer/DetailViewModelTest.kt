@@ -48,7 +48,7 @@ class DetailViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `chat clicked should ensure conversation from loaded cafe`() = runTest {
+    fun `chat clicked should ensure conversation from loaded cafe`() = runTest(dispatcherRule.testDispatcher) {
         every { foodDetailUseCase.invoke("food-1") } returns flowOf(
             Resource.Success(
                 Food(
@@ -99,7 +99,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `chat clicked should show error when cafe id is blank`() = runTest {
+    fun `chat clicked should show error when cafe id is blank`() = runTest(dispatcherRule.testDispatcher) {
         every { foodDetailUseCase.invoke("food-1") } returns flowOf(
             Resource.Success(
                 Food(
@@ -148,7 +148,7 @@ class DetailViewModelTest {
     }
 
     @Test
-    fun `toggle favorite should update detail favorite state`() = runTest {
+    fun `toggle favorite should update detail favorite state`() = runTest(dispatcherRule.testDispatcher) {
         every { addFavoriteFoodUseCase.invoke("food-1") } returns flowOf(Resource.Success(Unit))
 
         val vm = DetailViewModel(

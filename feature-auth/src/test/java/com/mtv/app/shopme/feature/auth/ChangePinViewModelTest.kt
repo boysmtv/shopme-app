@@ -20,7 +20,7 @@ class ChangePinViewModelTest {
     @get:Rule val dispatcherRule = MainDispatcherRule()
     private val useCase: ChangePinUseCase = mockk()
 
-    @Test fun `change pin should call backend usecase`() = runTest {
+    @Test fun `change pin should call backend usecase`() = runTest(dispatcherRule.testDispatcher) {
         every { useCase.invoke(ChangePinParam("111111", "222222")) } returns flowOf(Resource.Success(Unit))
         val vm = ChangePinViewModel(useCase)
         vm.onEvent(ChangePinEvent.OnOldPinChange("111111"))
@@ -32,7 +32,7 @@ class ChangePinViewModelTest {
     }
 
     @Test
-    fun `change pin should handle error from usecase`() = runTest {
+    fun `change pin should handle error from usecase`() = runTest(dispatcherRule.testDispatcher) {
         every { useCase.invoke(ChangePinParam("111111", "222222")) } returns flowOf(Resource.Error(IOException("API Error")))
         val vm = ChangePinViewModel(useCase)
         vm.onEvent(ChangePinEvent.OnOldPinChange("111111"))
@@ -44,7 +44,7 @@ class ChangePinViewModelTest {
     }
 
     @Test
-    fun `change pin should show validation error on pin mismatch`() = runTest {
+    fun `change pin should show validation error on pin mismatch`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ChangePinViewModel(useCase)
         vm.onEvent(ChangePinEvent.OnOldPinChange("111111"))
         vm.onEvent(ChangePinEvent.OnNewPinChange("222222"))

@@ -42,7 +42,7 @@ class SellerChatDetailViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should read seller conversation and map seller message state`() = runTest {
+    fun `load should read seller conversation and map seller message state`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(true) } returns flowOf(
             Resource.Success(
@@ -108,7 +108,7 @@ class SellerChatDetailViewModelTest {
     }
 
     @Test
-    fun `load should keep route conversation id when seller opens direct chat`() = runTest {
+    fun `load should keep route conversation id when seller opens direct chat`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(true) } returns flowOf(
             Resource.Success(

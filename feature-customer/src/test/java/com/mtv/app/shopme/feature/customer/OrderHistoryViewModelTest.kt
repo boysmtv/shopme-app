@@ -48,7 +48,7 @@ class OrderHistoryViewModelTest {
     )
 
     @Test
-    fun `load should populate orders and clear loading`() = runTest {
+    fun `load should populate orders and clear loading`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrdersUseCase.invoke() } returns flowOf(Resource.Success(listOf(sampleOrder)))
         val vm = OrderHistoryViewModel(getOrdersUseCase = getOrdersUseCase, sessionManager = sessionManager)
 
@@ -61,7 +61,7 @@ class OrderHistoryViewModelTest {
     }
 
     @Test
-    fun `click order should emit navigate to detail effect`() = runTest {
+    fun `click order should emit navigate to detail effect`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrdersUseCase.invoke() } returns flowOf(Resource.Success(listOf(sampleOrder)))
         val vm = OrderHistoryViewModel(getOrdersUseCase = getOrdersUseCase, sessionManager = sessionManager)
         val effect = async { vm.effect.first() }
@@ -77,7 +77,7 @@ class OrderHistoryViewModelTest {
     }
 
     @Test
-    fun `change filter should update selected filter`() = runTest {
+    fun `change filter should update selected filter`() = runTest(dispatcherRule.testDispatcher) {
         val vm = OrderHistoryViewModel(getOrdersUseCase = getOrdersUseCase, sessionManager = sessionManager)
 
         vm.onEvent(OrderHistoryEvent.ChangeFilter(OrderFilter.COMPLETED))
@@ -86,7 +86,7 @@ class OrderHistoryViewModelTest {
     }
 
     @Test
-    fun `click back should emit navigate back effect`() = runTest {
+    fun `click back should emit navigate back effect`() = runTest(dispatcherRule.testDispatcher) {
         val vm = OrderHistoryViewModel(getOrdersUseCase = getOrdersUseCase, sessionManager = sessionManager)
         val effect = async { vm.effect.first() }
 
@@ -97,7 +97,7 @@ class OrderHistoryViewModelTest {
     }
 
     @Test
-    fun `refresh should reload orders`() = runTest {
+    fun `refresh should reload orders`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrdersUseCase.invoke() } returns flowOf(Resource.Success(listOf(sampleOrder)))
         val vm = OrderHistoryViewModel(getOrdersUseCase = getOrdersUseCase, sessionManager = sessionManager)
 
@@ -109,7 +109,7 @@ class OrderHistoryViewModelTest {
     }
 
     @Test
-    fun `error state should be handled gracefully`() = runTest {
+    fun `error state should be handled gracefully`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrdersUseCase.invoke() } returns flowOf(
             Resource.Error(throwable = RuntimeException("Failed to load"))
         )

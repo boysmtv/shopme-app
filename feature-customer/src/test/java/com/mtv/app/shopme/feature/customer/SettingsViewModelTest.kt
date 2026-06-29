@@ -26,7 +26,7 @@ class SettingsViewModelTest {
     private val getNotificationPreferencesUseCase: GetNotificationPreferencesUseCase = mockk()
 
     @Test
-    fun `load should mark notifications disabled when backend preferences are off`() = runTest {
+    fun `load should mark notifications disabled when backend preferences are off`() = runTest(dispatcherRule.testDispatcher) {
         every { getNotificationPreferencesUseCase.invoke() } returns flowOf(
             Resource.Success(
                 NotificationPreferences(

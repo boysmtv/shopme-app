@@ -42,7 +42,7 @@ class SearchViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load with blank query should fetch discovery foods`() = runTest {
+    fun `load with blank query should fetch discovery foods`() = runTest(dispatcherRule.testDispatcher) {
         every { discoveryFoodUseCase.invoke(any<DiscoveryParam>()) } returns flowOf(
             Resource.Success(PagedData(listOf(foodItem("food-1", "Ramen")), 0, true))
         )
@@ -66,9 +66,12 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `query changed triggers debounced search after delay`() = runTest {
+    fun `query changed triggers debounced search after delay`() = runTest(dispatcherRule.testDispatcher) {
         every { searchFoodUseCase.invoke(any<SearchParam>()) } returns flowOf(
             Resource.Success(PagedData(listOf(foodItem("food-2", "Mie Ayam")), 0, true))
+        )
+        every { discoveryFoodUseCase.invoke(any<DiscoveryParam>()) } returns flowOf(
+            Resource.Success(PagedData(emptyList<SearchFood>(), 0, true))
         )
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
@@ -89,7 +92,10 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `back clicked should emit navigate back effect`() = runTest {
+    fun `back clicked should emit navigate back effect`() = runTest(dispatcherRule.testDispatcher) {
+        every { discoveryFoodUseCase.invoke(any<DiscoveryParam>()) } returns flowOf(
+            Resource.Success(PagedData(emptyList<SearchFood>(), 0, true))
+        )
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = SearchViewModel(
@@ -110,7 +116,10 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `click food should emit navigate to detail effect`() = runTest {
+    fun `click food should emit navigate to detail effect`() = runTest(dispatcherRule.testDispatcher) {
+        every { discoveryFoodUseCase.invoke(any<DiscoveryParam>()) } returns flowOf(
+            Resource.Success(PagedData(emptyList<SearchFood>(), 0, true))
+        )
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = SearchViewModel(
@@ -131,7 +140,10 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `click favorites should emit navigate to favorites effect`() = runTest {
+    fun `click favorites should emit navigate to favorites effect`() = runTest(dispatcherRule.testDispatcher) {
+        every { discoveryFoodUseCase.invoke(any<DiscoveryParam>()) } returns flowOf(
+            Resource.Success(PagedData(emptyList<SearchFood>(), 0, true))
+        )
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
 
         val vm = SearchViewModel(
@@ -152,7 +164,10 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `toggle favorite should add food id when not yet favorited`() = runTest {
+    fun `toggle favorite should add food id when not yet favorited`() = runTest(dispatcherRule.testDispatcher) {
+        every { discoveryFoodUseCase.invoke(any<DiscoveryParam>()) } returns flowOf(
+            Resource.Success(PagedData(emptyList<SearchFood>(), 0, true))
+        )
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
         every { addFavoriteFoodUseCase.invoke("food-1") } returns flowOf(Resource.Success(Unit))
 
@@ -173,7 +188,10 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun `toggle favorite should remove food id when already favorited`() = runTest {
+    fun `toggle favorite should remove food id when already favorited`() = runTest(dispatcherRule.testDispatcher) {
+        every { discoveryFoodUseCase.invoke(any<DiscoveryParam>()) } returns flowOf(
+            Resource.Success(PagedData(emptyList<SearchFood>(), 0, true))
+        )
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(listOf("food-1")))
         every { removeFavoriteFoodUseCase.invoke("food-1") } returns flowOf(Resource.Success(Unit))
 

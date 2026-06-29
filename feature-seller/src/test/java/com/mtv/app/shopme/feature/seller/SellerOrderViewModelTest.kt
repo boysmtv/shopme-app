@@ -31,7 +31,7 @@ class SellerOrderViewModelTest {
     private val realtimeGateway: ShopmeRealtimeGateway = mockk(relaxed = true)
 
     @Test
-    fun `load and toggle online should follow backend profile state`() = runTest {
+    fun `load and toggle online should follow backend profile state`() = runTest(dispatcherRule.testDispatcher) {
         every { getOrdersUseCase.invoke(0, 20) } returns flowOf(Resource.Success(PagedData(emptyList(), 0, true)))
         every { getProfileUseCase.invoke() } returns flowOf(
             Resource.Success(

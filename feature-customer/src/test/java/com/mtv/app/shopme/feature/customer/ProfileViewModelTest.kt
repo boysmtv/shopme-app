@@ -56,7 +56,7 @@ class ProfileViewModelTest {
     )
 
     @Test
-    fun `load should fetch customer data`() = runTest {
+    fun `load should fetch customer data`() = runTest(dispatcherRule.testDispatcher) {
         every { customerUseCase.invoke() } returns flowOf(Resource.Success(sampleCustomer))
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
@@ -72,7 +72,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `error loading customer should show error state`() = runTest {
+    fun `error loading customer should show error state`() = runTest(dispatcherRule.testDispatcher) {
         every { customerUseCase.invoke() } returns flowOf(
             Resource.Error(throwable = RuntimeException("Failed"))
         )
@@ -89,7 +89,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `click edit profile should navigate to edit profile`() = runTest {
+    fun `click edit profile should navigate to edit profile`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
             sessionManager = sessionManager,
@@ -104,7 +104,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `click order history should navigate to order history`() = runTest {
+    fun `click order history should navigate to order history`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
             sessionManager = sessionManager,
@@ -119,7 +119,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `click favorites should navigate to favorites`() = runTest {
+    fun `click favorites should navigate to favorites`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
             sessionManager = sessionManager,
@@ -134,7 +134,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `click settings should navigate to settings`() = runTest {
+    fun `click settings should navigate to settings`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
             sessionManager = sessionManager,
@@ -149,7 +149,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `click help center should navigate to help center`() = runTest {
+    fun `click help center should navigate to help center`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
             sessionManager = sessionManager,
@@ -164,7 +164,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `click order should navigate to order with filter`() = runTest {
+    fun `click order should navigate to order with filter`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
             sessionManager = sessionManager,
@@ -179,7 +179,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `load should set order count from customer profile data`() = runTest {
+    fun `load should set order count from customer profile data`() = runTest(dispatcherRule.testDispatcher) {
         val customerWithStats = sampleCustomer.copy(
             stats = Stats(
                 totalOrders = 10,
@@ -211,7 +211,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `click order with filter should emit navigate to order with correct filter`() = runTest {
+    fun `click order with filter should emit navigate to order with correct filter`() = runTest(dispatcherRule.testDispatcher) {
         val vm = ProfileViewModel(
             securePrefs = securePrefs,
             sessionManager = sessionManager,
@@ -226,7 +226,7 @@ class ProfileViewModelTest {
     }
 
     @Test
-    fun `logout should clear prefs and emit navigate to login`() = runTest {
+    fun `logout should clear prefs and emit navigate to login`() = runTest(dispatcherRule.testDispatcher) {
         every { securePrefs.getString(ConstantPreferences.REMEMBERED_LOGIN_EMAIL) } returns "john@mail.com"
 
         val vm = ProfileViewModel(

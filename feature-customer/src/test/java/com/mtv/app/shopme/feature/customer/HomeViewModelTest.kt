@@ -57,7 +57,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `should keep successful foods state even if customer request fails`() = runTest {
+    fun `should keep successful foods state even if customer request fails`() = runTest(dispatcherRule.testDispatcher) {
         val foods = listOf(fakeFood())
 
         coEvery { customerUseCase() } returns flowOf(Resource.Error(throwable = Exception("error")))
@@ -71,7 +71,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `should emit navigation effect when click food`() = runTest {
+    fun `should emit navigation effect when click food`() = runTest(dispatcherRule.testDispatcher) {
         val id = "food-id"
 
         viewModel.effect.test {
@@ -82,7 +82,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `toggle favorite should update favorite ids`() = runTest {
+    fun `toggle favorite should update favorite ids`() = runTest(dispatcherRule.testDispatcher) {
         coEvery { addFavoriteFoodUseCase("1") } returns flowOf(Resource.Success(Unit))
 
         viewModel.onEvent(HomeEvent.ToggleFavorite("1"))
@@ -92,7 +92,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `load next page should append foods and update pagination state`() = runTest {
+    fun `load next page should append foods and update pagination state`() = runTest(dispatcherRule.testDispatcher) {
         coEvery { customerUseCase() } returns flowOf(Resource.Success(fakeCustomer()))
         coEvery { getFavoriteFoodIdsUseCase() } returns flowOf(Resource.Success(emptyList()))
         coEvery { discoveryFoodUseCase(any()) } answers {

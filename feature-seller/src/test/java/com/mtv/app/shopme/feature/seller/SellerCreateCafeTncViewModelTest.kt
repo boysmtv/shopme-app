@@ -28,7 +28,7 @@ class SellerCreateCafeTncViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should populate onboarding terms from backend`() = runTest {
+    fun `load should populate onboarding terms from backend`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(sampleSupportCenter()))
 
         val vm = SellerCreateCafeTncViewModel(
@@ -45,7 +45,7 @@ class SellerCreateCafeTncViewModelTest {
     }
 
     @Test
-    fun `next should navigate after all backend terms are checked`() = runTest {
+    fun `next should navigate after all backend terms are checked`() = runTest(dispatcherRule.testDispatcher) {
         every { getSupportCenterUseCase.invoke() } returns flowOf(Resource.Success(sampleSupportCenter()))
 
         val vm = SellerCreateCafeTncViewModel(

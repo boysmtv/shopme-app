@@ -44,7 +44,7 @@ class FavoriteViewModelTest {
     )
 
     @Test
-    fun `load should fetch favorite foods and ids`() = runTest {
+    fun `load should fetch favorite foods and ids`() = runTest(dispatcherRule.testDispatcher) {
         every { getFavoriteFoodsUseCase.invoke() } returns flowOf(Resource.Success(listOf<SearchFood>(food1, food2)))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(listOf("food-1", "food-2")))
 
@@ -65,7 +65,7 @@ class FavoriteViewModelTest {
     }
 
     @Test
-    fun `toggle favorite should remove food from list when already favorited`() = runTest {
+    fun `toggle favorite should remove food from list when already favorited`() = runTest(dispatcherRule.testDispatcher) {
         every { getFavoriteFoodsUseCase.invoke() } returns flowOf(Resource.Success(listOf<SearchFood>(food1, food2)))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(listOf("food-1", "food-2")))
         every { removeFavoriteFoodUseCase.invoke("food-1") } returns flowOf(Resource.Success(Unit))
@@ -90,7 +90,7 @@ class FavoriteViewModelTest {
     }
 
     @Test
-    fun `click food should emit navigate to detail effect`() = runTest {
+    fun `click food should emit navigate to detail effect`() = runTest(dispatcherRule.testDispatcher) {
         val empty: List<SearchFood> = emptyList()
         every { getFavoriteFoodsUseCase.invoke() } returns flowOf(Resource.Success(empty))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
@@ -111,7 +111,7 @@ class FavoriteViewModelTest {
     }
 
     @Test
-    fun `click back should emit navigate back effect`() = runTest {
+    fun `click back should emit navigate back effect`() = runTest(dispatcherRule.testDispatcher) {
         val empty: List<SearchFood> = emptyList()
         every { getFavoriteFoodsUseCase.invoke() } returns flowOf(Resource.Success(empty))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))
@@ -132,7 +132,7 @@ class FavoriteViewModelTest {
     }
 
     @Test
-    fun `error loading favorites should handle gracefully`() = runTest {
+    fun `error loading favorites should handle gracefully`() = runTest(dispatcherRule.testDispatcher) {
         val empty: List<SearchFood> = emptyList()
         every { getFavoriteFoodsUseCase.invoke() } returns flowOf(
             Resource.Error(throwable = RuntimeException("Failed"))
@@ -155,7 +155,7 @@ class FavoriteViewModelTest {
     }
 
     @Test
-    fun `dismiss dialog should clear dialog`() = runTest {
+    fun `dismiss dialog should clear dialog`() = runTest(dispatcherRule.testDispatcher) {
         val empty: List<SearchFood> = emptyList()
         every { getFavoriteFoodsUseCase.invoke() } returns flowOf(Resource.Success(empty))
         every { getFavoriteFoodIdsUseCase.invoke() } returns flowOf(Resource.Success(emptyList()))

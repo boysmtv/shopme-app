@@ -51,7 +51,7 @@ class CartViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `checkout clicked should request fresh customer before session token`() = runTest {
+    fun `checkout clicked should request fresh customer before session token`() = runTest(dispatcherRule.testDispatcher) {
         every { customerUseCase.invoke(forceRefresh = true) } returns flowOf(
             Resource.Success(completeCustomer())
         )
@@ -89,7 +89,7 @@ class CartViewModelTest {
     }
 
     @Test
-    fun `invalid pin should not force logout`() = runTest {
+    fun `invalid pin should not force logout`() = runTest(dispatcherRule.testDispatcher) {
         every { customerUseCase.invoke(forceRefresh = true) } returns flowOf(
             Resource.Success(completeCustomer())
         )

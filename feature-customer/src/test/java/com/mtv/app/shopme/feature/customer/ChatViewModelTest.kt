@@ -40,7 +40,7 @@ class ChatViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should infer active chat and mark it as read`() = runTest {
+    fun `load should infer active chat and mark it as read`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(
@@ -106,7 +106,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `send message should refresh metadata without duplicate chat fetching`() = runTest {
+    fun `send message should refresh metadata without duplicate chat fetching`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(
@@ -170,7 +170,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `load should keep route chat id even when it is not the first cached conversation`() = runTest {
+    fun `load should keep route chat id even when it is not the first cached conversation`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(

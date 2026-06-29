@@ -27,7 +27,7 @@ class LoginViewModelTest {
     private val loginUseCase: GetLoginUseCase = mockk()
 
     @Test
-    fun `invalid credentials should keep login inputs`() = runTest {
+    fun `invalid credentials should keep login inputs`() = runTest(dispatcherRule.testDispatcher) {
         every {
             loginUseCase.invoke(LoginParam("buyer.demo@shopme.local", "wrongpass"))
         } returns flowOf(Resource.Error(throwable = ApiException.Unauthorized(message = "Credential salah")))

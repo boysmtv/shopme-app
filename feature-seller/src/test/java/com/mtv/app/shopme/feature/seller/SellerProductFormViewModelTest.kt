@@ -45,7 +45,7 @@ class SellerProductFormViewModelTest {
     private val uploadMediaUseCase: UploadMediaUseCase = mockk(relaxed = true)
 
     @Test
-    fun `load edit product should map backend detail to form state`() = runTest {
+    fun `load edit product should map backend detail to form state`() = runTest(dispatcherRule.testDispatcher) {
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
                 SellerProfile(
@@ -102,7 +102,7 @@ class SellerProductFormViewModelTest {
     }
 
     @Test
-    fun `save new product should call backend and emit success`() = runTest {
+    fun `save new product should call backend and emit success`() = runTest(dispatcherRule.testDispatcher) {
         val requestSlot = slot<FoodUpsertParam>()
         every { getSellerProfileUseCase.invoke() } returns flowOf(
             Resource.Success(
@@ -171,7 +171,7 @@ class SellerProductFormViewModelTest {
     }
 
     @Test
-    fun `help center event should emit navigation effect`() = runTest {
+    fun `help center event should emit navigation effect`() = runTest(dispatcherRule.testDispatcher) {
         val vm = SellerProductFormViewModel(
             sessionManager = sessionManager,
             getSellerProfileUseCase = getSellerProfileUseCase,

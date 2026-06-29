@@ -35,7 +35,7 @@ class ChatListViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `clear should empty customer chat list state`() = runTest {
+    fun `clear should empty customer chat list state`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(
@@ -68,7 +68,7 @@ class ChatListViewModelTest {
     }
 
     @Test
-    fun `load should expose empty success state when backend has no chats`() = runTest {
+    fun `load should expose empty success state when backend has no chats`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(ChatList(chatList = emptyList()))
@@ -83,7 +83,7 @@ class ChatListViewModelTest {
     }
 
     @Test
-    fun `chat message realtime should update existing conversation without refetch`() = runTest {
+    fun `chat message realtime should update existing conversation without refetch`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(
@@ -123,7 +123,7 @@ class ChatListViewModelTest {
     }
 
     @Test
-    fun `chat read realtime should clear unread count locally`() = runTest {
+    fun `chat read realtime should clear unread count locally`() = runTest(dispatcherRule.testDispatcher) {
         every { realtimeGateway.events } returns realtimeEvents
         every { getChatListUseCase.invoke(false) } returns flowOf(
             Resource.Success(

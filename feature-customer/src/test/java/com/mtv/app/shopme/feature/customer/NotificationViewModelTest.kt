@@ -29,7 +29,7 @@ class NotificationViewModelTest {
     private val sessionManager: SessionManager = mockk(relaxed = true)
 
     @Test
-    fun `load should reflect backend notification preferences`() = runTest {
+    fun `load should reflect backend notification preferences`() = runTest(dispatcherRule.testDispatcher) {
         every { getNotificationPreferencesUseCase.invoke() } returns flowOf(
             Resource.Success(
                 NotificationPreferences(
@@ -57,7 +57,7 @@ class NotificationViewModelTest {
     }
 
     @Test
-    fun `toggle should persist updated preferences`() = runTest {
+    fun `toggle should persist updated preferences`() = runTest(dispatcherRule.testDispatcher) {
         every { getNotificationPreferencesUseCase.invoke() } returns flowOf(
             Resource.Success(
                 NotificationPreferences(
@@ -106,7 +106,7 @@ class NotificationViewModelTest {
     }
 
     @Test
-    fun `unauthorized notification load should force logout`() = runTest {
+    fun `unauthorized notification load should force logout`() = runTest(dispatcherRule.testDispatcher) {
         every { getNotificationPreferencesUseCase.invoke() } returns flowOf(
             Resource.Error(throwable = ApiException.Unauthorized(message = "Session expired"))
         )
