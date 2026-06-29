@@ -147,7 +147,7 @@ def parse_data_class_fields(path: Path, class_name: str) -> list[str]:
     fields: list[str] = []
     for raw_line in body.splitlines():
         line = raw_line.strip()
-        if not line or line.startswith("@"):
+        if not line:
             continue
         field = re.search(r"\b(?:val|var)\s+(\w+)\s*:", line)
         if field:
