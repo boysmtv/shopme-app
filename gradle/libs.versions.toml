@@ -15,7 +15,7 @@ firebaseBom = "33.5.1"
 firebaseCommonKtx = "21.0.0"
 firebaseCrashlytics = "3.0.7"
 
-google-services = "4.4.0"
+google-services = "4.4.2"
 gson = "2.10.1"
 hilt = "2.51"
 hiltCompose = "1.0.0"
