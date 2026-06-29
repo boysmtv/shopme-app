@@ -12,7 +12,6 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -24,6 +23,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.messaging
 import com.mtv.app.shopme.BuildConfig
+import com.mtv.app.shopme.common.AppLogger
 import com.mtv.app.shopme.common.notification.NotificationDeepLink
 import com.mtv.app.shopme.common.notification.NotificationDeepLinkExtras
 import com.mtv.app.shopme.feature.firebase.NotificationRepository
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            if (BuildConfig.DEBUG) Log.d("LOG_BOYS_FCM", "Notification permission granted=$granted")
+            AppLogger.d("Notification permission granted=$granted", tag = "LOG_BOYS_FCM")
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,18 +57,17 @@ class MainActivity : ComponentActivity() {
             if (task.isSuccessful) {
                 notificationRepository.saveStatus(task.result.isEmpty())
                 notificationRepository.saveToken(task.result)
-                if (BuildConfig.DEBUG) Log.d("LOG_BOYS_FCM", "Token: ${task.result}")
             } else {
                 notificationRepository.saveStatus(false)
-                if (BuildConfig.DEBUG) Log.d("LOG_BOYS_FCM", "Token failed", task.exception)
+                AppLogger.d("Token failed", tag = "LOG_BOYS_FCM")
             }
         }
         Firebase.messaging.subscribeToTopic("news")
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    if (BuildConfig.DEBUG) Log.d("LOG_BOYS_FCM", "Subscribed to news")
+                    AppLogger.d("Subscribed to news", tag = "LOG_BOYS_FCM")
                 } else {
-                    if (BuildConfig.DEBUG) Log.d("LOG_BOYS_FCM", "Failed Subscribed to news")
+                    AppLogger.d("Failed Subscribed to news", tag = "LOG_BOYS_FCM")
                 }
             }
         setContent {

@@ -8,9 +8,9 @@
 
 package com.mtv.app.shopme.feature.firebase
 
-import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.mtv.app.shopme.common.AppLogger
 import com.mtv.based.core.provider.utils.SecurePrefs
 import com.mtv.app.shopme.common.notification.NotificationDeepLink
 import com.mtv.app.shopme.domain.model.NotificationItem
@@ -62,7 +62,7 @@ class NotificationServices : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         repository.saveStatus(token.isEmpty())
         repository.saveToken(token)
-        if (BuildConfig.DEBUG) Log.d("LOG_BOYS_FCM", "Token-onNewToken: $token")
+        AppLogger.d("Token-onNewToken: $token", tag = "LOG_BOYS_FCM")
     }
 }
 

@@ -13,12 +13,11 @@ class ShopmeRealtimeGatewayImplTest {
     @Test
     fun `buildRealtimeUrl should convert http base url into websocket endpoint`() {
         val actual = buildRealtimeUrl(
-            baseUrl = "http://192.168.100.20:8080/",
-            token = "jwt token"
+            baseUrl = "http://192.168.100.20:8080/"
         )
 
         assertEquals(
-            "ws://192.168.100.20:8080/ws/realtime?token=jwt+token",
+            "ws://192.168.100.20:8080/ws/realtime",
             actual
         )
     }

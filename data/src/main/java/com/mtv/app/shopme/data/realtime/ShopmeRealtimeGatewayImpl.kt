@@ -9,7 +9,6 @@ import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
 import com.mtv.based.core.provider.utils.SecurePrefs
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.net.URLEncoder
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -99,7 +98,8 @@ class ShopmeRealtimeGatewayImpl @Inject constructor(
         }
 
         val request = Request.Builder()
-            .url(buildRealtimeUrl(BuildConfig.BASE_URL, token))
+            .url(buildRealtimeUrl(BuildConfig.BASE_URL))
+            .addHeader("Authorization", "Bearer $token")
             .build()
 
         val socket = client.newWebSocket(request, listenerFor(token))
@@ -194,7 +194,7 @@ internal fun parseRealtimeEvent(raw: String): ShopmeRealtimeEvent? = runCatching
         .toDomain()
 }.getOrNull()
 
-internal fun buildRealtimeUrl(baseUrl: String, token: String): String {
+internal fun buildRealtimeUrl(baseUrl: String): String {
     val normalizedBase = baseUrl.removeSuffix("/")
     val websocketBase = when {
         normalizedBase.startsWith("https://") -> "wss://${normalizedBase.removePrefix("https://")}"
@@ -203,7 +203,7 @@ internal fun buildRealtimeUrl(baseUrl: String, token: String): String {
         else -> "ws://$normalizedBase"
     }
 
-    return "$websocketBase/ws/realtime?token=${URLEncoder.encode(token, Charsets.UTF_8.name())}"
+    return "$websocketBase/ws/realtime"
 }
 
 private fun RealtimeEventPayloadDto.toDomain() = ShopmeRealtimeEvent(
