@@ -1,16 +1,5 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: SellerDashboardScreen.kt
- *
- * Last modified by Dedy Wijaya on 18/02/26 12.16
- */
-
 package com.mtv.app.shopme.feature.seller.ui
 
-import android.graphics.Paint
-import com.mtv.app.shopme.feature.seller.ui.component.OrderFilterChips
-import com.mtv.app.shopme.feature.seller.ui.component.matchesOrderFilter
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,6 +30,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -50,14 +39,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -67,15 +57,21 @@ import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.ContentErrorState
 import com.mtv.app.shopme.common.ShimmerBlock
 import com.mtv.app.shopme.common.ShimmerLine
-import com.mtv.app.shopme.common.toRupiah
 import com.mtv.app.shopme.common.navbar.seller.SellerBottomNavigationBar
+import com.mtv.app.shopme.domain.model.ChartDataItem
+import com.mtv.app.shopme.domain.model.SellerDashboard
 import com.mtv.app.shopme.domain.model.SellerOrderItem
+import com.mtv.app.shopme.domain.model.StatusCountItem
+import com.mtv.app.shopme.domain.model.TopProductItem
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerDashboardUiState
+import com.mtv.app.shopme.feature.seller.ui.component.OrderFilterChips
+import com.mtv.app.shopme.feature.seller.ui.component.matchesOrderFilter
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.max
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -86,8 +82,8 @@ fun SellerDashboardScreen(
     val isOnline = state.isOnline
     val selectedFilter = state.selectedFilter
     val selectedSort = state.selectedSort
-
     val orders = state.orders
+    val dashboard = state.dashboard
 
     val visibleOrders = remember(orders, selectedFilter, selectedSort) {
         val filtered = orders.filter { matchesOrderFilter(selectedFilter, it.status) }
@@ -128,9 +124,9 @@ fun SellerDashboardScreen(
 
             item { Spacer(Modifier.height(20.dp)) }
 
-            if (state.isLoading && orders.isEmpty()) {
+            if (state.isLoading && dashboard == null) {
                 item { SellerDashboardShimmer() }
-            } else if (!state.errorMessage.isNullOrBlank() && orders.isEmpty()) {
+            } else if (!state.errorMessage.isNullOrBlank() && dashboard == null) {
                 item {
                     ContentErrorState(
                         title = "Gagal memuat dashboard",
@@ -140,13 +136,28 @@ fun SellerDashboardScreen(
                     )
                 }
             } else {
-                item { WeeklySummaryCard(orders) }
+                dashboard?.let { data ->
+                    item { RevenueCardsSection(data) }
+                    item { Spacer(Modifier.height(16.dp)) }
+                    item { QuickStatsSection(data) }
+                    item { Spacer(Modifier.height(16.dp)) }
 
-                item { Spacer(Modifier.height(24.dp)) }
+                    if (data.lowStockProducts > 0) {
+                        item { LowStockWarning(data.lowStockProducts) }
+                        item { Spacer(Modifier.height(16.dp)) }
+                    }
 
-                item { WeeklyOrdersChart(orders) }
+                    item { WeeklyRevenueChart(data.weeklyRevenue) }
+                    item { Spacer(Modifier.height(16.dp)) }
 
-                item { Spacer(Modifier.height(20.dp)) }
+                    if (data.topProducts.isNotEmpty()) {
+                        item { TopProductsSection(data.topProducts) }
+                        item { Spacer(Modifier.height(16.dp)) }
+                    }
+
+                    item { OrderStatusBreakdown(data.orderStatusBreakdown) }
+                    item { Spacer(Modifier.height(16.dp)) }
+                }
 
                 item {
                     Row(
@@ -211,7 +222,411 @@ fun SellerDashboardScreen(
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
+}
 
+@Composable
+private fun RevenueCardsSection(dashboard: SellerDashboard) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        RevenueCard(
+            title = "Hari Ini",
+            value = dashboard.todayRevenue,
+            color = Color(0xFF4CAF50),
+            modifier = Modifier.weight(1f)
+        )
+        RevenueCard(
+            title = "Minggu Ini",
+            value = dashboard.thisWeekRevenue,
+            color = Color(0xFF2196F3),
+            modifier = Modifier.weight(1f)
+        )
+    }
+    Spacer(Modifier.height(8.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        RevenueCard(
+            title = "Bulan Ini",
+            value = dashboard.thisMonthRevenue,
+            color = Color(0xFFFF9800),
+            modifier = Modifier.weight(1f)
+        )
+        RevenueCard(
+            title = "Total",
+            value = dashboard.totalRevenue,
+            color = Color(0xFF9C27B0),
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun RevenueCard(title: String, value: String, color: Color, modifier: Modifier = Modifier) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(8.dp)
+                    .clip(CircleShape)
+                    .background(color)
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = title,
+                fontSize = 12.sp,
+                color = Color.Gray
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = value,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuickStatsSection(dashboard: SellerDashboard) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text("Ringkasan", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Spacer(Modifier.height(12.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                StatItem("Total Pesanan", dashboard.totalOrders.toString())
+                StatItem("Produk Aktif", dashboard.activeProducts.toString())
+                StatItem("Terjual", dashboard.totalSold.toString())
+                StatItem("Pending", dashboard.pendingOrders.toString())
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatItem(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Text(label, fontSize = 11.sp, color = Color.Gray)
+    }
+}
+
+@Composable
+private fun LowStockWarning(count: Long) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .clickable { },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF3E0)),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFFF9800).copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("!", color = Color(0xFFFF9800), fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            }
+            Spacer(Modifier.width(12.dp))
+            Column {
+                Text(
+                    "Stok Menipis",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 14.sp,
+                    color = Color(0xFFE65100)
+                )
+                Text(
+                    "$count produk memiliki stok tersisa sedikit",
+                    fontSize = 12.sp,
+                    color = Color(0xFFBF360C)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WeeklyRevenueChart(weeklyData: List<ChartDataItem>) {
+    if (weeklyData.isEmpty()) return
+
+    val maxValue = max(weeklyData.maxOfOrNull { it.value } ?: 1L, 1L)
+
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(Modifier.padding(20.dp)) {
+            Text("Pendapatan Mingguan", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Spacer(Modifier.height(16.dp))
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+            ) {
+                val chartWidth = size.width
+                val chartHeight = size.height - 40.dp.toPx()
+                val barCount = weeklyData.size
+                val barSpacing = 12.dp.toPx()
+                val totalSpacing = barSpacing * (barCount - 1)
+                val barWidth = (chartWidth - totalSpacing) / barCount
+
+                weeklyData.forEachIndexed { index, item ->
+                    val barHeight = (item.value.toFloat() / maxValue) * chartHeight
+                    val x = index * (barWidth + barSpacing)
+                    val y = chartHeight - barHeight
+
+                    drawRect(
+                        color = Color(0xFF1BA0E2),
+                        topLeft = Offset(x, y),
+                        size = Size(barWidth, barHeight),
+                        style = Stroke(width = 0f)
+                    )
+                    drawRect(
+                        color = Color(0xFF1BA0E2).copy(alpha = 0.8f),
+                        topLeft = Offset(x, y),
+                        size = Size(barWidth, barHeight)
+                    )
+
+                    drawContext.canvas.nativeCanvas.apply {
+                        drawText(
+                            item.label.take(3),
+                            x + barWidth / 2,
+                            chartHeight + 24.dp.toPx(),
+                            android.graphics.Paint().apply {
+                                textAlign = android.graphics.Paint.Align.CENTER
+                                textSize = 28f
+                                color = android.graphics.Color.GRAY
+                            }
+                        )
+                    }
+
+                    val valueLabel = if (item.value >= 1_000_000) "${item.value / 1_000_000}jt" else if (item.value >= 1_000) "${item.value / 1_000}rb" else item.value.toString()
+                    if (barHeight > 30.dp.toPx()) {
+                        drawContext.canvas.nativeCanvas.apply {
+                            drawText(
+                                valueLabel,
+                                x + barWidth / 2,
+                                y - 8.dp.toPx(),
+                                android.graphics.Paint().apply {
+                                    textAlign = android.graphics.Paint.Align.CENTER
+                                    textSize = 24f
+                                    color = android.graphics.Color.DKGRAY
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun OrderStatusBreakdown(items: List<StatusCountItem>) {
+    val total = items.sumOf { it.count }.toFloat().coerceAtLeast(1f)
+    val statusColors = mapOf(
+        "UNPAID" to Color(0xFFFF5722),
+        "ORDERED" to Color(0xFF2196F3),
+        "COOKING" to Color(0xFFFF9800),
+        "DELIVERING" to Color(0xFF29B6F6),
+        "COMPLETED" to Color(0xFF4CAF50),
+        "CANCELLED" to Color(0xFFF44336)
+    )
+
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(Modifier.padding(20.dp)) {
+            Text("Status Pesanan", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Spacer(Modifier.height(12.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                items.forEach { item ->
+                    val fraction = item.count / total
+                    if (fraction > 0f) {
+                        Box(
+                            modifier = Modifier
+                                .weight(fraction)
+                                .fillMaxSize()
+                                .clip(
+                                    if (item == items.first()) RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp)
+                                    else if (item == items.last()) RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp)
+                                    else RoundedCornerShape(0.dp)
+                                )
+                                .background(statusColors[item.status] ?: Color.Gray)
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            items.forEach { item ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(statusColors[item.status] ?: Color.Gray)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            when (item.status) {
+                                "UNPAID" -> "Belum Bayar"
+                                "ORDERED" -> "Pesanan Baru"
+                                "COOKING" -> "Dimasak"
+                                "DELIVERING" -> "Diantar"
+                                "COMPLETED" -> "Selesai"
+                                "CANCELLED" -> "Dibatalkan"
+                                else -> item.status
+                            },
+                            fontSize = 13.sp
+                        )
+                    }
+                    Text(
+                        item.count.toString(),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = Color.Black
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopProductsSection(products: List<TopProductItem>) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(Modifier.padding(20.dp)) {
+            Text("Produk Terlaris", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+            Spacer(Modifier.height(12.dp))
+            products.forEachIndexed { index, product ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(
+                                when (index) {
+                                    0 -> Color(0xFFFFD700)
+                                    1 -> Color(0xFFC0C0C0)
+                                    2 -> Color(0xFFCD7F32)
+                                    else -> Color.Gray.copy(alpha = 0.3f)
+                                }
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            "${index + 1}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (index < 3) Color.Black else Color.Gray
+                        )
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            product.productName,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 14.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            product.price,
+                            fontSize = 11.sp,
+                            color = Color.Gray
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.End) {
+                        Text(
+                            "${product.totalSold} terjual",
+                            fontSize = 12.sp,
+                            color = AppColor.Blue,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            product.revenue,
+                            fontSize = 11.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+                if (index < products.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        color = Color.Gray.copy(alpha = 0.15f)
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -235,7 +650,7 @@ private fun SellerDashboardShimmer() {
                 ShimmerLine(widthFraction = 0.34f, heightDp = 16)
                 ShimmerLine(widthFraction = 0.22f, heightDp = 12)
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    repeat(2) {
+                    repeat(4) {
                         ShimmerBlock(
                             modifier = Modifier
                                 .weight(1f)
@@ -279,45 +694,49 @@ private fun SellerDashboardShimmer() {
             }
         }
         repeat(2) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+            OrderItemShimmer()
+        }
+    }
+}
+
+@Composable
+private fun OrderItemShimmer() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            ShimmerLine(widthFraction = 0.36f, heightDp = 14)
-                            Spacer(Modifier.height(8.dp))
-                            ShimmerLine(widthFraction = 0.58f, heightDp = 12)
-                        }
-                        ShimmerLine(widthFraction = 0.18f, heightDp = 14)
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ShimmerBlock(
-                            modifier = Modifier
-                                .width(84.dp)
-                                .height(18.dp),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                        ShimmerBlock(
-                            modifier = Modifier
-                                .width(96.dp)
-                                .height(18.dp),
-                            shape = RoundedCornerShape(10.dp)
-                        )
-                    }
+                Column(modifier = Modifier.weight(1f)) {
+                    ShimmerLine(widthFraction = 0.36f, heightDp = 14)
+                    Spacer(Modifier.height(8.dp))
+                    ShimmerLine(widthFraction = 0.58f, heightDp = 12)
                 }
+                ShimmerLine(widthFraction = 0.18f, heightDp = 14)
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ShimmerBlock(
+                    modifier = Modifier
+                        .width(84.dp)
+                        .height(18.dp),
+                    shape = RoundedCornerShape(10.dp)
+                )
+                ShimmerBlock(
+                    modifier = Modifier
+                        .width(96.dp)
+                        .height(18.dp),
+                    shape = RoundedCornerShape(10.dp)
+                )
             }
         }
     }
@@ -503,7 +922,7 @@ fun NotificationBadge(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = count.toString(),
+                    text = min(count, 99).toString(),
                     color = AppColor.White,
                     fontSize = 12.sp
                 )
@@ -511,158 +930,6 @@ fun NotificationBadge(
         }
     }
 }
-
-@Composable
-fun WeeklySummaryCard(orders: List<SellerOrderItem>) {
-    val totalOrders = orders.size
-    val totalRevenue = orders.sumOf { parseCurrencyAmount(it.total) }
-    val completedOrders = orders.count { it.status.equals("COMPLETED", ignoreCase = true) }
-
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Column(Modifier.padding(20.dp)) {
-
-            Text("Weekly Summary", fontWeight = FontWeight.SemiBold)
-
-            Spacer(Modifier.height(12.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                SummaryItem("Orders", totalOrders.toString())
-                SummaryItem("Revenue", formatRupiah(totalRevenue))
-                SummaryItem("Completed", completedOrders.toString())
-            }
-        }
-    }
-}
-
-@Composable
-fun SummaryItem(label: String, value: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(value, fontWeight = FontWeight.Bold)
-        Text(label, fontSize = 12.sp, color = Color.Gray)
-    }
-}
-
-@Composable
-fun WeeklyOrdersChart(orders: List<SellerOrderItem>) {
-    val weeklyCounts = buildWeeklyOrderCounts(orders)
-    val data = weeklyCounts.map { it.second.toFloat() }
-    val maxValue = max(data.max(), 1f)
-    val days = weeklyCounts.map { it.first }
-
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier
-            .padding(horizontal = 20.dp)
-            .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(6.dp)
-    ) {
-        Column(Modifier.padding(20.dp)) {
-
-            Text("Orders This Week", fontWeight = FontWeight.SemiBold)
-
-            Spacer(Modifier.height(20.dp))
-
-            Canvas(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-            ) {
-                val width = size.width
-                val height = size.height - 20.dp.toPx()
-                val space = width / (data.size - 1)
-
-                val path = Path()
-
-                data.forEachIndexed { index, value ->
-                    val x = space * index
-                    val y = height - (value / maxValue) * height
-
-                    if (index == 0) {
-                        path.moveTo(x, y)
-                    } else {
-                        path.lineTo(x, y)
-                    }
-
-                    drawCircle(
-                        color = AppColor.Blue,
-                        radius = 6f,
-                        center = Offset(x, y)
-                    )
-                }
-
-                drawPath(
-                    path = path,
-                    color = AppColor.Blue,
-                    style = Stroke(width = 4f)
-                )
-
-                data.forEachIndexed { index, _ ->
-                    val x = space * index
-                    drawContext.canvas.nativeCanvas.apply {
-                        drawText(
-                            days[index],
-                            x,
-                            height + 20.dp.toPx(),
-                            Paint().apply {
-                                textAlign = Paint.Align.CENTER
-                                textSize = 30f
-                                color = android.graphics.Color.BLACK
-                            }
-                        )
-                    }
-                }
-
-                val step = maxValue / 5
-                for (i in 1..5) {
-                    val y = height - (i * step / maxValue) * height
-                    drawLine(
-                        color = Color.LightGray,
-                        start = Offset(0f, y),
-                        end = Offset(width, y),
-                        strokeWidth = 1f
-                    )
-                }
-            }
-        }
-    }
-}
-
-private fun parseCurrencyAmount(total: String): Long =
-    total.replace(Regex("[^0-9]"), "").toLongOrNull() ?: 0L
-
-private fun formatRupiah(amount: Long): String =
-    amount.toRupiah()
-
-private fun buildWeeklyOrderCounts(orders: List<SellerOrderItem>): List<Pair<String, Int>> {
-    val formatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH)
-    val today = LocalDate.now()
-    val dates = (6 downTo 0).map { today.minusDays(it.toLong()) }
-    val counts = dates.associateWith { 0 }.toMutableMap()
-
-    orders.forEach { order ->
-        val parsedDate = runCatching { LocalDate.parse(order.date, formatter) }.getOrNull() ?: return@forEach
-        if (parsedDate in counts.keys) {
-            counts[parsedDate] = (counts[parsedDate] ?: 0) + 1
-        }
-    }
-
-    return dates.map { date ->
-        date.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() } to (counts[date] ?: 0)
-    }
-}
-
-
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable

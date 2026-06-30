@@ -1,17 +1,10 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: SellerDashboardViewModel.kt
- *
- * Last modified by Dedy Wijaya on 18/02/26 12.15
- */
-
 package com.mtv.app.shopme.feature.seller.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeEventType
 import com.mtv.app.shopme.core.realtime.ShopmeRealtimeGateway
+import com.mtv.app.shopme.domain.usecase.GetSellerDashboardUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerOrdersUseCase
 import com.mtv.app.shopme.domain.usecase.GetUnreadNotificationCountUseCase
@@ -38,6 +31,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class SellerDashboardViewModel @Inject constructor(
     private val sessionManager: SessionManager,
+    private val getSellerDashboardUseCase: GetSellerDashboardUseCase,
     private val getSellerOrdersUseCase: GetSellerOrdersUseCase,
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val getUnreadNotificationCountUseCase: GetUnreadNotificationCountUseCase,
@@ -127,13 +121,41 @@ class SellerDashboardViewModel @Inject constructor(
     }
 
     private fun refresh() {
+        loadDashboard()
+        loadOrders()
+    }
+
+    private fun loadDashboard() {
+        observeIndependentDataFlow(
+            flow = getSellerDashboardUseCase(),
+            onState = { result ->
+                _state.update {
+                    it.copy(
+                        dashboard = if (result is LoadState.Success) result.data else it.dashboard,
+                        isLoading = result is LoadState.Loading && it.dashboard == null,
+                        errorMessage = when (result) {
+                            is LoadState.Success, is LoadState.Loading -> null
+                            else -> it.errorMessage
+                        }
+                    )
+                }
+            },
+            onError = {
+                _state.update { state ->
+                    state.copy(isLoading = false, errorMessage = it.message)
+                }
+                showError(it)
+            }
+        )
+    }
+
+    private fun loadOrders() {
         observeIndependentDataFlow(
             flow = getSellerOrdersUseCase(0, DASHBOARD_ORDER_PAGE_SIZE),
             onState = { result ->
                 _state.update {
                     it.copy(
-                        isLoading = result is LoadState.Loading,
-                        isRefreshing = result is LoadState.Loading && it.orders.isNotEmpty(),
+                        isRefreshing = result is LoadState.Loading && it.dashboard != null,
                         orders = if (result is LoadState.Success) result.data.content else it.orders,
                         errorMessage = when (result) {
                             is LoadState.Success, is LoadState.Loading -> null

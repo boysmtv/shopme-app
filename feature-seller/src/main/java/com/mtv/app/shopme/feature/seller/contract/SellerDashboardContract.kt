@@ -1,24 +1,16 @@
-/*
- * Project: Shopme App
- * Author: Boys.mtv@gmail.com
- * File: SellerDashboardContract.kt
- *
- * Last modified by Dedy Wijaya on 18/02/26 12.16
- */
-
 package com.mtv.app.shopme.feature.seller.contract
 
 import androidx.compose.runtime.Immutable
+import com.mtv.app.shopme.domain.model.SellerDashboard
 import com.mtv.app.shopme.domain.model.SellerOrderItem
-import com.mtv.based.core.network.utils.ResourceFirebase
 
 @Immutable
 data class SellerDashboardUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
-    val emptyState: ResourceFirebase<Unit> = ResourceFirebase.Loading,
     val errorMessage: String? = null,
 
+    val dashboard: SellerDashboard? = null,
     val orders: List<SellerOrderItem> = emptyList(),
 
     val storeName: String = "",
@@ -32,9 +24,7 @@ data class SellerDashboardUiState(
 sealed class SellerDashboardEvent {
     object Load : SellerDashboardEvent()
     object DismissDialog : SellerDashboardEvent()
-
     object Refresh : SellerDashboardEvent()
-
     object ClickProduct : SellerDashboardEvent()
     object ClickOrder : SellerDashboardEvent()
     data class ClickOrderDetail(val orderId: String) : SellerDashboardEvent()

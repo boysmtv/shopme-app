@@ -6,6 +6,7 @@ import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.datasource.SellerRemoteDataSource
 import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.data.remote.response.SellerDashboardResponse
 import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
 import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
@@ -30,6 +31,17 @@ class SellerRepositoryImpl @Inject constructor(
     private val homeDao: HomeDao,
     private val syncManager: OfflineMutationSyncManager
 ) : SellerRepository {
+
+    override fun getDashboard() =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val dashboard = remote.getDashboard()
+                emit(Resource.Success(dashboard.toDomain()))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
 
     override fun getProfile() =
         flow {

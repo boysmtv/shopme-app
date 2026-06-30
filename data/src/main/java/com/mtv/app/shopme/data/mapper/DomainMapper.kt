@@ -76,13 +76,21 @@ import com.mtv.app.shopme.data.remote.response.OrderTimelineResponse
 import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
 import com.mtv.app.shopme.data.remote.response.SellerProfileResponse
+import com.mtv.app.shopme.data.remote.response.SellerDashboardResponse
+import com.mtv.app.shopme.data.remote.response.ChartDataPoint
+import com.mtv.app.shopme.data.remote.response.StatusCount
+import com.mtv.app.shopme.data.remote.response.TopProductData
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderItem
 import com.mtv.app.shopme.domain.model.OrderTimeline
+import com.mtv.app.shopme.domain.model.SellerDashboard
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.model.SellerPaymentMethod
 import com.mtv.app.shopme.domain.model.SellerProfile
 import com.mtv.app.shopme.domain.model.Village
+import com.mtv.app.shopme.domain.model.ChartDataItem
+import com.mtv.app.shopme.domain.model.StatusCountItem
+import com.mtv.app.shopme.domain.model.TopProductItem
 
 /* =========================================================
  * RESPONSE → DOMAIN
@@ -369,6 +377,26 @@ fun SellerPaymentMethodResponse.toDomain(): SellerPaymentMethod = SellerPaymentM
     danaNumber = danaNumber.orEmpty(),
     gopayEnabled = gopayEnabled,
     gopayNumber = gopayNumber.orEmpty()
+)
+
+fun SellerDashboardResponse.toDomain(): SellerDashboard = SellerDashboard(
+    totalRevenue = totalRevenue,
+    todayRevenue = todayRevenue,
+    thisWeekRevenue = thisWeekRevenue,
+    thisMonthRevenue = thisMonthRevenue,
+    totalOrders = totalOrders,
+    pendingOrders = pendingOrders,
+    processingOrders = processingOrders,
+    completedOrders = completedOrders,
+    cancelledOrders = cancelledOrders,
+    totalProducts = totalProducts,
+    activeProducts = activeProducts,
+    lowStockProducts = lowStockProducts,
+    totalSold = totalSold,
+    weeklyRevenue = weeklyRevenue.map { ChartDataItem(label = it.label, value = it.value.filter { c -> c.isDigit() }.toLongOrNull() ?: 0L) },
+    monthlyRevenue = monthlyRevenue.map { ChartDataItem(label = it.label, value = it.value.filter { c -> c.isDigit() }.toLongOrNull() ?: 0L) },
+    orderStatusBreakdown = orderStatusBreakdown.map { StatusCountItem(status = it.status, count = it.count) },
+    topProducts = topProducts.map { TopProductItem(productId = it.productId, productName = it.productName, totalSold = it.totalSold, revenue = it.revenue, price = it.price) }
 )
 
 fun SellerOrderSummaryResponse.toDomain(): SellerOrderItem = SellerOrderItem(

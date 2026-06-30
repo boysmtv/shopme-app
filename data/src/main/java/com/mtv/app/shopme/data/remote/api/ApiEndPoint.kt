@@ -204,6 +204,7 @@ object ApiEndPoint {
     }
 
     object Seller {
+        object Dashboard : IApiEndPoint { override val path = "$API/$SELLER/dashboard"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object Profile : IApiEndPoint { override val path = "$API/$SELLER/profile"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object PaymentMethods : IApiEndPoint { override val path = "$API/$SELLER/payment-methods"; override val method = HttpMethod.Get; override val type = EndpointType.Json }
         object UpdatePaymentMethods : IApiEndPoint { override val path = "$API/$SELLER/payment-methods"; override val method = HttpMethod.Put; override val type = EndpointType.Json }

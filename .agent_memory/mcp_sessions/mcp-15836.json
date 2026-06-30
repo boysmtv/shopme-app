@@ -1,0 +1,46 @@
+{
+  "session_id": "mcp-15836",
+  "created_at": "2026-06-30T04:57:53.628884+00:00",
+  "last_active": "2026-06-30T14:45:20.921888+00:00",
+  "tool_call_count": 5,
+  "context": {
+    "client_info": "{'name': 'opencode', 'version': '1.16.2'}",
+    "client_name": "opencode",
+    "last_tool": "tools/call",
+    "last_args": "{'query': \"Analyze the seller-side feature module in this Android project. List all existing screens, ViewModels, contracts, and identify what's missing or could be improved for UI/UX and features. Lo"
+  },
+  "stream_buffer": [
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "project_status",
+        "success": true
+      },
+      "timestamp": "2026-06-30T04:58:32.774289+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "memory_query",
+        "success": true
+      },
+      "timestamp": "2026-06-30T04:58:32.821760+00:00"
+    },
+    {
+      "type": "tool_error",
+      "data": {
+        "tool": "coding_task_run",
+        "error": "AutonomousCodingRequest.__init__() got an unexpected keyword argument 'goal'"
+      },
+      "timestamp": "2026-06-30T06:21:33.316785+00:00"
+    },
+    {
+      "type": "tool_error",
+      "data": {
+        "tool": "project_ask",
+        "error": "Missing API key environment variable: DEEPSEEK_API_KEY"
+      },
+      "timestamp": "2026-06-30T14:45:20.921888+00:00"
+    }
+  ]
+}

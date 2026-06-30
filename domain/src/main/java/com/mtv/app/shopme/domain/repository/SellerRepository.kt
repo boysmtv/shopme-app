@@ -3,6 +3,7 @@ package com.mtv.app.shopme.domain.repository
 import com.mtv.app.shopme.domain.model.Order
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PagedData
+import com.mtv.app.shopme.domain.model.SellerDashboard
 import com.mtv.app.shopme.domain.model.SellerPaymentMethod
 import com.mtv.app.shopme.domain.model.SellerOrderItem
 import com.mtv.app.shopme.domain.model.SellerProfile
@@ -11,6 +12,7 @@ import com.mtv.app.shopme.domain.model.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface SellerRepository {
+    fun getDashboard(): Flow<Resource<SellerDashboard>>
     fun getProfile(): Flow<Resource<SellerProfile>>
     fun getPaymentMethods(): Flow<Resource<SellerPaymentMethod>>
     fun getOrders(): Flow<Resource<List<SellerOrderItem>>>
