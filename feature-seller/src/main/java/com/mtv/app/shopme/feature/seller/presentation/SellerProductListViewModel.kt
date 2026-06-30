@@ -12,9 +12,11 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.model.Food
 import com.mtv.app.shopme.domain.model.ProductItem
 import com.mtv.app.shopme.domain.usecase.DeleteFoodUseCase
+import com.mtv.app.shopme.domain.param.FoodBulkStatusParam
 import com.mtv.app.shopme.domain.usecase.GetFoodsByCafeUseCase
 import com.mtv.app.shopme.domain.usecase.GetProductStatsUseCase
 import com.mtv.app.shopme.domain.usecase.GetSellerProfileUseCase
+import com.mtv.app.shopme.domain.usecase.UpdateFoodBulkStatusUseCase
 import com.mtv.app.shopme.feature.seller.contract.*
 import com.mtv.app.shopme.feature.seller.contract.SellerProductListEffect.*
 import com.mtv.based.core.network.utils.LoadState
@@ -35,7 +37,8 @@ class SellerProductListViewModel @Inject constructor(
     private val getSellerProfileUseCase: GetSellerProfileUseCase,
     private val getFoodsByCafeUseCase: GetFoodsByCafeUseCase,
     private val getProductStatsUseCase: GetProductStatsUseCase,
-    private val deleteFoodUseCase: DeleteFoodUseCase
+    private val deleteFoodUseCase: DeleteFoodUseCase,
+    private val updateFoodBulkStatusUseCase: UpdateFoodBulkStatusUseCase
 ) : BaseEventViewModel<SellerProductListEvent, SellerProductListEffect>() {
 
     private val _state = MutableStateFlow(SellerProductListUiState())
@@ -93,6 +96,69 @@ class SellerProductListViewModel @Inject constructor(
 
             SellerProductListEvent.ClickBack ->
                 emitEffect(NavigateBack)
+
+            SellerProductListEvent.ToggleSelectionMode -> {
+                _state.update { it.copy(isSelectionMode = !it.isSelectionMode, selectedProductIds = emptySet()) }
+            }
+
+            is SellerProductListEvent.ToggleProductSelection -> {
+                _state.update { state ->
+                    val newSelected = if (event.productId in state.selectedProductIds) {
+                        state.selectedProductIds - event.productId
+                    } else {
+                        state.selectedProductIds + event.productId
+                    }
+                    state.copy(selectedProductIds = newSelected)
+                }
+            }
+
+            SellerProductListEvent.SelectAll -> {
+                _state.update { it.copy(selectedProductIds = it.products.map { p -> p.id }.toSet()) }
+            }
+
+            SellerProductListEvent.DeselectAll -> {
+                _state.update { it.copy(selectedProductIds = emptySet()) }
+            }
+
+            SellerProductListEvent.BulkActivate -> {
+                val ids = _state.value.selectedProductIds.toList()
+                if (ids.isNotEmpty()) {
+                    observeDataFlow(
+                        flow = updateFoodBulkStatusUseCase(FoodBulkStatusParam(ids, true)),
+                        onState = { state ->
+                            if (state is com.mtv.based.core.network.utils.LoadState.Success) {
+                                _state.update { it.copy(isSelectionMode = false, selectedProductIds = emptySet()) }
+                                reloadProducts()
+                            }
+                        },
+                        onError = { /* handle error */ }
+                    )
+                }
+            }
+
+            SellerProductListEvent.BulkDeactivate -> {
+                val ids = _state.value.selectedProductIds.toList()
+                if (ids.isNotEmpty()) {
+                    observeDataFlow(
+                        flow = updateFoodBulkStatusUseCase(FoodBulkStatusParam(ids, false)),
+                        onState = { state ->
+                            if (state is com.mtv.based.core.network.utils.LoadState.Success) {
+                                _state.update { it.copy(isSelectionMode = false, selectedProductIds = emptySet()) }
+                                reloadProducts()
+                            }
+                        },
+                        onError = { /* handle error */ }
+                    )
+                }
+            }
+
+            SellerProductListEvent.BulkDelete -> {
+                val ids = _state.value.selectedProductIds.toList()
+                if (ids.isNotEmpty()) {
+                    ids.forEach { id -> deleteProduct(id) }
+                    _state.update { it.copy(isSelectionMode = false, selectedProductIds = emptySet()) }
+                }
+            }
         }
     }
 

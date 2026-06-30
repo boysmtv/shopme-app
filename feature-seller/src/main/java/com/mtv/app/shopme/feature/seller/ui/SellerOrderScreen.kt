@@ -8,6 +8,10 @@
 
 package com.mtv.app.shopme.feature.seller.ui
 
+import android.content.ContentValues
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
 import androidx.compose.foundation.background
 import com.mtv.app.shopme.feature.seller.ui.component.OrderFilterChips
 import androidx.compose.foundation.clickable
@@ -33,6 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Payment
 import androidx.compose.material.icons.filled.Receipt
@@ -44,15 +49,21 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -64,7 +75,9 @@ import com.mtv.app.shopme.common.ShimmerLine
 import com.mtv.app.shopme.feature.seller.contract.OrderSummary
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerOrderUiState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -72,12 +85,22 @@ fun SellerOrderScreen(
     state: SellerOrderUiState,
     event: (SellerOrderEvent) -> Unit
 ) {
+    val context = LocalContext.current
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state.isRefreshing,
         onRefresh = { event(SellerOrderEvent.Load) }
     )
     val listState = rememberSaveable(saver = LazyListState.Saver, init = { LazyListState() })
     val canLoadMore = !state.isLoading && !state.isLoadingMore && !state.isLastPage
+
+    var exportTrigger by remember { mutableStateOf(false) }
+
+    LaunchedEffect(exportTrigger) {
+        if (exportTrigger) {
+            exportOrdersToCsv(context, state.orders)
+            exportTrigger = false
+        }
+    }
 
     LaunchedEffect(listState, canLoadMore) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
@@ -106,6 +129,9 @@ fun SellerOrderScreen(
             totalOrders = state.orders.size,
             onToggle = {
                 event(SellerOrderEvent.ToggleOnline)
+            },
+            onExportCsv = {
+                exportTrigger = true
             }
         )
 
@@ -245,7 +271,8 @@ private fun SellerOrderShimmer() {
 fun SellerOrderHeader(
     isOnline: Boolean,
     totalOrders: Int,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    onExportCsv: () -> Unit
 ) {
 
     Box(
@@ -280,6 +307,19 @@ fun SellerOrderHeader(
                 )
 
                 Spacer(Modifier.weight(1f))
+
+                IconButton(
+                    onClick = onExportCsv,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Download,
+                        contentDescription = "Export CSV",
+                        tint = Color.White
+                    )
+                }
+
+                Spacer(Modifier.width(8.dp))
 
                 Box(
                     modifier = Modifier
@@ -436,6 +476,47 @@ private fun String.displayOrderStatusLabel(): String = when (uppercase()) {
 }
 
 
+
+private suspend fun exportOrdersToCsv(
+    context: android.content.Context,
+    orders: List<OrderSummary>
+) = withContext(Dispatchers.IO) {
+    val header = "Order ID,Customer,Total,Date,Time,Payment,Status,Location"
+    val rows = orders.joinToString("\n") { order ->
+        listOf(
+            order.orderId,
+            "\"${order.customerName}\"",
+            order.total,
+            order.date,
+            order.time,
+            order.paymentMethod,
+            order.status,
+            "\"${order.location}\""
+        ).joinToString(",")
+    }
+
+    val csvContent = "$header\n$rows"
+    val fileName = "orders_${System.currentTimeMillis()}.csv"
+
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+        put(MediaStore.Downloads.MIME_TYPE, "text/csv")
+        put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+    }
+
+    val resolver = context.contentResolver
+    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+
+    if (uri != null) {
+        resolver.openOutputStream(uri)?.use { outputStream ->
+            outputStream.write(csvContent.toByteArray(Charsets.UTF_8))
+        }
+    }
+
+    withContext(Dispatchers.Main) {
+        Toast.makeText(context, "CSV exported to Downloads/$fileName", Toast.LENGTH_LONG).show()
+    }
+}
 
 @Preview(showBackground = true, device = Devices.PIXEL_4_XL)
 @Composable

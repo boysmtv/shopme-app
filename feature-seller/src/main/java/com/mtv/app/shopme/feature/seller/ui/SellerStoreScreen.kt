@@ -37,6 +37,8 @@ import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.QRCode
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Store
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -50,7 +52,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,6 +73,7 @@ import com.mtv.app.shopme.common.SmartImage
 import com.mtv.app.shopme.common.ProfileMenuItem
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreEvent
 import com.mtv.app.shopme.feature.seller.contract.SellerStoreUiState
+import com.mtv.app.shopme.feature.seller.ui.component.StoreQrDialog
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.uicomponent.core.ui.util.Constants.Companion.EMPTY_STRING
 
@@ -91,6 +96,19 @@ fun SellerStoreScreen(
         refreshing = state.isRefreshing,
         onRefresh = { event(SellerStoreEvent.Load) }
     )
+
+    var showQrDialog by remember { mutableStateOf(false) }
+
+    if (showQrDialog) {
+        StoreQrDialog(
+            storeName = state.storeName,
+            storeUrl = "https://shopme.app/store/${state.storeName}",
+            onDismiss = {
+                showQrDialog = false
+                event(SellerStoreEvent.DismissQrDialog)
+            }
+        )
+    }
 
     val menuItems = listOf(
         ProfileMenuItem(
@@ -137,7 +155,8 @@ fun SellerStoreScreen(
         ) {
             SellerStoreTopBar(
                 onBack = { event(SellerStoreEvent.ClickBack) },
-                onLogout = { event(SellerStoreEvent.Logout) }
+                onLogout = { event(SellerStoreEvent.Logout) },
+                onShareQr = { showQrDialog = true }
             )
         }
 
@@ -179,7 +198,8 @@ fun SellerStoreScreen(
 @Composable
 fun SellerStoreTopBar(
     onBack: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onShareQr: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -208,6 +228,17 @@ fun SellerStoreTopBar(
                 fontSize = 18.sp,
                 fontFamily = PoppinsFont,
                 color = Color.Black
+            )
+        }
+
+        IconButton(
+            onClick = onShareQr,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.QRCode,
+                contentDescription = "Share QR",
+                tint = AppColor.BlueMedium
             )
         }
 
@@ -407,6 +438,41 @@ fun SellerStoreHeader(
                 lineHeight = 16.sp
             )
 
+            if (state.rating > 0f) {
+                Spacer(Modifier.height(12.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    repeat(5) { index ->
+                        val starFraction = (state.rating - index).coerceIn(0f, 1f)
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = if (starFraction > 0f) Color(0xFFFFB300) else Color(0xFFE0E0E0)
+                        )
+                    }
+
+                    Spacer(Modifier.width(6.dp))
+
+                    Text(
+                        text = String.format("%.1f", state.rating),
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = PoppinsFont,
+                        color = Color(0xFFFFB300)
+                    )
+
+                    Spacer(Modifier.width(4.dp))
+
+                    Text(
+                        text = "(${state.ratingCount})",
+                        fontSize = 12.sp,
+                        color = AppColor.Gray,
+                        fontFamily = PoppinsFont
+                    )
+                }
+            }
+
             Spacer(Modifier.height(14.dp))
 
             Row(
@@ -470,7 +536,9 @@ fun SellerStoreScreenPreview() {
         phone = "08123456789",
         storeName = "Shopme Store",
         storeAddress = "Jakarta, Indonesia",
-        isOnline = true
+        isOnline = true,
+        rating = 4.5f,
+        ratingCount = 128
     )
 
     SellerStoreScreen(

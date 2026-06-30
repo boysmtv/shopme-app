@@ -24,7 +24,10 @@ data class SellerStoreUiState(
     val storePhoto: String = "",
     val storeAddress: String = "",
 
-    val isOnline: Boolean = true
+    val isOnline: Boolean = true,
+
+    val rating: Float = 0f,
+    val ratingCount: Int = 0
 )
 
 sealed class SellerStoreEvent {
@@ -42,6 +45,8 @@ sealed class SellerStoreEvent {
 
     object Logout : SellerStoreEvent()
     object ClickBack : SellerStoreEvent()
+    object ClickShareQr : SellerStoreEvent()
+    object DismissQrDialog : SellerStoreEvent()
 }
 
 sealed class SellerStoreEffect {

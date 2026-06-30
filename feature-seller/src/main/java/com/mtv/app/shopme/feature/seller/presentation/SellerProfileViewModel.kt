@@ -69,6 +69,12 @@ class SellerProfileViewModel @Inject constructor(
                 emitEffect(SellerStoreEffect.NavigateToHelpCenter)
 
             SellerStoreEvent.ClickBack -> emitEffect(SellerStoreEffect.NavigateToDashboard)
+            SellerStoreEvent.ClickShareQr -> {
+                // QR dialog is handled in UI layer
+            }
+            SellerStoreEvent.DismissQrDialog -> {
+                // QR dialog dismissed in UI layer
+            }
             SellerStoreEvent.Logout -> logout()
             else -> {}
         }

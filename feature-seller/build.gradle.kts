@@ -108,6 +108,11 @@ dependencies {
     implementation(libs.coil.compose)
 
     /* =========================
+     * QR Code Generation
+     * ========================= */
+    implementation("com.google.zxing:core:3.5.3")
+
+    /* =========================
      * Date & Time
      * ========================= */
     implementation(libs.threetenabp)

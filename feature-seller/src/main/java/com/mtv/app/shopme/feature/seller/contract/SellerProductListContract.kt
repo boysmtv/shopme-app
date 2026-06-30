@@ -28,6 +28,8 @@ data class SellerProductListUiState(
     val statusFilter: FoodStatus? = null,
     val activeFilter: Boolean? = null,
     val productStats: ProductStats? = null,
+    val isSelectionMode: Boolean = false,
+    val selectedProductIds: Set<String> = emptySet(),
 
     val products: List<ProductItem> = emptyList()
 )
@@ -47,6 +49,14 @@ sealed class SellerProductListEvent {
     object ClearFilters : SellerProductListEvent()
 
     object ClickBack : SellerProductListEvent()
+
+    object ToggleSelectionMode : SellerProductListEvent()
+    data class ToggleProductSelection(val productId: String) : SellerProductListEvent()
+    object SelectAll : SellerProductListEvent()
+    object DeselectAll : SellerProductListEvent()
+    object BulkActivate : SellerProductListEvent()
+    object BulkDeactivate : SellerProductListEvent()
+    object BulkDelete : SellerProductListEvent()
 }
 
 sealed class SellerProductListEffect {
