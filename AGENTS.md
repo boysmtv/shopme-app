@@ -305,28 +305,92 @@ feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/
 
 ---
 
-## Session Context (Last: 30 Jun 2026)
+## Session Context (Last: 30 Jun 2026 — End of Day)
 
 ### Backend Status
-- **Running**: `http://localhost:8080` (PID via `java -jar` dengan arg: `--spring.profiles.active=prod --spring.datasource.url=jdbc:postgresql://localhost:5432/app_db --spring.datasource.username=app_user --spring.datasource.password=fdjtaZKqIAhjbpG/7RJJY4PGDljcZXZW --spring.data.redis.host=localhost --spring.data.redis.port=6379 --jwt.secret=aLCfkYeSKKWosA8YhszaxH4U+6xliM2R4WEYpMORcBA= --admin.name=Admin --admin.email=admin.shopme@mtv.com --admin.password=sEzunWapdxj62uF3By3bKmjBz2rAO6Ph --shopme.media.enabled=false --shopme.media.endpoint=http://localhost:9000 --shopme.media.access-key=minioadmin --shopme.media.secret-key=minioadmin123`)
-- **Media disabled** sementara (`--shopme.media.enabled=false`), perlu restart tanpa flag itu kalau MinIO aktif.
+- **Running**: `http://localhost:8080` (PID 6416, started via `Start-Process` with env vars)
+- **Profile**: `prod` with Flyway, DDL auto=validate
+- **Media**: disabled (`SHOPME_MEDIA_ENABLED=false`) — MinIO still running but not used
 - **DB**: PostgreSQL `app_db` via Docker (`localhost:5432`)
 - **Redis**: `localhost:6379` via Docker
-- **MinIO**: `localhost:9000`
+- **MinIO**: `localhost:9000` via Docker
+- **Startup**: requires env vars `SPRING_DATASOURCE_URL/USERNAME/PASSWORD`, `SPRING_DATA_REDIS_HOST/PORT`, `JWT_SECRET`, `ADMIN_NAME/EMAIL/PASSWORD`, `SHOPME_MEDIA_*`
 
 ### Seed Data
-- **Buyer**: `buyer.demo@shopme.local` / `Demo123!` (with address)
-- **Seller**: `seller.demo@shopme.local` / `Demo123!` (approved, role=SELLER)
-- **Cafe**: `Shopme Demo Cafe` (ID: `bf7ddf4d-36d9-4333-bcdc-a47b8f00fec7`)
-- **Menu (4)**: Demo Nasi Goreng (Rp18k), Demo Ayam Geprek (Rp22k), Demo Es Kopi Susu (Rp14k), Demo Teh Tarik (Rp12k)
-- **Admin**: `admin.shopme@mtv.com` (password di .env)
+- **Admin**: `admin.shopme@mtv.com` / `sEzunWapdxj62uF3By3bKmjBz2rAO6Ph`
+- **Buyers**: 4 buyers (emails from seed script)
+- **Sellers**: 10 sellers w/ cafes + products
+- **Orders**: 10 orders seeded
+- **NOTE**: `seller.demo@shopme.local` / `Demo123!` — login returning 401, might need re-seed or different password hash
+
+### Seller Dashboard API
+- **New endpoint**: `GET /api/v1/seller/dashboard` → returns `SellerDashboardResponse`
+- Response includes: total/today/week/month revenue, order counts by status, weekly/monthly chart data, order status breakdown, top 5 products by sales, total sold, product stats, low stock count
+
+### Seller Feature Improvements (Today — 30 Jun 2026)
+
+#### Revenue & Analytics (✅ Done)
+- **Backend**: `SellerController.getDashboard()` → `SellerService.getDashboard()`
+  - Aggregates revenue from completed/delivering orders (today, this week via Mon, this month, all-time)
+  - Weekly revenue chart data (7 days)
+  - Monthly revenue chart data (last 4 months)
+  - Order status breakdown (UNPAID, ORDERED, COOKING, DELIVERING, COMPLETED, CANCELLED)
+  - Top 5 products by units sold
+- **Android**: Redesigned `SellerDashboardScreen.kt` with:
+  - Revenue cards (Today/Week/Month/Total) with colored indicators
+  - Quick stats row (Total Orders, Active Products, Total Sold, Pending)
+  - Weekly Revenue Bar Chart (Canvas-based)
+  - Order Status Breakdown (horizontal stacked bar + legend)
+  - Top Products section (#1/#2/#3 badges)
+  - Low Stock Warning card
+  - Keep existing: header, online toggle, notification badge, order filter chips, order list
+
+#### Stock Management (✅ Already Implemented)
+- Product list: `ModernStockBadge` (≤5 = red "Low Stock - N", >5 = blue "Stock - N")
+- Product header stats: Total Products, Total Stock, Low Stock count
+- Dashboard: `lowStockProducts` count + warning card
+- Product form: stock quantity input field
+
+#### Store QR Code (✅ Done)
+- `StoreQrDialog.kt` — ZXing-based QR code generation
+- Shows QR code bitmap (240dp) for store URL
+- Share button → Android share intent
+- QR icon in Store screen top bar
+
+#### Rating Display (✅ Done)
+- Added `rating: Float`, `ratingCount: Int` to `SellerStoreUiState`
+- Star rating display (5 star icons + rating value + count) in Store header
+
+#### Order CSV Export (✅ Done)
+- Download icon button in Order screen header
+- Exports order list as CSV to Downloads folder via `MediaStore.Downloads`
+- Shows Toast on completion
+
+#### Bulk Actions (✅ Done — Partial UI)
+- Backend: `PATCH /api/v1/foods/bulk/active` (existing)
+- Domain: `FoodBulkStatusParam`, `UpdateFoodBulkStatusUseCase`
+- Contract: selection mode state + events (ToggleSelectionMode, ToggleProductSelection, SelectAll, DeselectAll, BulkActivate, BulkDeactivate, BulkDelete)
+- ViewModel: handlers for all bulk events
+- **Pending**: UI update to product list screen (selection checkboxes, bulk action bar)
+
+### Pending Features (Need Backend Work)
+| Feature | What's Needed |
+|---------|---------------|
+| **Promo & Diskon** | Backend: discount table, CRUD API. Frontend: discount form, badge |
+| **Customer Reviews** | Backend: review table, rating API. Frontend: review list, reply |
+| **Product Category Management** | Backend: category CRUD API. Frontend: category manager |
+| **Operating Hours** | Backend: already has openTime/closeTime on Cafe. Frontend: display & edit UI |
 
 ### Key Learnings
 1. `FoodRequest.estimate: String` is **required** (no default) — will cause 400 if missing.
 2. `CafeAddRequest.image` is `@NotBlank` dan divalidasi oleh MinioMediaAssetService — must be empty or managed key when media enabled.
-3. Backend startup requires: DB, Redis, JWT, Admin, Media credentials — all passed as `--` args.
-4. `Invoke-RestMethod` returns `PSCustomObject` with PascalCase props (e.g., `$resp.data.Id`).
-5. API is now `/api/v1/...` — Android `ApiEndPoint.kt` already updated.
+3. Backend application.yml uses `${SPRING_DATASOURCE_URL}` — env vars, NOT `--spring.datasource.url` args.
+4. MinIO requires `SHOPME_MEDIA_PUBLIC_BASE_URL` when media enabled.
+5. `Invoke-RestMethod` returns `PSCustomObject` with PascalCase props (e.g., `$resp.data.Id`).
+6. API is `/api/v1/...` — Android `ApiEndPoint.kt` already updated.
+7. Backend rebuild: `.\mvnw.cmd package -pl shopme-app -am -D"maven.test.skip=true"`
+8. Backend start: `Start-Process -FilePath "java" -ArgumentList "-jar <jar>""` with env vars pre-set
+9. Android build: `./gradlew assembleDebug`
 
 ### Android Build
 - APK debug v1.0.15-x di Firebase App Distribution
