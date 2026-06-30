@@ -18,7 +18,9 @@ data class LoginUiState(
     val email: String = EMPTY_STRING,
     val password: String = EMPTY_STRING,
     val rememberEmail: Boolean = false,
-    val login: LoadState<Login> = LoadState.Idle
+    val login: LoadState<Login> = LoadState.Idle,
+    val dialog: LoginDialog? = null,
+    val debugToast: String = ""
 )
 
 sealed class LoginEvent {
@@ -36,4 +38,8 @@ sealed class LoginEffect {
     data object NavigateToSellerDashboard : LoginEffect()
     data object NavigateToRegister : LoginEffect()
     data object NavigateToForgotPassword : LoginEffect()
+}
+
+sealed class LoginDialog {
+    data class Error(val message: String) : LoginDialog()
 }

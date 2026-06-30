@@ -66,8 +66,12 @@ import androidx.compose.ui.unit.sp
 import com.mtv.app.shopme.common.AppColor
 import com.mtv.app.shopme.common.PoppinsFont
 import com.mtv.app.shopme.common.R
+import com.mtv.app.shopme.feature.auth.contract.LoginDialog
 import com.mtv.app.shopme.feature.auth.contract.LoginEvent
 import com.mtv.app.shopme.feature.auth.contract.LoginUiState
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogCenterV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
+import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import com.mtv.based.uicomponent.core.component.loading.LoadingV2
 import com.mtv.based.core.network.utils.LoadState
 
@@ -87,8 +91,6 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
-                .verticalScroll(rememberScrollState())
         ) {
 
             Box(
@@ -106,13 +108,16 @@ fun LoginScreen(
 
             Card(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.White)
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .imePadding()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
 
@@ -328,6 +333,29 @@ fun LoginScreen(
             ) {
                 LoadingV2()
             }
+        }
+
+        if (state.dialog is LoginDialog.Error) {
+            DialogCenterV1(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = "Login gagal",
+                    message = (state.dialog as LoginDialog.Error).message
+                ),
+                onDismiss = { event(LoginEvent.DismissDialog) }
+            )
+        }
+
+        if (state.debugToast.isNotBlank()) {
+            Text(
+                text = state.debugToast,
+                color = Color.Red,
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .align(Alignment.BottomCenter)
+            )
         }
     }
 }

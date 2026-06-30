@@ -8,15 +8,15 @@ class ApiEndPointChatTest {
     @Test
     fun `ensure conversation endpoints should have correct paths`() {
         assertEquals(
-            "api/chat/conversation",
+            "api/v1/chat/conversation",
             ApiEndPoint.Chat.EnsureConversation.path
         )
         assertEquals(
-            "api/chat/conversation/order",
+            "api/v1/chat/conversation/order",
             ApiEndPoint.Chat.EnsureOrderConversation.path
         )
         assertEquals(
-            "api/chat/conversation/seller",
+            "api/v1/chat/conversation/seller",
             ApiEndPoint.Chat.EnsureSellerConversation.path
         )
     }

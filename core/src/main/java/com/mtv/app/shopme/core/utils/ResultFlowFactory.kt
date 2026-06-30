@@ -2,7 +2,6 @@ package com.mtv.app.shopme.core.utils
 
 import com.mtv.app.shopme.domain.model.Resource
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -18,7 +17,6 @@ class ResultFlowFactory @Inject constructor() {
         val result = block()
         emit(Resource.Success(result))
     }.catch { throwable ->
-        if (throwable is CancellationException) throw throwable
         emit(Resource.Error(throwable))
     }.flowOn(Dispatchers.IO)
 

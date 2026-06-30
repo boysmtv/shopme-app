@@ -12,12 +12,8 @@ import com.mtv.app.shopme.core.base.BaseEventViewModel
 import com.mtv.app.shopme.domain.param.RegisterParam
 import com.mtv.app.shopme.domain.usecase.GetRegisterUseCase
 import com.mtv.app.shopme.feature.auth.contract.*
-import com.mtv.based.core.network.utils.ErrorMessages
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
-import com.mtv.based.core.provider.utils.dialog.UiDialog
-import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
-import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +42,7 @@ class RegisterViewModel @Inject constructor(
                 _state.update { it.copy(password = event.value) }
             }
 
-            RegisterEvent.DismissDialog -> dismissDialog()
+            RegisterEvent.DismissDialog -> _state.update { it.copy(activeDialog = null) }
             is RegisterEvent.OnRegisterClick -> doRegister()
             RegisterEvent.OnLoginClick -> emitEffect(RegisterEffect.NavigateToLogin)
         }
@@ -79,15 +75,6 @@ class RegisterViewModel @Inject constructor(
     }
 
     private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = ErrorMessages.GENERIC_ERROR,
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
-            )
-        )
+        _state.update { it.copy(activeDialog = RegisterDialog.Error(error.message)) }
     }
 }

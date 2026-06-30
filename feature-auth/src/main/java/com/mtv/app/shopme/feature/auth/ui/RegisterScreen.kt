@@ -39,13 +39,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import android.widget.Toast
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -78,18 +81,41 @@ fun RegisterScreen(
 
     var passwordVisible by remember { mutableStateOf(false) }
 
-    if (state.activeDialog is RegisterDialog.Success) {
-        DialogCenterV1(
-            state = DialogStateV1(
-                type = DialogType.SUCCESS,
-                title = stringResource(R.string.success),
-                message = stringResource(R.string.success_register),
-                primaryButtonText = OK_STRING
-            ),
-            onDismiss = {
-                event(RegisterEvent.DismissDialog)
-            }
-        )
+    when (state.activeDialog) {
+        is RegisterDialog.Success -> {
+            DialogCenterV1(
+                state = DialogStateV1(
+                    type = DialogType.SUCCESS,
+                    title = stringResource(R.string.success),
+                    message = stringResource(R.string.success_register),
+                    primaryButtonText = OK_STRING
+                ),
+                onDismiss = { event(RegisterEvent.DismissDialog) }
+            )
+        }
+        is RegisterDialog.Error -> {
+            DialogCenterV1(
+                state = DialogStateV1(
+                    type = DialogType.ERROR,
+                    title = "Registrasi gagal",
+                    message = (state.activeDialog as RegisterDialog.Error).message
+                ),
+                onDismiss = { event(RegisterEvent.DismissDialog) }
+            )
+        }
+        null -> {}
+    }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(state.register) {
+        if (state.register is LoadState.Error) {
+            Toast.makeText(
+                context,
+                (state.register as LoadState.Error).error.message,
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     Box(
@@ -101,8 +127,6 @@ fun RegisterScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .imePadding()
-                .verticalScroll(rememberScrollState())
         ) {
 
             Box(
@@ -120,14 +144,17 @@ fun RegisterScreen(
 
             Card(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
                 shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                 colors = CardDefaults.cardColors(containerColor = AppColor.White)
             ) {
 
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .imePadding()
                         .padding(horizontal = 24.dp, vertical = 16.dp)
                 ) {
 

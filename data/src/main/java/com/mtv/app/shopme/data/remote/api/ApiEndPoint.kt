@@ -8,7 +8,7 @@ import java.net.URLEncoder
 
 object ApiEndPoint {
 
-    private const val API = "api"
+    private const val API = "api/v1"
     private const val AUTH = "auth"
     private const val ADDRESS = "address"
     private const val VILLAGE = "village"

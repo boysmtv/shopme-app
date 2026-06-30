@@ -22,9 +22,17 @@ class NotificationServices : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         val data = remoteMessage.data
+        val notificationType = data["type"] ?: EMPTY_STRING
+        val conversationId = data["conversationId"] ?: data["conversation_id"] ?: EMPTY_STRING
+
+        if (notificationType == "chat_message" && conversationId.isNotBlank()) {
+            handleChatNotification(data)
+            return
+        }
+
         val title = data["title"]
             ?: remoteMessage.notification?.title
-            ?: data["type"]?.toPushTitle()
+            ?: notificationType.toPushTitle()
             ?: EMPTY_STRING
         val message = data["message"]
             ?: remoteMessage.notification?.body
@@ -56,6 +64,33 @@ class NotificationServices : FirebaseMessagingService() {
             title = title,
             message = message,
             deepLink = deepLink
+        )
+    }
+
+    private fun handleChatNotification(data: Map<String, String>) {
+        val conversationId = data["conversationId"] ?: data["conversation_id"] ?: return
+        val senderName = data["actorName"] ?: data["customerName"] ?: data["cafeName"] ?: "Seseorang"
+        val chatMessage = data["message"] ?: data["body"] ?: "Pesan baru"
+        val role = data["role"]
+
+        repository.saveNotification(
+            NotificationItem(
+                title = "Pesan dari $senderName",
+                message = chatMessage,
+                photo = data["photo"] ?: EMPTY_STRING,
+                signatureName = senderName,
+                signatureDate = EMPTY_STRING,
+                signatureTime = EMPTY_STRING,
+                isRead = false
+            )
+        )
+
+        applicationContext.showChatNotification(
+            title = senderName,
+            message = chatMessage,
+            conversationId = conversationId,
+            role = role,
+            summary = "Pesan baru dari $senderName"
         )
     }
 

@@ -29,7 +29,7 @@ android {
         applicationId = "com.mtv.app.shopme"
         minSdk = 24
         targetSdk = 36
-        versionCode = 22
+        versionCode = 34
         versionName = "1.0.15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

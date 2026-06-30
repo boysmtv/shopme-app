@@ -18,9 +18,7 @@ import com.mtv.app.shopme.feature.auth.contract.*
 import com.mtv.based.core.network.utils.LoadState
 import com.mtv.based.core.network.utils.UiError
 import com.mtv.based.core.provider.utils.SecurePrefs
-import com.mtv.based.core.provider.utils.dialog.UiDialog
-import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogStateV1
-import com.mtv.based.uicomponent.core.component.dialog.dialogv1.DialogType
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +47,7 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.OnPasswordChange -> onPasswordChange(event)
             is LoginEvent.OnRememberEmailChange -> onRememberEmailChange(event)
             LoginEvent.OnLoginClick -> doLogin()
-            LoginEvent.DismissDialog -> dismissDialog()
+            LoginEvent.DismissDialog -> _state.update { it.copy(dialog = null) }
             LoginEvent.NavigateToRegister -> emitEffect(LoginEffect.NavigateToRegister)
             LoginEvent.NavigateToForgotPassword -> emitEffect(LoginEffect.NavigateToForgotPassword)
         }
@@ -131,24 +129,12 @@ class LoginViewModel @Inject constructor(
                     it.copy(
                         email = submittedEmail,
                         password = submittedPassword,
-                        login = LoadState.Error(uiError)
+                        login = LoadState.Error(uiError),
+                        dialog = LoginDialog.Error(uiError.message),
+                        debugToast = "ERROR:${uiError::class.simpleName}:${uiError.message}"
                     )
                 }
-                showError(uiError)
             }
-        )
-    }
-
-    private fun showError(error: UiError) {
-        setDialog(
-            UiDialog.Center(
-                state = DialogStateV1(
-                    type = DialogType.ERROR,
-                    title = "Login gagal",
-                    message = error.message
-                ),
-                onPrimary = { dismissDialog() }
-            )
         )
     }
 

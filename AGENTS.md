@@ -300,6 +300,35 @@ feature-customer/src/main/java/com/mtv/app/shopme/feature/customer/
 
 ---
 
-**Last Updated:** May 2026  
+**Last Updated:** June 2026  
 **Kotlin Version:** 2.0.21 | **Android API:** 36 | **Min API:** 24
+
+---
+
+## Session Context (Last: 30 Jun 2026)
+
+### Backend Status
+- **Running**: `http://localhost:8080` (PID via `java -jar` dengan arg: `--spring.profiles.active=prod --spring.datasource.url=jdbc:postgresql://localhost:5432/app_db --spring.datasource.username=app_user --spring.datasource.password=fdjtaZKqIAhjbpG/7RJJY4PGDljcZXZW --spring.data.redis.host=localhost --spring.data.redis.port=6379 --jwt.secret=aLCfkYeSKKWosA8YhszaxH4U+6xliM2R4WEYpMORcBA= --admin.name=Admin --admin.email=admin.shopme@mtv.com --admin.password=sEzunWapdxj62uF3By3bKmjBz2rAO6Ph --shopme.media.enabled=false --shopme.media.endpoint=http://localhost:9000 --shopme.media.access-key=minioadmin --shopme.media.secret-key=minioadmin123`)
+- **Media disabled** sementara (`--shopme.media.enabled=false`), perlu restart tanpa flag itu kalau MinIO aktif.
+- **DB**: PostgreSQL `app_db` via Docker (`localhost:5432`)
+- **Redis**: `localhost:6379` via Docker
+- **MinIO**: `localhost:9000`
+
+### Seed Data
+- **Buyer**: `buyer.demo@shopme.local` / `Demo123!` (with address)
+- **Seller**: `seller.demo@shopme.local` / `Demo123!` (approved, role=SELLER)
+- **Cafe**: `Shopme Demo Cafe` (ID: `bf7ddf4d-36d9-4333-bcdc-a47b8f00fec7`)
+- **Menu (4)**: Demo Nasi Goreng (Rp18k), Demo Ayam Geprek (Rp22k), Demo Es Kopi Susu (Rp14k), Demo Teh Tarik (Rp12k)
+- **Admin**: `admin.shopme@mtv.com` (password di .env)
+
+### Key Learnings
+1. `FoodRequest.estimate: String` is **required** (no default) — will cause 400 if missing.
+2. `CafeAddRequest.image` is `@NotBlank` dan divalidasi oleh MinioMediaAssetService — must be empty or managed key when media enabled.
+3. Backend startup requires: DB, Redis, JWT, Admin, Media credentials — all passed as `--` args.
+4. `Invoke-RestMethod` returns `PSCustomObject` with PascalCase props (e.g., `$resp.data.Id`).
+5. API is now `/api/v1/...` — Android `ApiEndPoint.kt` already updated.
+
+### Android Build
+- APK debug v1.0.15-x di Firebase App Distribution
+- Base URL dari `local.properties`: `http://192.168.100.55:8080/`
 

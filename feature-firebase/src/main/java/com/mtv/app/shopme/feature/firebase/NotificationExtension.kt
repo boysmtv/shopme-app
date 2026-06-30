@@ -15,28 +15,38 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+
 import com.mtv.app.shopme.common.R
 import com.mtv.app.shopme.common.notification.NotificationDeepLink
 import com.mtv.app.shopme.common.notification.NotificationDeepLinkExtras
 
+private const val CHANNEL_DEFAULT = "default_channel"
+private const val CHANNEL_CHAT = "chat_channel"
+private const val GROUP_CHAT = "chat_messages"
+
+fun Context.ensureNotificationChannels() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(
+            NotificationChannel(CHANNEL_DEFAULT, "Default", NotificationManager.IMPORTANCE_HIGH)
+        )
+        manager.createNotificationChannel(
+            NotificationChannel(CHANNEL_CHAT, "Chat", NotificationManager.IMPORTANCE_HIGH)
+        )
+    }
+}
+
 fun Context.showNotification(
     title: String,
     message: String,
-    channelId: String = "default_channel",
+    channelId: String = CHANNEL_DEFAULT,
     deepLink: NotificationDeepLink? = null
 ) {
+    ensureNotificationChannels()
+
     val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channel = NotificationChannel(
-            channelId,
-            "Default Channel",
-            NotificationManager.IMPORTANCE_HIGH
-        )
-        notificationManager.createNotificationChannel(channel)
-    }
-
     val pendingIntent = deepLink?.toPendingIntent(this)
+
     val notification = NotificationCompat.Builder(this, channelId)
         .setContentTitle(title)
         .setContentText(message)
@@ -50,6 +60,50 @@ fun Context.showNotification(
         .build()
 
     notificationManager.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), notification)
+}
+
+fun Context.showChatNotification(
+    title: String,
+    message: String,
+    conversationId: String,
+    role: String? = null,
+    summary: String? = null
+) {
+    ensureNotificationChannels()
+
+    val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val deepLink = NotificationDeepLink(
+        type = "chat_message",
+        conversationId = conversationId,
+        role = role.orEmpty()
+    )
+    val pendingIntent = deepLink.toPendingIntent(this)
+
+    val notification = NotificationCompat.Builder(this, CHANNEL_CHAT)
+        .setContentTitle(title)
+        .setContentText(message)
+        .setSmallIcon(R.drawable.image_cheese_burger)
+        .setAutoCancel(true)
+        .setGroup(GROUP_CHAT)
+        .setContentIntent(pendingIntent)
+        .build()
+
+    notificationManager.notify(
+        conversationId.hashCode(),
+        notification
+    )
+
+    if (summary != null) {
+        val summaryNotification = NotificationCompat.Builder(this, CHANNEL_CHAT)
+            .setSmallIcon(R.drawable.image_cheese_burger)
+            .setStyle(NotificationCompat.InboxStyle()
+                .setSummaryText(summary))
+            .setGroup(GROUP_CHAT)
+            .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN)
+            .setAutoCancel(true)
+            .build()
+        notificationManager.notify(GROUP_CHAT.hashCode(), summaryNotification)
+    }
 }
 
 private fun NotificationDeepLink.toPendingIntent(context: Context): PendingIntent? {
