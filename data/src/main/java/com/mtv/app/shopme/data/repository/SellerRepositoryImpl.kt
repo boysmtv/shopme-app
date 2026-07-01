@@ -5,7 +5,10 @@ import com.mtv.app.shopme.core.utils.ResultFlowFactory
 import com.mtv.app.shopme.data.mapper.toDomain
 import com.mtv.app.shopme.data.mapper.toRequest
 import com.mtv.app.shopme.data.remote.datasource.SellerRemoteDataSource
+import com.mtv.app.shopme.data.remote.response.DiscountResponse
 import com.mtv.app.shopme.data.remote.response.OrderResponse
+import com.mtv.app.shopme.data.remote.response.ReviewResponse
+import com.mtv.app.shopme.data.remote.response.SellerCategoryResponse
 import com.mtv.app.shopme.data.remote.response.SellerDashboardResponse
 import com.mtv.app.shopme.data.remote.response.SellerOrderSummaryResponse
 import com.mtv.app.shopme.data.remote.response.SellerPaymentMethodResponse
@@ -15,6 +18,9 @@ import com.mtv.app.shopme.data.sync.PendingMutationAction
 import com.mtv.app.shopme.data.utils.PayloadCacheStore
 import com.mtv.app.shopme.domain.model.OrderStatus
 import com.mtv.app.shopme.domain.model.PagedData
+import com.mtv.app.shopme.domain.param.DiscountParam
+import com.mtv.app.shopme.domain.param.ReviewReplyParam
+import com.mtv.app.shopme.domain.param.SellerCategoryParam
 import com.mtv.app.shopme.domain.param.SellerPaymentMethodParam
 import com.mtv.app.shopme.domain.repository.SellerRepository
 import com.mtv.app.shopme.domain.model.Resource
@@ -230,6 +236,104 @@ class SellerRepositoryImpl @Inject constructor(
                 }
             }
         }.flowOn(Dispatchers.IO)
+
+    override fun getDiscounts() =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val discounts = remote.getDiscounts()
+                emit(Resource.Success(discounts.map { it.toDomain() }))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun createDiscount(param: DiscountParam) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val discount = remote.createDiscount(param.toRequest())
+                emit(Resource.Success(discount.toDomain()))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun updateDiscount(discountId: String, param: DiscountParam) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val discount = remote.updateDiscount(discountId, param.toRequest())
+                emit(Resource.Success(discount.toDomain()))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun deleteDiscount(discountId: String) =
+        resultFlow.create {
+            remote.deleteDiscount(discountId)
+        }
+
+    override fun getReviews() =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val reviews = remote.getReviews()
+                emit(Resource.Success(reviews.map { it.toDomain() }))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun replyToReview(reviewId: String, param: ReviewReplyParam) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val review = remote.replyToReview(reviewId, param.toRequest())
+                emit(Resource.Success(review.toDomain()))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun getCategories() =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val categories = remote.getCategories()
+                emit(Resource.Success(categories.map { it.toDomain() }))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun createCategory(param: SellerCategoryParam) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val category = remote.createCategory(param.toRequest())
+                emit(Resource.Success(category.toDomain()))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun updateCategory(categoryId: String, param: SellerCategoryParam) =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val category = remote.updateCategory(categoryId, param.toRequest())
+                emit(Resource.Success(category.toDomain()))
+            } catch (throwable: Throwable) {
+                emit(Resource.Error(throwable))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override fun deleteCategory(categoryId: String) =
+        resultFlow.create {
+            remote.deleteCategory(categoryId)
+        }
 
     private fun sellerOrderDetailCacheKey(orderId: String) = "seller:order:detail:$orderId"
 

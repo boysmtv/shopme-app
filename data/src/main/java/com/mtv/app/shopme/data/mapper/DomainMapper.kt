@@ -20,6 +20,8 @@ import com.mtv.app.shopme.data.remote.response.CafeResponse
 import com.mtv.app.shopme.data.remote.response.CartItemResponse
 import com.mtv.app.shopme.data.remote.response.ChatListResponse
 import com.mtv.app.shopme.data.remote.response.CustomerResponse
+import com.mtv.app.shopme.data.remote.response.DiscountResponse
+import com.mtv.app.shopme.data.remote.response.SellerCategoryResponse
 import com.mtv.app.shopme.data.remote.response.FoodOptionResponse
 import com.mtv.app.shopme.data.remote.response.FoodResponse
 import com.mtv.app.shopme.data.remote.response.FoodStatsResponse
@@ -27,6 +29,7 @@ import com.mtv.app.shopme.data.remote.response.FoodVariantResponse
 import com.mtv.app.shopme.data.remote.response.LoginResponse
 import com.mtv.app.shopme.data.remote.response.MenuSummaryResponse
 import com.mtv.app.shopme.data.remote.response.NotificationPreferencesResponse
+import com.mtv.app.shopme.data.remote.response.ReviewResponse
 import com.mtv.app.shopme.data.remote.response.SessionTokenResponse
 import com.mtv.app.shopme.data.remote.response.SplashResponse
 import com.mtv.app.shopme.data.remote.response.StatsResponse
@@ -546,3 +549,39 @@ private fun String.toNotificationTitle(fallback: String): String {
         else -> fallback
     }
 }
+
+fun ReviewResponse.toDomain() = com.mtv.app.shopme.domain.model.Review(
+    id = id,
+    foodId = foodId,
+    foodName = foodName,
+    cafeId = cafeId,
+    customerName = customerName,
+    customerPhoto = customerPhoto,
+    rating = rating,
+    comment = comment,
+    reply = reply,
+    repliedAt = repliedAt,
+    createdAt = createdAt
+)
+
+fun SellerCategoryResponse.toDomain() = com.mtv.app.shopme.domain.model.SellerCategory(
+    id = id,
+    cafeId = cafeId,
+    name = name,
+    isActive = isActive,
+    createdAt = createdAt
+)
+
+fun DiscountResponse.toDomain() = com.mtv.app.shopme.domain.model.SellerDiscount(
+    id = id,
+    cafeId = cafeId,
+    name = name,
+    type = try { com.mtv.app.shopme.domain.model.DiscountType.valueOf(type) } catch (e: Exception) { com.mtv.app.shopme.domain.model.DiscountType.PERCENTAGE },
+    value = value,
+    minOrder = minOrder,
+    maxDiscount = maxDiscount,
+    startDate = startDate,
+    endDate = endDate,
+    isActive = isActive,
+    createdAt = createdAt
+)

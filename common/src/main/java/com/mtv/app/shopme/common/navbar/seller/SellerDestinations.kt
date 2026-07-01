@@ -25,6 +25,9 @@ object SellerDestinations {
     const val SELLER_NOTIFICATION_GRAPH = "SELLER_NOTIFICATION_GRAPH"
     const val SELLER_EDIT_STORE_GRAPH = "SELLER_EDIT_STORE_GRAPH"
     const val SELLER_PAYMENT_METHOD_GRAPH = "SELLER_PAYMENT_METHOD_GRAPH"
+    const val SELLER_DISCOUNT_GRAPH = "SELLER_DISCOUNT_GRAPH"
+    const val SELLER_REVIEW_GRAPH = "SELLER_REVIEW_GRAPH"
+    const val SELLER_CATEGORY_GRAPH = "SELLER_CATEGORY_GRAPH"
 
     fun navigateToOrderDetail(orderId: String) = "SELLER_ORDER_DETAIL_GRAPH/$orderId"
     fun navigateToChatDetail(chatId: String) = "SELLER_CHAT_DETAIL_GRAPH/$chatId"

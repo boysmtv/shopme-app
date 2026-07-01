@@ -17,6 +17,7 @@ import com.mtv.app.shopme.data.remote.request.ChangePasswordRequest
 import com.mtv.app.shopme.data.remote.request.ChangePinRequest
 import com.mtv.app.shopme.data.remote.request.CreateOrderRequest
 import com.mtv.app.shopme.data.remote.request.CustomerUpdateRequest
+import com.mtv.app.shopme.data.remote.request.DiscountRequest
 import com.mtv.app.shopme.data.remote.request.FoodAddToCartRequest
 import com.mtv.app.shopme.data.remote.request.FoodBulkStatusRequest
 import com.mtv.app.shopme.data.remote.request.FoodImageRequest
@@ -28,11 +29,16 @@ import com.mtv.app.shopme.data.remote.request.ForgotPasswordRequest
 import com.mtv.app.shopme.data.remote.request.LoginRequest
 import com.mtv.app.shopme.data.remote.request.NotificationPreferencesRequest
 import com.mtv.app.shopme.data.remote.request.ResetPasswordRequest
+import com.mtv.app.shopme.data.remote.request.ReviewReplyRequest
+import com.mtv.app.shopme.data.remote.request.SellerCategoryRequest
 import com.mtv.app.shopme.data.remote.request.RegisterRequest
 import com.mtv.app.shopme.data.remote.request.SellerPaymentMethodRequest
 import com.mtv.app.shopme.data.remote.request.VerifyOtpRequest
 import com.mtv.app.shopme.data.remote.request.VerifyPinRequest
 import com.mtv.app.shopme.domain.param.AddressAddParam
+import com.mtv.app.shopme.domain.param.DiscountParam
+import com.mtv.app.shopme.domain.param.ReviewReplyParam
+import com.mtv.app.shopme.domain.param.SellerCategoryParam
 import com.mtv.app.shopme.domain.param.AddressUpdateParam
 import com.mtv.app.shopme.domain.param.CafeAddParam
 import com.mtv.app.shopme.domain.param.CafeAddressUpsertParam
@@ -209,4 +215,24 @@ fun RegisterParam.toRequest() = RegisterRequest(
     name = name,
     email = email,
     password = password
+)
+
+fun SellerCategoryParam.toRequest() = SellerCategoryRequest(
+    name = name,
+    isActive = isActive
+)
+
+fun ReviewReplyParam.toRequest() = ReviewReplyRequest(
+    reply = reply
+)
+
+fun DiscountParam.toRequest() = DiscountRequest(
+    name = name,
+    type = type.name,
+    value = value,
+    minOrder = minOrder,
+    maxDiscount = maxDiscount,
+    startDate = startDate,
+    endDate = endDate,
+    isActive = isActive
 )

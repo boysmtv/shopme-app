@@ -32,9 +32,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -144,21 +146,28 @@ fun SellerProductListScreen(
                 totalProduct = productStats.total,
                 totalStock = productStats.stock,
                 lowStock = productStats.lowStock,
+                isSelectionMode = state.isSelectionMode,
+                selectedCount = state.selectedProductIds.size,
                 onBack = {
                     event(SellerProductListEvent.ClickBack)
+                },
+                onToggleSelection = {
+                    event(SellerProductListEvent.ToggleSelectionMode)
                 }
             )
 
-            Spacer(Modifier.height(16.dp))
+            if (!state.isSelectionMode) {
+                Spacer(Modifier.height(16.dp))
 
-            ProductSearchAndFilters(
-                state = state,
-                onSearch = { event(SellerProductListEvent.ChangeSearchQuery(it)) },
-                onCategory = { event(SellerProductListEvent.SelectCategoryFilter(it)) },
-                onStatus = { event(SellerProductListEvent.SelectStatusFilter(it)) },
-                onActive = { event(SellerProductListEvent.SelectActiveFilter(it)) },
-                onClear = { event(SellerProductListEvent.ClearFilters) }
-            )
+                ProductSearchAndFilters(
+                    state = state,
+                    onSearch = { event(SellerProductListEvent.ChangeSearchQuery(it)) },
+                    onCategory = { event(SellerProductListEvent.SelectCategoryFilter(it)) },
+                    onStatus = { event(SellerProductListEvent.SelectStatusFilter(it)) },
+                    onActive = { event(SellerProductListEvent.SelectActiveFilter(it)) },
+                    onClear = { event(SellerProductListEvent.ClearFilters) }
+                )
+            }
 
             Spacer(Modifier.height(12.dp))
 
@@ -196,11 +205,16 @@ fun SellerProductListScreen(
                     ) { _, product ->
                         ModernProductItem(
                             product = product,
+                            isSelectionMode = state.isSelectionMode,
+                            isSelected = product.id in state.selectedProductIds,
                             onEdit = {
                                 event(SellerProductListEvent.ClickEdit(product.id))
                             },
                             onDelete = {
                                 event(SellerProductListEvent.ClickDelete(product.id))
+                            },
+                            onToggleSelect = {
+                                event(SellerProductListEvent.ToggleProductSelection(product.id))
                             }
                         )
                     }
@@ -223,11 +237,24 @@ fun SellerProductListScreen(
                 }
             }
         }
-            PullRefreshIndicator(
-                refreshing = state.isRefreshing,
-                state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
+
+        if (state.isSelectionMode && state.selectedProductIds.isNotEmpty()) {
+            BulkActionBar(
+                selectedCount = state.selectedProductIds.size,
+                onSelectAll = { event(SellerProductListEvent.SelectAll) },
+                onDeselectAll = { event(SellerProductListEvent.DeselectAll) },
+                onBulkActivate = { event(SellerProductListEvent.BulkActivate) },
+                onBulkDeactivate = { event(SellerProductListEvent.BulkDeactivate) },
+                onBulkDelete = { event(SellerProductListEvent.BulkDelete) },
+                modifier = Modifier.align(Alignment.BottomCenter)
             )
+        }
+
+        PullRefreshIndicator(
+            refreshing = state.isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter)
+        )
         }
     }
 }
@@ -380,7 +407,10 @@ fun ProductHeader(
     totalProduct: Int,
     totalStock: Int,
     lowStock: Int,
-    onBack: () -> Unit
+    isSelectionMode: Boolean = false,
+    selectedCount: Int = 0,
+    onBack: () -> Unit,
+    onToggleSelection: () -> Unit = {}
 ) {
 
     Column(
@@ -389,39 +419,54 @@ fun ProductHeader(
             .background(AppColor.Blue)
             .padding(horizontal = 20.dp, vertical = 16.dp)
     ) {
-        Text(
-            text = "Product Management",
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        // 🔹 Stats Container (Solid White Card)
-        Card(
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(6.dp),
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Text(
+                text = if (isSelectionMode) "$selectedCount selected"
+                       else "Product Management",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center
+            )
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            TextButton(onClick = onToggleSelection) {
+                Text(
+                    text = if (isSelectionMode) "Cancel" else "Select",
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        if (!isSelectionMode) {
+            Spacer(Modifier.height(20.dp))
+
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(6.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
 
-                CleanStatItem("Products", totalProduct)
-                CleanStatItem("Total Stock", totalStock)
-                CleanStatItem(
-                    "Low Stock",
-                    lowStock,
-                    isWarning = lowStock > 0
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+
+                    CleanStatItem("Products", totalProduct)
+                    CleanStatItem("Total Stock", totalStock)
+                    CleanStatItem(
+                        "Low Stock",
+                        lowStock,
+                        isWarning = lowStock > 0
+                    )
+                }
             }
         }
     }
@@ -454,8 +499,11 @@ fun CleanStatItem(
 @Composable
 fun ModernProductItem(
     product: ProductItem,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit
+    isSelectionMode: Boolean = false,
+    isSelected: Boolean = false,
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {},
+    onToggleSelect: () -> Unit = {}
 ) {
 
     val isLowStock = product.stock <= 5
@@ -475,13 +523,27 @@ fun ModernProductItem(
     Card(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) AppColor.Blue.copy(alpha = 0.04f) else Color.White
+        ),
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
+            if (isSelectionMode) {
+                Icon(
+                    imageVector = if (isSelected) Icons.Default.CheckCircle
+                                  else Icons.Default.RadioButtonUnchecked,
+                    contentDescription = if (isSelected) "Selected" else "Not selected",
+                    tint = if (isSelected) AppColor.Blue else Color.Gray,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .padding(end = 12.dp)
+                )
+            }
 
             Box(
                 modifier = Modifier
@@ -500,7 +562,6 @@ fun ModernProductItem(
 
             Spacer(Modifier.width(16.dp))
 
-            // 🔹 Product Info
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -537,24 +598,34 @@ fun ModernProductItem(
                 ModernStockBadge(product.stock, isLowStock)
             }
 
-            // 🔹 Action Buttons
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                IconButton(onClick = onEdit) {
+            if (isSelectionMode) {
+                IconButton(onClick = onToggleSelect) {
                     Icon(
-                        Icons.Default.Edit,
-                        contentDescription = "Edit",
-                        tint = Color.Gray
+                        if (isSelected) Icons.Default.CheckCircle
+                        else Icons.Default.RadioButtonUnchecked,
+                        contentDescription = if (isSelected) "Deselect" else "Select",
+                        tint = if (isSelected) AppColor.Blue else Color.Gray
                     )
                 }
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    IconButton(onClick = onEdit) {
+                        Icon(
+                            Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = Color.Gray
+                        )
+                    }
 
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        Icons.Default.DeleteOutline,
-                        contentDescription = "Delete",
-                        tint = Color.Red
-                    )
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            Icons.Default.DeleteOutline,
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
                 }
             }
         }
@@ -642,6 +713,56 @@ fun EmptyProductState(
                 colors = ButtonDefaults.buttonColors(AppColor.Blue)
             ) {
                 Text("Add Product", color = Color.White)
+            }
+        }
+    }
+}
+
+@Composable
+fun BulkActionBar(
+    selectedCount: Int,
+    onSelectAll: () -> Unit,
+    onDeselectAll: () -> Unit,
+    onBulkActivate: () -> Unit,
+    onBulkDeactivate: () -> Unit,
+    onBulkDelete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "$selectedCount product(s) selected",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.Gray
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                TextButton(onClick = onSelectAll) {
+                    Text("Select All", fontSize = 13.sp)
+                }
+                TextButton(onClick = onDeselectAll) {
+                    Text("Deselect", fontSize = 13.sp)
+                }
+                TextButton(onClick = onBulkActivate) {
+                    Text("Activate", fontSize = 13.sp, color = Color(0xFF2E7D32))
+                }
+                TextButton(onClick = onBulkDeactivate) {
+                    Text("Deactivate", fontSize = 13.sp, color = Color(0xFFE65100))
+                }
+                TextButton(onClick = onBulkDelete) {
+                    Text("Delete", fontSize = 13.sp, color = Color.Red)
+                }
             }
         }
     }

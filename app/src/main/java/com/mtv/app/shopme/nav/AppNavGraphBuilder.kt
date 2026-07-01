@@ -45,7 +45,10 @@ import com.mtv.app.shopme.nav.route.seller.SellerChatListRoute
 import com.mtv.app.shopme.nav.route.seller.SellerCreateCafeRoute
 import com.mtv.app.shopme.nav.route.seller.SellerCreateCafeTncRoute
 import com.mtv.app.shopme.nav.route.seller.SellerDashboardRoute
+import com.mtv.app.shopme.nav.route.seller.SellerCategoryRoute
+import com.mtv.app.shopme.nav.route.seller.SellerDiscountRoute
 import com.mtv.app.shopme.nav.route.seller.SellerEditStoreRoute
+import com.mtv.app.shopme.nav.route.seller.SellerReviewRoute
 import com.mtv.app.shopme.nav.route.seller.SellerNotifRoute
 import com.mtv.app.shopme.nav.route.seller.SellerOrderDetailRoute
 import com.mtv.app.shopme.nav.route.seller.SellerOrderRoute
@@ -284,5 +287,14 @@ fun NavGraphBuilder.sellerDetailGraph(nav: NavHostController) {
     }
     composable(SellerDestinations.SELLER_PAYMENT_METHOD_GRAPH) {
         SellerPaymentMethodRoute(nav)
+    }
+    composable(SellerDestinations.SELLER_DISCOUNT_GRAPH) {
+        SellerDiscountRoute(nav)
+    }
+    composable(SellerDestinations.SELLER_REVIEW_GRAPH) {
+        SellerReviewRoute(nav)
+    }
+    composable(SellerDestinations.SELLER_CATEGORY_GRAPH) {
+        SellerCategoryRoute(nav)
     }
 }
